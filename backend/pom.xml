@@ -124,7 +124,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <compilerArgs>
-            <arg>-Xlint:all,-processing</arg>
+            <!-- "path" off: jars from Maven Central (jaxb-runtime) declare Class-Path entries that do not exist in ~/.m2. -->
+            <arg>-Xlint:all,-processing,-path</arg>
           </compilerArgs>
           <failOnWarning>true</failOnWarning>
         </configuration>

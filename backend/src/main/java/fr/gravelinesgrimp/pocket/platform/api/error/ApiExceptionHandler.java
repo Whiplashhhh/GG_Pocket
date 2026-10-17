@@ -56,9 +56,17 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return response;
     }
 
+    /**
+     * The message of a business exception may name members or ids: it goes to the logs only. The
+     * client gets the stable code, which the frontend turns into a sentence.
+     */
     @ExceptionHandler(BusinessException.class)
     ResponseEntity<ProblemDetail> handleBusiness(BusinessException ex) {
-        return problem(statusOf(ex.code().category()), ex.code(), ex.getMessage());
+        log.info("Business rule refused the request ({}): {}", ex.code(), ex.getMessage());
+        return problem(
+                statusOf(ex.code().category()),
+                ex.code(),
+                "The request was refused by a business rule.");
     }
 
     @ExceptionHandler(AuthenticationException.class)

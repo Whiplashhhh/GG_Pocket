@@ -32,6 +32,10 @@ class SecurityConfig {
                                         .requestMatchers(
                                                 HttpMethod.GET, "/v3/api-docs", "/v3/api-docs/**")
                                         .permitAll()
+                                        // Container-level errors (rejected URL, bad request) are
+                                        // re-dispatched here: keep their real status, not a 401.
+                                        .requestMatchers("/error")
+                                        .permitAll()
                                         .anyRequest()
                                         .authenticated())
                 // Single-page app: token in a cookie readable by the front, sent back in a header.

@@ -59,11 +59,11 @@ class ApiExceptionHandlerTest {
     }
 
     @Test
-    void businessExceptionKeepsItsCodeAndMessage() throws Exception {
+    void businessExceptionKeepsItsCodeButNotItsMessage() throws Exception {
         mockMvc.perform(get("/probe/business"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"))
-                .andExpect(jsonPath("$.detail").value("Only the president can do that."));
+                .andExpect(content().string(not(Matchers.containsString("president"))));
     }
 
     @Test

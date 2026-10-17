@@ -16,6 +16,7 @@ import fr.gravelinesgrimp.pocket.platform.infra.InstanceMarkerRepository;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.mock.env.MockEnvironment;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -61,9 +62,38 @@ class InstanceMarkerGuardTest {
         verify(repository, never()).save(any());
     }
 
+    @Test
+    void refusesTheProdProfileWithoutTheProdEnvironment() {
+        var prodProfile = new MockEnvironment();
+        prodProfile.setActiveProfiles("prod");
+
+        assertThatThrownBy(
+                        () -> guardConfiguredFor(DeploymentEnvironment.LOCAL, prodProfile).verify())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("GG_ENVIRONMENT");
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void acceptsTheProdProfileWithTheProdEnvironment() {
+        var prodProfile = new MockEnvironment();
+        prodProfile.setActiveProfiles("prod");
+        when(repository.findById(InstanceMarker.SINGLETON_ID))
+                .thenReturn(Optional.of(marker(DeploymentEnvironment.PROD)));
+
+        guardConfiguredFor(DeploymentEnvironment.PROD, prodProfile).verify();
+
+        verify(repository, never()).save(any());
+    }
+
     private InstanceMarkerGuard guardConfiguredFor(DeploymentEnvironment environment) {
+        return guardConfiguredFor(environment, new MockEnvironment());
+    }
+
+    private InstanceMarkerGuard guardConfiguredFor(
+            DeploymentEnvironment environment, MockEnvironment springEnvironment) {
         var properties = new GgProperties(environment, new GgProperties.Git("unknown", "unknown"));
-        return new InstanceMarkerGuard(repository, properties, clock);
+        return new InstanceMarkerGuard(repository, properties, clock, springEnvironment);
     }
 
     private InstanceMarker marker(DeploymentEnvironment environment) {

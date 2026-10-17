@@ -32,7 +32,7 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [x] `deploy/compose.local.yml` (PostgreSQL)
 - [~] `.github/workflows/ci.yml` : backend, frontend, synchro des types, e2e, gitleaks
 - [x] Captures clair/sombre 360 px et 1280 px, relues et critiquées
-- [~] Revue critique de fin de phase (sécurité + UX), corrections
+- [x] Revue critique de fin de phase (sécurité + UX), corrections
 - [ ] PR « Phase 0 — Fondations », CI verte
 
 ## Phase 1 — Comptes et rôles
@@ -41,7 +41,7 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [ ] Codes d'inscription (CRUD admin, expiration, plafond d'utilisations, compteur) + limitation de débit sur la saisie du code
 - [ ] Inscription (formulaire une page, mots de passe courants refusés, accord parental < 15 ans, consentement « Tes données »)
 - [ ] Connexion / déconnexion, Spring Session JDBC, cookie HttpOnly Secure SameSite=Lax, 180 jours glissants, « Rester connecté »
-- [ ] CSRF adapté SPA (cookie lisible + en-tête)
+- [ ] CSRF adapté SPA : côté serveur déjà en place (`csrf.spa()`) ; côté front, middleware openapi-fetch qui recopie le cookie `XSRF-TOKEN` dans `X-XSRF-TOKEN` sur les requêtes non-GET
 - [ ] Limitation de débit connexion / inscription / réinitialisation ; messages qui ne révèlent pas l'existence d'un pseudo
 - [ ] Mes appareils (liste des sessions, fermer une ou toutes les autres)
 - [ ] Onboarding (photo, infos passables) ; upload d'avatar sécurisé (type réel, taille, ré-encodage, EXIF supprimé)
@@ -62,6 +62,7 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [ ] Dockerfiles backend et frontend (multi-étapes, non root, version et commit injectés)
 - [ ] `compose.yml`, `compose.dev.yml`, `compose.prod.yml`, Caddy (TLS, en-têtes de sécurité, CSP stricte, `/api` proxifié)
 - [ ] Limites mémoire, `MaxRAMPercentage`, healthchecks, `restart: unless-stopped`
+- [ ] Dev déployé : aucun repli sur les identifiants locaux `ggpocket` (variables `GG_DB_*` obligatoires hors machine locale)
 - [ ] `deploy-dev.yml` (manuel ou label `deploy:dev`, option reset + seed)
 - [ ] `prepare-release.yml`, `release.yml` (tag, branche `prod/X.Y.Z`, GitHub Release, images ghcr, déploiement approuvé)
 - [ ] Scripts `backup.sh`, `restore.sh` (testé), `deploy.sh`, `rollback.sh` ; rétention 14 j + 8 semaines

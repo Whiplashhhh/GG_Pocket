@@ -11,6 +11,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import java.io.IOException;
+
 /**
  * Hands 401 and 403 raised by the security filter chain over to {@link ApiExceptionHandler}, so
  * they get exactly the same Problem Details format as every other error.
@@ -30,15 +32,22 @@ public class ProblemDetailsSecurityErrorHandler
     public void commence(
             HttpServletRequest request,
             HttpServletResponse response,
-            AuthenticationException authException) {
-        resolver.resolveException(request, response, null, authException);
+            AuthenticationException authException)
+            throws IOException {
+        if (resolver.resolveException(request, response, null, authException) == null) {
+            // The resolver could not render the problem: still answer with the right status.
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        }
     }
 
     @Override
     public void handle(
             HttpServletRequest request,
             HttpServletResponse response,
-            AccessDeniedException accessDeniedException) {
-        resolver.resolveException(request, response, null, accessDeniedException);
+            AccessDeniedException accessDeniedException)
+            throws IOException {
+        if (resolver.resolveException(request, response, null, accessDeniedException) == null) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        }
     }
 }

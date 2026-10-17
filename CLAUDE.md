@@ -57,6 +57,9 @@ dès qu'elles existent. Tiens cette section à jour.
 - Environnement de Claude Code (sans Java, Docker ni accès aux navigateurs Playwright, voir DECISIONS D-030) :
   `export PATH=$HOME/.local/bin:$PATH PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=$HOME/.local/bin/gg-chromium`,
   e2e locaux limités au projet `--project="Desktop Chrome"` ; le backend est validé par la CI.
+  Le bac à sable ne récupère pas les processus zombies (chaque lancement de Chromium en laisse, plafond 1024 PID/threads) :
+  lancer Playwright avec `--workers=1` et `RAYON_NUM_THREADS=2 UV_THREADPOOL_SIZE=2`, et ne capturer que les écrans utiles
+  (`pnpm screenshots --project=mobile-light --grep actu`). Compteur : `cat /sys/fs/cgroup/pids.current`.
 
 <!-- COMMANDES : à compléter en phase 0 -->
 

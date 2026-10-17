@@ -13,3 +13,7 @@ logging:
   structured:
     format:
       console: ecs
+
+# No default: a production instance must say it is one (InstanceMarkerGuard also checks it).
+gg:
+  environment: ${GG_ENVIRONMENT}

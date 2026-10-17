@@ -4,6 +4,46 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-17 — Phase 0 (fondations), session 2
+
+**Branche** : `feature/fondations-0.0.0` (commits locaux, **toujours pas poussée** : jeton GitHub en lecture seule).
+
+### Fait
+
+- Revue UX (sous-agent, sur les captures) appliquée : mot-symbole lisible dans le header (le logo complet restait illisible
+  à 44 px, D-039), étiquette de voie (tampon « Démontée » qui laisse le nom lisible, coin orange pour la dernière chance en
+  petit format, séparateur de cotation), états vides en bande pleine largeur, focus déplacé sur le contenu à chaque navigation,
+  titres d'écran en `text-xl`, contrôle segmenté 48 px disponible, apostrophes typographiques, textes revus.
+- Revue sécurité/backend (sous-agent, API vérifiées dans les sources GitHub) appliquée :
+  - `-Xlint:-path`, sans quoi la compilation des tests aurait échoué (Class-Path de jaxb-runtime) ;
+  - en prod, `GG_ENVIRONMENT` est obligatoire et le profil `prod` refuse un environnement autre que `PROD` (testé) ;
+  - le message d'une `BusinessException` ne part plus au client ;
+  - repli `sendError` si le rendu d'une erreur 401/403 échoue ;
+  - `/error` autorisé.
+- La revue confirme comme probablement conformes : le contrat OpenAPI écrit à la main, les signatures Spring 7 / Jackson 3 /
+  ArchUnit / Testcontainers, les versions des actions de la CI.
+- Frontend : lint, format, typecheck, 49 tests Vitest, build et 9 e2e Desktop Chrome verts.
+
+### Reste pour clore la phase 0
+
+- Pousser, faire passer la CI (backend jamais compilé), ouvrir la PR avec les captures.
+
+### Prochaine action exacte
+
+1. `git push -u origin feature/fondations-0.0.0`, puis `gh run watch`.
+2. Corriger le backend jusqu'au vert. Si `OpenApiContractIT` échoue : `gh run download <id> -n openapi-contract -D /tmp/contract`,
+   `cp /tmp/contract/openapi.json frontend/src/api/openapi.json && (cd frontend && pnpm api:types)`.
+3. Ouvrir la PR « Phase 0 — Fondations » (gabarit `.github/pull_request_template.md`, captures de `frontend/screenshots/`).
+
+### Points bloquants
+
+- **Push impossible** : il faut un jeton fine-grained sur `Whiplashhhh/GG_Pocket` avec Contents, Workflows et Pull requests
+  en lecture/écriture, et Actions en lecture.
+- Bac à sable : les processus zombies de Chromium ne sont jamais récupérés (plafond 1024 PID/threads, ~500 déjà pris).
+  Playwright doit tourner avec `--workers=1` (voir CLAUDE.md, section Commandes).
+
+---
+
 ## 2026-10-17 — Phase 0 (fondations), session 1
 
 **Branche** : `feature/fondations-0.0.0` (commits locaux, **pas encore poussée** : voir blocage).
