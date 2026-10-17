@@ -5,6 +5,7 @@ import fr.gravelinesgrimp.pocket.platform.application.AppMetadataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +21,7 @@ class MetaController {
         this.metadataService = metadataService;
     }
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             operationId = "getMeta",
             summary = "Version, environment and commit of the running server (public)")

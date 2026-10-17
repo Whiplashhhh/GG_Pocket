@@ -40,6 +40,24 @@ où la prochaine session ne sait pas où elle en est. Commit souvent, par petite
 Les commandes exactes (build, test, lint, lancement local, génération des types) sont listées ici
 dès qu'elles existent. Tiens cette section à jour.
 
+### Commandes
+
+- Base locale : `docker compose -f deploy/compose.local.yml up -d` (PostgreSQL 18, `ggpocket`/`ggpocket`).
+- Backend (`backend/`) :
+  - lancer : `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev` (ou `./mvnw spring-boot:test-run`, base Testcontainers) ;
+  - tout vérifier : `./mvnw verify` (Spotless, unitaires `*Test`, intégration `*IT` Testcontainers, ArchUnit, contrat OpenAPI) ;
+  - formater : `./mvnw spotless:apply` (google-java-format AOSP ; binaire natif possible : `google-java-format --aosp --replace`) ;
+  - mettre à jour le contrat : `./mvnw verify -Dgg.openapi.write=true` (écrit `frontend/src/api/openapi.json`).
+- Frontend (`frontend/`, Node 24, pnpm 12) :
+  - `pnpm install`, `pnpm dev` (port 5173, `/api` → 8080), galerie sur `/dev/galerie` ;
+  - `pnpm lint`, `pnpm format:check` (ou `pnpm format`), `pnpm typecheck`, `pnpm test` ;
+  - `pnpm api:types` après tout changement du contrat (la CI vérifie la synchro) ;
+  - `pnpm build && pnpm e2e` (Playwright iPhone 13 + Desktop Chrome) ;
+  - `pnpm screenshots` → `frontend/screenshots/{mobile,desktop}-{light,dark}/` (à regarder avant de dire « fini »).
+- Environnement de Claude Code (sans Java, Docker ni accès aux navigateurs Playwright, voir DECISIONS D-030) :
+  `export PATH=$HOME/.local/bin:$PATH PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=$HOME/.local/bin/gg-chromium`,
+  e2e locaux limités au projet `--project="Desktop Chrome"` ; le backend est validé par la CI.
+
 <!-- COMMANDES : à compléter en phase 0 -->
 
 ## Git

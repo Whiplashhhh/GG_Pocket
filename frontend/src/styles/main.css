@@ -1,0 +1,142 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/archivo/standard.css';
+@import '@fontsource/kalam/700.css';
+@import './tokens.css';
+
+/* dark: matches a forced dark theme, or the system dark theme unless light is forced. */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+      @slot;
+    }
+  }
+}
+
+@theme inline {
+  /* Only our palette exists: no stray Tailwind colours. */
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-bg: var(--gg-bg);
+  --color-surface: var(--gg-surface);
+  --color-surface-sunken: var(--gg-surface-sunken);
+  --color-ink: var(--gg-ink);
+  --color-ink-muted: var(--gg-ink-muted);
+  --color-rule: var(--gg-rule);
+  --color-brand: var(--gg-brand);
+  --color-brand-ink: var(--gg-brand-ink);
+  --color-on-brand: var(--gg-on-brand);
+  --color-olive: var(--gg-olive);
+  --color-on-olive: var(--gg-on-olive);
+  --color-success: var(--gg-success);
+  --color-danger: var(--gg-danger);
+  --color-on-danger: var(--gg-on-danger);
+  --color-focus: var(--gg-focus);
+  --color-bar: var(--gg-bar);
+  --color-bar-ink: var(--gg-bar-ink);
+  --color-bar-muted: var(--gg-bar-muted);
+  --color-bar-active: var(--gg-bar-active);
+  --color-label-paper: var(--gg-label-paper);
+  --color-label-edge: var(--gg-label-edge);
+  --color-label-ink: var(--gg-label-ink);
+
+  --font-sans: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  --font-hand: 'Kalam', 'Comic Neue', cursive;
+
+  /* Type scale (docs/DESIGN.md §3), in rem to honour the system text size. */
+  --text-micro: 0.75rem;
+  --text-micro--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.625rem;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 2.25rem;
+  --text-3xl--line-height: 2.5rem;
+
+  --radius-paper: 2px;
+  --radius-control: 4px;
+  --radius-sheet: 20px;
+
+  --shadow-sheet: var(--gg-shadow-sheet);
+  --shadow-paper: var(--gg-shadow-paper);
+}
+
+@layer base {
+  html {
+    background-color: var(--gg-bg);
+    color: var(--gg-ink);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--gg-focus);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility font-title {
+  font-weight: 750;
+  font-stretch: 112%;
+  letter-spacing: -0.01em;
+}
+
+/* Painted cord numbers on the wall: very condensed, very bold. */
+@utility font-cord {
+  font-weight: 850;
+  font-stretch: 62%;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+@utility font-grade {
+  font-weight: 800;
+  font-stretch: 75%;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* Grid of T-nut holes, like a bare climbing wall panel. */
+@utility bg-inserts {
+  background-image:
+    radial-gradient(circle, var(--gg-insert-dot) 2px, transparent 2.5px),
+    radial-gradient(circle, var(--gg-insert-dot) 2px, transparent 2.5px);
+  background-size: 28px 28px;
+  background-position:
+    0 0,
+    14px 14px;
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -41,27 +42,30 @@ class OpenApiContractIT {
                         .andReturn()
                         .getResponse()
                         .getContentAsString(StandardCharsets.UTF_8);
-        var actual = pretty(body);
+        var actual = JSON.readTree(body);
         Files.createDirectories(GENERATED.getParent());
-        Files.writeString(GENERATED, actual);
+        Files.writeString(GENERATED, pretty(actual));
 
         if (Boolean.getBoolean("gg.openapi.write")) {
-            Files.writeString(RepositoryFiles.OPENAPI_CONTRACT, actual);
+            Files.writeString(RepositoryFiles.OPENAPI_CONTRACT, pretty(actual));
             return;
         }
 
         assertThat(RepositoryFiles.OPENAPI_CONTRACT).exists();
-        var committed = pretty(Files.readString(RepositoryFiles.OPENAPI_CONTRACT));
-        assertThat(actual)
-                .as(
-                        "The API changed but frontend/src/api/openapi.json was not updated. Run"
-                                + " ./mvnw verify -Dgg.openapi.write=true (or copy"
-                                + " backend/target/openapi.json), then pnpm api:types in"
-                                + " frontend/.")
-                .isEqualTo(committed);
+        var committed = JSON.readTree(Files.readString(RepositoryFiles.OPENAPI_CONTRACT));
+        // Tree equality ignores key order; on mismatch, compare the texts to get a readable diff.
+        if (!actual.equals(committed)) {
+            assertThat(pretty(actual))
+                    .as(
+                            "The API changed but frontend/src/api/openapi.json was not updated."
+                                    + " Run ./mvnw verify -Dgg.openapi.write=true (or copy"
+                                    + " backend/target/openapi.json), then pnpm api:types in"
+                                    + " frontend/.")
+                    .isEqualTo(pretty(committed));
+        }
     }
 
-    private static String pretty(String json) {
-        return JSON.writeValueAsString(JSON.readTree(json)) + "\n";
+    private static String pretty(JsonNode tree) {
+        return JSON.writeValueAsString(tree) + "\n";
     }
 }

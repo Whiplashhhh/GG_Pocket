@@ -1,0 +1,8 @@
+# Exact versions only: upgrades are deliberate (Dependabot or a chore/ PR).
+savePrefix: ''
+
+allowBuilds:
+  # Only checks that the platform binary is present.
+  esbuild: true
+  # Its postinstall only matters for Vue 2; Vue 3 is its default.
+  vue-demi: false

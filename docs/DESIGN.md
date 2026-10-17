@@ -217,7 +217,7 @@ Chiffres : `font-variant-numeric: tabular-nums` partout où des nombres s'aligne
 `RouteLabel.vue`, utilisée partout où une voie apparaît : topo, saisie de séance, fil, À faire, gestion.
 
 ```
-   ▓▓ (scotch, tailles md/lg)
+   ▓▓ (scotch, taille lg)
  ┌─────┬──────┬────────────────────────┬──────┐
  │ 12  │ ●●   │ Bye Bye Morice         │  6b  │
  └─────┴──────┴────────────────────────┴──────┘
@@ -229,9 +229,12 @@ Chiffres : `font-variant-numeric: tabular-nums` partout où des nombres s'aligne
   le multicolore est un motif à quartiers.
 - **Nom** : Kalam 700, tronqué avec ellipse si besoin (nom complet dans le libellé accessible).
 - **Cotation** : Archivo 800 largeur 75, minuscules (« 6a+ »), chiffres tabulaires.
-- **Support** : papier (`--label-paper`), rayon 2 px, ombre papier fine. En taille `lg` (fiche voie) : inclinaison de −0,8° et un bout de scotch.
-- **Statuts** : dernière chance = ruban orange « Dernière chance » sur le bord droit ; démontée = étiquette délavée et tampon « Démontée ».
-- **Tailles** : `sm` (32 px de haut, fil et listes compactes), `md` (44 px, topo, À faire, saisie), `lg` (fiche voie).
+- **Support** : papier (`--gg-label-paper`), rayon 2 px, ombre papier fine. En taille `lg` (fiche voie) : inclinaison de −0,8°, un bout de scotch,
+  et le nom passe à la ligne au lieu d'être tronqué. Pas de scotch dans les listes : répété sur chaque ligne, il devenait du bruit.
+- **Statuts** : dernière chance = ruban orange « Dernière chance » qui déborde en haut à droite ; démontée = étiquette délavée, prises en gris
+  et tampon « Démontée » placé à droite pour laisser le nom lisible.
+- **Tailles** : `sm` (32 px de haut, prises 18 px, fil et listes compactes), `md` (44 px, prises 24 px, topo, À faire, saisie), `lg` (64 px
+  minimum, prises 32 px, fiche voie).
 - **Accessibilité** : un seul libellé lisible, par exemple « Corde 12, Bye Bye Morice, 6b, prises jaunes et bleues, dernière chance ».
 
 ## 6. Composants de base
@@ -249,7 +252,7 @@ groupe de boutons), habillés par nos tokens.
 | `UserAvatar` | Photo ou initiales sur une couleur dérivée du pseudo. |
 | `EmptyState` | Illustration, titre drôle, explication claire, action. |
 | `SegmentedControl` | Mouli / Tête, Oui / Non : gros boutons groupés. |
-| `InsertGrid` | Le motif de fond « grille d'inserts ». |
+| `bg-inserts` | Utilitaire CSS du motif de fond « grille d'inserts » (pas besoin d'un composant). |
 | `SkeletonBlock` | Squelette de chargement (pas de spinner plein écran). |
 
 ## 7. Icônes
@@ -283,3 +286,12 @@ Première version du plan relue avec cette question :
 - *Version 1* : contour encre épais sur tous les boutons. → Rejeté : style « néo-brutaliste » à la mode, sans lien avec la salle.
 - Ce qui reste propre à GG Pocket : la magnésie, l'étiquette en papier au feutre, les numéros de corde peints, les prises avec boulon,
   la grille d'inserts, les deux « G » olive et orange du logo.
+
+### Itérations après captures (phase 0)
+
+- Prises passées de 19 à 24 px en taille `md` : à 19 px elles ressemblaient à des points, or ce sont elles qu'on cherche au mur.
+- Tampon « Démontée » déplacé du centre vers la droite : centré, il rendait le nom illisible.
+- Scotch réservé à la taille `lg` (voir §5).
+- Logo du header : le recadrage coupait le bas de « GRIMP » ; mot-symbole refait en isolant les formes du texte et du sommet.
+- Bandeau DEV en petit texte : sur deux lignes en 360 px, il mangeait trop de hauteur.
+- Barre d'onglets : filet supérieur en thème sombre, sinon elle se confondait avec le fond.
