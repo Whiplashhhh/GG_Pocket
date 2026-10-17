@@ -1,3 +1,4 @@
+import { nextTick } from 'vue'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 import ActuView from '@/views/ActuView.vue'
@@ -67,7 +68,13 @@ export const router = createRouter({
   scrollBehavior: (_to, _from, savedPosition) => savedPosition ?? { top: 0 },
 })
 
-router.afterEach((to) => {
+router.afterEach((to, from) => {
   const appName = i18n.global.t('app.name')
   document.title = to.meta.titleKey ? `${i18n.global.t(to.meta.titleKey)} · ${appName}` : appName
+
+  // After an in-app navigation, move focus to the new content so screen readers announce it.
+  // Not on the first load: the browser already starts at the top of the page.
+  if (from.matched.length > 0 && to.path !== from.path) {
+    void nextTick(() => document.getElementById('contenu')?.focus({ preventScroll: true }))
+  }
 })

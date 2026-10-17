@@ -235,7 +235,8 @@ Chiffres : `font-variant-numeric: tabular-nums` partout où des nombres s'aligne
   et tampon « Démontée » placé à droite pour laisser le nom lisible.
 - **Tailles** : `sm` (32 px de haut, prises 18 px, fil et listes compactes), `md` (44 px, prises 24 px, topo, À faire, saisie), `lg` (64 px
   minimum, prises 32 px, fiche voie).
-- **Accessibilité** : un seul libellé lisible, par exemple « Corde 12, Bye Bye Morice, 6b, prises jaunes et bleues, dernière chance ».
+- **Accessibilité** : un seul libellé lisible, par exemple « Corde 12, Bye Bye Morice, 6b, couleur jaune et bleu, dernière chance »
+  (« couleur » + libellé singulier de la configuration : évite les accords que l’admin devrait saisir).
 
 ## 6. Composants de base
 
@@ -292,6 +293,8 @@ Première version du plan relue avec cette question :
 - Prises passées de 19 à 24 px en taille `md` : à 19 px elles ressemblaient à des points, or ce sont elles qu'on cherche au mur.
 - Tampon « Démontée » déplacé du centre vers la droite : centré, il rendait le nom illisible.
 - Scotch réservé à la taille `lg` (voir §5).
-- Logo du header : le recadrage coupait le bas de « GRIMP » ; mot-symbole refait en isolant les formes du texte et du sommet.
+- Logo du header : même recadré, le logo restait illisible à 44 px (lettres de 7 px) ; remplacé par un mot-symbole composé
+  (sommet olive + « Gravelines Grimp »), voir DECISIONS D-039. Revue UX : bandeau du club sans répétition du nom, états vides
+  en bande pleine largeur avec la prise boulonnée sur un insert, étiquette `sm` avec coin orange pour la dernière chance.
 - Bandeau DEV en petit texte : sur deux lignes en 360 px, il mangeait trop de hauteur.
 - Barre d'onglets : filet supérieur en thème sombre, sinon elle se confondait avec le fond.

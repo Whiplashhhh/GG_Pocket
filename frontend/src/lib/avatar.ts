@@ -3,7 +3,6 @@
  * the WCAG AA contrast in both themes (checked in avatar.spec.ts).
  */
 export const AVATAR_COLORS = [
-  '#c3c04c',
   '#f4a582',
   '#e3c79a',
   '#9cc9e0',

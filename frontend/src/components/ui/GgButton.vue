@@ -25,7 +25,7 @@ const VARIANTS = {
 const SIZES = { md: 'min-h-11 px-4 text-base', lg: 'min-h-12 px-5 text-lg' } as const
 
 const classes = computed(() => [
-  'inline-flex items-center justify-center gap-2 rounded-control font-semibold transition-[filter,background-color] duration-150 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 rounded-control font-semibold transition-[filter,background-color] duration-150 active:translate-y-px disabled:cursor-not-allowed disabled:border-transparent disabled:bg-surface-sunken disabled:text-ink-muted disabled:hover:filter-none',
   VARIANTS[props.variant],
   SIZES[props.size],
   { 'w-full': props.block },

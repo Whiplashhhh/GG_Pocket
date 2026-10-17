@@ -68,6 +68,7 @@
 
   --shadow-sheet: var(--gg-shadow-sheet);
   --shadow-paper: var(--gg-shadow-paper);
+  --shadow-fab: var(--gg-shadow-fab);
 }
 
 @layer base {
@@ -128,9 +129,10 @@
     radial-gradient(circle, var(--gg-insert-dot) 2px, transparent 2.5px),
     radial-gradient(circle, var(--gg-insert-dot) 2px, transparent 2.5px);
   background-size: 28px 28px;
+  /* Centred: an insert sits exactly in the middle, where empty states bolt their hold. */
   background-position:
-    0 0,
-    14px 14px;
+    center,
+    calc(50% + 14px) calc(50% + 14px);
 }
 
 @utility pb-safe {

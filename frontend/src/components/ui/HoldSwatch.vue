@@ -56,7 +56,9 @@ const boltRing = computed(() => darken(props.color.hex, 0.5))
       stroke-width="1.4"
       stroke-linejoin="round"
     />
+    <!-- Shine only on large holds: small ones looked like buttons with it. -->
     <ellipse
+      v-if="size >= 28"
       cx="9.4"
       cy="8.1"
       rx="2.6"

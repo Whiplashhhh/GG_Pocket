@@ -7,30 +7,32 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 
 ## Phase 0 — Fondations
 
+`[~]` côté backend = écrit avec ses tests, mais pas encore compilé ni exécuté par la CI (voir PROGRESS).
+
 - [x] Docs de pilotage : ROADMAP, PROGRESS, DECISIONS (choix du §19 recopiés, versions épinglées)
 - [x] DESIGN.md (palette, typographie, mise en page, wireframes, étiquette de voie, relecture « générique ? »)
-- [ ] README (démarrage local en 5 minutes), CONTRIBUTING, ARCHITECTURE (domaines, couches, flux, modèle cible en mermaid)
-- [ ] `VERSION`, `CHANGELOG.md` (Keep a Changelog, section « Non publié »), `.gitignore`, `.gitattributes`, `.editorconfig`, `.env.example`
-- [ ] Backend : projet Maven + wrapper, Spring Boot 4.1, découpage par domaine (`platform` d'abord)
-- [ ] Backend : `/api/v1/meta` (version, environnement, commit, branche)
-- [ ] Backend : Problem Details avec `code` métier (validation, 404, 405, 401, 403, 500)
-- [ ] Backend : Spring Security « tout fermé sauf liste blanche »
-- [ ] Backend : Flyway + migration V1 (`instance_marker`) + garde-fou d'environnement au démarrage
-- [ ] Backend : horloge métier `Europe/Paris` injectable
-- [ ] Backend : tests unitaires, tests d'intégration Testcontainers, ArchUnit (couches et entités non exposées)
-- [ ] Backend : contrat OpenAPI exporté et comparé au fichier commité
-- [ ] Frontend : Vite + Vue 3 + TS strict, ESLint/Prettier, Vitest, Playwright (iPhone 13 + Desktop Chrome)
-- [ ] Frontend : vue-i18n (`fr.json` structuré par écran), Vue Router, Pinia, TanStack Query
-- [ ] Frontend : client API typé généré depuis l'OpenAPI (`pnpm api:types`) + vérification de synchro
-- [ ] Frontend : tokens, thèmes clair/sombre/auto, polices auto-hébergées
-- [ ] Frontend : composants de base (bouton, bouton icône, avatar, badge de rôle, état vide, contrôle segmenté, squelette, grille d'inserts)
-- [ ] Frontend : étiquette de voie + prise dessinée
-- [ ] Frontend : app shell (header, 5 onglets, FAB « Nouvelle séance », bandeau DEV, pied de version) et écrans vides drôles
-- [ ] Frontend : galerie des composants `/dev/galerie` (dev uniquement)
-- [ ] `deploy/compose.local.yml` (PostgreSQL)
-- [ ] `.github/workflows/ci.yml` : backend, frontend, synchro des types, e2e, gitleaks
-- [ ] Captures clair/sombre 360 px et 1280 px, relues et critiquées
-- [ ] Revue critique de fin de phase (sécurité + UX), corrections
+- [x] README (démarrage local en 5 minutes), CONTRIBUTING, ARCHITECTURE (domaines, couches, flux, modèle cible en mermaid)
+- [x] `VERSION`, `CHANGELOG.md` (Keep a Changelog, section « Non publié »), `.gitignore`, `.gitattributes`, `.editorconfig`, `.env.example`
+- [~] Backend : projet Maven + wrapper, Spring Boot 4.1, découpage par domaine (`platform` d'abord)
+- [~] Backend : `/api/v1/meta` (version, environnement, commit, branche)
+- [~] Backend : Problem Details avec `code` métier (validation, 404, 405, 401, 403, 500)
+- [~] Backend : Spring Security « tout fermé sauf liste blanche »
+- [~] Backend : Flyway + migration V1 (`instance_marker`) + garde-fou d'environnement au démarrage
+- [~] Backend : horloge injectable (`Clock`) ; la zone `Europe/Paris` arrive avec la première règle calendaire (phase 1)
+- [~] Backend : tests unitaires, tests d'intégration Testcontainers, ArchUnit (couches et entités non exposées)
+- [~] Backend : contrat OpenAPI exporté et comparé au fichier commité
+- [x] Frontend : Vite + Vue 3 + TS strict, ESLint/Prettier, Vitest, Playwright (iPhone 13 + Desktop Chrome)
+- [x] Frontend : vue-i18n (`fr.json` structuré par écran), Vue Router, Pinia, TanStack Query
+- [x] Frontend : client API typé généré depuis l'OpenAPI (`pnpm api:types`) + vérification de synchro
+- [x] Frontend : tokens, thèmes clair/sombre/auto, polices auto-hébergées
+- [x] Frontend : composants de base (bouton, bouton icône, avatar, badge de rôle, état vide, contrôle segmenté, squelette, grille d'inserts)
+- [x] Frontend : étiquette de voie + prise dessinée
+- [x] Frontend : app shell (header, 5 onglets, FAB « Nouvelle séance », bandeau DEV, pied de version) et écrans vides drôles
+- [x] Frontend : galerie des composants `/dev/galerie` (dev uniquement)
+- [x] `deploy/compose.local.yml` (PostgreSQL)
+- [~] `.github/workflows/ci.yml` : backend, frontend, synchro des types, e2e, gitleaks
+- [x] Captures clair/sombre 360 px et 1280 px, relues et critiquées
+- [~] Revue critique de fin de phase (sécurité + UX), corrections
 - [ ] PR « Phase 0 — Fondations », CI verte
 
 ## Phase 1 — Comptes et rôles

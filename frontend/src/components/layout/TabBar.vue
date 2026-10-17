@@ -23,7 +23,7 @@ const TABS = [
       <li v-for="tab in TABS" :key="tab.to">
         <RouterLink
           :to="tab.to"
-          class="group relative flex h-full flex-col items-center justify-center gap-1 text-micro font-semibold text-bar-muted transition-colors duration-150 hover:text-bar-ink aria-[current=page]:text-bar-active"
+          class="group relative flex h-full flex-col items-center justify-center gap-1 text-[0.8125rem] font-semibold text-bar-muted transition-colors duration-150 hover:text-bar-ink aria-[current=page]:text-bar-active"
         >
           <span
             class="absolute top-0 h-[3px] w-8 rounded-b-[2px] bg-bar-active opacity-0 transition-opacity duration-150 group-aria-[current=page]:opacity-100"

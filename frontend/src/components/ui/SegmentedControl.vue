@@ -5,11 +5,16 @@ import { RadioGroupItem, RadioGroupRoot } from 'reka-ui'
  * Big grouped choice buttons (Mouli / Tête, Oui / Non). Radio semantics: one value is always
  * selected, arrow keys move the selection.
  */
-defineProps<{
-  /** Accessible name of the group. */
-  label: string
-  options: { value: T; label: string }[]
-}>()
+withDefaults(
+  defineProps<{
+    /** Accessible name of the group. */
+    label: string
+    options: { value: T; label: string }[]
+    /** lg (48 px) for the session entry, used with chalky hands. */
+    size?: 'md' | 'lg'
+  }>(),
+  { size: 'md' },
+)
 
 const model = defineModel<T>({ required: true })
 
@@ -31,7 +36,8 @@ function select(value: unknown) {
       v-for="option in options"
       :key="option.value"
       :value="option.value"
-      class="min-h-11 min-w-20 rounded-[2px] px-4 font-semibold text-ink transition-colors duration-150 data-[state=checked]:bg-ink data-[state=checked]:text-bg"
+      :class="size === 'lg' ? 'min-h-12 text-lg' : 'min-h-11'"
+      class="min-w-20 rounded-[2px] px-4 font-semibold text-ink transition-colors duration-150 data-[state=checked]:bg-ink data-[state=checked]:text-bg"
     >
       {{ option.label }}
     </RadioGroupItem>

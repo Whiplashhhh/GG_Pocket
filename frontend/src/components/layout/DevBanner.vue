@@ -22,8 +22,9 @@ const text = computed(() =>
 <template>
   <p
     v-if="visible"
-    class="bg-brand px-4 py-1 pt-safe text-center text-micro font-semibold text-on-brand"
+    class="truncate bg-brand px-4 pt-[max(0.25rem,env(safe-area-inset-top))] pb-1 text-center text-micro font-semibold text-on-brand"
     role="note"
+    :title="text"
   >
     {{ text }}
   </p>

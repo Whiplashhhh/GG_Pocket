@@ -186,9 +186,10 @@ Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), techniq
 
 ### D-039 — Logo : versions clair/sombre détourées depuis le JPEG
 - **Contexte** : seul `GG_logo.jpeg` (447 px, fond blanc) est disponible ; le texte noir disparaît sur fond sombre.
-- **Choix** : versions détourées générées une fois (fond transparent ; encre noire passée en blanc magnésie pour le sombre), plus une version
-  « mot-symbole » recadrée (sommet + « Gravelines GRIMP ») pour le header, où le logo complet serait illisible. Fichiers dans
-  `frontend/src/assets/brand/`. En phase 8, l'admin pourra téléverser ses propres logos clair et sombre.
+- **Choix** : versions détourées générées une fois (fond transparent ; encre noire passée en blanc magnésie pour le sombre),
+  dans `frontend/src/assets/brand/`, affichées en grand sur l'Actu. Dans le header, le logo complet (et même un recadrage sur
+  « Gravelines GRIMP ») est illisible à 44 px de haut : on y affiche un mot-symbole composé (le sommet olive du logo dessiné
+  en SVG + « Gravelines Grimp » en Archivo, « Grimp » en orange brique). En phase 8, l'admin pourra téléverser ses logos.
 - **À demander au club** : une version vectorielle (SVG, PDF, AI) ou en haute définition du logo, et la version « fond noir » qu'il utilise déjà.
 - **Statut** : à valider (rendu acceptable, mais une source vectorielle serait bien meilleure).
 

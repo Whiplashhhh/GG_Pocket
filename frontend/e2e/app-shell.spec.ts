@@ -46,7 +46,7 @@ test.describe('app shell', () => {
     await page.goto('/actu')
     await fab.click()
     await expect(page).toHaveURL(/\/seance\/nouvelle$/)
-    await expect(page.getByRole('heading', { name: "Voie en cours d'ouverture" })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Voie en cours d’ouverture' })).toBeVisible()
   })
 
   test('the avatar opens the profile, where the theme can be forced', async ({ page }) => {
@@ -74,7 +74,7 @@ test.describe('app shell', () => {
   test('an unknown address gets a friendly 404', async ({ page }) => {
     await page.goto('/voie-qui-n-existe-pas')
     await expect(page.getByRole('heading', { level: 1, name: 'Voie introuvable.' })).toBeVisible()
-    await page.getByRole('link', { name: "Retour à l'actu", exact: true }).click()
+    await page.getByRole('link', { name: 'Retour à l’actu', exact: true }).click()
     await expect(page).toHaveURL(/\/actu$/)
   })
 
