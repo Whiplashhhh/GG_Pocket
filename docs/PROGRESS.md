@@ -4,6 +4,41 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-18 — Phase 0 (fondations), session 3
+
+**Branche** : `feature/fondations-0.0.0`, poussée ; PR ouverte vers `main`.
+
+### Fait
+
+- Jeton GitHub mis à jour par Willem : branche poussée.
+- CI : frontend, e2e (iPhone 13/WebKit et Desktop Chrome) et gitleaks verts du premier coup. Le backend est passé au vert
+  après 5 corrections, toutes liées à l'outillage de format et jamais au code applicatif :
+  - google-java-format 1.37 incompatible avec Spotless 3.10.4 (`Style` devenu un record) : épinglé en 1.36.1 (D-020) ;
+  - étape `removeUnusedImports` retirée (redondante) ;
+  - ordre des imports AOSP (`reorderImports`) pour coller au binaire local ;
+  - commentaire XML invalide ;
+  - `.mvn/jvm.config` (exports `jdk.compiler`).
+- Backend vert : 20 tests unitaires + 10 tests d'intégration Testcontainers, ArchUnit, contrat OpenAPI identique au fichier
+  écrit à la main (vérifié par `OpenApiContractIT`), zéro avertissement Maven.
+- Captures de la PR dans `docs/captures/phase-0/` (360 px, clair et sombre).
+
+### Reste
+
+- Relecture et fusion de la PR par Willem (squash). Ensuite, activer la protection de `main` (prévu en phase 2, mais faisable
+  tout de suite dans les réglages GitHub : PR obligatoire, CI obligatoire, pas de force-push).
+
+### Prochaine action exacte
+
+- Une fois la PR fusionnée : `git checkout main && git pull`, puis brancher `feature/comptes-0.0.0` pour la phase 1,
+  en commençant par le mode plan (fichiers, migrations, endpoints, écrans, tests) comme le demande la spec §0.
+
+### Points bloquants
+
+- Aucun pour la phase 0.
+- Réseau du bac à sable instable vers GitHub (coupures de quelques secondes) et artefacts de la CI non téléchargeables
+  (stockage Azure inaccessible) : relancer les commandes `gh`/`git` en boucle ; lire les journaux avec `gh run view --log`.
+
+
 ## 2026-10-17 — Phase 0 (fondations), session 2
 
 **Branche** : `feature/fondations-0.0.0` (commits locaux, **toujours pas poussée** : jeton GitHub en lecture seule).
