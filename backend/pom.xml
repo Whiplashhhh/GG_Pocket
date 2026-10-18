@@ -166,6 +166,8 @@
             <googleJavaFormat>
               <version>${google-java-format.version}</version>
               <style>AOSP</style>
+              <!-- Order imports the AOSP way too, exactly like `google-java-format --aosp`. -->
+              <reorderImports>true</reorderImports>
             </googleJavaFormat>
             <!-- google-java-format already removes unused imports: no separate step (its own default
                  formatter version does not run on Java 25). -->
