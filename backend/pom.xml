@@ -166,7 +166,8 @@
               <version>${google-java-format.version}</version>
               <style>AOSP</style>
             </googleJavaFormat>
-            <removeUnusedImports/>
+            <!-- google-java-format already removes unused imports: no separate step (its own default
+                 formatter version does not run on Java 25). -->
           </java>
         </configuration>
         <executions>
