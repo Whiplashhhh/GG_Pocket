@@ -1,0 +1,111 @@
+import { expect, test } from './fixtures'
+
+test.describe('app shell', () => {
+  test('opens on Actu with the five tabs at hand', async ({ page }) => {
+    await page.goto('/')
+
+    await expect(page).toHaveURL(/\/actu$/)
+    await expect(page).toHaveTitle('Actu · GG Pocket')
+    const nav = page.getByRole('navigation', { name: 'Navigation principale' })
+    await expect(nav.getByRole('link')).toHaveText([
+      'Actu',
+      'Topo',
+      'À faire',
+      'Planning',
+      'Podium',
+    ])
+    await expect(page.getByRole('heading', { name: 'Le mur est calme… trop calme.' })).toBeVisible()
+  })
+
+  test('each tab shows its own screen', async ({ page }) => {
+    await page.goto('/actu')
+    const nav = page.getByRole('navigation', { name: 'Navigation principale' })
+
+    for (const [tab, heading] of [
+      ['Topo', 'Topo'],
+      ['À faire', 'À faire'],
+      ['Planning', 'Planning'],
+      ['Podium', 'Podium'],
+    ] as const) {
+      await nav.getByRole('link', { name: tab }).click()
+      await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible()
+      await expect(nav.getByRole('link', { name: tab })).toHaveAttribute('aria-current', 'page')
+    }
+  })
+
+  test('"Nouvelle séance" is offered on Actu and Planning only', async ({ page }) => {
+    const fab = page.getByRole('link', { name: 'Nouvelle séance' })
+
+    await page.goto('/actu')
+    await expect(fab).toBeVisible()
+    await page.goto('/planning')
+    await expect(fab).toBeVisible()
+    await page.goto('/topo')
+    await expect(fab).toBeHidden()
+
+    await page.goto('/actu')
+    await fab.click()
+    await expect(page).toHaveURL(/\/seance\/nouvelle$/)
+    await expect(page.getByRole('heading', { name: 'Voie en cours d’ouverture' })).toBeVisible()
+  })
+
+  test('the avatar opens the profile, where the theme can be forced', async ({ page }) => {
+    await page.goto('/actu')
+    await page.getByRole('link', { name: 'Mon profil' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Mon profil' })).toBeVisible()
+
+    await page.getByRole('radio', { name: 'Sombre' }).click()
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+
+    // The choice survives a reload, applied before the app even starts.
+    await page.reload()
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+
+    await page.getByRole('radio', { name: 'Auto' }).click()
+    await expect(page.locator('html')).not.toHaveAttribute('data-theme')
+  })
+
+  test('shows the app and server versions in the profile', async ({ page }) => {
+    await page.goto('/profil')
+    await expect(page.getByText('GG Pocket 0.0.0')).toBeVisible()
+    await expect(page.getByText('Serveur 0.0.0')).toBeVisible()
+  })
+
+  test('an unknown address gets a friendly 404', async ({ page }) => {
+    await page.goto('/voie-qui-n-existe-pas')
+    await expect(page.getByRole('heading', { level: 1, name: 'Voie introuvable.' })).toBeVisible()
+    await page.getByRole('link', { name: 'Retour à l’actu', exact: true }).click()
+    await expect(page).toHaveURL(/\/actu$/)
+  })
+
+  test('keyboard users can skip straight to the content', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Keyboard navigation is a desktop concern')
+    await page.goto('/actu')
+    await page.keyboard.press('Tab')
+    const skipLink = page.getByRole('link', { name: 'Aller au contenu' })
+    await expect(skipLink).toBeFocused()
+    await skipLink.press('Enter')
+    await expect(page.locator('#contenu')).toBeFocused()
+  })
+})
+
+test.describe('dev environment', () => {
+  test.use({ meta: { environment: 'dev', branch: 'feature/topo-0.3.0', commit: 'abc1234def' } })
+
+  test('shows a permanent banner with branch and commit', async ({ page }) => {
+    await page.goto('/actu')
+    await expect(page.getByRole('note')).toHaveText(
+      'Environnement de dev — branche feature/topo-0.3.0 @ abc1234',
+    )
+  })
+})
+
+test.describe('production environment', () => {
+  test.use({ meta: { environment: 'prod' } })
+
+  test('has no dev banner', async ({ page }) => {
+    await page.goto('/actu')
+    await expect(page.getByRole('heading', { name: 'Le mur est calme… trop calme.' })).toBeVisible()
+    await expect(page.getByRole('note')).toHaveCount(0)
+  })
+})

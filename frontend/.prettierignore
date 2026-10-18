@@ -1,0 +1,8 @@
+dist
+coverage
+playwright-report
+test-results
+screenshots
+pnpm-lock.yaml
+# Written by the backend contract test, compared as JSON (not text).
+src/api/openapi.json

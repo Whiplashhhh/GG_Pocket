@@ -1,0 +1,132 @@
+{
+  "app": {
+    "name": "GG Pocket",
+    "clubName": "Gravelines Grimp",
+    "skipToContent": "Aller au contenu",
+    "versionFooter": "GG Pocket {version}",
+    "serverVersion": "Serveur {version}",
+    "clubNameFirst": "Gravelines",
+    "clubNameSecond": "Grimp"
+  },
+  "nav": {
+    "label": "Navigation principale",
+    "actu": "Actu",
+    "topo": "Topo",
+    "todo": "À faire",
+    "planning": "Planning",
+    "podium": "Podium"
+  },
+  "header": {
+    "homeLink": "Gravelines Grimp, retour à l’actu",
+    "profileLink": "Mon profil",
+    "management": "Espace gestion"
+  },
+  "roles": {
+    "CLIMBER": "Grimpeur GG",
+    "SETTER": "Ouvreur·se",
+    "BOARD": "Direction (ça grimpe en haut)",
+    "ADMIN": "Le Président·e"
+  },
+  "devBanner": {
+    "text": "Environnement de dev — branche {branch} {'@'} {commit}"
+  },
+  "newSession": {
+    "fab": "Nouvelle séance",
+    "placeholderTitle": "Voie en cours d’ouverture",
+    "placeholderBody": "La saisie de séance arrive très vite. En attendant, garde tes avant-bras au chaud.",
+    "back": "Retour à l’actu"
+  },
+  "actu": {
+    "title": "Actu",
+    "emptyTitle": "Le mur est calme… trop calme.",
+    "emptyBody": "Ajoute des amis ou enregistre ta première séance : ton fil se remplira tout seul.",
+    "clubTagline": "Le fil du club : tes séances et celles de tes amis, au même endroit."
+  },
+  "topo": {
+    "title": "Topo",
+    "emptyTitle": "Le mur est tout nu.",
+    "emptyBody": "Aucune voie ouverte pour l’instant. Les ouvreurs ont sûrement la visseuse à la main."
+  },
+  "todo": {
+    "title": "À faire",
+    "emptyTitle": "Rien à faire. Savoure, ça ne durera pas.",
+    "emptyBody": "Soit tu as tout enchaîné, soit les voies ne sont pas encore ouvertes. Dès qu’une voie te résiste, elle atterrit ici."
+  },
+  "planning": {
+    "title": "Planning",
+    "emptyTitle": "Pas encore une trace de magnésie.",
+    "emptyBody": "Chaque venue à la salle cochera son jour ici. Ta première séance ouvrira le bal."
+  },
+  "podium": {
+    "title": "Podium",
+    "emptyTitle": "Le podium attend ses premiers grimpeurs.",
+    "emptyBody": "Personne n’a encore grimpé ce mois-ci. C’est le moment de prendre la tête (de cordée)."
+  },
+  "profile": {
+    "title": "Mon profil",
+    "emptyTitle": "Ton profil se prépare au pied de la voie.",
+    "emptyBody": "Photo, badges et chiffres clés arrivent avec les comptes. En attendant, choisis ton thème.",
+    "settings": "Réglages"
+  },
+  "theme": {
+    "label": "Thème",
+    "auto": "Auto",
+    "light": "Clair",
+    "dark": "Sombre",
+    "autoHint": "Suit le réglage de ton appareil."
+  },
+  "notFound": {
+    "title": "Voie introuvable.",
+    "body": "Cette page a dû être démontée, ou elle n’a jamais été ouverte.",
+    "back": "Retour à l’actu"
+  },
+  "routeLabel": {
+    "accessibleName": "Corde {cord}, {name}, {grade}, couleur {colors}",
+    "colorsJoin": "{first} et {second}",
+    "lastChance": "Dernière chance",
+    "dismounted": "Démontée",
+    "statusLastChance": "{label}, dernière chance",
+    "statusDismounted": "{label}, démontée"
+  },
+  "climbing": {
+    "topRope": "Mouli",
+    "lead": "Tête",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "errors": {
+    "UNAUTHENTICATED": "Tu n’es plus encordé·e : reconnecte-toi pour continuer.",
+    "ACCESS_DENIED": "Pas de passage par ici : tu n’as pas les droits pour faire ça.",
+    "CSRF_TOKEN_INVALID": "Ta session a besoin d’un petit coup de frais. Recharge la page et réessaie.",
+    "NOT_FOUND": "Introuvable : ce que tu cherches a peut-être été démonté.",
+    "VALIDATION_FAILED": "Certains champs ne passent pas. Corrige ce qui est signalé et réessaie.",
+    "MALFORMED_REQUEST": "La demande est partie de travers. Réessaie ; si ça recommence, préviens le club.",
+    "METHOD_NOT_ALLOWED": "Le serveur n’a pas compris la demande. Réessaie ; si ça recommence, préviens le club.",
+    "UNSUPPORTED_MEDIA_TYPE": "Le serveur n’a pas compris la demande. Réessaie ; si ça recommence, préviens le club.",
+    "REQUEST_REJECTED": "Le serveur n’a pas compris la demande. Réessaie ; si ça recommence, préviens le club.",
+    "INTERNAL_ERROR": "Ça a zippé de notre côté. Réessaie dans un instant.",
+    "NETWORK": "Ça a zippé : pas de réseau pour l’instant. Réessaie quand tu captes.",
+    "UNKNOWN": "Quelque chose a lâché. Réessaie dans un instant."
+  },
+  "gallery": {
+    "title": "Galerie des composants",
+    "intro": "Page de travail, absente des builds de prod. Bascule le thème dans ton profil ou ton système pour vérifier les deux rendus.",
+    "palette": "Palette",
+    "type": "Typographie",
+    "typeSample": "Le grimpeur topa la voie, puis l’enchaîna.",
+    "buttons": "Boutons",
+    "primary": "Enregistrer la séance",
+    "secondary": "Voir le topo",
+    "ghost": "Annuler",
+    "danger": "Supprimer cette séance",
+    "disabled": "Indisponible",
+    "routeLabels": "Étiquettes de voie",
+    "holds": "Prises",
+    "identity": "Identité",
+    "segmented": "Contrôles segmentés",
+    "mode": "Mode",
+    "topped": "Topée",
+    "empty": "État vide",
+    "skeleton": "Chargement"
+  }
+}

@@ -1,0 +1,7 @@
+# Local machine and deployed dev environment. Local defaults match deploy/compose.local.yml;
+# the deployed dev overrides them with GG_DB_URL / GG_DB_USER / GG_DB_PASSWORD.
+spring:
+  datasource:
+    url: ${GG_DB_URL:jdbc:postgresql://localhost:5432/ggpocket}
+    username: ${GG_DB_USER:ggpocket}
+    password: ${GG_DB_PASSWORD:ggpocket}

@@ -1,0 +1,59 @@
+{
+  "components" : {
+    "schemas" : {
+      "Meta" : {
+        "description" : "What is running on the server.",
+        "properties" : {
+          "branch" : {
+            "description" : "Git branch, or 'unknown'",
+            "type" : "string"
+          },
+          "commit" : {
+            "description" : "Git commit, or 'unknown'",
+            "type" : "string"
+          },
+          "environment" : {
+            "enum" : [ "local", "dev", "prod" ],
+            "type" : "string"
+          },
+          "version" : {
+            "example" : "1.0.0",
+            "type" : "string"
+          }
+        },
+        "required" : [ "branch", "commit", "environment", "version" ],
+        "type" : "object"
+      }
+    }
+  },
+  "info" : {
+    "description" : "API of GG Pocket, the Gravelines Grimp club app.",
+    "title" : "GG Pocket API",
+    "version" : "v1"
+  },
+  "openapi" : "3.1.0",
+  "paths" : {
+    "/api/v1/meta" : {
+      "get" : {
+        "operationId" : "getMeta",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Meta"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Version, environment and commit of the running server (public)",
+        "tags" : [ "Meta" ]
+      }
+    }
+  },
+  "servers" : [ {
+    "url" : "/"
+  } ]
+}

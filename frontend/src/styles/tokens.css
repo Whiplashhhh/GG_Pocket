@@ -1,0 +1,118 @@
+/*
+ * GG Pocket design tokens. Source of truth: docs/DESIGN.md.
+ * Light theme "magnésie" by default; dark theme "salle fermée" when the system asks for it
+ * (unless the member forced light) or when the member forced dark.
+ * The dark block is written twice on purpose: light-dark() would break on iOS < 17.5.
+ */
+:root {
+  color-scheme: light;
+
+  --gg-bg: #f4f1ea;
+  --gg-surface: #fffdf8;
+  --gg-surface-sunken: #eae5da;
+  --gg-ink: #17140f;
+  --gg-ink-muted: #5e574c;
+  --gg-rule: #d9d1c1;
+  --gg-brand: #f9561a;
+  --gg-brand-ink: #b23e0b;
+  --gg-on-brand: #17140f;
+  --gg-olive: #c3c04c;
+  --gg-on-olive: #17140f;
+  --gg-success: #4a5a0c;
+  --gg-danger: #a3261b;
+  --gg-on-danger: #ffffff;
+  --gg-focus: #b23e0b;
+
+  /* Bottom tab bar: logo ink in both themes. */
+  --gg-bar: #17140f;
+  --gg-bar-ink: #f4f1ea;
+  --gg-bar-muted: #a39b8b;
+  --gg-bar-active: #f9561a;
+  --gg-bar-edge: #17140f;
+
+  /* The route label is paper, in both themes. */
+  --gg-label-paper: #fffdf4;
+  --gg-label-edge: #ddd3bd;
+  --gg-label-ink: #17140f;
+  --gg-label-tape: rgb(222 210 168 / 0.75);
+
+  --gg-shadow-sheet: 0 -8px 32px rgb(23 20 15 / 0.18);
+  --gg-shadow-paper: 0 1px 0 rgb(23 20 15 / 0.08), 0 2px 6px rgb(23 20 15 / 0.08);
+  --gg-shadow-fab: 0 6px 16px rgb(23 20 15 / 0.28);
+  --gg-insert-dot: rgb(23 20 15 / 0.09);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --gg-bg: #12110e;
+  --gg-surface: #1e1c18;
+  --gg-surface-sunken: #29261f;
+  --gg-ink: #f3efe6;
+  --gg-ink-muted: #ada594;
+  --gg-rule: #3a352d;
+  --gg-brand: #f9561a;
+  --gg-brand-ink: #ff7340;
+  --gg-on-brand: #17140f;
+  --gg-olive: #c3c04c;
+  --gg-on-olive: #17140f;
+  --gg-success: #c9c653;
+  --gg-danger: #ff8a7a;
+  --gg-on-danger: #17140f;
+  --gg-focus: #ff7340;
+
+  --gg-bar: #0a0908;
+  --gg-bar-ink: #f3efe6;
+  --gg-bar-muted: #a39b8b;
+  --gg-bar-active: #f9561a;
+  --gg-bar-edge: #3a352d;
+
+  --gg-label-paper: #e9e2d0;
+  --gg-label-edge: #b9ae94;
+  --gg-label-ink: #17140f;
+  --gg-label-tape: rgb(196 184 140 / 0.7);
+
+  --gg-shadow-sheet: 0 -8px 32px rgb(0 0 0 / 0.5);
+  --gg-shadow-paper: 0 1px 0 rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.35);
+  --gg-shadow-fab: 0 6px 18px rgb(0 0 0 / 0.55);
+  --gg-insert-dot: rgb(243 239 230 / 0.07);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --gg-bg: #12110e;
+    --gg-surface: #1e1c18;
+    --gg-surface-sunken: #29261f;
+    --gg-ink: #f3efe6;
+    --gg-ink-muted: #ada594;
+    --gg-rule: #3a352d;
+    --gg-brand: #f9561a;
+    --gg-brand-ink: #ff7340;
+    --gg-on-brand: #17140f;
+    --gg-olive: #c3c04c;
+    --gg-on-olive: #17140f;
+    --gg-success: #c9c653;
+    --gg-danger: #ff8a7a;
+    --gg-on-danger: #17140f;
+    --gg-focus: #ff7340;
+
+    --gg-bar: #0a0908;
+    --gg-bar-ink: #f3efe6;
+    --gg-bar-muted: #a39b8b;
+    --gg-bar-active: #f9561a;
+    --gg-bar-edge: #3a352d;
+
+    --gg-label-paper: #e9e2d0;
+    --gg-label-edge: #b9ae94;
+    --gg-label-ink: #17140f;
+    --gg-label-tape: rgb(196 184 140 / 0.7);
+
+    --gg-shadow-sheet: 0 -8px 32px rgb(0 0 0 / 0.5);
+    --gg-shadow-paper: 0 1px 0 rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.35);
+    --gg-shadow-fab: 0 6px 18px rgb(0 0 0 / 0.55);
+    --gg-shadow-fab: 0 6px 18px rgb(0 0 0 / 0.55);
+    --gg-insert-dot: rgb(243 239 230 / 0.07);
+  }
+}

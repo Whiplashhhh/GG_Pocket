@@ -1,0 +1,19 @@
+# Production: no default for anything sensitive, the application fails to start if a value is missing.
+spring:
+  datasource:
+    url: ${GG_DB_URL}
+    username: ${GG_DB_USER}
+    password: ${GG_DB_PASSWORD}
+
+springdoc:
+  api-docs:
+    enabled: false
+
+logging:
+  structured:
+    format:
+      console: ecs
+
+# No default: a production instance must say it is one (InstanceMarkerGuard also checks it).
+gg:
+  environment: ${GG_ENVIRONMENT}
