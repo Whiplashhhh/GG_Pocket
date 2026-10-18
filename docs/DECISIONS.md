@@ -91,6 +91,7 @@ Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), techniq
 | Maven (wrapper) | 3.9.16 | 3.10.0 publiée le 2026-10-01 : on attend qu'elle mûrisse, la 3.9 reste maintenue |
 | Spring Boot | 4.1.1 | Gère Spring Framework 7.0, Spring Security 7.1, Hibernate 7.4, Flyway 12.4, Testcontainers 2.0, Jackson 3.1 |
 | springdoc-openapi | 3.1.1 | Branche 3.x = Spring Boot 4 |
+| Spotless / google-java-format | 3.10.4 / 1.36.1 | gjf 1.37 a changé une API (`Style` devenu un record) que Spotless 3.10.4 utilise : on reste sur 1.36.1 tant que Spotless n'a pas suivi |
 | ArchUnit | 1.5.1 | Artefact `archunit-junit6` (Boot 4.1 embarque JUnit Jupiter 6) |
 | PostgreSQL | 18 (image `postgres:18-alpine`) | Dernière majeure stable |
 | Node.js | 24 LTS (24.22) | Node 26 passe LTS le 2026-10-28 : montée de version prévue dans la roadmap |

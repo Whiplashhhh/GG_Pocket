@@ -23,7 +23,8 @@
     <springdoc.version>3.1.1</springdoc.version>
     <archunit.version>1.5.1</archunit.version>
     <spotless.version>3.10.4</spotless.version>
-    <google-java-format.version>1.37.0</google-java-format.version>
+    <!-- 1.36.1, not 1.37.x: 1.37 turned JavaFormatterOptions.Style into a record, which Spotless 3.10.4 cannot drive. -->
+    <google-java-format.version>1.36.1</google-java-format.version>
   </properties>
 
   <dependencies>
