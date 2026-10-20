@@ -1,6 +1,7 @@
 package fr.gravelinesgrimp.pocket.platform.api.error;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,7 +48,7 @@ class ApiErrorsIT {
 
     @Test
     void unsupportedMethodIsReported() throws Exception {
-        mockMvc.perform(post("/api/v1/meta").with(user("grimpeur")).with(csrf()))
+        mockMvc.perform(post("/api/v1/meta").with(user("grimpeur")).with(xsrf()))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.code").value("METHOD_NOT_ALLOWED"));
     }

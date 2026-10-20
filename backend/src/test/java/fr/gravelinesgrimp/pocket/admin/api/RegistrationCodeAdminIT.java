@@ -2,11 +2,11 @@ package fr.gravelinesgrimp.pocket.admin.api;
 
 import static fr.gravelinesgrimp.pocket.MemberFixtures.as;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.freshAddress;
+import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.hamcrest.Matchers.not;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -44,7 +44,7 @@ class RegistrationCodeAdminIT {
                 mockMvc.perform(
                                 post("/api/v1/admin/registration-codes")
                                         .with(as(admin))
-                                        .with(csrf())
+                                        .with(xsrf())
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(
                                                 """
@@ -62,7 +62,7 @@ class RegistrationCodeAdminIT {
 
         mockMvc.perform(
                         post("/api/v1/auth/registration-code/check")
-                                .with(csrf())
+                                .with(xsrf())
                                 .with(freshAddress())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"code\": \"%s\"}".formatted(code)))
@@ -80,7 +80,7 @@ class RegistrationCodeAdminIT {
                 mockMvc.perform(
                                 post("/api/v1/admin/registration-codes")
                                         .with(as(admin))
-                                        .with(csrf())
+                                        .with(xsrf())
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(
                                                 "{\"label\": \"Portes ouvertes\", \"active\":"
@@ -94,7 +94,7 @@ class RegistrationCodeAdminIT {
         mockMvc.perform(
                         put("/api/v1/admin/registration-codes/" + id)
                                 .with(as(admin))
-                                .with(csrf())
+                                .with(xsrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(OPEN_DAY_INACTIVE))
                 .andExpect(status().isOk())
@@ -102,7 +102,7 @@ class RegistrationCodeAdminIT {
 
         mockMvc.perform(
                         post("/api/v1/auth/registration-code/check")
-                                .with(csrf())
+                                .with(xsrf())
                                 .with(freshAddress())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"code\": \"%s\"}".formatted(code)))

@@ -1,10 +1,10 @@
 package fr.gravelinesgrimp.pocket.auth.api;
 
 import static fr.gravelinesgrimp.pocket.MemberFixtures.PASSWORD;
+import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -88,7 +88,7 @@ class SessionsIT {
                 MemberFixtures.signIn(mockMvc, member.nickname(), PASSWORD, true, ANDROID_CHROME);
         var tabletId = otherDeviceIds(phone).getFirst();
 
-        mockMvc.perform(delete("/api/v1/me/devices/" + tabletId).with(csrf()).cookie(phone))
+        mockMvc.perform(delete("/api/v1/me/devices/" + tabletId).with(xsrf()).cookie(phone))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/me").cookie(tablet)).andExpect(status().isUnauthorized());
@@ -101,7 +101,7 @@ class SessionsIT {
         var victimDevice = JsonPath.<List<String>>read(devicesJson(victim), "$[*].id").getFirst();
         var attacker = MemberFixtures.signIn(mockMvc, members.create(Role.ADMIN), true);
 
-        mockMvc.perform(delete("/api/v1/me/devices/" + victimDevice).with(csrf()).cookie(attacker))
+        mockMvc.perform(delete("/api/v1/me/devices/" + victimDevice).with(xsrf()).cookie(attacker))
                 .andExpect(status().isNotFound());
 
         mockMvc.perform(get("/api/v1/me").cookie(victim)).andExpect(status().isOk());
@@ -114,7 +114,7 @@ class SessionsIT {
         var laptop = MemberFixtures.signIn(mockMvc, member, true);
         var tablet = MemberFixtures.signIn(mockMvc, member, false);
 
-        mockMvc.perform(post("/api/v1/me/devices/close-others").with(csrf()).cookie(phone))
+        mockMvc.perform(post("/api/v1/me/devices/close-others").with(xsrf()).cookie(phone))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/me").cookie(laptop)).andExpect(status().isUnauthorized());
@@ -131,7 +131,7 @@ class SessionsIT {
 
         mockMvc.perform(
                         put("/api/v1/me/password")
-                                .with(csrf())
+                                .with(xsrf())
                                 .cookie(phone)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
@@ -156,7 +156,7 @@ class SessionsIT {
         var phone = MemberFixtures.signIn(mockMvc, members.create(Role.CLIMBER), true);
         mockMvc.perform(
                         put("/api/v1/me/password")
-                                .with(csrf())
+                                .with(xsrf())
                                 .cookie(phone)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(

@@ -7,6 +7,9 @@ spring:
   jackson:
     # Absent optional fields are left out instead of sent as null, as the OpenAPI types describe them.
     default-property-inclusion: non_null
+    deserialization:
+      # Jackson 3 refuses an absent boolean by default; an absent optional flag means false.
+      fail-on-null-for-primitives: false
   servlet:
     multipart:
       # Spec §14: photos up to 10 MB at upload, resized by the server.
@@ -33,13 +36,6 @@ spring:
 server:
   # Behind Caddy: the client address comes from X-Forwarded-For, trusted from private networks only.
   forward-headers-strategy: native
-  servlet:
-    session:
-      cookie:
-        name: GG_SESSION
-        http-only: true
-        secure: true
-        same-site: lax
 
 gg:
   media:

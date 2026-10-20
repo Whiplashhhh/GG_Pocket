@@ -1,6 +1,7 @@
 package fr.gravelinesgrimp.pocket.auth.api;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,7 +50,7 @@ class RateLimitIT {
 
     private static MockHttpServletRequestBuilder codeCheck(String address) {
         return post("/api/v1/auth/registration-code/check")
-                .with(csrf())
+                .with(xsrf())
                 .with(
                         request -> {
                             request.setRemoteAddr(address);
@@ -61,7 +62,7 @@ class RateLimitIT {
 
     private static MockHttpServletRequestBuilder login(String nickname, String password) {
         return post("/api/v1/auth/login")
-                .with(csrf())
+                .with(xsrf())
                 .with(MemberFixtures.freshAddress())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(

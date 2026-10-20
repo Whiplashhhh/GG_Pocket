@@ -2,10 +2,10 @@ package fr.gravelinesgrimp.pocket.admin.api;
 
 import static fr.gravelinesgrimp.pocket.MemberFixtures.as;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.freshAddress;
+import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -134,7 +134,7 @@ class MemberAdminIT {
         mockMvc.perform(get("/api/v1/me").cookie(session)).andExpect(status().isUnauthorized());
         mockMvc.perform(
                         post("/api/v1/auth/login")
-                                .with(csrf())
+                                .with(xsrf())
                                 .with(freshAddress())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
@@ -159,7 +159,7 @@ class MemberAdminIT {
         var token = tokenOf(resetLink(board, climber).andExpect(status().isOk()));
         mockMvc.perform(
                         post("/api/v1/auth/password-reset/check")
-                                .with(csrf())
+                                .with(xsrf())
                                 .with(freshAddress())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"token\": \"%s\"}".formatted(token)))
@@ -245,7 +245,7 @@ class MemberAdminIT {
         return mockMvc.perform(
                 put("/api/v1/admin/members/" + target.id() + "/role")
                         .with(as(actor))
-                        .with(csrf())
+                        .with(xsrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"role\": \"%s\"}".formatted(role)));
     }
@@ -255,7 +255,7 @@ class MemberAdminIT {
         return mockMvc.perform(
                 put("/api/v1/admin/members/" + target.id() + "/status")
                         .with(as(actor))
-                        .with(csrf())
+                        .with(xsrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\": \"%s\"}".formatted(status)));
     }
@@ -264,13 +264,13 @@ class MemberAdminIT {
         return mockMvc.perform(
                 post("/api/v1/admin/members/" + target.id() + "/password-reset-link")
                         .with(as(actor))
-                        .with(csrf()));
+                        .with(xsrf()));
     }
 
     private ResultActions reset(String token, String newPassword) throws Exception {
         return mockMvc.perform(
                 post("/api/v1/auth/password-reset")
-                        .with(csrf())
+                        .with(xsrf())
                         .with(freshAddress())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(

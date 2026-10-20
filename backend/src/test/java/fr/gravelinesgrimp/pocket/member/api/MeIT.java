@@ -1,10 +1,10 @@
 package fr.gravelinesgrimp.pocket.member.api;
 
 import static fr.gravelinesgrimp.pocket.MemberFixtures.as;
+import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -153,7 +153,7 @@ class MeIT {
     void iRemoveMyPhoto() throws Exception {
         var me = members.create(Role.CLIMBER);
         mockMvc.perform(upload(me, png(300, 300))).andExpect(status().isOk());
-        mockMvc.perform(delete("/api/v1/me/avatar").with(as(me)).with(csrf()))
+        mockMvc.perform(delete("/api/v1/me/avatar").with(as(me)).with(xsrf()))
                 .andExpect(status().isNoContent());
         mockMvc.perform(get("/api/v1/me").with(as(me)))
                 .andExpect(jsonPath("$.avatarUrl").doesNotExist());
@@ -165,7 +165,7 @@ class MeIT {
         return mockMvc.perform(
                 put("/api/v1/me/profile")
                         .with(as(me))
-                        .with(csrf())
+                        .with(xsrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 """
@@ -189,7 +189,7 @@ class MeIT {
     private static MockMultipartHttpServletRequestBuilder upload(
             Member me, MockMultipartFile file) {
         var request = multipart(HttpMethod.PUT, "/api/v1/me/avatar").file(file);
-        request.with(as(me)).with(csrf());
+        request.with(as(me)).with(xsrf());
         return request;
     }
 

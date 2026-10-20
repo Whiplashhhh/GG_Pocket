@@ -1,6 +1,252 @@
 {
   "components" : {
     "schemas" : {
+      "AuditEntry" : {
+        "description" : "Who did what, to whom, when.",
+        "properties" : {
+          "action" : {
+            "enum" : [ "MEMBER_ROLE_CHANGED", "MEMBER_DISABLED", "MEMBER_ENABLED", "PASSWORD_RESET_LINK_CREATED", "REGISTRATION_CODE_CREATED", "REGISTRATION_CODE_UPDATED" ],
+            "type" : "string"
+          },
+          "actorId" : {
+            "description" : "Absent if that member was deleted since",
+            "format" : "uuid",
+            "type" : "string"
+          },
+          "actorNickname" : {
+            "description" : "Nickname at the time of the action",
+            "type" : "string"
+          },
+          "after" : {
+            "type" : "string"
+          },
+          "before" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "uuid",
+            "type" : "string"
+          },
+          "occurredAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "targetId" : {
+            "format" : "uuid",
+            "type" : "string"
+          },
+          "targetLabel" : {
+            "description" : "Name at the time of the action",
+            "type" : "string"
+          },
+          "targetType" : {
+            "enum" : [ "MEMBER", "REGISTRATION_CODE" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "action", "id", "occurredAt", "targetLabel", "targetType" ],
+        "type" : "object"
+      },
+      "AuditPage" : {
+        "description" : "Newest first.",
+        "properties" : {
+          "entries" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AuditEntry"
+            },
+            "type" : "array"
+          },
+          "nextCursor" : {
+            "description" : "Pass it as ?cursor= for the next page; absent on the last page",
+            "type" : "string"
+          }
+        },
+        "required" : [ "entries" ],
+        "type" : "object"
+      },
+      "AuthState" : {
+        "description" : "Whether this browser is signed in, and as whom.",
+        "properties" : {
+          "authenticated" : {
+            "type" : "boolean"
+          },
+          "member" : {
+            "$ref" : "#/components/schemas/CurrentMember",
+            "description" : "Present when signed in"
+          }
+        },
+        "required" : [ "authenticated" ],
+        "type" : "object"
+      },
+      "CurrentMember" : {
+        "description" : "The signed-in member, as shown in the app shell.",
+        "properties" : {
+          "avatarUrl" : {
+            "description" : "Profile photo, absent when the member has none",
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "uuid",
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "role" : {
+            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "firstName", "id", "lastName", "nickname", "role" ],
+        "type" : "object"
+      },
+      "Device" : {
+        "description" : "An open session of the member (\"Mes appareils\").",
+        "properties" : {
+          "browser" : {
+            "enum" : [ "SAFARI", "CHROME", "FIREFOX", "EDGE", "SAMSUNG_INTERNET", "OPERA", "OTHER" ],
+            "type" : "string"
+          },
+          "current" : {
+            "description" : "The device making this request",
+            "type" : "boolean"
+          },
+          "id" : {
+            "description" : "Opaque id, not the session id",
+            "type" : "string"
+          },
+          "lastActiveAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "platform" : {
+            "enum" : [ "IPHONE", "IPAD", "ANDROID", "MAC", "WINDOWS", "LINUX", "OTHER" ],
+            "type" : "string"
+          },
+          "signedInAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "required" : [ "browser", "current", "id", "lastActiveAt", "platform", "signedInAt" ],
+        "type" : "object"
+      },
+      "LoginRequest" : {
+        "properties" : {
+          "nickname" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "password" : {
+            "maxLength" : 200,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "rememberMe" : {
+            "description" : "\"Rester connecté\": 180 days instead of the browser session",
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "nickname", "password" ],
+        "type" : "object"
+      },
+      "MemberDetail" : {
+        "description" : "The member sheet, with what the caller may do.",
+        "properties" : {
+          "climbingSinceYear" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "clubArrivalYear" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "member" : {
+            "$ref" : "#/components/schemas/MemberSummary"
+          },
+          "permissions" : {
+            "$ref" : "#/components/schemas/MemberPermissions"
+          },
+          "underFifteenWithParentalConsent" : {
+            "description" : "Under 15, with a parental consent declared (no birth date)",
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "member", "permissions", "underFifteenWithParentalConsent" ],
+        "type" : "object"
+      },
+      "MemberPermissions" : {
+        "properties" : {
+          "assignableRoles" : {
+            "items" : {
+              "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "canCreateResetLink" : {
+            "type" : "boolean"
+          },
+          "canDisable" : {
+            "type" : "boolean"
+          },
+          "canEnable" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "assignableRoles", "canCreateResetLink", "canDisable", "canEnable" ],
+        "type" : "object"
+      },
+      "MemberSummary" : {
+        "description" : "A line of the members table.",
+        "properties" : {
+          "avatarUrl" : {
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "uuid",
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "lastSeenAt" : {
+            "description" : "Roughly, to the hour; absent if never seen since registration",
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "registeredAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "role" : {
+            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "ACTIVE", "DISABLED" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "firstName", "id", "lastName", "nickname", "registeredAt", "role", "status" ],
+        "type" : "object"
+      },
       "Meta" : {
         "description" : "What is running on the server.",
         "properties" : {
@@ -23,6 +269,350 @@
         },
         "required" : [ "branch", "commit", "environment", "version" ],
         "type" : "object"
+      },
+      "MyProfile" : {
+        "description" : "Everything the member may see and edit about themselves.",
+        "properties" : {
+          "age" : {
+            "description" : "Age today, when the birth date is known",
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "appearsInRankings" : {
+            "type" : "boolean"
+          },
+          "avatarUrl" : {
+            "type" : "string"
+          },
+          "bio" : {
+            "type" : "string"
+          },
+          "birthDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "climbingSinceYear" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "clubArrivalYear" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "createdAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "uuid",
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "parentalConsent" : {
+            "description" : "A parent or legal guardian agreed (declared under 15)",
+            "type" : "boolean"
+          },
+          "role" : {
+            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
+            "type" : "string"
+          },
+          "showAge" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "appearsInRankings", "createdAt", "firstName", "id", "lastName", "nickname", "parentalConsent", "role", "showAge" ],
+        "type" : "object"
+      },
+      "PasswordChange" : {
+        "properties" : {
+          "currentPassword" : {
+            "maxLength" : 200,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "newPassword" : {
+            "maxLength" : 200,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "required" : [ "currentPassword", "newPassword" ],
+        "type" : "object"
+      },
+      "PasswordReset" : {
+        "properties" : {
+          "newPassword" : {
+            "maxLength" : 200,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "token" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "required" : [ "newPassword", "token" ],
+        "type" : "object"
+      },
+      "PasswordResetCheck" : {
+        "properties" : {
+          "token" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "required" : [ "token" ],
+        "type" : "object"
+      },
+      "PasswordResetLink" : {
+        "description" : "The secret of a reset link, shown once. The app builds the link with its own address: /nouveau-mot-de-passe#<token>.",
+        "properties" : {
+          "expiresAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "token" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "expiresAt", "token" ],
+        "type" : "object"
+      },
+      "PasswordResetTarget" : {
+        "description" : "Who a valid reset link is for.",
+        "properties" : {
+          "firstName" : {
+            "type" : "string"
+          },
+          "nickname" : {
+            "description" : "Their login, as a reminder",
+            "type" : "string"
+          }
+        },
+        "required" : [ "firstName", "nickname" ],
+        "type" : "object"
+      },
+      "ProfileUpdate" : {
+        "description" : "The whole editable profile, as the member wants it.",
+        "properties" : {
+          "appearsInRankings" : {
+            "type" : "boolean"
+          },
+          "bio" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "birthDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "climbingSinceYear" : {
+            "format" : "int32",
+            "maximum" : 2100,
+            "minimum" : 1950,
+            "type" : "integer"
+          },
+          "clubArrivalYear" : {
+            "format" : "int32",
+            "maximum" : 2100,
+            "minimum" : 1950,
+            "type" : "integer"
+          },
+          "email" : {
+            "format" : "email",
+            "maxLength" : 254,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "firstName" : {
+            "maxLength" : 50,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "lastName" : {
+            "maxLength" : 50,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "nickname" : {
+            "pattern" : "^[A-Za-z0-9._-]{3,20}$",
+            "type" : "string"
+          },
+          "parentalConsent" : {
+            "description" : "Declares that a parent agreed; required once under 15",
+            "type" : "boolean"
+          },
+          "showAge" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "firstName", "lastName", "nickname" ],
+        "type" : "object"
+      },
+      "RegisterRequest" : {
+        "description" : "The one-page registration form (spec §6).",
+        "properties" : {
+          "birthDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "code" : {
+            "maxLength" : 32,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "email" : {
+            "format" : "email",
+            "maxLength" : 254,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "firstName" : {
+            "maxLength" : 50,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "lastName" : {
+            "maxLength" : 50,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "nickname" : {
+            "pattern" : "^[A-Za-z0-9._-]{3,20}$",
+            "type" : "string"
+          },
+          "parentalConsent" : {
+            "description" : "Required when the birth date says under 15",
+            "type" : "boolean"
+          },
+          "password" : {
+            "description" : "8 characters minimum, not a common password",
+            "maxLength" : 200,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "privacyAccepted" : {
+            "description" : "\"Tes données\" accepted",
+            "type" : "boolean"
+          },
+          "rememberMe" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "code", "firstName", "lastName", "nickname", "password", "privacyAccepted" ],
+        "type" : "object"
+      },
+      "RegistrationCode" : {
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "code" : {
+            "example" : "K7XM-P2QA",
+            "type" : "string"
+          },
+          "createdAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "expiresAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "uuid",
+            "type" : "string"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "maxUses" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "state" : {
+            "enum" : [ "USABLE", "INACTIVE", "EXPIRED", "EXHAUSTED" ],
+            "type" : "string"
+          },
+          "useCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "active", "code", "createdAt", "id", "label", "state", "useCount" ],
+        "type" : "object"
+      },
+      "RegistrationCodeCheck" : {
+        "properties" : {
+          "code" : {
+            "example" : "K7XM-P2QA",
+            "maxLength" : 32,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "required" : [ "code" ],
+        "type" : "object"
+      },
+      "RegistrationCodeSettings" : {
+        "description" : "Absent expiry or maximum: no limit.",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "expiresAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "label" : {
+            "example" : "Affiche de la salle, saison 2026",
+            "maxLength" : 80,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "maxUses" : {
+            "format" : "int32",
+            "maximum" : 10000,
+            "minimum" : 1,
+            "type" : "integer"
+          }
+        },
+        "required" : [ "active", "label" ],
+        "type" : "object"
+      },
+      "RoleChange" : {
+        "properties" : {
+          "role" : {
+            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "role" ],
+        "type" : "object"
+      },
+      "StatusChange" : {
+        "properties" : {
+          "status" : {
+            "enum" : [ "ACTIVE", "DISABLED" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "status" ],
+        "type" : "object"
       }
     }
   },
@@ -33,6 +623,650 @@
   },
   "openapi" : "3.1.0",
   "paths" : {
+    "/api/v1/admin/audit" : {
+      "get" : {
+        "operationId" : "listAuditEntries",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "cursor",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "size",
+          "required" : false,
+          "schema" : {
+            "default" : 50,
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuditPage"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "The audit log, newest first (board+)",
+        "tags" : [ "Audit log" ]
+      }
+    },
+    "/api/v1/admin/members" : {
+      "get" : {
+        "operationId" : "listMembers",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/MemberSummary"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Every member, sorted by name (board+)",
+        "tags" : [ "Member management" ]
+      }
+    },
+    "/api/v1/admin/members/{id}" : {
+      "get" : {
+        "operationId" : "getMember",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "uuid",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MemberDetail"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "A member sheet and allowed actions (board+)",
+        "tags" : [ "Member management" ]
+      }
+    },
+    "/api/v1/admin/members/{id}/password-reset-link" : {
+      "post" : {
+        "operationId" : "createPasswordResetLink",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "uuid",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PasswordResetLink"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "A single-use reset link valid 24 hours; replaces the previous one",
+        "tags" : [ "Member management" ]
+      }
+    },
+    "/api/v1/admin/members/{id}/role" : {
+      "put" : {
+        "operationId" : "changeMemberRole",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "uuid",
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RoleChange"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MemberDetail"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Give a role (role matrix, spec §5)",
+        "tags" : [ "Member management" ]
+      }
+    },
+    "/api/v1/admin/members/{id}/status" : {
+      "put" : {
+        "operationId" : "changeMemberStatus",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "uuid",
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/StatusChange"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MemberDetail"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Disable (closes all sessions) or enable an account",
+        "tags" : [ "Member management" ]
+      }
+    },
+    "/api/v1/admin/registration-codes" : {
+      "get" : {
+        "operationId" : "listRegistrationCodes",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/RegistrationCode"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Club codes, newest first (admin)",
+        "tags" : [ "Registration codes" ]
+      },
+      "post" : {
+        "operationId" : "createRegistrationCode",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RegistrationCodeSettings"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RegistrationCode"
+                }
+              }
+            },
+            "description" : "Created"
+          }
+        },
+        "summary" : "A new club code (admin)",
+        "tags" : [ "Registration codes" ]
+      }
+    },
+    "/api/v1/admin/registration-codes/{id}" : {
+      "put" : {
+        "operationId" : "updateRegistrationCode",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "uuid",
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RegistrationCodeSettings"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RegistrationCode"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Rename, limit, deactivate or reactivate a code (admin)",
+        "tags" : [ "Registration codes" ]
+      }
+    },
+    "/api/v1/auth/login" : {
+      "post" : {
+        "operationId" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CurrentMember"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Sign in with nickname and password",
+        "tags" : [ "Auth" ]
+      }
+    },
+    "/api/v1/auth/logout" : {
+      "post" : {
+        "operationId" : "logout",
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "summary" : "Close the session of this device",
+        "tags" : [ "Auth" ]
+      }
+    },
+    "/api/v1/auth/password-reset" : {
+      "post" : {
+        "operationId" : "resetPassword",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PasswordReset"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CurrentMember"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Choose a new password with a reset link; signs in this device only",
+        "tags" : [ "Auth" ]
+      }
+    },
+    "/api/v1/auth/password-reset/check" : {
+      "post" : {
+        "operationId" : "checkPasswordResetLink",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PasswordResetCheck"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PasswordResetTarget"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Who a reset link is for",
+        "tags" : [ "Auth" ]
+      }
+    },
+    "/api/v1/auth/register" : {
+      "post" : {
+        "operationId" : "register",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CurrentMember"
+                }
+              }
+            },
+            "description" : "Created"
+          }
+        },
+        "summary" : "Join the club, then sign in at once",
+        "tags" : [ "Auth" ]
+      }
+    },
+    "/api/v1/auth/registration-code/check" : {
+      "post" : {
+        "operationId" : "checkRegistrationCode",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RegistrationCodeCheck"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "summary" : "Whether a registration code can be used (204) or not (400)",
+        "tags" : [ "Auth" ]
+      }
+    },
+    "/api/v1/auth/state" : {
+      "get" : {
+        "operationId" : "getAuthState",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuthState"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Whether this browser is signed in (public). Also sets the CSRF cookie.",
+        "tags" : [ "Auth" ]
+      }
+    },
+    "/api/v1/me" : {
+      "get" : {
+        "operationId" : "getMyProfile",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MyProfile"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "My whole profile",
+        "tags" : [ "Me" ]
+      }
+    },
+    "/api/v1/me/avatar" : {
+      "delete" : {
+        "operationId" : "removeMyAvatar",
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "summary" : "Remove my profile photo",
+        "tags" : [ "Me" ]
+      },
+      "put" : {
+        "operationId" : "replaceMyAvatar",
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "properties" : {
+                  "file" : {
+                    "format" : "binary",
+                    "type" : "string"
+                  }
+                },
+                "required" : [ "file" ],
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MyProfile"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Upload my profile photo (JPEG, PNG or WebP, 10 MB max)",
+        "tags" : [ "Me" ]
+      }
+    },
+    "/api/v1/me/devices" : {
+      "get" : {
+        "operationId" : "listMyDevices",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Device"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "My open sessions, most recent first",
+        "tags" : [ "Me" ]
+      }
+    },
+    "/api/v1/me/devices/close-others" : {
+      "post" : {
+        "operationId" : "closeMyOtherDevices",
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "summary" : "Close all my sessions but this one",
+        "tags" : [ "Me" ]
+      }
+    },
+    "/api/v1/me/devices/{deviceId}" : {
+      "delete" : {
+        "operationId" : "closeMyDevice",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "deviceId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "summary" : "Close one of my sessions",
+        "tags" : [ "Me" ]
+      }
+    },
+    "/api/v1/me/password" : {
+      "put" : {
+        "operationId" : "changeMyPassword",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PasswordChange"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "summary" : "Change my password; closes my other sessions",
+        "tags" : [ "Me" ]
+      }
+    },
+    "/api/v1/me/profile" : {
+      "put" : {
+        "operationId" : "updateMyProfile",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProfileUpdate"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MyProfile"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Edit my profile",
+        "tags" : [ "Me" ]
+      }
+    },
+    "/api/v1/media/{id}" : {
+      "get" : {
+        "operationId" : "getMedia",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "uuid",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "image/jpeg" : {
+                "schema" : {
+                  "format" : "byte",
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "An uploaded image, after an access check",
+        "tags" : [ "Media" ]
+      }
+    },
     "/api/v1/meta" : {
       "get" : {
         "operationId" : "getMeta",

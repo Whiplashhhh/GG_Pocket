@@ -1,7 +1,8 @@
 package fr.gravelinesgrimp.pocket.security;
 
+import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 
 import fr.gravelinesgrimp.pocket.IntegrationTest;
@@ -101,7 +102,7 @@ class AuthorizationMatrixIT {
     void callersBelowTheRequiredRoleAreRefused(Endpoint endpoint, Role caller) throws Exception {
         var request =
                 request(endpoint.method(), endpoint.path())
-                        .with(csrf())
+                        .with(xsrf())
                         .with(MemberFixtures.freshAddress());
         if (endpoint.body() != null) {
             request.contentType(MediaType.APPLICATION_JSON).content(endpoint.body());

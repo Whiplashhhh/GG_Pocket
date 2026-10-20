@@ -3,9 +3,9 @@ package fr.gravelinesgrimp.pocket.auth.api;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.PASSWORD;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.SESSION_COOKIE;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.freshAddress;
+import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
@@ -139,7 +139,7 @@ class AuthFlowIT {
     void thePrivacyPageMustBeAccepted() throws Exception {
         mockMvc.perform(
                         post("/api/v1/auth/register")
-                                .with(csrf())
+                                .with(xsrf())
                                 .with(freshAddress())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
@@ -200,7 +200,7 @@ class AuthFlowIT {
         var session = MemberFixtures.signIn(mockMvc, members.create(Role.CLIMBER), true);
         mockMvc.perform(get("/api/v1/me").cookie(session)).andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/v1/auth/logout").with(csrf()).cookie(session))
+        mockMvc.perform(post("/api/v1/auth/logout").with(xsrf()).cookie(session))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/me").cookie(session)).andExpect(status().isUnauthorized());
@@ -235,7 +235,7 @@ class AuthFlowIT {
             throws Exception {
         return mockMvc.perform(
                 post("/api/v1/auth/login")
-                        .with(csrf())
+                        .with(xsrf())
                         .with(freshAddress())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials(nickname, password, remember)));
@@ -251,7 +251,7 @@ class AuthFlowIT {
     private ResultActions check(String code) throws Exception {
         return mockMvc.perform(
                 post("/api/v1/auth/registration-code/check")
-                        .with(csrf())
+                        .with(xsrf())
                         .with(freshAddress())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"code\": \"%s\"}".formatted(code)));
@@ -267,7 +267,7 @@ class AuthFlowIT {
         var birth = birthDate == null ? "null" : "\"" + birthDate + "\"";
         return mockMvc.perform(
                 post("/api/v1/auth/register")
-                        .with(csrf())
+                        .with(xsrf())
                         .with(freshAddress())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(

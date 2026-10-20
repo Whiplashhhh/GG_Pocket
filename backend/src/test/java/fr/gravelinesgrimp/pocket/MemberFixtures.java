@@ -1,7 +1,6 @@
 package fr.gravelinesgrimp.pocket;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,7 +23,9 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /** Members created straight in the database, and ways to act as them in MockMvc requests. */
@@ -74,6 +75,25 @@ public class MemberFixtures {
     }
 
     /**
+     * A CSRF token the way the app sends it: the XSRF-TOKEN cookie, copied into the X-XSRF-TOKEN
+     * header. Not Spring Security's {@code csrf()} post-processor: it swaps, for good, the token
+     * repository of the filter shared by every integration test, which then stops writing cookies.
+     */
+    public static RequestPostProcessor xsrf() {
+        var token = UUID.randomUUID().toString();
+        return request -> {
+            var cookie = new Cookie("XSRF-TOKEN", token);
+            var existing = request.getCookies();
+            var cookies = existing == null ? new Cookie[0] : existing;
+            var all = Arrays.copyOf(cookies, cookies.length + 1);
+            all[cookies.length] = cookie;
+            request.setCookies(all);
+            request.addHeader("X-XSRF-TOKEN", token);
+            return request;
+        };
+    }
+
+    /**
      * Each request from its own address, so the rate limits of the auth endpoints never mix up
      * unrelated tests (they share one application).
      */
@@ -97,7 +117,7 @@ public class MemberFixtures {
         var response =
                 mockMvc.perform(
                                 post("/api/v1/auth/login")
-                                        .with(csrf())
+                                        .with(xsrf())
                                         .with(freshAddress())
                                         .header(HttpHeaders.USER_AGENT, userAgent)
                                         .contentType(MediaType.APPLICATION_JSON)
