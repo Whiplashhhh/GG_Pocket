@@ -29,8 +29,13 @@ prod_url=${prod_url:-https://pocket.${host//./-}.sslip.io}
 dev_url=${dev_url:-https://dev.pocket.${host//./-}.sslip.io}
 say() { printf '\n==> %s\n' "$*"; }
 
+for tool in gh jq ssh-keyscan ssh-keygen; do
+    command -v "$tool" >/dev/null || { echo "missing tool: $tool (run this on your own machine)" >&2; exit 1; }
+done
+gh auth status >/dev/null 2>&1 || { echo "gh is not logged in: gh auth login" >&2; exit 1; }
+
 say "Server fingerprint"
-known_hosts=$(ssh-keyscan -t ed25519 "$host" 2>/dev/null)
+known_hosts=$(ssh-keyscan -T 10 -t ed25519 "$host" 2>/dev/null || true)
 [[ -n $known_hosts ]] || { echo "no answer from $host on port 22" >&2; exit 1; }
 ssh-keygen -lf <(echo "$known_hosts")
 echo "Compare with, on the server: ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub"
