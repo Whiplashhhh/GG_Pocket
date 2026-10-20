@@ -187,7 +187,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      GG_HOME: ${{ runner.temp }}/gg-pocket
+      GG_HOME: /tmp/gg-pocket-home
       GG_ENV_FILE: ${{ github.workspace }}/deploy/env/ci.env
       GG_SKIP_PULL: "1"
       GG_IMAGE_TAG: ci
