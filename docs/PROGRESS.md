@@ -6,7 +6,7 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ## 2026-10-20 — Phase 1 (comptes et rôles)
 
-**Branche** : `feature/comptes-0.0.0` (depuis `main` après fusion de la phase 0), poussée ; PR « Phase 1 — Comptes et rôles ».
+**Branche** : `feature/comptes-0.0.0` (depuis `main` après fusion de la phase 0), poussée ; PR #3 « Phase 1 — Comptes et rôles », CI verte (backend, frontend, e2e iPhone 13 + Desktop Chrome, gitleaks).
 
 ### Fait
 
