@@ -52,6 +52,13 @@ test('a demo climber signs in, browses and signs out without any CSP violation',
   page,
 }) => {
   expect(SEED_PASSWORD, 'GG_SEED_PASSWORD must be set').not.toBe('')
+  // The invitation to install opens by itself on a first visit (modal): already declined here.
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'gg-pocket:install-invite',
+      JSON.stringify({ dismissals: 3, lastDismissedAt: Date.now() }),
+    )
+  })
   const violations = cspViolations(page)
   const calls: string[] = []
   page.on('response', (response) => {
