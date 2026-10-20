@@ -5,3 +5,9 @@ spring:
     url: ${GG_DB_URL:jdbc:postgresql://localhost:5432/ggpocket}
     username: ${GG_DB_USER:ggpocket}
     password: ${GG_DB_PASSWORD:ggpocket}
+
+# Demo accounts (spec §17): only with GG_ALLOW_DEMO_SEED=true, see DemoSeeder for the other safety catches.
+gg:
+  demo-seed:
+    allowed: ${GG_ALLOW_DEMO_SEED:false}
+    password: ${GG_SEED_PASSWORD:}
