@@ -1,4 +1,4 @@
-package fr.gravelinesgrimp.pocket.auth.application;
+package fr.gravelinesgrimp.pocket.platform.application;
 
 import fr.gravelinesgrimp.pocket.platform.domain.RateLimitedException;
 
@@ -15,7 +15,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Sliding-window attempt counters, kept in memory: one API instance serves the club, and a restart
- * resetting the counters is acceptable (DECISIONS D-051). Keys are client addresses or nicknames.
+ * resetting the counters is acceptable (DECISIONS D-050). Keys are client addresses, nicknames or
+ * member ids.
  */
 @Component
 public class RateLimiter {
@@ -27,9 +28,16 @@ public class RateLimiter {
     public static final Rule LOGIN_PER_ADDRESS =
             new Rule("login-per-address", 30, Duration.ofMinutes(15));
 
-    /** Failed passwords only: a member who types it right is never slowed down by others. */
+    /**
+     * Failed passwords for one nickname from one address: stops guessing, without letting a
+     * stranger lock the account for everyone (their failures only block their own address).
+     */
+    public static final Rule LOGIN_FAILURES_PER_NICKNAME_AND_ADDRESS =
+            new Rule("login-failures-per-nickname-and-address", 10, Duration.ofMinutes(15));
+
+    /** Failed passwords for one nickname from anywhere: only a wide, distributed attack hits it. */
     public static final Rule LOGIN_FAILURES_PER_NICKNAME =
-            new Rule("login-failures-per-nickname", 10, Duration.ofMinutes(15));
+            new Rule("login-failures-per-nickname", 100, Duration.ofMinutes(15));
 
     public static final Rule REGISTRATION_CODE_PER_ADDRESS =
             new Rule("registration-code-per-address", 20, Duration.ofMinutes(15));
@@ -39,6 +47,10 @@ public class RateLimiter {
 
     public static final Rule PASSWORD_RESET_PER_ADDRESS =
             new Rule("password-reset-per-address", 20, Duration.ofMinutes(15));
+
+    /** Decoding a photo is the heaviest thing a member can ask for. */
+    public static final Rule AVATAR_UPLOAD_PER_MEMBER =
+            new Rule("avatar-upload-per-member", 10, Duration.ofHours(1));
 
     /** Above this many tracked keys, stale ones are dropped before adding more. */
     private static final int PURGE_THRESHOLD = 10_000;

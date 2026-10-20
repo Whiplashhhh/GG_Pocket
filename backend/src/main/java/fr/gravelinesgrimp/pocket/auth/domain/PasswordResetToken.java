@@ -69,4 +69,9 @@ public class PasswordResetToken extends TimestampedEntity {
     public Instant usedAt() {
         return usedAt;
     }
+
+    /** The board member or admin who made the link; null if that account was deleted since. */
+    public UUID createdBy() {
+        return createdBy;
+    }
 }

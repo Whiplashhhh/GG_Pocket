@@ -1,4 +1,4 @@
-package fr.gravelinesgrimp.pocket.admin.domain;
+package fr.gravelinesgrimp.pocket.member.domain;
 
 import static fr.gravelinesgrimp.pocket.member.domain.Role.ADMIN;
 import static fr.gravelinesgrimp.pocket.member.domain.Role.BOARD;
@@ -6,8 +6,6 @@ import static fr.gravelinesgrimp.pocket.member.domain.Role.CLIMBER;
 import static fr.gravelinesgrimp.pocket.member.domain.Role.SETTER;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import fr.gravelinesgrimp.pocket.member.domain.Role;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

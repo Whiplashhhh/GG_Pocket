@@ -1,4 +1,4 @@
-import type { BrowserContext, Page, Request, Route } from '@playwright/test'
+import type { BrowserContext, Page, Route } from '@playwright/test'
 
 import type { components } from '../src/api/schema'
 
@@ -142,17 +142,17 @@ export class FakeClub {
     ])
   }
 
-  private cookie(request: Request, name: string): string | undefined {
-    const header = (request.headers().cookie as string | undefined) ?? ''
-    return header
+  /** Cookie header: WebKit only exposes it through allHeaders(), not headers(). */
+  private cookie(headers: Partial<Record<string, string>>, name: string): string | undefined {
+    return (headers.cookie ?? '')
       .split(';')
       .map((part) => part.trim().split('='))
       .find(([key]) => key === name)?.[1]
   }
 
   /** The member of a live session, extending it like Spring Session does on every request. */
-  private current(request: Request): FakeMember | undefined {
-    const token = this.cookie(request, SESSION_COOKIE)
+  private current(headers: Partial<Record<string, string>>): FakeMember | undefined {
+    const token = this.cookie(headers, SESSION_COOKIE)
     const session = token === undefined ? undefined : this.sessions.get(token)
     if (token === undefined || session === undefined) {
       return undefined
@@ -256,6 +256,7 @@ export class FakeClub {
 
   private async handle(route: Route): Promise<void> {
     const request = route.request()
+    const headers = await request.allHeaders()
     const method = request.method()
     const path = new URL(request.url()).pathname.replace('/api/v1', '')
     const body = (): Record<string, unknown> => {
@@ -279,15 +280,15 @@ export class FakeClub {
 
     // The app must send the CSRF cookie back in the header on every write.
     if (method !== 'GET') {
-      const cookie = this.cookie(request, CSRF_COOKIE)
-      if (cookie === undefined || request.headers()['x-xsrf-token'] !== cookie) {
+      const cookie = this.cookie(headers, CSRF_COOKIE)
+      if (cookie === undefined || headers['x-xsrf-token'] !== cookie) {
         return fail(403, 'CSRF_TOKEN_INVALID')
       }
     }
 
     if (path === '/auth/state') {
       await this.context.addCookies([{ name: CSRF_COOKIE, value: 'jeton-csrf', url: this.origin }])
-      const member = this.current(request)
+      const member = this.current(headers)
       return json(
         member
           ? { authenticated: true, member: this.currentMember(member) }
@@ -309,7 +310,7 @@ export class FakeClub {
       return json(this.currentMember(member))
     }
     if (path === '/auth/logout') {
-      const token = this.cookie(request, SESSION_COOKIE)
+      const token = this.cookie(headers, SESSION_COOKIE)
       if (token !== undefined) this.sessions.delete(token)
       await this.context.clearCookies({ name: SESSION_COOKIE })
       return route.fulfill({ status: 204 })
@@ -362,7 +363,7 @@ export class FakeClub {
       return route.fulfill({ status: 200, contentType: 'image/png', body: PIXEL })
     }
 
-    const me = this.current(request)
+    const me = this.current(headers)
     if (me === undefined) return fail(401, 'UNAUTHENTICATED')
 
     if (path === '/me' && method === 'GET') return json(this.profile(me))
@@ -385,7 +386,7 @@ export class FakeClub {
       return route.fulfill({ status: 204 })
     }
     if (path === '/me/devices') {
-      const token = this.cookie(request, SESSION_COOKIE)
+      const token = this.cookie(headers, SESSION_COOKIE)
       return json(
         [...this.sessions.entries()]
           .filter(([, session]) => session.memberId === me.id)

@@ -38,14 +38,26 @@ class RateLimitIT {
     }
 
     @Test
-    void tooManyWrongPasswordsLockTheNicknameForAWhileEvenFromElsewhere() throws Exception {
+    void tooManyWrongPasswordsLockThatNicknameFromThatAddress() throws Exception {
         var member = members.create(Role.CLIMBER);
+        var guesser = "192.0.2.20";
         for (var i = 0; i < 10; i++) {
-            mockMvc.perform(login(member.nickname(), "mauvais mot de passe"))
+            mockMvc.perform(login(member.nickname(), "mauvais mot de passe", guesser))
                     .andExpect(status().isUnauthorized());
         }
-        mockMvc.perform(login(member.nickname(), MemberFixtures.PASSWORD))
+        mockMvc.perform(login(member.nickname(), MemberFixtures.PASSWORD, guesser))
                 .andExpect(status().isTooManyRequests());
+    }
+
+    @Test
+    void aStrangerCannotLockTheMemberOut() throws Exception {
+        var member = members.create(Role.CLIMBER);
+        for (var i = 0; i < 10; i++) {
+            mockMvc.perform(login(member.nickname(), "mauvais mot de passe", "192.0.2.30"))
+                    .andExpect(status().isUnauthorized());
+        }
+        mockMvc.perform(login(member.nickname(), MemberFixtures.PASSWORD, "192.0.2.31"))
+                .andExpect(status().isOk());
     }
 
     private static MockHttpServletRequestBuilder codeCheck(String address) {
@@ -60,10 +72,15 @@ class RateLimitIT {
                 .content("{\"code\": \"ZZZZ-ZZZZ\"}");
     }
 
-    private static MockHttpServletRequestBuilder login(String nickname, String password) {
+    private static MockHttpServletRequestBuilder login(
+            String nickname, String password, String address) {
         return post("/api/v1/auth/login")
                 .with(xsrf())
-                .with(MemberFixtures.freshAddress())
+                .with(
+                        request -> {
+                            request.setRemoteAddr(address);
+                            return request;
+                        })
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                         "{\"nickname\": \"%s\", \"password\": \"%s\", \"rememberMe\": true}"

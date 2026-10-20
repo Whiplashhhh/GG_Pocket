@@ -65,10 +65,12 @@ test.describe('app shell', () => {
     await expect(page.locator('html')).not.toHaveAttribute('data-theme')
   })
 
-  test('shows the app and server versions in the profile', async ({ page }) => {
+  test('shows the app version in the profile, the server version to the board only', async ({
+    page,
+  }) => {
     await page.goto('/profil')
     await expect(page.getByText('GG Pocket 0.0.0')).toBeVisible()
-    await expect(page.getByText('Serveur 0.0.0')).toBeVisible()
+    await expect(page.getByText('Serveur 0.0.0')).toHaveCount(0)
   })
 
   test('an unknown address gets a friendly 404', async ({ page }) => {

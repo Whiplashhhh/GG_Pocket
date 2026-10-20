@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MemberFixtures {
 
     public static final String PASSWORD = "Bras de T-Rex 2026";
-    public static final String SESSION_COOKIE = "GG_SESSION";
+    public static final String SESSION_COOKIE = "__Host-GG_SESSION";
     public static final String IPHONE_SAFARI =
             "Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15"
                     + " (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1";

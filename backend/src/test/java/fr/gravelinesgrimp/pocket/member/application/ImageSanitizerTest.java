@@ -69,6 +69,20 @@ class ImageSanitizerTest {
     @Test
     void refusesHugeImagesBeforeDecodingThem() {
         assertRefused(pngHeaderOnly(10_000, 10_000), ErrorCode.IMAGE_TOO_LARGE);
+        // 4400 × 4000: 17.6 megapixels.
+        assertRefused(pngHeaderOnly(4_400, 4_000), ErrorCode.IMAGE_TOO_LARGE);
+        // Few pixels, but a side longer than 8192.
+        assertRefused(pngHeaderOnly(9_000, 100), ErrorCode.IMAGE_TOO_LARGE);
+    }
+
+    @Test
+    void decodesBigPhotosSubsampledButStillSharpEnough() throws IOException {
+        var clean = sanitizer.squareJpeg(image("png", 3000, 2200), 512);
+        assertThat(clean.width()).isEqualTo(512);
+        var decoded = ImageIO.read(new ByteArrayInputStream(clean.jpeg()));
+        // The centre of the test picture is the olive disc.
+        var centre = new Color(decoded.getRGB(256, 256));
+        assertThat(centre.getGreen()).isGreaterThan(centre.getBlue() + 60);
     }
 
     private void assertRefused(byte[] upload, ErrorCode code) {

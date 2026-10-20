@@ -5,6 +5,7 @@ import fr.gravelinesgrimp.pocket.member.domain.MediaUsage;
 import fr.gravelinesgrimp.pocket.member.infra.MediaFileRepository;
 import fr.gravelinesgrimp.pocket.member.infra.MediaStorage;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
@@ -32,6 +33,7 @@ public class AvatarService {
     private final MediaFileRepository mediaFiles;
     private final MediaStorage storage;
     private final ImageSanitizer sanitizer;
+    private final RateLimiter rateLimiter;
     private final Clock clock;
 
     public AvatarService(
@@ -39,11 +41,13 @@ public class AvatarService {
             MediaFileRepository mediaFiles,
             MediaStorage storage,
             ImageSanitizer sanitizer,
+            RateLimiter rateLimiter,
             Clock clock) {
         this.members = members;
         this.mediaFiles = mediaFiles;
         this.storage = storage;
         this.sanitizer = sanitizer;
+        this.rateLimiter = rateLimiter;
         this.clock = clock;
     }
 
@@ -52,6 +56,7 @@ public class AvatarService {
         var member =
                 members.findById(memberId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No member"));
+        rateLimiter.consume(RateLimiter.AVATAR_UPLOAD_PER_MEMBER, memberId.toString());
         var image = sanitizer.squareJpeg(upload, AVATAR_SIZE);
         var media =
                 new MediaFile(

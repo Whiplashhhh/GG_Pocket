@@ -314,7 +314,11 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     plafonnent à 400 jours) et il est **renvoyé tous les 7 jours** par `CurrentMemberFilter`, pour que son échéance côté navigateur
     glisse aussi : un membre qui revient au moins une fois tous les six mois ne se reconnecte jamais.
   - Décoché : cookie de session navigateur (disparaît à la fermeture) et inactivité maximale **12 heures** côté serveur.
-  - Cookie `HttpOnly`, `Secure`, `SameSite=Lax`, déclaré explicitement (`SessionCookieConfig`) : les propriétés
+  - Cookie `__Host-GG_SESSION`, `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/` : le préfixe `__Host-` interdit à un sous-domaine
+    voisin (le futur dev) de le poser. Le jeton CSRF n'est lu que dans l'en-tête `X-XSRF-TOKEN`, jamais dans un paramètre de
+    formulaire : un sous-domaine peut déposer un cookie, pas envoyer cet en-tête (pas de CORS). À la déconnexion,
+    `Clear-Site-Data: "cache"` efface les photos gardées par le navigateur. Les sessions des autres appareils sont fermées
+    **après** la validation d'un changement de mot de passe. Déclaré explicitement (`SessionCookieConfig`) : les propriétés
     `server.servlet.session.cookie.*` ne s'appliquent à Spring Session qu'avec un serveur embarqué, les tests auraient eu un autre cookie.
   - La session ne garde que l'identifiant du membre (`MemberPrincipal`, aussi clé de « Mes appareils ») ; rôle et statut sont relus
     en base à chaque requête (une petite requête) : un nouveau rôle s'applique tout de suite, un compte désactivé perd sa session.
@@ -333,10 +337,13 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 
 ### D-050 — Limitation de débit en mémoire
 - **Choix** : fenêtres glissantes en mémoire (une seule instance d'API ; un redémarrage remet les compteurs à zéro, acceptable).
-  Connexion : 30 essais / 15 min par adresse (le Wi-Fi de la salle est partagé) et 10 échecs / 15 min par pseudo (un mauvais mot de
-  passe ne bloque que ce pseudo, quelle que soit l'adresse ; le bon mot de passe d'un autre membre n'est jamais ralenti) ;
+  Connexion : 30 essais / 15 min par adresse (le Wi-Fi de la salle est partagé) ; 10 échecs / 15 min pour un pseudo **depuis une
+  même adresse** (un inconnu qui tape de faux mots de passe ne bloque que lui-même, jamais le vrai membre) et 100 échecs / 15 min
+  pour un pseudo toutes adresses confondues (seule une attaque très distribuée l'atteint) ;
   vérification de code d'inscription : 20 / 15 min par adresse ; inscription : 30 / heure par adresse ; réinitialisation :
-  20 / 15 min par adresse ; changement de mot de passe : compté avec les échecs du pseudo. Réponse 429 `RATE_LIMITED` + `Retry-After`.
+  20 / 15 min par adresse ; changement de mot de passe : compté avec les échecs du pseudo depuis l'adresse ; photo de profil :
+  10 envois / heure par membre. Réponse 429 `RATE_LIMITED` + `Retry-After`. Les adresses IPv6 comptent par réseau /64
+  (une box en possède des milliards).
   L'adresse du client vient de `X-Forwarded-For` posé par Caddy, cru seulement depuis les réseaux privés
   (`server.forward-headers-strategy: native`).
 - **Alternatives** : Bucket4j (une dépendance pour quelques compteurs) ; Redis (refusé par la spec).
@@ -355,7 +362,11 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Choix** : jeton aléatoire de 256 bits, seul son SHA-256 est en base, usage unique, 24 h ; un nouveau lien efface les précédents
   non utilisés. Le lien est `/nouveau-mot-de-passe#<jeton>` : le jeton est dans le **fragment**, jamais envoyé dans une requête de page,
   donc absent des journaux du serveur et du `Referer`. Après usage : toutes les sessions du membre sont fermées et cet appareil est
-  connecté. L'écran rappelle le pseudo du membre (il l'a souvent oublié avec le mot de passe).
+  connecté. L'écran rappelle le pseudo du membre (il l'a souvent oublié avec le mot de passe). Le jeton quitte la barre d'adresse et
+  l'historique dès la lecture de la page.
+  Un lien en attente est annulé quand le rôle ou le statut du membre change, ou qu'il change lui-même son mot de passe ; à l'usage,
+  son auteur doit être encore actif et encore autorisé à gérer ce membre (sinon, un lien fait pour un grimpeur promu ensuite à la
+  direction, ou fait par une direction rétrogradée depuis, ouvrirait un compte hors de portée). Revue de sécurité de fin de phase.
 - **Statut** : validée.
 
 ### D-053 — Mots de passe
@@ -369,7 +380,9 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 ### D-054 — Photos de profil
 - **Choix** : le navigateur recadre au carré, réduit à 1024 px et redessine la photo (ce qui applique l'orientation EXIF et lit le
   HEIC des iPhone) ; le serveur vérifie le type réel (octets JPEG, PNG ou WebP, jamais le nom ni le type annoncé), refuse au-delà de
-  40 mégapixels **avant** de décoder, redessine les pixels en 512 × 512 et ré-encode en JPEG sans aucune métadonnée (EXIF, GPS).
+  16 mégapixels ou 8192 px de côté **avant** de décoder, ne décode que le carré central en sautant des pixels (au plus deux fois la
+  taille finale : une petite image très grande ne peut pas épuiser la mémoire), deux décodages à la fois au maximum, puis redessine
+  en 512 × 512 et ré-encode en JPEG sans aucune métadonnée (EXIF, GPS).
   Décodage WebP par TwelveMonkeys 3.15.3. Fichiers sur le volume `GG_MEDIA_ROOT`, nom aléatoire, servis par `GET /api/v1/media/{id}`
   aux seuls membres connectés (`Cache-Control: private, immutable` : une nouvelle photo a un nouvel identifiant).
 - **Limite connue** : une photo envoyée sans passer par l'appli garde son orientation brute (pas de lecture de l'EXIF côté serveur).

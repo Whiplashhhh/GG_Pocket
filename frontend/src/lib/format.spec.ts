@@ -14,7 +14,8 @@ describe('formatDate', () => {
   it('uses the time in Gravelines', () => {
     // 23:30 UTC on 31 October is already 1 November in Paris (UTC+1).
     expect(formatDate('2026-10-31T23:30:00Z')).toBe('1 novembre 2026')
-    expect(formatDateTime('2026-07-14T16:30:00Z')).toBe('14 juillet à 18:30')
+    expect(formatDateTime('2026-07-14T16:30:00Z')).toBe('14 juillet à 18\u00a0h\u00a030')
+    expect(formatDateTime('2026-10-21T08:00:00Z')).toBe('21 octobre à 10\u00a0h')
   })
 })
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeft } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import type { RouteLocationRaw } from 'vue-router'
 
 import logoDark from '@/assets/brand/logo-dark.webp'
@@ -18,6 +19,8 @@ withDefaults(
   }>(),
   { intro: undefined, back: undefined, backLabel: undefined, large: false },
 )
+
+const { t } = useI18n()
 </script>
 
 <template>
@@ -30,7 +33,7 @@ withDefaults(
     <div class="flex flex-col items-center gap-4 pt-2 pb-6 text-center">
       <img
         :src="logoLight"
-        alt=""
+        :alt="large ? t('app.clubName') : ''"
         :width="large ? 168 : 88"
         :height="large ? 166 : 87"
         class="dark:hidden"
@@ -38,7 +41,7 @@ withDefaults(
       />
       <img
         :src="logoDark"
-        alt=""
+        :alt="large ? t('app.clubName') : ''"
         :width="large ? 168 : 88"
         :height="large ? 166 : 87"
         class="hidden dark:block"

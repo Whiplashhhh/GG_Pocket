@@ -59,7 +59,7 @@ function submit() {
     :back-label="t('common.back')"
   />
   <form class="flex flex-col gap-5 px-4 pb-10" novalidate @submit.prevent="submit">
-    <FormAlert v-if="sessionEnded && !general">{{ t('login.sessionEnded') }}</FormAlert>
+    <FormAlert v-if="sessionEnded && !general" tone="info">{{ t('login.sessionEnded') }}</FormAlert>
     <FormAlert v-if="general">{{ t(general.key, general.params ?? {}) }}</FormAlert>
 
     <TextField
@@ -88,7 +88,7 @@ function submit() {
     <div class="flex flex-col gap-2">
       <button
         type="button"
-        class="min-h-11 self-start font-semibold text-brand-ink underline-offset-4 hover:underline"
+        class="min-h-11 self-start font-semibold underline underline-offset-4"
         :aria-expanded="showForgotHelp"
         aria-controls="aide-mot-de-passe"
         @click="showForgotHelp = !showForgotHelp"

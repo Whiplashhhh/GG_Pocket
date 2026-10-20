@@ -13,6 +13,8 @@ const props = withDefaults(
     /** Already translated. */
     error?: string
     optional?: boolean
+    /** Shows « (facultatif) » next to the label of an optional field; not for a search box. */
+    showOptionalMark?: boolean
     maxlength?: number
     min?: string | number
     max?: string | number
@@ -27,6 +29,7 @@ const props = withDefaults(
     hint: undefined,
     error: undefined,
     optional: false,
+    showOptionalMark: true,
     maxlength: undefined,
     min: undefined,
     max: undefined,
@@ -54,7 +57,9 @@ defineExpose({ focus: () => input.value?.focus() })
   <div class="flex flex-col gap-1.5">
     <label :for="id" class="font-semibold">
       {{ label }}
-      <span v-if="optional" class="font-normal text-ink-muted">({{ t('common.optional') }})</span>
+      <span v-if="optional && showOptionalMark" class="font-normal text-ink-muted"
+        >({{ t('common.optional') }})</span
+      >
     </label>
     <div class="relative">
       <input

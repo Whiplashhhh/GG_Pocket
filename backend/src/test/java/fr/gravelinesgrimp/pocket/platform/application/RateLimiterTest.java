@@ -1,10 +1,10 @@
-package fr.gravelinesgrimp.pocket.auth.application;
+package fr.gravelinesgrimp.pocket.platform.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import fr.gravelinesgrimp.pocket.auth.application.RateLimiter.Rule;
+import fr.gravelinesgrimp.pocket.platform.application.RateLimiter.Rule;
 import fr.gravelinesgrimp.pocket.platform.domain.RateLimitedException;
 
 import org.junit.jupiter.api.Test;

@@ -83,7 +83,13 @@ class SecurityConfig {
                 .securityContext(
                         context -> context.securityContextRepository(securityContextRepository))
                 // Single-page app: token in a cookie readable by the front, sent back in a header.
-                .csrf(csrf -> csrf.spa())
+                // Only the header counts: a sibling subdomain can plant a cookie, but cannot send
+                // a custom header to this origin (no CORS), so no forged form gets through.
+                .csrf(
+                        csrf ->
+                                csrf.spa()
+                                        .csrfTokenRequestHandler(
+                                                new HeaderOnlyCsrfTokenRequestHandler()))
                 .addFilterBefore(
                         new CurrentMemberFilter(memberAccess, cookieSerializer, clock),
                         AuthorizationFilter.class)

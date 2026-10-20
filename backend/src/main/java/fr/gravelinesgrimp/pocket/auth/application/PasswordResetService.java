@@ -6,7 +6,9 @@ import fr.gravelinesgrimp.pocket.auth.infra.MemberSessionStore;
 import fr.gravelinesgrimp.pocket.auth.infra.PasswordResetTokenRepository;
 import fr.gravelinesgrimp.pocket.member.application.CurrentMemberView;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
+import fr.gravelinesgrimp.pocket.member.domain.MemberGovernance;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
 
@@ -82,8 +84,13 @@ public class PasswordResetService {
         var member =
                 tokens.findByTokenHash(PasswordResetToken.hash(token))
                         .filter(found -> found.isUsable(clock.instant()))
-                        .flatMap(found -> members.findById(found.memberId()))
-                        .filter(Member::isActive)
+                        .flatMap(
+                                found ->
+                                        members.findById(found.memberId())
+                                                .filter(Member::isActive)
+                                                .filter(
+                                                        target ->
+                                                                creatorStillManages(found, target)))
                         .orElseThrow(PasswordResetService::invalidLink);
         return new ResetTarget(member.firstName(), member.nickname());
     }
@@ -103,12 +110,38 @@ public class PasswordResetService {
         var member =
                 members.findById(link.memberId())
                         .filter(Member::isActive)
+                        .filter(target -> creatorStillManages(link, target))
                         .orElseThrow(PasswordResetService::invalidLink);
         passwordPolicy.check(newPassword);
         member.changePasswordHash(passwordEncoder.encode(newPassword));
         link.markUsed(now);
-        sessions.deleteAllOf(member.id(), null);
+        sessions.deleteAllOfAfterCommit(member.id(), null);
         return CurrentMemberView.of(member);
+    }
+
+    /**
+     * Cancels the pending links of a member whose role or status just changed: a link made for a
+     * climber must not open the account of the board member they became (DECISIONS D-052).
+     */
+    @Transactional
+    public void cancelLinks(UUID memberId) {
+        tokens.deleteUnusedOf(memberId);
+    }
+
+    /** The maker of the link must still be active and still allowed to manage this member. */
+    private boolean creatorStillManages(PasswordResetToken link, Member target) {
+        if (link.createdBy() == null) {
+            return false;
+        }
+        return members.findById(link.createdBy())
+                .filter(Member::isActive)
+                .filter(
+                        creator ->
+                                MemberGovernance.canManageAccount(
+                                        creator.role(),
+                                        creator.id().equals(target.id()),
+                                        target.role()))
+                .isPresent();
     }
 
     private static BusinessException invalidLink() {

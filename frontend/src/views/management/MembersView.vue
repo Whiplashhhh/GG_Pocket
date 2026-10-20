@@ -7,7 +7,6 @@ import { useMembers, type MemberSummary } from '@/api/admin'
 import { errorMessageKey } from '@/api/errors'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
-import RoleBadge from '@/components/ui/RoleBadge.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import TextField from '@/components/ui/TextField.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
@@ -69,6 +68,7 @@ function fullName(member: MemberSummary): string {
         :placeholder="t('members.searchPlaceholder')"
         inputmode="search"
         optional
+        :show-optional-mark="false"
         verbatim
       >
         <template #trailing>
@@ -122,11 +122,11 @@ function fullName(member: MemberSummary): string {
             <span class="truncate font-semibold">{{ fullName(member) }}</span>
             <span class="truncate text-sm text-ink-muted">@{{ member.nickname }}</span>
             <span class="flex gap-2">
-              <RoleBadge :role="member.role" />
+              <span class="text-sm text-ink-muted">{{ t(`roleNames.${member.role}`) }}</span>
               <span
                 v-if="member.status === 'DISABLED'"
                 class="rounded-control border border-danger px-1.5 text-micro font-semibold text-danger"
-                >{{ t('members.status.DISABLED') }}</span
+                >{{ t('members.disabledChip') }}</span
               >
             </span>
           </span>
@@ -176,11 +176,11 @@ function fullName(member: MemberSummary): string {
                 :src="member.avatarUrl"
                 :size="32"
               />
-              {{ member.lastName }} {{ member.firstName }}
+              {{ member.firstName }} {{ member.lastName }}
             </RouterLink>
           </td>
           <td class="py-2 pr-3 text-ink-muted">@{{ member.nickname }}</td>
-          <td class="py-2 pr-3"><RoleBadge :role="member.role" /></td>
+          <td class="py-2 pr-3">{{ t(`roleNames.${member.role}`) }}</td>
           <td
             class="py-2 pr-3"
             :class="{ 'font-semibold text-danger': member.status === 'DISABLED' }"

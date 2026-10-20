@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useClipboard } from '@vueuse/core'
-import { Plus } from 'lucide-vue-next'
+import { Pencil, Plus } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -16,6 +16,7 @@ import EmptyState from '@/components/ui/EmptyState.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import GgDialog from '@/components/ui/GgDialog.vue'
+import GgIconButton from '@/components/ui/GgIconButton.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import TextField from '@/components/ui/TextField.vue'
 import { codeSettings, toCodeForm, type CodeForm } from '@/lib/codes'
@@ -29,14 +30,7 @@ const { t } = useI18n()
 const codes = useRegistrationCodes()
 const create = useCreateRegistrationCode()
 const update = useUpdateRegistrationCode()
-const {
-  copy,
-  copied,
-  text: copiedText,
-  isSupported: canCopy,
-} = useClipboard({
-  copiedDuring: 2500,
-})
+const { copy, isSupported: canCopy } = useClipboard()
 
 const editing = ref<RegistrationCode | 'new' | null>(null)
 const open = ref(false)
@@ -95,6 +89,13 @@ function save() {
   }
 }
 
+/** The copy is announced by the notice area, read out by screen readers too. */
+async function copyAndSay(text: string) {
+  await copy(text)
+  failure.value = null
+  notice.value = t('codes.copiedNotice')
+}
+
 function signUpLink(code: RegistrationCode): string {
   return `${window.location.origin}/inscription?code=${encodeURIComponent(code.code)}`
 }
@@ -126,14 +127,14 @@ function uses(code: RegistrationCode): string {
   </div>
   <EmptyState v-else-if="(codes.data.value ?? []).length === 0" :title="t('codes.empty')" body="" />
 
-  <ul v-else class="grid grid-cols-1 border-t border-rule lg:grid-cols-2 lg:gap-4 lg:border-0">
+  <ul v-else class="border-t border-rule">
     <li
       v-for="code in codes.data.value"
       :key="code.id"
-      class="flex flex-col gap-2 border-b border-rule px-4 py-4 lg:rounded-control lg:border lg:bg-surface"
+      class="flex flex-col gap-3 border-b border-rule px-4 py-4 lg:flex-row lg:items-center lg:gap-6 lg:px-0"
     >
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex flex-col">
+      <div class="flex min-w-0 flex-1 items-start justify-between gap-3">
+        <div class="flex min-w-0 flex-col">
           <p
             class="text-3xl font-cord tracking-wide"
             :class="{ 'text-ink-muted line-through': code.state !== 'USABLE' }"
@@ -141,45 +142,38 @@ function uses(code: RegistrationCode): string {
             {{ code.code }}
           </p>
           <p class="font-semibold">{{ code.label }}</p>
+          <p class="text-sm text-ink-muted">
+            {{ uses(code) }} ·
+            {{
+              code.expiresAt
+                ? t('codes.expires', { date: formatDate(code.expiresAt) })
+                : t('codes.noExpiry')
+            }}
+          </p>
         </div>
-        <span
-          class="shrink-0 rounded-control px-1.5 py-px text-micro font-semibold"
-          :class="
-            code.state === 'USABLE' ? 'bg-olive text-on-olive' : 'border border-rule text-ink-muted'
-          "
-          >{{ t(`codes.states.${code.state}`) }}</span
-        >
+        <div class="flex shrink-0 items-center gap-1">
+          <span
+            class="rounded-control border px-1.5 py-px text-micro font-semibold"
+            :class="
+              code.state === 'USABLE' ? 'border-success text-success' : 'border-rule text-ink-muted'
+            "
+            >{{ t(`codes.states.${code.state}`) }}</span
+          >
+          <GgIconButton :label="t('codes.editNamed', { code: code.code })" @click="startEdit(code)">
+            <Pencil :size="20" aria-hidden="true" />
+          </GgIconButton>
+        </div>
       </div>
-      <p class="text-sm text-ink-muted">
-        {{ uses(code) }} ·
-        {{
-          code.expiresAt
-            ? t('codes.expires', { date: formatDate(code.expiresAt) })
-            : t('codes.noExpiry')
-        }}
-      </p>
-      <div class="flex flex-wrap gap-2">
+      <div v-if="canCopy && code.state === 'USABLE'" class="flex flex-wrap gap-2">
         <GgButton
-          v-if="canCopy && code.state === 'USABLE'"
           variant="secondary"
-          :aria-label="t('codes.copyCode', { code: code.code })"
-          @click="copy(code.code)"
+          :aria-label="t('codes.copyCodeNamed', { code: code.code })"
+          @click="copyAndSay(code.code)"
         >
-          {{ copied && copiedText === code.code ? t('common.copied') : t('common.copy') }}
+          {{ t('codes.copyCode') }}
         </GgButton>
-        <GgButton
-          v-if="canCopy && code.state === 'USABLE'"
-          variant="ghost"
-          @click="copy(signUpLink(code))"
-        >
-          {{ copied && copiedText === signUpLink(code) ? t('common.copied') : t('codes.copyLink') }}
-        </GgButton>
-        <GgButton
-          variant="ghost"
-          :aria-label="t('codes.editNamed', { code: code.code })"
-          @click="startEdit(code)"
-        >
-          {{ t('codes.edit') }}
+        <GgButton variant="secondary" @click="copyAndSay(signUpLink(code))">
+          {{ t('codes.copyLink') }}
         </GgButton>
       </div>
     </li>

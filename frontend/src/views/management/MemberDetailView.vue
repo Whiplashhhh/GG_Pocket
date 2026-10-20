@@ -222,6 +222,9 @@ function makeResetLink() {
             {{ t(`roleNames.${role}`) }}
           </option>
         </select>
+        <span class="text-sm text-ink-muted">{{
+          t('member.roleCurrent', { role: t(`roleNames.${detail.member.role}`) })
+        }}</span>
       </label>
       <GgButton
         class="self-start"

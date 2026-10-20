@@ -50,7 +50,11 @@ class MySecurityController {
             @Valid @RequestBody PasswordChangeRequest body,
             HttpServletRequest request) {
         passwordChange.change(
-                me.memberId(), body.currentPassword(), body.newPassword(), sessionId(request));
+                me.memberId(),
+                body.currentPassword(),
+                body.newPassword(),
+                sessionId(request),
+                ClientAddress.of(request));
     }
 
     @GetMapping(path = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)

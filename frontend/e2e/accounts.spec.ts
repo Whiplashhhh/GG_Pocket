@@ -6,7 +6,7 @@ test.describe('a visitor', () => {
   test('lands on the welcome screen with the two doors', async ({ page }) => {
     await page.goto('/')
     await expect(page).toHaveURL(/\/accueil$/)
-    await expect(page.getByRole('heading', { level: 1, name: 'Gravelines Grimp' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'GG Pocket' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'J’ai un code du club' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'J’ai déjà un compte' })).toBeVisible()
     await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toHaveCount(0)
@@ -102,7 +102,7 @@ test.describe('joining the club', () => {
     // First steps: photo (skipped), details, invitation to install.
     await expect(page).toHaveURL(/\/premiers-pas\/photo$/)
     await expect(page.getByText('Étape 1 sur 3')).toBeVisible()
-    await page.getByRole('button', { name: 'Continuer' }).click()
+    await page.getByRole('button', { name: 'Passer cette étape' }).click()
     await page.getByLabel('Je grimpe depuis').fill('2015')
     await page.getByRole('button', { name: 'Continuer' }).click()
     await expect(page.getByRole('heading', { name: 'Installe GG Pocket' })).toBeVisible()
@@ -155,7 +155,7 @@ test.describe('a signed-in member', () => {
     club.advance(181)
     await profileLink.click()
     await expect(page).toHaveURL(/\/connexion\?fin=1/)
-    await expect(page.getByRole('alert')).toContainText('Tu n’es plus encordé·e')
+    await expect(page.getByRole('status')).toContainText('Tu n’es plus encordé·e')
   })
 
   test('edits their profile', async ({ page }) => {

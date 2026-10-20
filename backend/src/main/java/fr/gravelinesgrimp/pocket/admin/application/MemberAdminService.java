@@ -2,12 +2,12 @@ package fr.gravelinesgrimp.pocket.admin.application;
 
 import fr.gravelinesgrimp.pocket.admin.domain.AuditAction;
 import fr.gravelinesgrimp.pocket.admin.domain.AuditTargetType;
-import fr.gravelinesgrimp.pocket.admin.domain.MemberGovernance;
 import fr.gravelinesgrimp.pocket.auth.application.DeviceService;
 import fr.gravelinesgrimp.pocket.auth.application.PasswordResetService;
 import fr.gravelinesgrimp.pocket.auth.application.PasswordResetService.ResetLink;
 import fr.gravelinesgrimp.pocket.member.domain.Age;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
+import fr.gravelinesgrimp.pocket.member.domain.MemberGovernance;
 import fr.gravelinesgrimp.pocket.member.domain.MemberStatus;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
@@ -111,6 +111,7 @@ public class MemberAdminService {
         }
         var before = member.role();
         member.changeRole(role);
+        passwordResets.cancelLinks(member.id());
         auditLog.record(
                 actor,
                 AuditAction.MEMBER_ROLE_CHANGED,
@@ -138,6 +139,7 @@ public class MemberAdminService {
             }
             member.disable();
             devices.closeAll(member.id());
+            passwordResets.cancelLinks(member.id());
         } else {
             member.enable();
         }

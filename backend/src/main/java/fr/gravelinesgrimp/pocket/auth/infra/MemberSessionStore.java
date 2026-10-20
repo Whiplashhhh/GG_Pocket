@@ -8,6 +8,8 @@ import fr.gravelinesgrimp.pocket.auth.domain.StoredSession;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Comparator;
 import java.util.List;
@@ -49,6 +51,24 @@ public class MemberSessionStore {
                                 sessions.deleteById(sessionId);
                             }
                         });
+    }
+
+    /**
+     * Same, once the current transaction has committed: after a password change, a sign-in that
+     * slipped in with the old password before the commit cannot outlive the change.
+     */
+    public void deleteAllOfAfterCommit(UUID memberId, String keptSessionId) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            deleteAllOf(memberId, keptSessionId);
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        deleteAllOf(memberId, keptSessionId);
+                    }
+                });
     }
 
     private static StoredSession toStoredSession(Session session) {

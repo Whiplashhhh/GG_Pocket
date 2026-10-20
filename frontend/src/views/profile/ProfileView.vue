@@ -124,7 +124,7 @@ const facts = computed(() => {
     </div>
     <div class="border-t border-rule px-4 py-6">
       <GgButton
-        variant="danger"
+        variant="secondary"
         :disabled="logout.isPending.value"
         @click="confirmingLogout = true"
       >
@@ -135,7 +135,9 @@ const facts = computed(() => {
 
   <footer class="border-t border-rule px-4 py-6 text-sm text-ink-muted">
     <p>{{ t('app.versionFooter', { version: appVersion }) }}</p>
-    <p v-if="meta">{{ t('app.serverVersion', { version: meta.version }) }}</p>
+    <p v-if="meta && profile && isAtLeast(profile.role, 'BOARD')">
+      {{ t('app.serverVersion', { version: meta.version }) }}
+    </p>
   </footer>
 
   <ConfirmDialog
@@ -143,7 +145,6 @@ const facts = computed(() => {
     :title="t('profile.logoutConfirmTitle')"
     :body="t('profile.logoutConfirmBody')"
     :confirm-label="t('profile.logout')"
-    danger
     @confirm="logout.mutate()"
   />
 </template>

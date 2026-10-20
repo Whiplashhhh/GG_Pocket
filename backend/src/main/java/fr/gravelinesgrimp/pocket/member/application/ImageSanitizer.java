@@ -2,17 +2,21 @@ package fr.gravelinesgrimp.pocket.member.application;
 
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
+import fr.gravelinesgrimp.pocket.platform.domain.RateLimitedException;
 
 import org.springframework.stereotype.Component;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -32,8 +36,18 @@ import javax.imageio.stream.ImageInputStream;
 @Component
 public class ImageSanitizer {
 
-    /** Beyond this, decoding alone could exhaust the memory of the server. */
-    static final long MAX_PIXELS = 40_000_000L;
+    /**
+     * Beyond this, refused before decoding. The app sends at most 1024 px; a phone photo sent as is
+     * stays well under. Decoding is also subsampled to about twice the target size.
+     */
+    static final long MAX_PIXELS = 16_000_000L;
+
+    static final int MAX_SIDE = 8192;
+
+    /** A decode may still need tens of megabytes: never more than two at once. */
+    static final int CONCURRENT_DECODES = 2;
+
+    private final Semaphore decodes = new Semaphore(CONCURRENT_DECODES);
 
     private static final float JPEG_QUALITY = 0.85f;
     private static final Color PAPER = new Color(0xFF, 0xFD, 0xF8);
@@ -68,17 +82,17 @@ public class ImageSanitizer {
                                         new BusinessException(
                                                 ErrorCode.IMAGE_UNSUPPORTED,
                                                 "Not a JPEG, PNG or WebP file"));
-        var source = decode(upload, type);
-        var side = Math.min(source.getWidth(), source.getHeight());
-        var target = Math.min(side, size);
-        var square =
-                source.getSubimage(
-                        (source.getWidth() - side) / 2,
-                        (source.getHeight() - side) / 2,
-                        side,
-                        side);
-        var resized = resize(square, target);
-        return new CleanImage(encodeJpeg(resized), target, target);
+        if (!decodes.tryAcquire()) {
+            throw new RateLimitedException("image-decoding", Duration.ofSeconds(5));
+        }
+        try {
+            var square = decodeCenteredSquare(upload, type, size);
+            var target = Math.min(square.getWidth(), size);
+            var resized = resize(square, target);
+            return new CleanImage(encodeJpeg(resized), target, target);
+        } finally {
+            decodes.release();
+        }
     }
 
     static Optional<ImageType> detect(byte[] bytes) {
@@ -106,7 +120,11 @@ public class ImageSanitizer {
         return true;
     }
 
-    private static BufferedImage decode(byte[] upload, ImageType type) {
+    /**
+     * Reads only the centred square, skipping pixels so that it comes out at most about twice the
+     * target size: memory stays small whatever the size of the photo.
+     */
+    private static BufferedImage decodeCenteredSquare(byte[] upload, ImageType type, int size) {
         try (ImageInputStream input =
                 ImageIO.createImageInputStream(new ByteArrayInputStream(upload))) {
             var readers = ImageIO.getImageReadersByFormatName(type.formatName);
@@ -116,12 +134,28 @@ public class ImageSanitizer {
             ImageReader reader = readers.next();
             try {
                 reader.setInput(input, true, true);
-                long pixels = (long) reader.getWidth(0) * reader.getHeight(0);
-                if (pixels > MAX_PIXELS) {
+                var width = reader.getWidth(0);
+                var height = reader.getHeight(0);
+                if ((long) width * height > MAX_PIXELS || width > MAX_SIDE || height > MAX_SIDE) {
                     throw new BusinessException(
-                            ErrorCode.IMAGE_TOO_LARGE, "Image of " + pixels + " pixels refused");
+                            ErrorCode.IMAGE_TOO_LARGE, "Image of " + width + "x" + height);
                 }
-                var image = reader.read(0);
+                var side = Math.min(width, height);
+                var step = Math.max(1, side / (2 * size));
+                var params = reader.getDefaultReadParam();
+                params.setSourceRegion(
+                        new Rectangle((width - side) / 2, (height - side) / 2, side, side));
+                params.setSourceSubsampling(step, step, 0, 0);
+                var decoded = reader.read(0, params);
+                // Subsampling may leave a pixel more on one side: keep it square.
+                var image =
+                        decoded == null || decoded.getWidth() == decoded.getHeight()
+                                ? decoded
+                                : decoded.getSubimage(
+                                        0,
+                                        0,
+                                        Math.min(decoded.getWidth(), decoded.getHeight()),
+                                        Math.min(decoded.getWidth(), decoded.getHeight()));
                 if (image == null || image.getWidth() == 0 || image.getHeight() == 0) {
                     throw unsupported("Empty image");
                 }

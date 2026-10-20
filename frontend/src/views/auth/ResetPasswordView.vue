@@ -25,6 +25,10 @@ import {
 const { t } = useI18n()
 const router = useRouter()
 const token = window.location.hash.replace(/^#/, '')
+// Kept in memory only: an unfinished reset leaves no secret in the address bar nor the history.
+if (token !== '') {
+  history.replaceState(history.state, '', window.location.pathname)
+}
 const target = usePasswordResetTarget(() => token)
 const reset = useResetPassword()
 
@@ -45,8 +49,6 @@ function submit() {
     { token, newPassword: password.value },
     {
       onSuccess: () => {
-        // The secret has served: take it out of the address bar and the history.
-        history.replaceState(null, '', window.location.pathname)
         void router.replace('/actu')
       },
       onError: (error) => {

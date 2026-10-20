@@ -12,7 +12,7 @@ const route = useRoute()
 
 <template>
   <div class="flex flex-1 flex-col bg-inserts">
-    <DoorHeader :title="t('app.clubName')" :intro="t('welcome.tagline')" large />
+    <DoorHeader :title="t('app.name')" :intro="t('welcome.tagline')" large />
     <div class="mt-auto flex flex-col gap-3 bg-bg/90 px-4 pt-6 pb-8">
       <GgButton to="/inscription" size="lg" block>{{ t('welcome.haveCode') }}</GgButton>
       <GgButton

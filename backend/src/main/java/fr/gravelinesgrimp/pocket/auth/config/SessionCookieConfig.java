@@ -14,7 +14,11 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 @Configuration(proxyBeanMethods = false)
 class SessionCookieConfig {
 
-    static final String COOKIE_NAME = "GG_SESSION";
+    /**
+     * "__Host-": the browser only accepts it from this very host, over HTTPS, for the whole site; a
+     * sibling subdomain (the dev environment) cannot plant one.
+     */
+    static final String COOKIE_NAME = "__Host-GG_SESSION";
 
     @Bean
     CookieSerializer cookieSerializer() {

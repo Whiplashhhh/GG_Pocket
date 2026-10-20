@@ -50,12 +50,13 @@ watch(
     id="contenu"
     tabindex="-1"
     class="mx-auto outline-none"
-    :class="[route.meta.wide ? 'max-w-6xl' : 'max-w-2xl', showFab ? 'pb-40' : 'pb-24']"
+    :class="[route.meta.wide ? 'max-w-6xl lg:pb-10' : 'max-w-2xl', showFab ? 'pb-40' : 'pb-24']"
   >
     <OfflineState v-if="unreachable" @retry="refetch()" />
     <RouterView v-else />
   </main>
   <NewSessionFab v-if="showFab" />
-  <TabBar />
+  <!-- Large management screens have their own navigation; the brand link leads back to the app. -->
+  <TabBar :class="{ 'lg:hidden': route.meta.wide }" />
   <InstallDialog v-model:open="inviting" />
 </template>

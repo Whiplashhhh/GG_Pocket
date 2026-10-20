@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import { useCurrentMember } from '@/api/auth'
 import { useMyProfile, useUpdateProfile } from '@/api/me'
 import InstallGuide from '@/components/install/InstallGuide.vue'
 import ProfileDetailsFields from '@/components/profile/ProfileDetailsFields.vue'
@@ -23,6 +24,7 @@ type Step = (typeof STEPS)[number]
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const member = useCurrentMember()
 const profile = useMyProfile()
 const update = useUpdateProfile()
 const install = useInstallStore()
@@ -123,7 +125,12 @@ function finish() {
       <p class="mt-2 text-ink-muted">{{ t('onboarding.photoBody') }}</p>
       <div class="py-8"><ProfilePhotoPicker /></div>
       <div class="mt-auto flex flex-col gap-2">
-        <GgButton size="lg" block @click="goTo('infos')">{{ t('onboarding.next') }}</GgButton>
+        <GgButton v-if="member?.avatarUrl" size="lg" block @click="goTo('infos')">
+          {{ t('onboarding.next') }}
+        </GgButton>
+        <GgButton variant="ghost" block @click="goTo('infos')">{{
+          t('onboarding.later')
+        }}</GgButton>
       </div>
     </template>
 

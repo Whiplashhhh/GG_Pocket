@@ -24,6 +24,9 @@ const sections = computed(() =>
     <SettingsLink v-for="section in sections" :key="section.to" :to="section.to">
       <template #icon><component :is="section.icon" :size="20" /></template>
       {{ t(section.labelKey) }}
+      <span v-if="section.soon" class="ml-1 text-sm font-normal text-ink-muted"
+        >({{ t('management.soon') }})</span
+      >
     </SettingsLink>
   </div>
 </template>

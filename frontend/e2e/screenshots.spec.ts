@@ -92,7 +92,7 @@ const CAPTURES: Capture[] = [
     prepare: someMembers,
     act: async (page) => {
       await page.getByRole('link', { name: /Talon/ }).first().click()
-      await page.getByLabel('Nouveau rôle').selectOption({ label: 'Direction' })
+      await page.getByLabel('Choisir le rôle').selectOption({ label: 'Direction' })
       await page.getByRole('button', { name: 'Changer le rôle' }).click()
       await page.getByText('Rôle mis à jour.').waitFor()
       await page.goto('/gestion/journal')

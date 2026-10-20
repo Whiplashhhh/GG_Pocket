@@ -7,11 +7,15 @@ const DAY = new Intl.DateTimeFormat('fr-FR', {
   year: 'numeric',
   timeZone: ZONE,
 })
-const DAY_TIME = new Intl.DateTimeFormat('fr-FR', {
+const DAY_MONTH = new Intl.DateTimeFormat('fr-FR', {
   day: 'numeric',
   month: 'long',
+  timeZone: ZONE,
+})
+const HOUR_MINUTE = new Intl.DateTimeFormat('en-GB', {
   hour: '2-digit',
   minute: '2-digit',
+  hourCycle: 'h23',
   timeZone: ZONE,
 })
 const RELATIVE = new Intl.RelativeTimeFormat('fr-FR', { numeric: 'auto' })
@@ -23,9 +27,15 @@ export function formatDate(value: string): string {
   return DAY.format(date)
 }
 
-/** "12 octobre à 18:30". */
+/** "12 octobre à 18 h 30", "12 octobre à 10 h": the French way of writing a time. */
 export function formatDateTime(value: string): string {
-  return DAY_TIME.format(new Date(value))
+  const date = new Date(value)
+  const [hours = '0', minutes = '00'] = HOUR_MINUTE.format(date).split(':')
+  const time =
+    minutes === '00'
+      ? `${String(Number(hours))}\u00a0h`
+      : `${String(Number(hours))}\u00a0h\u00a0${minutes}`
+  return `${DAY_MONTH.format(date)} à ${time}`
 }
 
 const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [

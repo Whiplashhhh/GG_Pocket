@@ -72,12 +72,14 @@ function icon(device: Device) {
             {{ label(device) }}
             <span
               v-if="device.current"
-              class="ml-1 rounded-control bg-olive px-1.5 py-px text-micro font-semibold text-on-olive"
+              class="ml-1 rounded-control border border-ink px-1.5 py-px text-micro font-semibold"
               >{{ t('devices.current') }}</span
             >
           </p>
           <p class="text-sm text-ink-muted">
-            {{ t('devices.signedIn', { date: formatDate(device.signedInAt) }) }} ·
+            {{ t('devices.signedIn', { date: formatDate(device.signedInAt) }) }}
+          </p>
+          <p class="text-sm text-ink-muted">
             {{ t('devices.lastActive', { when: formatRelative(device.lastActiveAt) }) }}
           </p>
         </div>

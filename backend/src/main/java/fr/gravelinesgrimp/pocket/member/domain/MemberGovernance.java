@@ -1,6 +1,4 @@
-package fr.gravelinesgrimp.pocket.admin.domain;
-
-import fr.gravelinesgrimp.pocket.member.domain.Role;
+package fr.gravelinesgrimp.pocket.member.domain;
 
 import java.util.EnumSet;
 import java.util.Set;

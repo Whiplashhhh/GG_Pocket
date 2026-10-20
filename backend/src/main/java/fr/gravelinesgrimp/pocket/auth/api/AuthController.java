@@ -86,8 +86,10 @@ class AuthController {
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(operationId = "logout", summary = "Close the session of this device")
-    void logout(HttpServletRequest request) {
+    void logout(HttpServletRequest request, HttpServletResponse response) {
         sessions.signOut(request);
+        // A shared phone keeps nothing of this member: cached photos included.
+        response.setHeader("Clear-Site-Data", "\"cache\"");
     }
 
     @PostMapping("/registration-code/check")

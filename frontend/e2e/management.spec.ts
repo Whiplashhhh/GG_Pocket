@@ -38,11 +38,11 @@ test.describe('the board', () => {
 
     await expect(page.getByRole('heading', { level: 1, name: 'Tonton Talon' })).toBeVisible()
     // The board only hands out the setter role.
-    await expect(page.getByLabel('Nouveau rôle').locator('option')).toHaveText([
+    await expect(page.getByLabel('Choisir le rôle').locator('option')).toHaveText([
       'Grimpeur·se',
       'Ouvreur·se',
     ])
-    await page.getByLabel('Nouveau rôle').selectOption({ label: 'Ouvreur·se' })
+    await page.getByLabel('Choisir le rôle').selectOption({ label: 'Ouvreur·se' })
     await page.getByRole('button', { name: 'Changer le rôle' }).click()
     await expect(page.getByText('Rôle mis à jour.')).toBeVisible()
 
@@ -86,7 +86,7 @@ test.describe('the admin', () => {
     await dialog.getByLabel('Libellé').fill('Affiche saison 2026')
     await dialog.getByLabel('Inscriptions maximum').fill('30')
     await dialog.getByRole('button', { name: 'Enregistrer' }).click()
-    await expect(page.getByText(/Code créé : K7XM-/)).toBeVisible()
+    await expect(page.getByText(/Code créé\s:\sK7XM-/)).toBeVisible()
     await expect(page.getByText('Affiche saison 2026')).toBeVisible()
     await expect(page.getByText('0 sur 30 inscriptions')).toBeVisible()
   })

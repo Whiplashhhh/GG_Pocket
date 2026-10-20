@@ -60,7 +60,7 @@ function removePhoto() {
       <!-- A label styled as a button: the native file picker opens, camera included on phones. -->
       <label
         :for="inputId"
-        class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-control bg-brand px-4 font-semibold text-on-brand hover:brightness-95 has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus"
+        class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-control border-2 border-ink px-4 font-semibold text-ink hover:bg-surface-sunken has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus"
         :class="{ 'pointer-events-none opacity-60': busy }"
       >
         <Camera :size="20" aria-hidden="true" />

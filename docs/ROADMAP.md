@@ -63,6 +63,7 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [ ] `compose.yml`, `compose.dev.yml`, `compose.prod.yml`, Caddy (TLS, en-têtes de sécurité, CSP stricte, `/api` proxifié)
 - [ ] Limites mémoire, `MaxRAMPercentage`, healthchecks, `restart: unless-stopped`
 - [ ] Dev déployé : aucun repli sur les identifiants locaux `ggpocket` (variables `GG_DB_*` obligatoires hors machine locale)
+- [ ] Port 8080 de l'API jamais publié ; Caddy ne relaie pas un `X-Forwarded-For` venu du client (`server.forward-headers-strategy: native` fait confiance aux réseaux privés)
 - [ ] `deploy-dev.yml` (manuel ou label `deploy:dev`, option reset + seed)
 - [ ] `prepare-release.yml`, `release.yml` (tag, branche `prod/X.Y.Z`, GitHub Release, images ghcr, déploiement approuvé)
 - [ ] Scripts `backup.sh`, `restore.sh` (testé), `deploy.sh`, `rollback.sh` ; rétention 14 j + 8 semaines

@@ -195,6 +195,33 @@ class MemberAdminIT {
     }
 
     @Test
+    void aLinkMadeForAClimberDoesNotOpenTheAccountOnceTheyArePromoted() throws Exception {
+        var board = members.create(Role.BOARD);
+        var admin = members.create(Role.ADMIN);
+        var climber = members.create(Role.CLIMBER);
+        var token = tokenOf(resetLink(board, climber));
+
+        changeRole(admin, climber, Role.BOARD).andExpect(status().isOk());
+
+        reset(token, "Du mou du mou du mou")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("PASSWORD_RESET_LINK_INVALID"));
+    }
+
+    @Test
+    void aLinkDiesWithTheRoleOfItsMaker() throws Exception {
+        var admin = members.create(Role.ADMIN);
+        var board = members.create(Role.BOARD);
+        var climber = members.create(Role.CLIMBER);
+        var token = tokenOf(resetLink(board, climber));
+
+        changeRole(admin, board, Role.CLIMBER).andExpect(status().isOk());
+
+        reset(token, "Du mou du mou du mou")
+                .andExpect(jsonPath("$.code").value("PASSWORD_RESET_LINK_INVALID"));
+    }
+
+    @Test
     void everyChangeIsInTheAuditLog() throws Exception {
         var admin = members.create(Role.ADMIN);
         var climber = members.create(Role.CLIMBER);
