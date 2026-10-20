@@ -51,6 +51,14 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
           git commit -am "chore(release): $NEXT"
+          # Left over by an earlier run that stopped before the PR (no PR open on it): replaced.
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            if [[ -n $(gh pr list --head "$branch" --state open --json number --jq '.[].number') ]]; then
+              echo "::error::A PR is already open for $branch: merge or close it first"
+              exit 1
+            fi
+            git push origin --delete "$branch"
+          fi
           git push origin "$branch"
           python3 .github/scripts/changelog.py notes "$NEXT" > "$RUNNER_TEMP/notes.md"
           {
@@ -65,6 +73,10 @@ jobs:
             echo
             echo "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
           } > "$RUNNER_TEMP/body.md"
-          gh pr create --base main --head "$branch" --title "Release $NEXT" --body-file "$RUNNER_TEMP/body.md"
+          gh pr create --base main --head "$branch" --title "Release $NEXT" --body-file "$RUNNER_TEMP/body.md" || {
+            echo "::error::GitHub refused the PR. Settings → Actions → General → Workflow permissions:" \
+              "tick « Allow GitHub Actions to create and approve pull requests » (DEPLOYMENT.md §3)."
+            exit 1
+          }
           # A push made with GITHUB_TOKEN starts no workflow: the checks required on main are run here.
           gh workflow run ci.yml --ref "$branch"

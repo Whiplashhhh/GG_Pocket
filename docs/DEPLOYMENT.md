@@ -78,10 +78,12 @@ Le script (relançable) :
 - pose les variables `DEPLOY_HOST`, `DEPLOY_KNOWN_HOSTS`, `GG_URL` de chaque environnement ;
 - ajoute les jobs « Deploy config » et « Docker stack » aux checks obligatoires de `main`, et réserve les branches
   `prod/*` et les tags `v*` au workflow de release ;
+- autorise les workflows à ouvrir des PR (Settings → Actions → General → Workflow permissions → « Allow GitHub Actions
+  to create and approve pull requests ») : `prepare-release.yml` en a besoin ;
 - crée le label `deploy:dev`.
 
 Il se termine en affichant la commande `bootstrap.sh` à lancer sur le serveur (section 2), clés comprises.
-Changer de clés : relancer le script, puis `bootstrap.sh` avec les nouvelles clés publiques.
+Le relancer garde les clés existantes. Changer de clés : `--new-keys`, puis `bootstrap.sh` avec les nouvelles clés publiques.
 
 Les images restent privées sur ghcr : à chaque déploiement, le serveur s'authentifie avec le jeton éphémère du job
 (valable jusqu'à la fin du job). Les images de la version en place et de la précédente restent sur le serveur, donc un
