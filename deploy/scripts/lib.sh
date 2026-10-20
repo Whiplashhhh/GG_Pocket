@@ -16,8 +16,16 @@ GG_ENV_FILE=${GG_ENV_FILE:-$GG_HOME/.env}
 log() { printf '\n==> %s\n' "$*"; }
 die() {
     printf 'ERROR: %s\n' "$*" >&2
+    [[ -z ${GITHUB_ACTIONS:-} ]] || echo "::error title=$(basename "$0")::$*"
     exit 1
 }
+
+# In GitHub Actions, a failing command is also reported as an annotation (raw logs are not
+# always at hand, see CLAUDE.md).
+if [[ -n ${GITHUB_ACTIONS:-} ]]; then
+    set -E
+    trap 'echo "::error title=$(basename "$0") line $LINENO::$BASH_COMMAND"' ERR
+fi
 
 check_env() {
     case ${1:-} in

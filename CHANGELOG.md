@@ -21,3 +21,4 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   la désactivation d'un compte, le journal de qui a fait quoi, et les codes d'inscription à afficher à la salle.
 - La page « Tes données » explique ce que l'appli garde sur toi, pourquoi, et qui le voit.
 - Quand une nouvelle version arrive, un bandeau te propose de recharger : jamais de rechargement surprise en pleine saisie.
+- Un mur d'essai en ligne pour les testeurs, peuplé de grimpeurs imaginaires : on y casse tout avant que le club n'y pose les mains.
