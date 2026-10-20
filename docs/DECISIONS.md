@@ -4,7 +4,38 @@ Une entrée par décision : contexte, choix, alternatives, statut.
 Statuts : **validée** (tranchée, à ne pas rediscuter sans raison nouvelle) ou **à valider** (choix par défaut appliqué, en attente de l'avis
 de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision remplacée est marquée « remplacée par D-xxx ».
 
-Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes).
+Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
+choix de la phase 1 (D-043 et suivantes).
+
+## Récapitulatif : tout ce qui reste à valider
+
+Chaque ligne est appliquée par défaut ; rien n'attend une réponse pour avancer. Qui tranche : **club** (président,
+direction) ou **Willem**.
+
+| Décision | Question | Qui | Choix appliqué en attendant |
+|---|---|---|---|
+| D-001 | Barre d'onglets à 5 entrées ? | club | Actu, Topo, À faire, Planning, Podium ; profil via l'avatar |
+| D-002 | Cotations avec les « + » ? | club | 4a à 7c avec les « + » (23 niveaux) |
+| D-003 | Classement « voies » : ascensions ou voies distinctes ? | club | Ascensions topées, répétitions comprises |
+| D-004 | Séances comptées en jours de grimpe ? | club | Oui : deux séances le même jour = une |
+| D-005 | Seuil du badge « Mois complet » ? | club | 10 jours de grimpe |
+| D-006 | Nom « Le flash » ou « L'à vue » ? | club | « Le flash » |
+| D-007 | Seuils inventés (absence, voie nouvelle, full tête, record) ? | club | 30 j, 14 j, 3 voies, dès la 4e séance |
+| D-008 | Badge « Tout frais » la première année ? | club | Oui |
+| D-009 | Saisie 7 jours en arrière, mois figé le 8 ? | club | Oui |
+| D-010 | Coup de cœur sur voie démontée : place libérée ? | club | Oui |
+| D-011 | Fil limité aux amis ? | club | Oui |
+| D-012 | Pas d'e-mail, lien de réinitialisation par la direction ? | club | Oui |
+| D-013 | Couleur des prises et photo de voie ? | club | Ajoutées |
+| D-014 | Âge masqué, accord parental sous 15 ans ? | club | Oui |
+| D-037 | Polices et étiquette de voie : le rendu plaît-il ? | club | Archivo + Kalam, à juger sur l'environnement dev |
+| D-039 | Logo vectoriel / haute définition / fond noir disponible ? | club | Détourage du JPEG fourni |
+| D-041 | Session conservée après installation sur iPhone ? | Willem + testeurs | À vérifier sur appareil réel (environnement dev, phase 2) |
+| D-043 | Nom officiel de l'association et contact RGPD ? | club | « Gravelines Grimp », contact saisi par l'admin dans l'appli |
+| D-044 | Durée de conservation des comptes inactifs ? | club | Suppression après 3 ans sans connexion |
+| D-045 | Ce que la direction voit dans la fiche d'un membre ? | club | Tout sauf la date de naissance |
+| D-046 | Format du pseudo ? | Willem | 3 à 20 caractères, `a-z 0-9 . _ -`, insensible à la casse |
+| D-047 | Qui reçoit le code admin de premier démarrage ? | Willem | Willem, qui le transmet au président |
 
 ---
 
@@ -229,3 +260,46 @@ Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), techniq
 ### D-042 — Branche de la phase 0
 - **Choix** : `feature/fondations-0.0.0` (la prod n'existe pas encore ; `0.0.0` est la version de base). Fusion dans `main` par PR squash.
 - **Statut** : validée.
+
+---
+
+## Choix de la phase 1 (comptes et rôles)
+
+Points non couverts par la spec, relevés avant la phase 1. Appliqués par défaut, en attente de réponse.
+
+### D-043 — Responsable du traitement et contact RGPD
+- **Contexte** : la page « Tes données » (spec §14) doit nommer le responsable du traitement et dire comment exercer ses droits.
+- **Choix** : responsable = l'association, nommée « Gravelines Grimp » tant que le nom officiel (statuts) n'est pas fourni ;
+  adresse de contact saisie par l'admin dans la configuration du club (pas en dur dans le code). Si le club ou sa fédération
+  a déjà une politique de confidentialité, la page s'y alignera.
+- **À fournir** : nom officiel de l'association, adresse de contact pour les demandes, politique existante éventuelle.
+- **Statut** : à valider.
+
+### D-044 — Durée de conservation
+- **Contexte** : la spec demande d'afficher une durée de conservation sans la fixer.
+- **Choix** : données conservées tant que le compte existe ; un compte sans aucune connexion depuis 3 ans est supprimé
+  (données personnelles et photos effacées, séances rattachées à « Ancien·ne membre », comme pour une suppression volontaire).
+  Journal d'audit conservé 3 ans.
+- **Alternatives** : 2 ans ; pas de suppression automatique (déconseillé : contraire au principe de limitation de la conservation).
+- **Statut** : à valider.
+
+### D-045 — Données visibles par la direction dans la fiche d'un membre
+- **Contexte** : la spec liste les colonnes du tableau des membres, pas le contenu de la fiche.
+- **Choix** : prénom, nom, pseudo, rôle, statut, inscription, dernière activité, nombre de séances, e-mail s'il est renseigné.
+  **Date de naissance masquée** : la direction voit seulement « moins de 15 ans, accord parental déclaré » quand c'est le cas
+  (minimisation, mineurs possibles).
+- **Statut** : à valider.
+
+### D-046 — Format du pseudo
+- **Contexte** : le pseudo est l'identifiant de connexion ; la spec dit seulement « unique, insensible à la casse ».
+- **Choix** : 3 à 20 caractères parmi lettres sans accents, chiffres, `.`, `_`, `-` ; unicité insensible à la casse ; casse
+  d'affichage conservée telle que saisie ; modifiable ensuite par le membre (l'ancien pseudo redevient libre).
+- **Alternatives** : accepter les accents (risque de doublons visuels « Élodie » / « Elodie » et de saisie difficile sur certains claviers).
+- **Statut** : à valider.
+
+### D-047 — Code admin de premier démarrage
+- **Contexte** : spec §16 : au premier démarrage de la prod, un code d'inscription admin à usage unique (24 h) s'affiche une fois dans les logs.
+- **Choix** : Willem le récupère et le transmet au président, qui crée le premier compte admin. Willem peut garder son propre compte
+  avec le rôle de son choix (créé ensuite par code d'inscription normal, rôle donné par l'admin).
+- **Statut** : à valider (sert à rédiger `DEPLOYMENT.md` et `GUIDE_CLUB.md`).
+
