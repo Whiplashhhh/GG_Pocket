@@ -23,7 +23,7 @@ backup=$(sed -n 's/^Backup written: \([^ ]*\) .*/\1/p' <<<"$output")
 [[ -n $backup ]] || die "no backup name in the output"
 
 log "Damage"
-sql "DROP TABLE restore_probe; DELETE FROM audit_log;"
+sql "DROP TABLE restore_probe; DELETE FROM audit_entry;"
 compose exec -T api rm /data/media/restore-probe.txt
 
 deploy_dir=$(dirname "${BASH_SOURCE[0]}")
