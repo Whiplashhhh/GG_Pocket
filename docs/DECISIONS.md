@@ -447,6 +447,9 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   healthcheck sur `/actuator/health/readiness` écrit en bash (pas de curl à embarquer). Web : `node:24-alpine` puis
   `caddy:2.11-alpine`, utilisateur 10001, port 8080 ; le build échoue si `index.html` contient un script en ligne.
   Conteneurs en lecture seule quand c'est possible, `cap_drop: ALL`, `no-new-privileges`, journaux plafonnés à 30 Mo.
+  Le binaire Caddy de l'image officielle porte une capacité fichier que le noyau refuse sans capacité : copié sans elle.
+  Un service ponctuel `media-owner` donne le volume des photos à l'uid 10001 avant chaque démarrage de l'API (Docker ne
+  recopie le propriétaire de l'image que si l'API monte le volume la première).
 - **Statut** : validée.
 
 ### D-062 — Accès SSH de déploiement

@@ -22,22 +22,23 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 - Workflows : `ci.yml` (+ jobs « Deploy config » et « Docker stack » : images, Trivy, frontal en HTTPS, e2e réels,
   sauvegarde/restauration ; + `workflow_dispatch`), `deploy-dev.yml`, `prepare-release.yml`, `release.yml`,
   `dependabot.yml`, `.github/scripts/changelog.py`, `.github/scripts/setup-github.sh` (D-065, D-066).
-- e2e contre la vraie stack (`frontend/e2e-stack/`, 5 tests, Chromium, via le frontal en HTTPS) : verts.
+- e2e contre la vraie stack (`frontend/e2e-stack/`, 5 tests, Chromium, via le frontal en HTTPS) et test
+  sauvegarde → dégâts → restauration : verts. Trouvé en route : volume des photos à root (service `media-owner` ajouté).
 - `docs/DEPLOYMENT.md`, CLAUDE.md (commandes), ARCHITECTURE §6, ROADMAP, CHANGELOG.
 - Label `deploy:dev` créé. Le jeton `gh` de Claude n'a pas les droits d'administration (environnements, secrets, règles) :
   tout est dans `setup-github.sh` pour Willem.
 
 ### Reste
 
-- Faire passer le test sauvegarde/restauration en CI (dernier rouge du job « Docker stack »), puis ouvrir la PR.
+- Revue de sécurité de la phase (sous-agent) et ses corrections.
 - Willem : `setup-github.sh --host <ip>` puis `bootstrap.sh` sur le VPS (DEPLOYMENT.md §2-3).
 - Premier déploiement dev (label `deploy:dev` sur la PR), vérification D-041 sur iPhone, fusion, release `0.1.0`,
   approbation, retour arrière testé (`release.yml` lancé à la main avec la version précédente… ou `gg-deploy rollback`).
 
 ### Prochaine action exacte
 
-- Lire les annotations du job « Docker stack » (`gh api repos/Whiplashhhh/GG_Pocket/check-runs/<job>/annotations`), corriger
-  `deploy/scripts/ci-restore-test.sh` ou `restore*.sh`, pousser jusqu'au vert.
+- Attendre que Willem ait lancé `setup-github.sh` et `bootstrap.sh`, puis poser le label `deploy:dev` sur la PR et suivre
+  le déploiement (`gh run list --workflow deploy-dev.yml`).
 
 ### Points bloquants
 
