@@ -1,4 +1,8 @@
+import { readFileSync } from 'node:fs'
+
 import { expect, test } from './fixtures'
+
+const APP_VERSION = readFileSync(new URL('../../VERSION', import.meta.url), 'utf8').trim()
 
 test.describe('app shell', () => {
   test('opens on Actu with the five tabs at hand', async ({ page }) => {
@@ -69,7 +73,8 @@ test.describe('app shell', () => {
     page,
   }) => {
     await page.goto('/profil')
-    await expect(page.getByText('GG Pocket 0.0.0')).toBeVisible()
+    // The version of the build (VERSION file), whatever the release; the fake server says 0.0.0.
+    await expect(page.getByText(`GG Pocket ${APP_VERSION}`)).toBeVisible()
     await expect(page.getByText('Serveur 0.0.0')).toHaveCount(0)
   })
 
