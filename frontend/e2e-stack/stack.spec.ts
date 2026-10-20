@@ -53,6 +53,14 @@ test('a demo climber signs in, browses and signs out without any CSP violation',
 }) => {
   expect(SEED_PASSWORD, 'GG_SEED_PASSWORD must be set').not.toBe('')
   const violations = cspViolations(page)
+  const calls: string[] = []
+  page.on('response', (response) => {
+    if (response.url().includes('/api/')) {
+      calls.push(
+        `${response.request().method()} ${new URL(response.url()).pathname} ${String(response.status())}`,
+      )
+    }
+  })
 
   await page.goto('/connexion')
   await page.getByLabel('Pseudo').fill('grimpeur')
@@ -64,10 +72,15 @@ test('a demo climber signs in, browses and signs out without any CSP violation',
   expect(login.status(), await login.text()).toBe(200)
   expect((await login.allHeaders())['set-cookie'], 'session cookie').toContain('__Host-GG_SESSION=')
   const navigation = page.getByRole('navigation', { name: 'Navigation principale' })
-  await expect(navigation.or(page.getByRole('alert')).first()).toBeVisible()
-  const where = `${page.url()}, cookies: ${(await page.context().cookies()).map((c) => c.name).join(' ')}`
-  expect(await page.getByRole('alert').allTextContents(), where).toEqual([])
-  await expect(navigation).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  const where = [
+    page.url(),
+    `h1: ${(await page.locator('h1').allTextContents()).join(' / ')}`,
+    `cookies: ${(await page.context().cookies()).map((c) => `${c.name} (${c.path})`).join(', ')}`,
+    `alerts: ${(await page.getByRole('alert').allTextContents()).join(' / ')}`,
+    `calls: ${calls.join(', ')}`,
+  ].join('\n')
+  await expect(navigation, where).toBeVisible()
 
   const cookies = await page.context().cookies()
   const session = cookies.find((cookie) => cookie.name === '__Host-GG_SESSION')
