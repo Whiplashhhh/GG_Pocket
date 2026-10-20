@@ -23,8 +23,17 @@ die() {
 # In GitHub Actions, a failing command is also reported as an annotation (raw logs are not
 # always at hand, see CLAUDE.md).
 if [[ -n ${GITHUB_ACTIONS:-} ]]; then
+    gg_stderr=$(mktemp)
+    exec 2> >(tee -a "$gg_stderr" >&2)
+    report_failure() {
+        local where output
+        where="$(basename "$0") lines ${BASH_LINENO[*]}"
+        output=$(tail -n 15 "$gg_stderr" | cut -c1-300)
+        output=${output//'%'/'%25'}
+        echo "::error title=$where::$1%0A${output//$'\n'/'%0A'}"
+    }
     set -E
-    trap 'echo "::error title=$(basename "$0") line $LINENO::$BASH_COMMAND"' ERR
+    trap 'report_failure "$BASH_COMMAND"' ERR
 fi
 
 check_env() {
