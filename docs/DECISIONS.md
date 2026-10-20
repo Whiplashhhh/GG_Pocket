@@ -5,7 +5,8 @@ Statuts : **validée** (tranchée, à ne pas rediscuter sans raison nouvelle) ou
 de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision remplacée est marquée « remplacée par D-xxx ».
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
-choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase).
+choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase), environnements et pipeline
+(D-059 à D-070, phase 2).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -37,6 +38,8 @@ direction) ou **Willem**.
 | D-046 | Format du pseudo ? | Willem | 3 à 20 caractères, `a-z 0-9 . _ -`, insensible à la casse |
 | D-047 | Qui reçoit le code admin de premier démarrage ? | Willem | Willem, qui le transmet au président |
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
+| D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
+| D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
 
 ---
 
@@ -416,4 +419,106 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 ### D-058 — Données optionnelles absentes plutôt que `null`
 - **Choix** : l'API omet les champs optionnels vides (`spring.jackson.default-property-inclusion: non_null`), ce que décrivent les
   types générés (`champ?: type`). En entrée, un booléen absent vaut `false` (Jackson 3 le refuse par défaut).
+- **Statut** : validée.
+
+### D-059 — Adresses provisoires en `sslip.io`
+- **Contexte** : le club n'a pas encore de nom de domaine ; la PWA exige HTTPS (service worker, installation).
+- **Choix** : `pocket.<ip-avec-tirets>.sslip.io` (prod) et `dev.pocket.<ip-avec-tirets>.sslip.io` (dev). sslip.io est un DNS public
+  qui renvoie l'IP écrite dans le nom : Let's Encrypt délivre un vrai certificat sans rien configurer. Le jour du vrai domaine :
+  deux variables du frontal et `GG_URL` dans GitHub (DEPLOYMENT.md §4) ; les applis installées devront être réinstallées.
+- **Alternatives** : HTTP sur l'IP (pas de PWA) ; certificat auto-signé (alertes partout) ; acheter un domaine (décision du club).
+- **Statut** : à valider (Willem, quand le domaine existe).
+
+### D-060 — Un frontal Caddy partagé, un Caddy par environnement
+- **Contexte** : dev et prod sur le même serveur, un seul couple de ports 80/443 (spec §16).
+- **Choix** : projet `gg-pocket-edge` : Caddy en réseau hôte, seul sur 80/443, TLS, routage par nom vers `127.0.0.1:8180` (prod)
+  et `:8181` (dev). Chaque environnement a son conteneur `web` (Caddy avec la PWA, les en-têtes de sécurité, `/api` vers l'API)
+  publié sur la boucle locale seulement ; API et base sur des réseaux Docker `internal` (aucun accès Internet, rien de publié).
+  Le réseau hôte donne au frontal les vraies adresses des clients, IPv6 comprise (le proxy de Docker les remplacerait par celle
+  de sa passerelle, ce qui fausserait la limitation de débit). Le frontal n'a aucun proxy de confiance : il écrase tout
+  `X-Forwarded-For` venu d'un client ; `web` et Tomcat font confiance aux réseaux privés.
+- **Alternatives** : un Caddy unique qui sert les deux environnements (couple leurs versions) ; Traefik et ses étiquettes (plus
+  de pièces mobiles).
+- **Statut** : validée.
+
+### D-061 — Images
+- **Choix** : contexte de build à la racine (les deux lisent `VERSION`). API : Maven sur `eclipse-temurin:25-jdk-noble`, exécution
+  sur `25-jre-noble`, couches Spring Boot, utilisateur 10001, `MaxRAMPercentage=75`, `SerialGC` (un processeur, petit tas),
+  healthcheck sur `/actuator/health/readiness` écrit en bash (pas de curl à embarquer). Web : `node:24-alpine` puis
+  `caddy:2.11-alpine`, utilisateur 10001, port 8080 ; le build échoue si `index.html` contient un script en ligne.
+  Conteneurs en lecture seule quand c'est possible, `cap_drop: ALL`, `no-new-privileges`, journaux plafonnés à 30 Mo.
+- **Statut** : validée.
+
+### D-062 — Accès SSH de déploiement
+- **Choix** : utilisateur `deploy` (groupe `docker`, sans mot de passe) ; chaque clé est épinglée à un environnement par une
+  commande forcée (`gg-deploy dev|prod`, `restrict`) qui n'accepte que `deploy`, `rollback`, `status`, `login`, `edge` ;
+  `authorized_keys` appartient à root. Les fichiers de déploiement voyagent avec la version (archive de `deploy/` sur l'entrée
+  standard) et sont gardés par version pour les retours arrière.
+- **Limite assumée** : le groupe `docker` équivaut à root, et un déploiement exécute les scripts de la version envoyée. La
+  protection réelle : seules les Actions du dépôt ont les clés (secrets d'environnement), la prod exige l'approbation de Willem.
+- **Alternatives** : Docker sans root (complexe, peu documenté avec Compose et le réseau hôte) ; agent de déploiement qui tire
+  depuis GitHub (un service de plus à maintenir).
+- **Statut** : validée.
+
+### D-063 — Sauvegardes
+- **Choix** : service `backup` (image PostgreSQL 18, uid 70) dans la prod : chaque nuit à 3 h 30 (heure de Paris), un fichier
+  `tar` = `pg_dump` au format custom + archive des photos ; 14 quotidiennes, la dominicale copiée en hebdomadaire (8 gardées),
+  10 avant déploiement, les manuelles jusqu'à suppression. `restore.sh` fait une sauvegarde de l'état actuel, recrée la base,
+  remplace les photos, redémarre ; il est joué à chaque CI sur une stack jetable (sonde en base et fichier).
+- **À valider** : aucune copie hors du serveur n'est automatisée (option « Backup Storage » d'OVH ou `rsync` vers une autre
+  machine, DEPLOYMENT.md §8).
+- **Statut** : à valider (Willem).
+
+### D-064 — Pas de repli sur les identifiants locaux hors machine locale
+- **Contexte** : `application-dev.yml` a des valeurs par défaut publiques (`ggpocket`/`ggpocket`) pour la machine locale, et le dev
+  déployé utilise aussi le profil `dev` (seed).
+- **Choix** : un `BeanFactoryPostProcessor` (avant toute connexion, donc avant Flyway) refuse de démarrer si l'environnement n'est
+  pas `local` et qu'une des variables `GG_DB_URL`, `GG_DB_USER`, `GG_DB_PASSWORD` manque, ou si le mot de passe est celui de la
+  machine locale. Les fichiers Compose exigent aussi ces variables (`${…:?}`).
+- **Statut** : validée.
+
+### D-065 — Release : PR ouverte par le robot, CI relancée à la main
+- **Contexte** : un push ou une PR faits avec le `GITHUB_TOKEN` ne déclenchent aucun workflow, or `main` exige la CI verte.
+- **Choix** : `prepare-release.yml` pousse `release/X.Y.Z`, ouvre la PR puis lance `ci.yml` sur la branche (`workflow_dispatch`,
+  ajouté à `ci.yml`) : les checks s'attachent au commit de la PR. `release.yml` se déclenche sur un changement de `VERSION` dans
+  `main` ; lancé à la main avec un numéro, il redéploie une version existante (retour arrière tracé, même approbation).
+  Le changelog est manipulé par `.github/scripts/changelog.py` (refus si « Non publié » est vide).
+- **Alternatives** : une GitHub App ou un jeton personnel pour le robot (un secret de plus à faire tourner).
+- **Statut** : validée.
+
+### D-066 — Administration GitHub et images privées
+- **Contexte** : le jeton de Claude Code n'a pas les droits d'administration du dépôt (environnements, secrets, règles : 403).
+- **Choix** : `.github/scripts/setup-github.sh`, lancé une fois par Willem, crée environnements, clés (la clé privée va directement
+  dans le secret, jamais sur disque), variables et règles (`main` exige aussi « Deploy config » et « Docker stack » ; `prod/*` et
+  `v*` réservés au workflow). Les images ghcr restent privées : le serveur se connecte avec le jeton éphémère du job ; les
+  images de la version en place et de la précédente restent sur le serveur pour un retour arrière sans téléchargement.
+- **Statut** : validée.
+
+### D-067 — e2e contre la vraie stack : Chromium seulement
+- **Contexte** : les e2e de `frontend/e2e/` tournent contre une fausse API ; la spec demande aussi des e2e contre la stack Docker.
+- **Choix** : `frontend/e2e-stack/` (en-têtes, CSP sans violation, cookie `__Host-` HttpOnly et Secure, connexion d'un compte de
+  démo, cache des fichiers, internes de l'API invisibles), contre `http://localhost:8080` dans le job « Docker stack ».
+  Chromium seulement : le cookie de session est `Secure` et seul Chromium l'accepte sur `http://localhost`. Les parcours
+  détaillés restent dans les e2e à fausse API (iPhone + Desktop).
+- **Statut** : validée.
+
+### D-068 — Réinitialiser le dev
+- **Choix** : l'option « réinitialiser » de `deploy-dev.yml` supprime les volumes du projet dev (base et photos) avant de démarrer ;
+  le seed recrée tout au démarrage. Cochée par défaut, et toujours active sur un déploiement par label. Refusée en prod (script et porte).
+- **Statut** : validée.
+
+### D-069 — Limiteur de débit : plafond dur
+- **Contexte** : revue sécurité de la phase 1 (L3) : au-delà de 10 000 clés, seules les entrées de plus d'une heure étaient purgées.
+- **Choix** : plafond de 50 000 clés ; au-delà, les clés restées calmes le plus longtemps sont oubliées (instantané trié, pour ne pas
+  trier une table que d'autres requêtes modifient). Oublier une clé ne fait que lui rendre ses essais : il faudrait plus de
+  50 000 adresses récentes pour effacer celle d'un attaquant précis.
+- **Statut** : validée.
+
+### D-070 — Sécurité des dépendances et CSP
+- **Choix** : Trivy (binaire vérifié par somme de contrôle, pas l'action) scanne les deux images ; échec sur une vulnérabilité
+  critique corrigée, chaque trouvaille (haute ou critique) remonte en annotation. Quand Spring Boot tarde, la version corrigée est
+  épinglée dans le pom (`tomcat.version`, `jackson-bom.version`, `jackson-2-bom.version`), à retirer dès que le parent la rattrape.
+  Dependabot ouvre des PR groupées chaque lundi (Maven, npm, actions, images). CSP : aucun script en ligne ; les attributs
+  `style` restent permis (`style-src-attr 'unsafe-inline'`), utilisés par Vue et Reka UI pour positionner les menus, sans
+  exécution de code possible.
 - **Statut** : validée.
