@@ -4,6 +4,48 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-20 — Phase 2 (environnements et pipeline)
+
+**Branche** : `chore/environnements` (depuis `main` après fusion de la phase 1), poussée.
+
+### Fait
+
+- Réponses de Willem (§20) : VPS OVH Ubuntu 8 Go avec Docker, rien d'autre dessus, pas encore de domaine → `sslip.io` (D-059).
+- Plan : `docs/plans/phase-2.md`. Décisions D-059 à D-070.
+- Backend : plafond dur du limiteur (50 000 clés, D-069), garde-fou « pas d'identifiants locaux hors local » avant toute
+  connexion (D-064), Tomcat 11.0.25 et Jackson 3.1.7 / 2.21.7 épinglés (CVE critiques et hautes, D-070).
+- Images `backend/Dockerfile`, `frontend/Dockerfile` (non root, couches, healthchecks, version et commit injectés) ;
+  `deploy/compose{,.dev,.prod,.ci}.yml` ; Caddy `web` (CSP stricte, HSTS, en-têtes, `/api`) et frontal `deploy/edge/` (D-060).
+- Scripts `deploy/scripts/` : `deploy.sh` (sauvegarde prod, healthchecks, fumée, retour arrière auto), `rollback.sh`,
+  `backup.sh` + `backup-loop.sh`, `restore.sh` + `restore-data.sh`, `backup-now.sh`, `ci-restore-test.sh` ;
+  serveur : `server/bootstrap.sh`, porte SSH `server/gg-deploy` (D-062).
+- Workflows : `ci.yml` (+ jobs « Deploy config » et « Docker stack » : images, Trivy, frontal en HTTPS, e2e réels,
+  sauvegarde/restauration ; + `workflow_dispatch`), `deploy-dev.yml`, `prepare-release.yml`, `release.yml`,
+  `dependabot.yml`, `.github/scripts/changelog.py`, `.github/scripts/setup-github.sh` (D-065, D-066).
+- e2e contre la vraie stack (`frontend/e2e-stack/`, 5 tests, Chromium, via le frontal en HTTPS) : verts.
+- `docs/DEPLOYMENT.md`, CLAUDE.md (commandes), ARCHITECTURE §6, ROADMAP, CHANGELOG.
+- Label `deploy:dev` créé. Le jeton `gh` de Claude n'a pas les droits d'administration (environnements, secrets, règles) :
+  tout est dans `setup-github.sh` pour Willem.
+
+### Reste
+
+- Faire passer le test sauvegarde/restauration en CI (dernier rouge du job « Docker stack »), puis ouvrir la PR.
+- Willem : `setup-github.sh --host <ip>` puis `bootstrap.sh` sur le VPS (DEPLOYMENT.md §2-3).
+- Premier déploiement dev (label `deploy:dev` sur la PR), vérification D-041 sur iPhone, fusion, release `0.1.0`,
+  approbation, retour arrière testé (`release.yml` lancé à la main avec la version précédente… ou `gg-deploy rollback`).
+
+### Prochaine action exacte
+
+- Lire les annotations du job « Docker stack » (`gh api repos/Whiplashhhh/GG_Pocket/check-runs/<job>/annotations`), corriger
+  `deploy/scripts/ci-restore-test.sh` ou `restore*.sh`, pousser jusqu'au vert.
+
+### Points bloquants
+
+- Accès d'administration GitHub et adresse IP du serveur : côté Willem (voir « Reste »).
+- Bac à sable : journaux bruts de la CI injoignables (annotations à la place), réseau GitHub intermittent.
+
+---
+
 ## 2026-10-20 — Phase 1 (comptes et rôles)
 
 **Branche** : `feature/comptes-0.0.0` (depuis `main` après fusion de la phase 0), poussée ; PR #3 « Phase 1 — Comptes et rôles », CI verte (backend, frontend, e2e iPhone 13 + Desktop Chrome, gitleaks).
