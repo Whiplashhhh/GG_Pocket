@@ -23,7 +23,11 @@ LABEL org.opencontainers.image.title="gg-pocket-web" \
       org.opencontainers.image.source="https://github.com/Whiplashhhh/GG_Pocket" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${GIT_COMMIT}"
-RUN addgroup -S -g 10001 gg \
+# The stock binary carries the file capability cap_net_bind_service, which the kernel refuses to
+# run without any capability (cap_drop: ALL in compose). Port 8080 needs none: a plain copy drops it.
+RUN cp /usr/bin/caddy /usr/bin/caddy.plain \
+    && mv /usr/bin/caddy.plain /usr/bin/caddy \
+    && addgroup -S -g 10001 gg \
     && adduser -S -u 10001 -G gg -H -h /srv gg \
     && chown -R gg:gg /config /data
 COPY deploy/web/Caddyfile /etc/caddy/Caddyfile
