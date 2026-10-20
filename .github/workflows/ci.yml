@@ -5,6 +5,9 @@ on:
     branches: ["**"]
   pull_request:
     branches: [main]
+  # prepare-release.yml runs it on the release branch: pushes made with GITHUB_TOKEN start no
+  # workflow by themselves (DECISIONS D-065).
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
@@ -15,6 +18,7 @@ permissions:
 
 env:
   GITLEAKS_VERSION: 8.30.1
+  TRIVY_VERSION: 0.75.0
 
 jobs:
   backend:
@@ -148,3 +152,121 @@ jobs:
           curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
             | tar -xz gitleaks
           ./gitleaks git --redact --verbose --exit-code 1 .
+
+  deploy-config:
+    name: Deploy config (shellcheck, compose, Caddy)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Shell scripts
+        run: cd deploy/scripts && shellcheck -x --severity=warning ./*.sh server/*
+      - name: Compose files resolve for every environment
+        working-directory: deploy
+        run: |
+          for env in dev prod; do
+            sed -e 's/^GG_DB_PASSWORD=$/GG_DB_PASSWORD=x/' -e 's/^GG_SEED_PASSWORD=$/GG_SEED_PASSWORD=x/' \
+              "env/$env.env.example" > "$RUNNER_TEMP/$env.env"
+            GG_IMAGE_TAG=1.2.3 docker compose -f compose.yml -f "compose.$env.yml" \
+              --env-file "$RUNNER_TEMP/$env.env" --profile backup config --quiet
+          done
+          GG_IMAGE_TAG=ci docker compose -f compose.yml -f compose.ci.yml --env-file env/ci.env config --quiet
+          cp env/edge.env.example edge/.env
+          docker compose -f edge/compose.yml config --quiet
+      - name: Caddyfiles parse
+        run: |
+          image=$(sed -n 's/^ *image: \(caddy:.*\)$/\1/p' deploy/edge/compose.yml)
+          docker run --rm -v "$PWD/deploy/web:/w:ro" "$image" caddy adapt --config /w/Caddyfile >/dev/null
+          mkdir -p "$RUNNER_TEMP/dev.d" && echo '# empty' > "$RUNNER_TEMP/dev.d/README.caddy"
+          docker run --rm -v "$PWD/deploy/edge:/e:ro" -v "$RUNNER_TEMP/dev.d:/etc/caddy/dev.d:ro" \
+            -e GG_PROD_DOMAIN=pocket.example.org -e GG_DEV_DOMAIN=dev.pocket.example.org \
+            "$image" caddy adapt --config /e/Caddyfile >/dev/null
+
+  stack:
+    name: Docker stack (images, Trivy, e2e, backup and restore)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GG_HOME: ${{ runner.temp }}/gg-pocket
+      GG_ENV_FILE: ${{ github.workspace }}/deploy/env/ci.env
+      GG_SKIP_PULL: "1"
+      GG_IMAGE_TAG: ci
+      GG_SEED_PASSWORD: ci-only-demo-password
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - name: Image metadata
+        id: meta
+        run: echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+      - name: Build the API image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: backend/Dockerfile
+          load: true
+          tags: gg-pocket/gg-pocket-api:ci
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            GIT_COMMIT=${{ github.sha }}
+            GIT_BRANCH=${{ github.head_ref || github.ref_name }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,scope=api,mode=max
+      - name: Build the web image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: frontend/Dockerfile
+          load: true
+          tags: gg-pocket/gg-pocket-web:ci
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            GIT_COMMIT=${{ github.sha }}
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,scope=web,mode=max
+      - name: Install Trivy
+        run: |
+          cd "$RUNNER_TEMP"
+          base="https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}"
+          curl -sSfLO "$base/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          curl -sSfLO "$base/trivy_${TRIVY_VERSION}_checksums.txt"
+          grep " trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz$" "trivy_${TRIVY_VERSION}_checksums.txt" | sha256sum -c -
+          tar -xzf "trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" trivy
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Scan the images (fails on a critical vulnerability with a fix)
+        run: |
+          for image in gg-pocket/gg-pocket-api:ci gg-pocket/gg-pocket-web:ci; do
+            trivy image --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed "$image"
+            trivy image --quiet --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 1 "$image"
+          done
+      - name: Start the stack with deploy.sh (demo seed)
+        run: |
+          mkdir -p "$GG_HOME" deploy/backups && chmod 777 deploy/backups
+          deploy/scripts/deploy.sh ci ci
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: End-to-end tests against the stack
+        working-directory: frontend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+          pnpm e2e:stack
+      - name: Backup, damage, restore, check
+        run: deploy/scripts/ci-restore-test.sh
+      - name: Stack logs on failure
+        if: failure()
+        run: |
+          docker compose -f deploy/compose.yml -f deploy/compose.ci.yml --env-file deploy/env/ci.env \
+            --profile backup logs --no-color --tail 200 || true
+      - name: Keep the report on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-stack-report
+          path: frontend/playwright-report
+          retention-days: 7

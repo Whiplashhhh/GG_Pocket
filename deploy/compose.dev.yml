@@ -1,0 +1,8 @@
+# Deployed dev (spec §15.4): demo seed with strong passwords from .env, resettable. Project gg-pocket-dev.
+name: gg-pocket-dev
+
+services:
+  api:
+    environment:
+      GG_ALLOW_DEMO_SEED: "true"
+      GG_SEED_PASSWORD: ${GG_SEED_PASSWORD:?GG_SEED_PASSWORD is required}

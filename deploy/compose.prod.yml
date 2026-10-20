@@ -1,0 +1,7 @@
+# Production (spec §15.4): real data, nightly backups, no demo seed. Project gg-pocket-prod.
+name: gg-pocket-prod
+
+services:
+  api:
+    environment:
+      GG_ALLOW_DEMO_SEED: "false"
