@@ -22,6 +22,8 @@ export default defineConfig({
     trace: 'retain-on-failure',
     locale: 'fr-FR',
     timezoneId: 'Europe/Paris',
+    // The API is answered by the tests (e2e/fakeClub.ts): a service worker would get in between.
+    serviceWorkers: 'block',
   },
   projects: [
     { name: 'iPhone 13', use: { ...devices['iPhone 13'] } },

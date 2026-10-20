@@ -25,3 +25,16 @@ export async function request<T>(call: Promise<ClientResult<T>>): Promise<T> {
   }
   return result.data
 }
+
+/** Same as {@link request}, for endpoints that answer 204 No Content. */
+export async function requestNoContent(call: Promise<ClientResult<unknown>>): Promise<void> {
+  let result: ClientResult<unknown>
+  try {
+    result = await call
+  } catch (cause) {
+    throw new ApiError('NETWORK', { cause })
+  }
+  if (result.error !== undefined || !result.response.ok) {
+    throw ApiError.fromResponse(result.error, result.response.status)
+  }
+}

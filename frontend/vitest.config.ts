@@ -5,7 +5,7 @@ import { configDefaults, defineConfig, mergeConfig } from 'vitest/config'
 import { createViteConfig } from './vite.config.ts'
 
 export default mergeConfig(
-  createViteConfig({ precompileMessages: false }),
+  createViteConfig({ precompileMessages: false, pwa: false }),
   defineConfig({
     test: {
       environment: 'jsdom',

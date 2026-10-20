@@ -19,7 +19,8 @@ const { t } = useI18n()
         stroke-linejoin="round"
       />
     </svg>
-    <span class="text-lg leading-none font-title">
+    <!-- At phone width the header also holds the nickname and avatar: the summit says enough. -->
+    <span class="hidden text-lg leading-none font-title min-[26rem]:inline">
       {{ t('app.clubNameFirst') }}
       <span class="text-brand-ink">{{ t('app.clubNameSecond') }}</span>
     </span>
