@@ -2,6 +2,7 @@ package fr.gravelinesgrimp.pocket.platform.application;
 
 import fr.gravelinesgrimp.pocket.platform.domain.RateLimitedException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -55,11 +56,26 @@ public class RateLimiter {
     /** Above this many tracked keys, stale ones are dropped before adding more. */
     private static final int PURGE_THRESHOLD = 10_000;
 
+    /**
+     * Hard ceiling on tracked keys, so a flood of addresses cannot exhaust the memory: beyond it,
+     * the keys quiet for the longest time are forgotten first (a few megabytes at most).
+     */
+    static final int MAX_TRACKED_KEYS = 50_000;
+
     private final Map<String, Deque<Instant>> attempts = new ConcurrentHashMap<>();
     private final Clock clock;
+    private final int purgeThreshold;
+    private final int maxTrackedKeys;
 
+    @Autowired
     public RateLimiter(Clock clock) {
+        this(clock, PURGE_THRESHOLD, MAX_TRACKED_KEYS);
+    }
+
+    RateLimiter(Clock clock, int purgeThreshold, int maxTrackedKeys) {
         this.clock = clock;
+        this.purgeThreshold = purgeThreshold;
+        this.maxTrackedKeys = maxTrackedKeys;
     }
 
     /** Counts this attempt, or refuses it if the limit is already reached. */
@@ -136,14 +152,26 @@ public class RateLimiter {
 
     /** Every window here is 1 hour or less: an entry older than that is useless. */
     private void purgeIfLarge(Instant now) {
-        if (attempts.size() > PURGE_THRESHOLD) {
-            var stale = now.minus(Duration.ofHours(1));
-            attempts.entrySet()
-                    .removeIf(
-                            entry -> {
-                                var last = entry.getValue().peekLast();
-                                return last == null || last.isBefore(stale);
-                            });
+        if (attempts.size() <= purgeThreshold) {
+            return;
         }
+        var stale = now.minus(Duration.ofHours(1));
+        attempts.entrySet().removeIf(entry -> lastAttempt(entry).isBefore(stale));
+        var excess = attempts.size() - maxTrackedKeys;
+        if (excess > 0) {
+            // Snapshot first: other requests keep updating the counters while this sorts.
+            attempts.entrySet().stream()
+                    .map(entry -> Map.entry(entry.getKey(), lastAttempt(entry)))
+                    .toList()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .limit(excess)
+                    .forEach(entry -> attempts.remove(entry.getKey()));
+        }
+    }
+
+    private static Instant lastAttempt(Map.Entry<String, Deque<Instant>> entry) {
+        var last = entry.getValue().peekLast();
+        return last == null ? Instant.MIN : last;
     }
 }

@@ -55,6 +55,26 @@ class RateLimiterTest {
     }
 
     @Test
+    void aFloodOfKeysForgetsTheQuietestOnesFirst() {
+        var small = new RateLimiter(clock, 4, 5);
+        for (var i = 0; i < 3; i++) {
+            small.consume(RULE, "oldest");
+        }
+        for (var key : new String[] {"b", "c", "d", "e"}) {
+            clock.advance(Duration.ofSeconds(1));
+            small.consume(RULE, key);
+        }
+        clock.advance(Duration.ofSeconds(1));
+        for (var i = 0; i < 3; i++) {
+            small.consume(RULE, "newest");
+        }
+
+        assertThatCode(() -> small.consume(RULE, "oldest")).doesNotThrowAnyException();
+        assertThatThrownBy(() -> small.consume(RULE, "newest"))
+                .isInstanceOf(RateLimitedException.class);
+    }
+
+    @Test
     void failuresAreCountedSeparatelyFromChecks() {
         limiter.ensureAllowed(RULE, "marie");
         limiter.record(RULE, "marie");
