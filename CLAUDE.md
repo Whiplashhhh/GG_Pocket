@@ -46,7 +46,7 @@ dès qu'elles existent. Tiens cette section à jour.
 - Backend (`backend/`) :
   - lancer : `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev` (ou `./mvnw spring-boot:test-run`, base Testcontainers) ;
   - tout vérifier : `./mvnw verify` (Spotless, unitaires `*Test`, intégration `*IT` Testcontainers, ArchUnit, contrat OpenAPI) ;
-  - formater : `./mvnw spotless:apply` (google-java-format AOSP ; binaire natif possible : `google-java-format --aosp --replace`) ;
+  - formater : `./mvnw spotless:apply` (google-java-format AOSP ; binaire natif possible : `google-java-format --aosp --skip-reflowing-long-strings --replace`, sans quoi il recoupe les longues chaînes autrement que Spotless) ;
   - mettre à jour le contrat : `./mvnw verify -Dgg.openapi.write=true` (écrit `frontend/src/api/openapi.json`).
 - Frontend (`frontend/`, Node 24, pnpm 12) :
   - `pnpm install`, `pnpm dev` (port 5173, `/api` → 8080), galerie sur `/dev/galerie` ;

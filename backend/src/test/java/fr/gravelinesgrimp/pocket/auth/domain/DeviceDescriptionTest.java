@@ -15,7 +15,7 @@ class DeviceDescriptionTest {
             delimiter = '|',
             value = {
                 "Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15"
-                    + " (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1|SAFARI|IPHONE",
+                        + " (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1|SAFARI|IPHONE",
                 "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko)"
                         + " Chrome/141.0.0.0 Mobile Safari/537.36|CHROME|ANDROID",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"

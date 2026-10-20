@@ -29,6 +29,11 @@ import java.nio.charset.StandardCharsets;
 @IntegrationTest
 class RegistrationCodeAdminIT {
 
+    private static final String OPEN_DAY_ACTIVE =
+            "{\"label\": \"Portes ouvertes\", \"active\": true}";
+    private static final String OPEN_DAY_INACTIVE =
+            "{\"label\": \"Portes ouvertes\", \"active\": false}";
+
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;
 
@@ -79,7 +84,7 @@ class RegistrationCodeAdminIT {
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(
                                                 "{\"label\": \"Portes ouvertes\", \"active\":"
-                                                    + " true}"))
+                                                        + " true}"))
                         .andReturn()
                         .getResponse()
                         .getContentAsString(StandardCharsets.UTF_8);
@@ -91,7 +96,7 @@ class RegistrationCodeAdminIT {
                                 .with(as(admin))
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"label\": \"Portes ouvertes\", \"active\": false}"))
+                                .content(OPEN_DAY_INACTIVE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value("INACTIVE"));
 
