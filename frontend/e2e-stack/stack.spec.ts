@@ -57,8 +57,16 @@ test('a demo climber signs in, browses and signs out without any CSP violation',
   await page.goto('/connexion')
   await page.getByLabel('Pseudo').fill('grimpeur')
   await page.getByLabel('Mot de passe', { exact: true }).fill(SEED_PASSWORD)
-  await page.getByRole('button', { name: 'Se connecter' }).click()
-  await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toBeVisible()
+  const [login] = await Promise.all([
+    page.waitForResponse('**/api/v1/auth/login'),
+    page.getByRole('button', { name: 'Se connecter' }).click(),
+  ])
+  expect(login.status(), await login.text()).toBe(200)
+  expect(login.headers()['set-cookie'], 'session cookie').toContain('__Host-GG_SESSION=')
+  const navigation = page.getByRole('navigation', { name: 'Navigation principale' })
+  await expect(navigation.or(page.getByRole('alert'))).toBeVisible()
+  expect(await page.getByRole('alert').allTextContents(), page.url()).toEqual([])
+  await expect(navigation).toBeVisible()
 
   const cookies = await page.context().cookies()
   const session = cookies.find((cookie) => cookie.name === '__Host-GG_SESSION')
