@@ -89,6 +89,7 @@ jobs:
           DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
           DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
           RESET: ${{ github.event_name == 'pull_request' || inputs.reset }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           install -d -m 700 ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
@@ -96,6 +97,9 @@ jobs:
           tar -czf "$RUNNER_TEMP/bundle.tgz" -C deploy .
           option=''
           [[ $RESET != true ]] || option='--reset'
+          # The server pulls the images with this job's token, valid until the job ends.
+          printf '%s' "$GITHUB_TOKEN" | ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes \
+            "deploy@$DEPLOY_HOST" "login $GITHUB_ACTOR"
           ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes "deploy@$DEPLOY_HOST" \
             "deploy ${{ steps.meta.outputs.tag }} $option" < "$RUNNER_TEMP/bundle.tgz"
       - name: Summary

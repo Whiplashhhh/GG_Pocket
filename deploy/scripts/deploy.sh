@@ -65,11 +65,21 @@ if [[ $previous != "$tag" ]]; then
 fi
 
 if [[ -d $GG_HOME/releases ]]; then
-    # Keep the last five releases (rollback targets), and images unused for two weeks go.
-    ls -1t "$GG_HOME/releases" | tail -n +6 | while read -r old; do
+    # Keep the files and images of this version and the previous one (rollback without pulling:
+    # the registry token of the deployment job has expired by then). Older ones of this
+    # environment go; the other environment's images are left alone.
+    ls -1t "$GG_HOME/releases" | tail -n +3 | while read -r old; do
         [[ $old == "$tag" || $old == "$previous" ]] || rm -rf -- "${GG_HOME:?}/releases/$old"
     done
-    docker image prune --all --force --filter "until=336h" >/dev/null || true
+    pattern='^[0-9]+\.[0-9]+\.[0-9]+$'
+    [[ $GG_ENV != dev ]] || pattern='^dev-'
+    docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E '/gg-pocket-(api|web):' |
+        while read -r image; do
+            image_tag=${image##*:}
+            if [[ $image_tag =~ $pattern && $image_tag != "$tag" && $image_tag != "$previous" ]]; then
+                docker image rm "$image" >/dev/null || true
+            fi
+        done
 fi
 
 log "$GG_ENV is running $tag"

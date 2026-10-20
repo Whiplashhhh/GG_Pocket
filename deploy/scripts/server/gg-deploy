@@ -6,6 +6,7 @@
 #   deploy <tag> [--reset]   bundle of the repository's deploy/ directory (tar.gz) on stdin
 #   rollback                 previous version back
 #   status                   deployed versions and containers
+#   login <user>             registry token on stdin (the job's short-lived GITHUB_TOKEN)
 #   edge                     (prod key only) edge proxy configuration from the bundle on stdin
 set -euo pipefail
 
@@ -53,6 +54,11 @@ case $command in
         current=$(cat "$home/current-tag")
         exec "$home/releases/$current/scripts/rollback.sh" "$env"
         ;;
+    login)
+        user=${request[1]:-}
+        [[ $user =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,38}(\[bot\])?$ ]] || { echo "gg-deploy: invalid user" >&2; exit 1; }
+        docker login ghcr.io --username "$user" --password-stdin
+        ;;
     status)
         echo "environment: $env"
         echo "current: $(cat "$home/current-tag" 2>/dev/null || echo none)"
@@ -71,7 +77,7 @@ case $command in
         echo "edge proxy configuration applied"
         ;;
     *)
-        echo "gg-deploy: unknown command '$command' (deploy, rollback, status, edge)" >&2
+        echo "gg-deploy: unknown command '$command' (deploy, rollback, status, login, edge)" >&2
         exit 1
         ;;
 esac

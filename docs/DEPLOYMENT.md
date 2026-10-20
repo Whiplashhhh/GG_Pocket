@@ -39,7 +39,7 @@ sudo /tmp/gg-pocket/deploy/scripts/server/bootstrap.sh \
   --firewall
 ```
 
-Les deux clés publiques sont celles des déploiements GitHub (section 3). Le script, que l'on peut relancer sans risque :
+Les deux clés publiques sont affichées par `setup-github.sh` (section 3), à lancer avant. Le script, que l'on peut relancer sans risque :
 
 - crée l'utilisateur `deploy` (sans mot de passe, membre du groupe `docker`) et installe la porte `/usr/local/bin/gg-deploy` ;
 - inscrit les clés dans `/home/deploy/.ssh/authorized_keys` (fichier à root), chacune **épinglée à un environnement** :
@@ -52,26 +52,35 @@ Les deux clés publiques sont celles des déploiements GitHub (section 3). Le sc
 À faire en plus, une fois : `sudo apt install unattended-upgrades` (mises à jour de sécurité automatiques).
 
 **À savoir** : être dans le groupe `docker` revient à être root. La porte limite ce que la clé peut demander
-(`deploy`, `rollback`, `status`, `edge`), mais un déploiement exécute les scripts de la version envoyée : la vraie
+(`deploy`, `rollback`, `status`, `login`, `edge`), mais un déploiement exécute les scripts de la version envoyée : la vraie
 protection est que seules les GitHub Actions du dépôt ont les clés, et que la prod attend l'approbation de Willem.
 
-## 3. GitHub (déjà fait par Claude, à refaire si on change de clés)
+## 3. GitHub (une seule fois, avant le serveur)
 
-Environnements du dépôt (Settings → Environments) :
+Depuis ta machine, avec la CLI GitHub connectée en admin du dépôt (`gh auth login`) :
 
-| Environnement | Secret | Variables | Protection |
-|---|---|---|---|
-| `dev` | `DEPLOY_SSH_KEY` (clé privée dev) | `DEPLOY_HOST`, `DEPLOY_KNOWN_HOSTS`, `GG_URL` | aucune |
-| `production` | `DEPLOY_SSH_KEY` (clé privée prod) | `DEPLOY_HOST`, `DEPLOY_KNOWN_HOSTS`, `GG_URL` | approbation de Willem, branche `main` et tags `v*` |
+```bash
+.github/scripts/setup-github.sh --host <IPv4 du serveur>
+```
 
-- Créer une paire de clés : `ssh-keygen -t ed25519 -N '' -C gg-pocket-dev -f gg-pocket-dev`, puis
-  `gh secret set DEPLOY_SSH_KEY --env dev < gg-pocket-dev` et effacer le fichier privé. La clé publique va au `bootstrap.sh`.
-- `DEPLOY_KNOWN_HOSTS` : `ssh-keyscan -t ed25519 <ip>` **vérifié** contre l'empreinte affichée sur le serveur
-  (`ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`).
-- Images : les paquets `gg-pocket-api` et `gg-pocket-web` sont publics (dépôt public, aucune donnée dans les images),
-  le serveur les tire sans identifiants.
-- Règles de branche : `main` exige une PR et la CI verte (jobs Backend, Frontend, E2E, Secret scan, Deploy config,
-  Docker stack), sans force-push ni suppression ; `prod/*` et les tags `v*` ne sont modifiables que par le workflow de release.
+Le script (relançable) :
+
+- affiche l'empreinte SSH du serveur et demande de la comparer à celle lue sur le serveur
+  (`ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`) avant de lui faire confiance ;
+- crée les environnements `dev` et `production` (ce dernier : approbation par toi, depuis `main` et les tags `v*` seulement) ;
+- génère une paire de clés SSH par environnement : la clé privée part directement dans le secret `DEPLOY_SSH_KEY`
+  de l'environnement et n'est jamais écrite ailleurs ; les clés publiques s'affichent, prêtes pour `bootstrap.sh` ;
+- pose les variables `DEPLOY_HOST`, `DEPLOY_KNOWN_HOSTS`, `GG_URL` de chaque environnement ;
+- ajoute les jobs « Deploy config » et « Docker stack » aux checks obligatoires de `main`, et réserve les branches
+  `prod/*` et les tags `v*` au workflow de release ;
+- crée le label `deploy:dev`.
+
+Il se termine en affichant la commande `bootstrap.sh` à lancer sur le serveur (section 2), clés comprises.
+Changer de clés : relancer le script, puis `bootstrap.sh` avec les nouvelles clés publiques.
+
+Les images restent privées sur ghcr : à chaque déploiement, le serveur s'authentifie avec le jeton éphémère du job
+(valable jusqu'à la fin du job). Les images de la version en place et de la précédente restent sur le serveur, donc un
+retour arrière depuis le serveur n'a rien à télécharger.
 
 ## 4. Nom de domaine
 
@@ -186,5 +195,5 @@ Cette restauration est testée à chaque CI (job « Docker stack » : sonde en b
 | « Refusing to fall back on the local defaults » | `.env` de l'environnement incomplet (`GG_DB_*`) : relancer `bootstrap.sh` ne l'écrase pas, le corriger à la main |
 | « belongs to the … environment » | La base n'est pas celle de cet environnement (mauvais `.env` ou sauvegarde d'un autre environnement) |
 | Certificat absent | `sudo docker logs gg-pocket-edge-caddy-1` : ports 80/443 ouverts ? DNS (ou IP du nom sslip.io) correct ? |
-| Plus de place disque | `sudo docker system df` ; les images de plus de 14 jours non utilisées sont nettoyées à chaque déploiement |
+| Plus de place disque | `sudo docker system df` ; chaque déploiement ne garde que les images de la version en place et de la précédente |
 | Mémoire | `sudo docker stats --no-stream` (budget : prod ≈ 1,5 Go, dev ≈ 1,1 Go, frontal 128 Mo) |
