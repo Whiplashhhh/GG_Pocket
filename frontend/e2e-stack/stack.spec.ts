@@ -62,7 +62,7 @@ test('a demo climber signs in, browses and signs out without any CSP violation',
     page.getByRole('button', { name: 'Se connecter' }).click(),
   ])
   expect(login.status(), await login.text()).toBe(200)
-  expect(login.headers()['set-cookie'], 'session cookie').toContain('__Host-GG_SESSION=')
+  expect((await login.allHeaders())['set-cookie'], 'session cookie').toContain('__Host-GG_SESSION=')
   const navigation = page.getByRole('navigation', { name: 'Navigation principale' })
   await expect(navigation.or(page.getByRole('alert'))).toBeVisible()
   expect(await page.getByRole('alert').allTextContents(), page.url()).toEqual([])
