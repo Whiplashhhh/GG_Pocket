@@ -54,11 +54,13 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [x] Page « Tes données » (contenu de base)
 - [x] Seed des comptes (profil `dev`, `GG_ALLOW_DEMO_SEED`, refus si marqueur `prod` ou comptes non seedés)
 - [x] Tests d'autorisation pour chaque rôle sur chaque endpoint ; e2e inscription → installation → retour 30 jours plus tard (horloge simulée)
-- [ ] Revues sécurité et UX de fin de phase, corrections, PR « Phase 1 — Comptes et rôles »
+- [x] Revues sécurité et UX de fin de phase, corrections
+- [~] PR « Phase 1 — Comptes et rôles » ouverte, à relire et fusionner par Willem
 - [ ] Contrôle sur un vrai iPhone de la copie des cookies à l'installation (D-041)
 
 ## Phase 2 — Environnements et pipeline
 
+- [ ] Limiteur de débit : plafond dur du nombre de clés suivies (revue sécurité phase 1, L3)
 - [ ] Dockerfiles backend et frontend (multi-étapes, non root, version et commit injectés)
 - [ ] `compose.yml`, `compose.dev.yml`, `compose.prod.yml`, Caddy (TLS, en-têtes de sécurité, CSP stricte, `/api` proxifié)
 - [ ] Limites mémoire, `MaxRAMPercentage`, healthchecks, `restart: unless-stopped`

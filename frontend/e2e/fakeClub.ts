@@ -1,4 +1,4 @@
-import type { BrowserContext, Page, Route } from '@playwright/test'
+import type { Page, Route } from '@playwright/test'
 
 import type { components } from '../src/api/schema'
 
@@ -7,7 +7,9 @@ type Role = Schemas['CurrentMember']['role']
 
 /**
  * A small in-memory GG Pocket API for the end-to-end tests (DECISIONS D-040): members, codes,
- * sessions carried by a real cookie, the CSRF check, and a clock the test moves forward. The real
+ * sessions, the CSRF check, and a clock the test moves forward. One browser context per test, so
+ * "the browser's session" is kept here rather than in a cookie (WebKit does not show cookies added
+ * by the test runner to localhost pages). The real
  * rules live in the backend and its integration tests; this only behaves the same at the surface.
  */
 export interface FakeMember {
@@ -38,8 +40,8 @@ interface FakeSession {
   lastActiveAt: number
 }
 
-const SESSION_COOKIE = 'GG_SESSION'
 const CSRF_COOKIE = 'XSRF-TOKEN'
+const CSRF_TOKEN = 'jeton-csrf'
 const DAY = 24 * 3600 * 1000
 const REMEMBERED_INACTIVITY = 180 * DAY
 const BROWSER_SESSION_INACTIVITY = DAY / 2
@@ -66,12 +68,9 @@ export class FakeClub {
   readonly audit: Schemas['AuditEntry'][] = []
   readonly resetTokens = new Map<string, string>()
   private readonly sessions = new Map<string, FakeSession>()
+  /** The session of the browser under test, as its cookie would carry it. */
+  private browserSession: string | undefined
   private sequence = 0
-
-  constructor(
-    private readonly context: BrowserContext,
-    private readonly origin: string,
-  ) {}
 
   addMember(overrides: Partial<FakeMember> & Pick<FakeMember, 'nickname'>): FakeMember {
     const member: FakeMember = {
@@ -104,8 +103,8 @@ export class FakeClub {
   }
 
   /** Signs the browser in as this member, like a past sign-in with "Rester connecté". */
-  async signIn(member: FakeMember): Promise<void> {
-    await this.openSession(member, true)
+  signIn(member: FakeMember): void {
+    this.openSession(member, true)
   }
 
   advance(days: number): void {
@@ -113,6 +112,13 @@ export class FakeClub {
   }
 
   async install(page: Page): Promise<void> {
+    // The CSRF cookie a real server sets on GET /auth/state, readable by the app's scripts.
+    await page.addInitScript(
+      ([name, value]) => {
+        document.cookie = `${name}=${value}; path=/`
+      },
+      [CSRF_COOKIE, CSRF_TOKEN],
+    )
     await page.route('**/api/v1/**', (route) => this.handle(route))
   }
 
@@ -121,7 +127,7 @@ export class FakeClub {
     return `00000000-0000-4000-8000-${this.sequence.toString().padStart(12, '0')}`
   }
 
-  private async openSession(member: FakeMember, remembered: boolean): Promise<void> {
+  private openSession(member: FakeMember, remembered: boolean): void {
     const token = `session-${this.nextId()}`
     this.sessions.set(token, {
       memberId: member.id,
@@ -129,30 +135,12 @@ export class FakeClub {
       signedInAt: this.now,
       lastActiveAt: this.now,
     })
-    await this.context.addCookies([
-      {
-        name: SESSION_COOKIE,
-        value: token,
-        url: this.origin,
-        httpOnly: true,
-        sameSite: 'Lax',
-        // Browsers keep remembered sessions; the server decides when they expire.
-        ...(remembered ? { expires: Math.floor(Date.now() / 1000) + 400 * 86400 } : {}),
-      },
-    ])
-  }
-
-  /** Cookie header: WebKit only exposes it through allHeaders(), not headers(). */
-  private cookie(headers: Partial<Record<string, string>>, name: string): string | undefined {
-    return (headers.cookie ?? '')
-      .split(';')
-      .map((part) => part.trim().split('='))
-      .find(([key]) => key === name)?.[1]
+    this.browserSession = token
   }
 
   /** The member of a live session, extending it like Spring Session does on every request. */
-  private current(headers: Partial<Record<string, string>>): FakeMember | undefined {
-    const token = this.cookie(headers, SESSION_COOKIE)
+  private current(): FakeMember | undefined {
+    const token = this.browserSession
     const session = token === undefined ? undefined : this.sessions.get(token)
     if (token === undefined || session === undefined) {
       return undefined
@@ -280,15 +268,13 @@ export class FakeClub {
 
     // The app must send the CSRF cookie back in the header on every write.
     if (method !== 'GET') {
-      const cookie = this.cookie(headers, CSRF_COOKIE)
-      if (cookie === undefined || headers['x-xsrf-token'] !== cookie) {
+      if (headers['x-xsrf-token'] !== CSRF_TOKEN) {
         return fail(403, 'CSRF_TOKEN_INVALID')
       }
     }
 
     if (path === '/auth/state') {
-      await this.context.addCookies([{ name: CSRF_COOKIE, value: 'jeton-csrf', url: this.origin }])
-      const member = this.current(headers)
+      const member = this.current()
       return json(
         member
           ? { authenticated: true, member: this.currentMember(member) }
@@ -306,13 +292,12 @@ export class FakeClub {
       )
       if (member?.password !== password) return fail(401, 'BAD_CREDENTIALS')
       if (member.status !== 'ACTIVE') return fail(403, 'ACCOUNT_DISABLED')
-      await this.openSession(member, rememberMe)
+      this.openSession(member, rememberMe)
       return json(this.currentMember(member))
     }
     if (path === '/auth/logout') {
-      const token = this.cookie(headers, SESSION_COOKIE)
-      if (token !== undefined) this.sessions.delete(token)
-      await this.context.clearCookies({ name: SESSION_COOKIE })
+      if (this.browserSession !== undefined) this.sessions.delete(this.browserSession)
+      this.browserSession = undefined
       return route.fulfill({ status: 204 })
     }
     if (path === '/auth/registration-code/check' || path === '/auth/register') {
@@ -341,7 +326,7 @@ export class FakeClub {
         registeredAt: new Date(this.now).toISOString(),
       })
       code.useCount += 1
-      await this.openSession(member, form.rememberMe ?? false)
+      this.openSession(member, form.rememberMe ?? false)
       return json(this.currentMember(member), 201)
     }
     if (path === '/auth/password-reset/check' || path === '/auth/password-reset') {
@@ -355,7 +340,7 @@ export class FakeClub {
       for (const [key, session] of this.sessions) {
         if (session.memberId === member.id) this.sessions.delete(key)
       }
-      await this.openSession(member, true)
+      this.openSession(member, true)
       return json(this.currentMember(member))
     }
 
@@ -363,7 +348,7 @@ export class FakeClub {
       return route.fulfill({ status: 200, contentType: 'image/png', body: PIXEL })
     }
 
-    const me = this.current(headers)
+    const me = this.current()
     if (me === undefined) return fail(401, 'UNAUTHENTICATED')
 
     if (path === '/me' && method === 'GET') return json(this.profile(me))
@@ -386,7 +371,7 @@ export class FakeClub {
       return route.fulfill({ status: 204 })
     }
     if (path === '/me/devices') {
-      const token = this.cookie(headers, SESSION_COOKIE)
+      const token = this.browserSession
       return json(
         [...this.sessions.entries()]
           .filter(([, session]) => session.memberId === me.id)

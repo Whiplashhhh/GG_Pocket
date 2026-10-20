@@ -28,10 +28,10 @@ export const test = base.extend<{
   meta: [{}, { option: true }],
   signedInAs: ['CLIMBER', { option: true }],
   installInvite: [false, { option: true }],
-  club: async ({ context, baseURL, signedInAs }, use) => {
-    const club = new FakeClub(context, baseURL ?? 'http://localhost:4173')
+  club: async ({ signedInAs }, use) => {
+    const club = new FakeClub()
     if (signedInAs !== null) {
-      await club.signIn(club.addMember({ nickname: 'marie', role: signedInAs }))
+      club.signIn(club.addMember({ nickname: 'marie', role: signedInAs }))
     }
     await use(club)
   },

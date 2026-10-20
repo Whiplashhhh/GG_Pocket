@@ -83,6 +83,7 @@ test.describe('app shell', () => {
   test('keyboard users can skip straight to the content', async ({ page, isMobile }) => {
     test.skip(isMobile, 'Keyboard navigation is a desktop concern')
     await page.goto('/actu')
+    await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toBeVisible()
     await page.keyboard.press('Tab')
     const skipLink = page.getByRole('link', { name: 'Aller au contenu' })
     await expect(skipLink).toBeFocused()
