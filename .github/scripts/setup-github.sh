@@ -2,25 +2,28 @@
 # One-time GitHub setup of the deployments (DEPLOYMENT.md, step 3), run by a repository admin on
 # their own machine with the GitHub CLI logged in (gh auth login). Idempotent.
 #
-#   .github/scripts/setup-github.sh --host 51.38.12.34 [--prod-url https://...] [--dev-url https://...]
+#   .github/scripts/setup-github.sh --host 51.38.12.34 [--prod-url https://...] [--dev-url https://...] [--new-keys]
 #
 # - environments "dev" and "production", both approved by the admin running this (a deployment
 #   runs the scripts of the branch it ships, as root on the server: DECISIONS D-062); production
 #   from main and v* tags only;
 # - one SSH key pair per environment: private key into the environment secret DEPLOY_SSH_KEY,
-#   public key printed for bootstrap.sh, nothing left on disk;
+#   public key printed for bootstrap.sh, nothing left on disk; existing keys are kept unless
+#   --new-keys (new keys must then be given to bootstrap.sh again);
+# - workflows allowed to open pull requests (prepare-release.yml opens "Release X.Y.Z");
 # - variables DEPLOY_HOST, DEPLOY_KNOWN_HOSTS (after you check the server fingerprint), GG_URL;
 # - rulesets: main requires the new CI jobs too; prod/* branches and v* tags only by the release workflow;
 # - label deploy:dev.
 set -euo pipefail
 
 repo=${GG_REPO:-Whiplashhhh/GG_Pocket}
-host='' prod_url='' dev_url=''
+host='' prod_url='' dev_url='' new_keys=''
 while [[ $# -gt 0 ]]; do
     case $1 in
         --host) host=$2; shift 2 ;;
         --prod-url) prod_url=$2; shift 2 ;;
         --dev-url) dev_url=$2; shift 2 ;;
+        --new-keys) new_keys=1; shift ;;
         *) echo "unknown option $1" >&2; exit 1 ;;
     esac
 done
@@ -63,15 +66,23 @@ trap 'rm -rf "$work"' EXIT
 declare -A public_keys
 for env in dev production; do
     short=${env/production/prod}
-    ssh-keygen -q -t ed25519 -N '' -C "gg-pocket-$short" -f "$work/$short"
-    gh secret set DEPLOY_SSH_KEY --repo "$repo" --env "$env" <"$work/$short"
-    public_keys[$short]=$(cat "$work/$short.pub")
+    if [[ -z $new_keys ]] && gh secret list --repo "$repo" --env "$env" --json name --jq '.[].name' | grep -qx DEPLOY_SSH_KEY; then
+        echo "$env: key already set, kept (--new-keys to replace it)"
+    else
+        ssh-keygen -q -t ed25519 -N '' -C "gg-pocket-$short" -f "$work/$short"
+        gh secret set DEPLOY_SSH_KEY --repo "$repo" --env "$env" <"$work/$short"
+        public_keys[$short]=$(cat "$work/$short.pub")
+    fi
     url=$dev_url
     [[ $env == dev ]] || url=$prod_url
     gh variable set DEPLOY_HOST --repo "$repo" --env "$env" --body "$host"
     gh variable set DEPLOY_KNOWN_HOSTS --repo "$repo" --env "$env" --body "$known_hosts"
     gh variable set GG_URL --repo "$repo" --env "$env" --body "$url"
 done
+
+say "Workflows may open pull requests (Release X.Y.Z)"
+gh api -X PUT "repos/$repo/actions/permissions/workflow" \
+    -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true --silent
 
 say "Rulesets"
 main_id=$(gh api "repos/$repo/rulesets" --jq '.[] | select(.name == "main") | .id')
@@ -109,10 +120,14 @@ done
 
 gh label create deploy:dev --repo "$repo" --color 0E8A16 --description "Déploie la PR sur l'environnement dev" --force >/dev/null
 
-say "Done. On the server, as root:"
+if [[ ${#public_keys[@]} -eq 0 ]]; then
+    say "Done (server keys unchanged: nothing to do on the server)"
+    exit 0
+fi
+say "Done. On the server, as root (keys that were not replaced stay as they are):"
 cat <<NEXT
 git clone https://github.com/$repo.git /tmp/gg-pocket
 sudo /tmp/gg-pocket/deploy/scripts/server/bootstrap.sh --firewall \\
-  --dev-key '${public_keys[dev]}' \\
-  --prod-key '${public_keys[prod]}'
+  ${public_keys[dev]:+--dev-key '${public_keys[dev]}'} \\
+  ${public_keys[prod]:+--prod-key '${public_keys[prod]}'}
 NEXT

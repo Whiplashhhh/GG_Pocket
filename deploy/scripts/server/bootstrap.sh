@@ -45,7 +45,10 @@ install -m 755 -o root -g root "$repo/deploy/scripts/server/gg-deploy" /usr/loca
 install -d -m 755 -o root -g root /home/deploy/.ssh
 keys=/home/deploy/.ssh/authorized_keys
 touch "$keys"
-grep -v 'gg-deploy' "$keys" >"$keys.new" || true
+cp "$keys" "$keys.new"
+# Only the environments given a new key lose their old one.
+[[ -z $dev_key ]] || sed -i '/gg-deploy dev"/d' "$keys.new"
+[[ -z $prod_key ]] || sed -i '/gg-deploy prod"/d' "$keys.new"
 [[ -z $dev_key ]] || echo "restrict,command=\"/usr/local/bin/gg-deploy dev\" $dev_key" >>"$keys.new"
 [[ -z $prod_key ]] || echo "restrict,command=\"/usr/local/bin/gg-deploy prod\" $prod_key" >>"$keys.new"
 install -m 644 -o root -g root "$keys.new" "$keys"
