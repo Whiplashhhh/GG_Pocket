@@ -91,7 +91,7 @@ test.describe('joining the club', () => {
     await page.getByLabel('Nom', { exact: true }).fill('Dupont')
     await page.getByLabel('Pseudo').fill('lea.d')
     await page.getByLabel('Mot de passe', { exact: true }).fill('azertyuiop')
-    await page.getByText('J’ai lu la page').click()
+    await page.getByRole('checkbox', { name: /J’ai lu la page/ }).check()
     await page.getByRole('button', { name: 'Créer mon compte' }).click()
     await expect(
       page.getByText('Ce mot de passe fait partie des plus courants', { exact: false }),

@@ -52,6 +52,8 @@ pnpm dev
 ```
 
 L'appli s'ouvre sur <http://localhost:5173> ; les appels `/api` sont relayés vers le backend.
+Utilise Chrome ou Firefox en local : le cookie de session est `Secure` (préfixe `__Host-`), ce que ces navigateurs
+acceptent sur `http://localhost`, contrairement à Safari.
 La galerie des composants est sur <http://localhost:5173/dev/galerie> (jamais présente dans un build de prod).
 
 ## Commandes utiles
