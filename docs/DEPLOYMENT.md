@@ -107,7 +107,7 @@ Niveau 2, désactivé par défaut : un mot de passe devant tout le site (authent
 Il gêne la PWA installée sur iPhone (iOS redemande le mot de passe, parfois en boucle) : à réserver à une période sensible.
 
 ```bash
-sudo docker run --rm caddy:2.10-alpine caddy hash-password --plaintext 'mot de passe des testeurs'
+sudo docker run --rm caddy:2.11-alpine caddy hash-password --plaintext 'mot de passe des testeurs'
 sudo tee /opt/gg-pocket/edge/dev.d/basic-auth.caddy <<'EOF'
 basic_auth {
 	testeurs <empreinte affichée par la commande précédente>

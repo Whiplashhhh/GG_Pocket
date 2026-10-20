@@ -234,10 +234,17 @@ jobs:
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
       - name: Scan the images (fails on a critical vulnerability with a fix)
         run: |
+          critical=0
           for image in gg-pocket/gg-pocket-api:ci gg-pocket/gg-pocket-web:ci; do
-            trivy image --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed "$image"
-            trivy image --quiet --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 1 "$image"
+            report="$RUNNER_TEMP/trivy-${image//[\/:]/-}.json"
+            trivy image --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed \
+              --format json --output "$report" "$image"
+            # One annotation per vulnerability: readable from the run page and the API.
+            jq -r --arg image "$image" '.Results[]?.Vulnerabilities[]? |
+              "::\(if .Severity == "CRITICAL" then "error" else "warning" end) title=\(.VulnerabilityID) \(.Severity)::\($image): \(.PkgName) \(.InstalledVersion), fixed in \(.FixedVersion)"' "$report"
+            critical=$((critical + $(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length' "$report")))
           done
+          [[ $critical -eq 0 ]] || { echo "::error::$critical critical vulnerabilities with a fix"; exit 1; }
       - name: Start the stack with deploy.sh (demo seed)
         run: |
           mkdir -p "$GG_HOME" deploy/backups && chmod 777 deploy/backups

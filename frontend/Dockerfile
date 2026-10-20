@@ -15,7 +15,7 @@ RUN pnpm build \
          echo 'dist/index.html has an inline script: the CSP (script-src self) would block it.' >&2; exit 1; \
        fi
 
-FROM caddy:2.10-alpine
+FROM caddy:2.11-alpine
 ARG GIT_COMMIT=unknown
 ARG VERSION=unknown
 LABEL org.opencontainers.image.title="gg-pocket-web" \
