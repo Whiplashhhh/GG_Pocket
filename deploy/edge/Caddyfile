@@ -8,12 +8,19 @@
 	}
 }
 
+# The security headers come from each environment's web container; the edge only hides itself.
+(quiet) {
+	header -Server
+}
+
 {$GG_PROD_DOMAIN} {
+	import quiet
 	# No trusted proxy here: whatever X-Forwarded-For a client sends is replaced by its address.
 	reverse_proxy 127.0.0.1:8180
 }
 
 {$GG_DEV_DOMAIN} {
+	import quiet
 	# Optional extra lock for dev (basic authentication, see DEPLOYMENT.md): files in dev.d/.
 	import /etc/caddy/dev.d/*.caddy
 	reverse_proxy 127.0.0.1:8181

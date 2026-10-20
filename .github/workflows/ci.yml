@@ -258,6 +258,13 @@ jobs:
         run: |
           mkdir -p "$GG_HOME" deploy/backups && chmod 777 deploy/backups
           deploy/scripts/deploy.sh ci ci
+      - name: Put the edge proxy in front, as on the server (https://prod.localhost, Caddy's own CA)
+        working-directory: deploy/edge
+        run: |
+          mkdir -p dev.d && echo '# empty' > dev.d/README.caddy
+          printf 'GG_PROD_DOMAIN=prod.localhost\nGG_DEV_DOMAIN=dev.localhost\n' > .env
+          docker compose up -d --wait --wait-timeout 60
+          curl -fsSk https://prod.localhost/api/v1/meta
       - uses: pnpm/action-setup@v6
         with:
           package_json_file: frontend/package.json
@@ -271,7 +278,7 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
           pnpm exec playwright install --with-deps chromium
-          pnpm e2e:stack
+          GG_E2E_BASE_URL=https://prod.localhost pnpm e2e:stack
       - name: Backup, damage, restore, check
         run: deploy/scripts/ci-restore-test.sh
       - name: Stack logs on failure
@@ -282,6 +289,7 @@ jobs:
           }
           compose ps --all || true
           compose logs --no-color --tail 200 || true
+          docker compose -f deploy/edge/compose.yml logs --no-color --tail 50 || true
           # Also as annotations, readable from the API without the raw logs.
           for service in api web db; do
             lines=$(compose logs --no-color --no-log-prefix --tail 60 "$service" 2>&1 | cut -c1-300 || true)
