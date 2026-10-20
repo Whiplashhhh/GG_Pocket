@@ -3,7 +3,7 @@
 L'appli du club d'escalade **Gravelines Grimp** : topo des voies, carnet de séances, fil d'actu entre amis, « à faire »,
 planning, podium mensuel et badges. Une PWA mobile d'abord, pensée pour la salle : tout à portée de pouce.
 
-> État : phase 0 (fondations). Voir [`docs/ROADMAP.md`](docs/ROADMAP.md) et [`docs/PROGRESS.md`](docs/PROGRESS.md).
+> État : phase 1 (comptes et rôles). Voir [`docs/ROADMAP.md`](docs/ROADMAP.md) et [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Documentation
 
@@ -80,4 +80,27 @@ Playwright télécharge ses navigateurs avec `pnpm exec playwright install`. Sur
 Les variables d'environnement sont documentées dans [`.env.example`](.env.example). Les environnements dev et prod
 (Docker Compose, Caddy, pipeline de release) arrivent en phase 2 et seront décrits dans `docs/DEPLOYMENT.md`.
 
-Comptes de test (seed de démonstration, dev et local uniquement) : arrivent en phase 1.
+### Comptes de test (local et dev uniquement)
+
+Avec `GG_ALLOW_DEMO_SEED=true` et le profil `dev`, le backend crée au démarrage un compte par rôle et un code d'inscription :
+
+| Pseudo | Rôle | Mot de passe en local |
+|---|---|---|
+| `admin` | Le Président·e (admin) | `grimpe-en-local` |
+| `direction` | Direction | `grimpe-en-local` |
+| `ouvreur` | Ouvreur·se | `grimpe-en-local` |
+| `grimpeur` | Grimpeur GG | `grimpe-en-local` |
+
+Code d'inscription de démonstration : `DEMO-2026`. Sur le dev déployé, le mot de passe vient de `GG_SEED_PASSWORD`
+(obligatoire, aucun mot de passe faible par défaut). Le seed refuse de tourner sur une base marquée `prod` ou qui contient
+des comptes qu'il n'a pas créés (spec §17).
+
+```sh
+GG_ALLOW_DEMO_SEED=true ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+### Premier démarrage sans seed
+
+Une base sans aucun membre reçoit un **code d'inscription admin** à usage unique, valable 24 heures, affiché une seule fois
+dans les logs du backend (`Single-use admin registration code…`). Il sert à créer le premier compte admin depuis l'écran
+« J'ai un code du club ». Tant que personne ne s'est inscrit, chaque redémarrage en affiche un nouveau.

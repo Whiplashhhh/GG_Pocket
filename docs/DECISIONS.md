@@ -5,7 +5,7 @@ Statuts : **validée** (tranchée, à ne pas rediscuter sans raison nouvelle) ou
 de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision remplacée est marquée « remplacée par D-xxx ».
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
-choix de la phase 1 (D-043 et suivantes).
+choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -36,6 +36,7 @@ direction) ou **Willem**.
 | D-045 | Ce que la direction voit dans la fiche d'un membre ? | club | Tout sauf la date de naissance |
 | D-046 | Format du pseudo ? | Willem | 3 à 20 caractères, `a-z 0-9 . _ -`, insensible à la casse |
 | D-047 | Qui reçoit le code admin de premier démarrage ? | Willem | Willem, qui le transmet au président |
+| D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 
 ---
 
@@ -303,3 +304,103 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   avec le rôle de son choix (créé ensuite par code d'inscription normal, rôle donné par l'admin).
 - **Statut** : à valider (sert à rédiger `DEPLOYMENT.md` et `GUIDE_CLUB.md`).
 
+
+### D-048 — Session longue : cookie « Rester connecté » et durées
+- **Contexte** : spec §6 (180 jours glissants, cookie posé par le serveur, « Rester connecté » coché par défaut).
+- **Choix** :
+  - Session Spring Session JDBC ; à chaque connexion, une **nouvelle** session (l'ancienne est invalidée : pas de fixation).
+  - « Rester connecté » coché : inactivité maximale **180 jours**, glissante (Spring Session repousse l'échéance à chaque requête).
+    Le cookie `GG_SESSION` reçoit un `Max-Age` lointain (mécanisme `REMEMBER_ME_LOGIN_ATTR` de Spring Session ; les navigateurs
+    plafonnent à 400 jours) et il est **renvoyé tous les 7 jours** par `CurrentMemberFilter`, pour que son échéance côté navigateur
+    glisse aussi : un membre qui revient au moins une fois tous les six mois ne se reconnecte jamais.
+  - Décoché : cookie de session navigateur (disparaît à la fermeture) et inactivité maximale **12 heures** côté serveur.
+  - Cookie `HttpOnly`, `Secure`, `SameSite=Lax`, déclaré explicitement (`SessionCookieConfig`) : les propriétés
+    `server.servlet.session.cookie.*` ne s'appliquent à Spring Session qu'avec un serveur embarqué, les tests auraient eu un autre cookie.
+  - La session ne garde que l'identifiant du membre (`MemberPrincipal`, aussi clé de « Mes appareils ») ; rôle et statut sont relus
+    en base à chaque requête (une petite requête) : un nouveau rôle s'applique tout de suite, un compte désactivé perd sa session.
+- **Alternatives** : jeton « remember-me » séparé (deux mécanismes à sécuriser) ; durée fixe de 180 jours (pas glissante).
+- **Statut** : validée.
+
+### D-049 — Qui gère qui (matrice du §5 précisée)
+- **Contexte** : la spec dit que la direction désactive les comptes et crée des liens de réinitialisation, sans dire pour qui.
+  Une direction qui pourrait réinitialiser le mot de passe de l'admin prendrait son compte.
+- **Choix** : personne n'agit sur son propre compte (rôle, désactivation, lien). La **direction** agit sur les grimpeurs et les
+  ouvreurs seulement (rôle Ouvreur·se donné ou retiré, désactivation, lien de réinitialisation). L'**admin** agit sur tout le monde
+  sauf lui-même et donne n'importe quel rôle. Il reste toujours un admin actif : vérifié sous verrou (`select … for update` des admins)
+  au moment d'un changement de rôle ou d'une désactivation ; avec la règle « pas sur soi-même », ce cas ne peut aujourd'hui pas se
+  produire par l'API, la vérification protège les futurs chemins (suppression de compte).
+- **Statut** : validée (règle de sécurité) ; à relire par le club pour le confort d'usage.
+
+### D-050 — Limitation de débit en mémoire
+- **Choix** : fenêtres glissantes en mémoire (une seule instance d'API ; un redémarrage remet les compteurs à zéro, acceptable).
+  Connexion : 30 essais / 15 min par adresse (le Wi-Fi de la salle est partagé) et 10 échecs / 15 min par pseudo (un mauvais mot de
+  passe ne bloque que ce pseudo, quelle que soit l'adresse ; le bon mot de passe d'un autre membre n'est jamais ralenti) ;
+  vérification de code d'inscription : 20 / 15 min par adresse ; inscription : 30 / heure par adresse ; réinitialisation :
+  20 / 15 min par adresse ; changement de mot de passe : compté avec les échecs du pseudo. Réponse 429 `RATE_LIMITED` + `Retry-After`.
+  L'adresse du client vient de `X-Forwarded-For` posé par Caddy, cru seulement depuis les réseaux privés
+  (`server.forward-headers-strategy: native`).
+- **Alternatives** : Bucket4j (une dépendance pour quelques compteurs) ; Redis (refusé par la spec).
+- **Statut** : validée.
+
+### D-051 — Codes d'inscription
+- **Choix** : codes générés par le serveur, 8 caractères sans caractères ambigus (pas de 0/O ni 1/I), affichés `K7XM-P2QA`, saisis
+  sans se soucier de la casse, des espaces ni des tirets. Un code est désactivé, jamais supprimé (son compteur reste). Un lien
+  `/inscription?code=…` prérempli peut être copié depuis l'écran des codes. L'usage d'un code est pris sous verrou (`for update`) :
+  sa dernière utilisation ne peut pas servir deux fois.
+- **Code de premier démarrage** : tant qu'aucun membre n'existe, chaque démarrage désactive le code précédent et en crée un nouveau
+  (rôle admin, usage unique, 24 h), affiché une seule fois dans les logs ; il n'apparaît jamais dans l'écran des codes.
+- **Statut** : validée.
+
+### D-052 — Lien de réinitialisation
+- **Choix** : jeton aléatoire de 256 bits, seul son SHA-256 est en base, usage unique, 24 h ; un nouveau lien efface les précédents
+  non utilisés. Le lien est `/nouveau-mot-de-passe#<jeton>` : le jeton est dans le **fragment**, jamais envoyé dans une requête de page,
+  donc absent des journaux du serveur et du `Referer`. Après usage : toutes les sessions du membre sont fermées et cet appareil est
+  connecté. L'écran rappelle le pseudo du membre (il l'a souvent oublié avec le mot de passe).
+- **Statut** : validée.
+
+### D-053 — Mots de passe
+- **Choix** : bcrypt via `DelegatingPasswordEncoder` ; 8 caractères minimum (comptés en caractères, pas en octets) ; 72 octets
+  maximum (au-delà, bcrypt tronquerait en silence) ; refus des 1000 mots de passe courants de 8 caractères ou plus (300 d'une liste
+  française, 700 d'une liste internationale, SecLists, `backend/src/main/resources/auth/common-passwords.txt`).
+  Les mauvais identifiants donnent la même réponse, que le pseudo existe ou non (comparaison à un hachage factice pour le même temps
+  de réponse) ; « compte désactivé » n'est dit qu'à quelqu'un qui a donné le bon mot de passe.
+- **Statut** : validée.
+
+### D-054 — Photos de profil
+- **Choix** : le navigateur recadre au carré, réduit à 1024 px et redessine la photo (ce qui applique l'orientation EXIF et lit le
+  HEIC des iPhone) ; le serveur vérifie le type réel (octets JPEG, PNG ou WebP, jamais le nom ni le type annoncé), refuse au-delà de
+  40 mégapixels **avant** de décoder, redessine les pixels en 512 × 512 et ré-encode en JPEG sans aucune métadonnée (EXIF, GPS).
+  Décodage WebP par TwelveMonkeys 3.15.3. Fichiers sur le volume `GG_MEDIA_ROOT`, nom aléatoire, servis par `GET /api/v1/media/{id}`
+  aux seuls membres connectés (`Cache-Control: private, immutable` : une nouvelle photo a un nouvel identifiant).
+- **Limite connue** : une photo envoyée sans passer par l'appli garde son orientation brute (pas de lecture de l'EXIF côté serveur).
+- **Statut** : validée.
+
+### D-055 — Reporté hors de la phase 1
+- **Choix** :
+  - **Voie préférée** (onboarding et profil) : phase 3, quand les voies existent.
+  - **Export JSON et suppression de compte** (libre-service et admin) : phase 4, quand les séances existent, pour faire
+    l'anonymisation « Ancien·ne membre » en une fois. La page « Tes données » le dit et renvoie vers la direction d'ici là.
+  - **Colonne « séances »** du tableau des membres : phase 4.
+  - **Captures d'écran du manifeste** (invite d'installation enrichie d'Android) : phase 8, avec les écrans définitifs.
+- **Statut** : validée.
+
+### D-056 — Invitation à installer
+- **Choix** : détection par fonctions pures (`lib/install.ts`, testées) : déjà installée (mode standalone) → jamais ; navigateur
+  intégré (WhatsApp, Instagram, Messenger, TikTok, Snapchat, LinkedIn) → explication pour ouvrir le vrai navigateur et bouton
+  « Copier le lien » ; iPhone et iPad (y compris iPadOS qui se présente comme un Mac) → les trois gestes du bouton Partager ;
+  invite native reçue (`beforeinstallprompt`) → bouton « Installer » ; Safari sur Mac → Fichier, « Ajouter au Dock » ; sinon → menu du
+  navigateur. Fermer l'invitation sans installer (« Plus tard », la croix ou en dehors) la reporte de 7 jours, 3 fois au maximum ;
+  quitter l'onboarding sans installer compte comme un premier « Plus tard ». Historique gardé dans le `localStorage` de l'appareil
+  (l'installation concerne un appareil, pas un compte). Toujours accessible depuis le profil.
+- **Statut** : validée ; libellés iOS à recontrôler sur appareil réel (D-041).
+
+### D-057 — Ce que la gestion montre aux ouvreurs
+- **Contexte** : spec §8.1, l'icône Gestion est visible dès le rôle Responsable ; leurs écrans (voies) arrivent en phase 3.
+- **Choix** : l'icône et l'espace existent dès maintenant pour eux, avec une section « Voies » qui annonce la suite ; les sections
+  Membres et Journal sont réservées à la direction, Codes d'inscription à l'admin (vérifié par le routeur et, surtout, par le serveur).
+- **Statut** : validée.
+
+### D-058 — Données optionnelles absentes plutôt que `null`
+- **Choix** : l'API omet les champs optionnels vides (`spring.jackson.default-property-inclusion: non_null`), ce que décrivent les
+  types générés (`champ?: type`). En entrée, un booléen absent vaut `false` (Jackson 3 le refuse par défaut).
+- **Statut** : validée.

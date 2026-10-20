@@ -32,28 +32,29 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [x] Captures clair/sombre 360 px et 1280 px, relues et critiquées
 - [x] Revue critique de fin de phase (sécurité + UX), corrections
 - [x] CI verte (backend : 20 tests unitaires + 10 d'intégration ; frontend : 49 Vitest + e2e iPhone 13 et Desktop Chrome)
-- [~] PR « Phase 0 — Fondations » ouverte, à relire et fusionner par Willem
+- [x] PR « Phase 0 — Fondations » fusionnée
 
 ## Phase 1 — Comptes et rôles
 
-- [ ] Modèle `User`, rôles hiérarchiques, statut ; migrations
-- [ ] Codes d'inscription (CRUD admin, expiration, plafond d'utilisations, compteur) + limitation de débit sur la saisie du code
-- [ ] Inscription (formulaire une page, mots de passe courants refusés, accord parental < 15 ans, consentement « Tes données »)
-- [ ] Connexion / déconnexion, Spring Session JDBC, cookie HttpOnly Secure SameSite=Lax, 180 jours glissants, « Rester connecté »
-- [ ] CSRF adapté SPA : côté serveur déjà en place (`csrf.spa()`) ; côté front, middleware openapi-fetch qui recopie le cookie `XSRF-TOKEN` dans `X-XSRF-TOKEN` sur les requêtes non-GET
-- [ ] Limitation de débit connexion / inscription / réinitialisation ; messages qui ne révèlent pas l'existence d'un pseudo
-- [ ] Mes appareils (liste des sessions, fermer une ou toutes les autres)
-- [ ] Onboarding (photo, infos passables) ; upload d'avatar sécurisé (type réel, taille, ré-encodage, EXIF supprimé)
-- [ ] PWA : manifeste, service worker (stratégie `prompt`), page hors ligne
-- [ ] Invitation à installer (Android natif, tutoriel iOS, navigateurs intégrés, déjà installée, « Plus tard » 7 jours × 3)
-- [ ] Profil de base + réglages (thème, mot de passe, classements)
-- [ ] Gestion des membres (tableau, fiche, rôles selon matrice §5, désactivation, dernier admin protégé, pas de modification de son propre rôle)
-- [ ] Lien de réinitialisation 24 h usage unique (haché), fermeture des autres sessions
-- [ ] Journal d'audit (écriture + lecture direction/admin)
-- [ ] Code admin de premier démarrage (usage unique, 24 h, affiché une fois dans les logs)
-- [ ] Page « Tes données » (contenu de base)
-- [ ] Seed des comptes (profil `dev`, `GG_ALLOW_DEMO_SEED`, refus si marqueur `prod` ou comptes non seedés)
-- [ ] Tests d'autorisation pour chaque rôle sur chaque endpoint ; e2e inscription → installation → retour 30 jours plus tard (horloge simulée)
+- [x] Modèle `User`, rôles hiérarchiques, statut ; migrations
+- [x] Codes d'inscription (CRUD admin, expiration, plafond d'utilisations, compteur) + limitation de débit sur la saisie du code
+- [x] Inscription (formulaire une page, mots de passe courants refusés, accord parental < 15 ans, consentement « Tes données »)
+- [x] Connexion / déconnexion, Spring Session JDBC, cookie HttpOnly Secure SameSite=Lax, 180 jours glissants, « Rester connecté »
+- [x] CSRF adapté SPA : côté serveur déjà en place (`csrf.spa()`) ; côté front, middleware openapi-fetch qui recopie le cookie `XSRF-TOKEN` dans `X-XSRF-TOKEN` sur les requêtes non-GET
+- [x] Limitation de débit connexion / inscription / réinitialisation ; messages qui ne révèlent pas l'existence d'un pseudo
+- [x] Mes appareils (liste des sessions, fermer une ou toutes les autres)
+- [x] Onboarding (photo, infos passables) ; upload d'avatar sécurisé (type réel, taille, ré-encodage, EXIF supprimé)
+- [x] PWA : manifeste, service worker (stratégie `prompt`), page hors ligne
+- [x] Invitation à installer (Android natif, tutoriel iOS, navigateurs intégrés, déjà installée, « Plus tard » 7 jours × 3)
+- [x] Profil de base + réglages (thème, mot de passe, classements)
+- [x] Gestion des membres (tableau, fiche, rôles selon matrice §5, désactivation, dernier admin protégé, pas de modification de son propre rôle)
+- [x] Lien de réinitialisation 24 h usage unique (haché), fermeture des autres sessions
+- [x] Journal d'audit (écriture + lecture direction/admin)
+- [x] Code admin de premier démarrage (usage unique, 24 h, affiché une fois dans les logs)
+- [x] Page « Tes données » (contenu de base)
+- [x] Seed des comptes (profil `dev`, `GG_ALLOW_DEMO_SEED`, refus si marqueur `prod` ou comptes non seedés)
+- [x] Tests d'autorisation pour chaque rôle sur chaque endpoint ; e2e inscription → installation → retour 30 jours plus tard (horloge simulée)
+- [ ] Revues sécurité et UX de fin de phase, corrections, PR « Phase 1 — Comptes et rôles »
 - [ ] Contrôle sur un vrai iPhone de la copie des cookies à l'installation (D-041)
 
 ## Phase 2 — Environnements et pipeline
@@ -74,6 +75,7 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 
 ## Phase 3 — Topo
 
+- [ ] Voie préférée dans l'onboarding et le profil (D-055)
 - [ ] Configuration du club : secteurs, cordes, couleurs de prises, cotations (seed de configuration identique dev/prod)
 - [ ] Gestion des voies (créer, modifier, dupliquer, photo, styles, conseil d'ouvreur)
 - [ ] Liste du topo : tris, filtres combinables, regroupement par secteur
@@ -86,6 +88,8 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 
 ## Phase 4 — Séances
 
+- [ ] Export JSON de mes données, suppression de compte (libre-service et admin) avec anonymisation « Ancien·ne membre » (D-055)
+- [ ] Colonne « séances » du tableau des membres (D-055)
 - [ ] Nouvelle séance (sélecteur rapide, lignes d'ascension, duplication, réordonner)
 - [ ] Brouillon IndexedDB + file d'attente hors ligne (photo comprise)
 - [ ] Photo de séance (compression client, traitement serveur)
@@ -119,7 +123,7 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 
 ## Phase 8 — Finitions et lancement
 
-- [ ] Logo téléversable (clair/sombre) et ses emplacements ; icônes PWA
+- [ ] Logo téléversable (clair/sombre) et ses emplacements ; icônes PWA ; captures d'écran du manifeste (D-055)
 - [ ] « Quoi de neuf ? » (CHANGELOG embarqué, fenêtre une fois par version)
 - [ ] Audits accessibilité et Lighthouse ≥ 90
 - [ ] Revue de sécurité complète
