@@ -3,6 +3,7 @@ package fr.gravelinesgrimp.pocket.platform.api.error;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCategory;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
+import fr.gravelinesgrimp.pocket.platform.domain.RateLimitedException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,21 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 statusOf(ex.code().category()),
                 ex.code(),
                 "The request was refused by a business rule.");
+    }
+
+    /** Too many attempts: says when to come back, in seconds (Retry-After). */
+    @ExceptionHandler(RateLimitedException.class)
+    ResponseEntity<ProblemDetail> handleRateLimited(RateLimitedException ex) {
+        log.info("Rate limit reached: {}", ex.getMessage());
+        var problem =
+                ProblemDetail.forStatusAndDetail(
+                        HttpStatus.TOO_MANY_REQUESTS, "Too many attempts, try again later.");
+        problem.setProperty(CODE_PROPERTY, ex.code().name());
+        var retryAfterSeconds = Math.max(1, ex.retryAfter().toSeconds());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, Long.toString(retryAfterSeconds))
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(problem);
     }
 
     @ExceptionHandler(AuthenticationException.class)
@@ -134,6 +150,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             case 403 -> ErrorCode.ACCESS_DENIED;
             case 404 -> ErrorCode.NOT_FOUND;
             case 405 -> ErrorCode.METHOD_NOT_ALLOWED;
+            case 413 -> ErrorCode.PAYLOAD_TOO_LARGE;
             case 415 -> ErrorCode.UNSUPPORTED_MEDIA_TYPE;
             default ->
                     status.is5xxServerError()
@@ -149,6 +166,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             case FORBIDDEN -> HttpStatus.FORBIDDEN;
             case NOT_FOUND -> HttpStatus.NOT_FOUND;
             case CONFLICT -> HttpStatus.CONFLICT;
+            case TOO_MANY_REQUESTS -> HttpStatus.TOO_MANY_REQUESTS;
             case INTERNAL -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
     }

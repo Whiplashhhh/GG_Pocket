@@ -1,6 +1,9 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
-import { ApiError, errorMessageKey, isRetryable } from './errors'
+import { ApiError, errorMessageKey, isRetryable, SERVER_ERROR_CODES } from './errors'
 
 describe('ApiError.fromResponse', () => {
   it('keeps the business code and field errors of a Problem Details body', () => {
@@ -40,5 +43,22 @@ describe('isRetryable', () => {
     expect(isRetryable(new ApiError('INTERNAL_ERROR', { status: 503 }))).toBe(true)
     expect(isRetryable(new ApiError('ACCESS_DENIED', { status: 403 }))).toBe(false)
     expect(isRetryable(new Error('boom'))).toBe(false)
+  })
+})
+
+describe('SERVER_ERROR_CODES', () => {
+  it('lists exactly the codes of the backend ErrorCode enum', () => {
+    // Unit tests run from frontend/ (vitest root).
+    const source = readFileSync(
+      resolve(
+        process.cwd(),
+        '../backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/ErrorCode.java',
+      ),
+      'utf8',
+    )
+    const backendCodes = [...source.matchAll(/^ {4}([A-Z_]+)\(ErrorCategory/gm)].map(
+      (match) => match[1],
+    )
+    expect([...SERVER_ERROR_CODES].sort()).toEqual(backendCodes.sort())
   })
 })

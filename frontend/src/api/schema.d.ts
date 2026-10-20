@@ -4,6 +4,399 @@
  */
 
 export interface paths {
+  '/api/v1/admin/audit': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The audit log, newest first (board+) */
+    get: operations['listAuditEntries']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/members': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Every member, sorted by name (board+) */
+    get: operations['listMembers']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/members/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** A member sheet and allowed actions (board+) */
+    get: operations['getMember']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/members/{id}/password-reset-link': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** A single-use reset link valid 24 hours; replaces the previous one */
+    post: operations['createPasswordResetLink']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/members/{id}/role': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Give a role (role matrix, spec §5) */
+    put: operations['changeMemberRole']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/members/{id}/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Disable (closes all sessions) or enable an account */
+    put: operations['changeMemberStatus']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/registration-codes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Club codes, newest first (admin) */
+    get: operations['listRegistrationCodes']
+    put?: never
+    /** A new club code (admin) */
+    post: operations['createRegistrationCode']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/registration-codes/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Rename, limit, deactivate or reactivate a code (admin) */
+    put: operations['updateRegistrationCode']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/auth/login': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Sign in with nickname and password */
+    post: operations['login']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/auth/logout': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Close the session of this device */
+    post: operations['logout']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/auth/password-reset': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Choose a new password with a reset link; signs in this device only */
+    post: operations['resetPassword']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/auth/password-reset/check': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Who a reset link is for */
+    post: operations['checkPasswordResetLink']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/auth/register': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Join the club, then sign in at once */
+    post: operations['register']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/auth/registration-code/check': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Whether a registration code can be used (204) or not (400) */
+    post: operations['checkRegistrationCode']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/auth/state': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Whether this browser is signed in (public). Also sets the CSRF cookie. */
+    get: operations['getAuthState']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** My whole profile */
+    get: operations['getMyProfile']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/avatar': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Upload my profile photo (JPEG, PNG or WebP, 10 MB max) */
+    put: operations['replaceMyAvatar']
+    post?: never
+    /** Remove my profile photo */
+    delete: operations['removeMyAvatar']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/devices': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** My open sessions, most recent first */
+    get: operations['listMyDevices']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/devices/close-others': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Close all my sessions but this one */
+    post: operations['closeMyOtherDevices']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/devices/{deviceId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Close one of my sessions */
+    delete: operations['closeMyDevice']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/password': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Change my password; closes my other sessions */
+    put: operations['changeMyPassword']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/profile': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Edit my profile */
+    put: operations['updateMyProfile']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/media/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** An uploaded image, after an access check */
+    get: operations['getMedia']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/meta': {
     parameters: {
       query?: never
@@ -25,6 +418,119 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    /** @description Who did what, to whom, when. */
+    AuditEntry: {
+      /** @enum {string} */
+      action:
+        | 'MEMBER_ROLE_CHANGED'
+        | 'MEMBER_DISABLED'
+        | 'MEMBER_ENABLED'
+        | 'PASSWORD_RESET_LINK_CREATED'
+        | 'REGISTRATION_CODE_CREATED'
+        | 'REGISTRATION_CODE_UPDATED'
+      /**
+       * Format: uuid
+       * @description Absent if that member was deleted since
+       */
+      actorId?: string
+      /** @description Nickname at the time of the action */
+      actorNickname?: string
+      after?: string
+      before?: string
+      /** Format: uuid */
+      id: string
+      /** Format: date-time */
+      occurredAt: string
+      /** Format: uuid */
+      targetId?: string
+      /** @description Name at the time of the action */
+      targetLabel: string
+      /** @enum {string} */
+      targetType: 'MEMBER' | 'REGISTRATION_CODE'
+    }
+    /** @description Newest first. */
+    AuditPage: {
+      entries: components['schemas']['AuditEntry'][]
+      /** @description Pass it as ?cursor= for the next page; absent on the last page */
+      nextCursor?: string
+    }
+    /** @description Whether this browser is signed in, and as whom. */
+    AuthState: {
+      authenticated: boolean
+      /** @description Present when signed in */
+      member?: components['schemas']['CurrentMember']
+    }
+    /** @description The signed-in member, as shown in the app shell. */
+    CurrentMember: {
+      /** @description Profile photo, absent when the member has none */
+      avatarUrl?: string
+      firstName: string
+      /** Format: uuid */
+      id: string
+      lastName: string
+      nickname: string
+      /** @enum {string} */
+      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+    }
+    /** @description An open session of the member ("Mes appareils"). */
+    Device: {
+      /** @enum {string} */
+      browser: 'SAFARI' | 'CHROME' | 'FIREFOX' | 'EDGE' | 'SAMSUNG_INTERNET' | 'OPERA' | 'OTHER'
+      /** @description The device making this request */
+      current: boolean
+      /** @description Opaque id, not the session id */
+      id: string
+      /** Format: date-time */
+      lastActiveAt: string
+      /** @enum {string} */
+      platform: 'IPHONE' | 'IPAD' | 'ANDROID' | 'MAC' | 'WINDOWS' | 'LINUX' | 'OTHER'
+      /** Format: date-time */
+      signedInAt: string
+    }
+    LoginRequest: {
+      nickname: string
+      password: string
+      /** @description "Rester connecté": 180 days instead of the browser session */
+      rememberMe?: boolean
+    }
+    /** @description The member sheet, with what the caller may do. */
+    MemberDetail: {
+      /** Format: int32 */
+      climbingSinceYear?: number
+      /** Format: int32 */
+      clubArrivalYear?: number
+      email?: string
+      member: components['schemas']['MemberSummary']
+      permissions: components['schemas']['MemberPermissions']
+      /** @description Under 15, with a parental consent declared (no birth date) */
+      underFifteenWithParentalConsent: boolean
+    }
+    MemberPermissions: {
+      assignableRoles: ('CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN')[]
+      canCreateResetLink: boolean
+      canDisable: boolean
+      canEnable: boolean
+    }
+    /** @description A line of the members table. */
+    MemberSummary: {
+      avatarUrl?: string
+      firstName: string
+      /** Format: uuid */
+      id: string
+      lastName: string
+      /**
+       * Format: date-time
+       * @description Roughly, to the hour; absent if never seen since registration
+       */
+      lastSeenAt?: string
+      nickname: string
+      /** Format: date-time */
+      registeredAt: string
+      /** @enum {string} */
+      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      /** @enum {string} */
+      status: 'ACTIVE' | 'DISABLED'
+    }
     /** @description What is running on the server. */
     Meta: {
       /** @description Git branch, or 'unknown' */
@@ -36,6 +542,136 @@ export interface components {
       /** @example 1.0.0 */
       version: string
     }
+    /** @description Everything the member may see and edit about themselves. */
+    MyProfile: {
+      /**
+       * Format: int32
+       * @description Age today, when the birth date is known
+       */
+      age?: number
+      appearsInRankings: boolean
+      avatarUrl?: string
+      bio?: string
+      /** Format: date */
+      birthDate?: string
+      /** Format: int32 */
+      climbingSinceYear?: number
+      /** Format: int32 */
+      clubArrivalYear?: number
+      /** Format: date-time */
+      createdAt: string
+      email?: string
+      firstName: string
+      /** Format: uuid */
+      id: string
+      lastName: string
+      nickname: string
+      /** @description A parent or legal guardian agreed (declared under 15) */
+      parentalConsent: boolean
+      /** @enum {string} */
+      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      showAge: boolean
+    }
+    PasswordChange: {
+      currentPassword: string
+      newPassword: string
+    }
+    PasswordReset: {
+      newPassword: string
+      token: string
+    }
+    PasswordResetCheck: {
+      token: string
+    }
+    /** @description The secret of a reset link, shown once. The app builds the link with its own address: /nouveau-mot-de-passe#<token>. */
+    PasswordResetLink: {
+      /** Format: date-time */
+      expiresAt: string
+      token: string
+    }
+    /** @description Who a valid reset link is for. */
+    PasswordResetTarget: {
+      firstName: string
+      /** @description Their login, as a reminder */
+      nickname: string
+    }
+    /** @description The whole editable profile, as the member wants it. */
+    ProfileUpdate: {
+      appearsInRankings?: boolean
+      bio?: string
+      /** Format: date */
+      birthDate?: string
+      /** Format: int32 */
+      climbingSinceYear?: number
+      /** Format: int32 */
+      clubArrivalYear?: number
+      /** Format: email */
+      email?: string
+      firstName: string
+      lastName: string
+      nickname: string
+      /** @description Declares that a parent agreed; required once under 15 */
+      parentalConsent?: boolean
+      showAge?: boolean
+    }
+    /** @description The one-page registration form (spec §6). */
+    RegisterRequest: {
+      /** Format: date */
+      birthDate?: string
+      code: string
+      /** Format: email */
+      email?: string
+      firstName: string
+      lastName: string
+      nickname: string
+      /** @description Required when the birth date says under 15 */
+      parentalConsent?: boolean
+      /** @description 8 characters minimum, not a common password */
+      password: string
+      /** @description "Tes données" accepted */
+      privacyAccepted: boolean
+      rememberMe?: boolean
+    }
+    RegistrationCode: {
+      active: boolean
+      /** @example K7XM-P2QA */
+      code: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      expiresAt?: string
+      /** Format: uuid */
+      id: string
+      label: string
+      /** Format: int32 */
+      maxUses?: number
+      /** @enum {string} */
+      state: 'USABLE' | 'INACTIVE' | 'EXPIRED' | 'EXHAUSTED'
+      /** Format: int32 */
+      useCount: number
+    }
+    RegistrationCodeCheck: {
+      /** @example K7XM-P2QA */
+      code: string
+    }
+    /** @description Absent expiry or maximum: no limit. */
+    RegistrationCodeSettings: {
+      active: boolean
+      /** Format: date-time */
+      expiresAt?: string
+      /** @example Affiche de la salle, saison 2026 */
+      label: string
+      /** Format: int32 */
+      maxUses?: number
+    }
+    RoleChange: {
+      /** @enum {string} */
+      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+    }
+    StatusChange: {
+      /** @enum {string} */
+      status: 'ACTIVE' | 'DISABLED'
+    }
   }
   responses: never
   parameters: never
@@ -45,6 +681,562 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  listAuditEntries: {
+    parameters: {
+      query?: {
+        cursor?: string
+        size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AuditPage']
+        }
+      }
+    }
+  }
+  listMembers: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MemberSummary'][]
+        }
+      }
+    }
+  }
+  getMember: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MemberDetail']
+        }
+      }
+    }
+  }
+  createPasswordResetLink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PasswordResetLink']
+        }
+      }
+    }
+  }
+  changeMemberRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoleChange']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MemberDetail']
+        }
+      }
+    }
+  }
+  changeMemberStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StatusChange']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MemberDetail']
+        }
+      }
+    }
+  }
+  listRegistrationCodes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RegistrationCode'][]
+        }
+      }
+    }
+  }
+  createRegistrationCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegistrationCodeSettings']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RegistrationCode']
+        }
+      }
+    }
+  }
+  updateRegistrationCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegistrationCodeSettings']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RegistrationCode']
+        }
+      }
+    }
+  }
+  login: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LoginRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CurrentMember']
+        }
+      }
+    }
+  }
+  logout: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  resetPassword: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PasswordReset']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CurrentMember']
+        }
+      }
+    }
+  }
+  checkPasswordResetLink: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PasswordResetCheck']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PasswordResetTarget']
+        }
+      }
+    }
+  }
+  register: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegisterRequest']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CurrentMember']
+        }
+      }
+    }
+  }
+  checkRegistrationCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegistrationCodeCheck']
+      }
+    }
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getAuthState: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AuthState']
+        }
+      }
+    }
+  }
+  getMyProfile: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MyProfile']
+        }
+      }
+    }
+  }
+  replaceMyAvatar: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file: string
+        }
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MyProfile']
+        }
+      }
+    }
+  }
+  removeMyAvatar: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  listMyDevices: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Device'][]
+        }
+      }
+    }
+  }
+  closeMyOtherDevices: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  closeMyDevice: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        deviceId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  changeMyPassword: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PasswordChange']
+      }
+    }
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  updateMyProfile: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProfileUpdate']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MyProfile']
+        }
+      }
+    }
+  }
+  getMedia: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'image/jpeg': string
+        }
+      }
+    }
+  }
   getMeta: {
     parameters: {
       query?: never

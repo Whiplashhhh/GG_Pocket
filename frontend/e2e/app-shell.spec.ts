@@ -65,10 +65,12 @@ test.describe('app shell', () => {
     await expect(page.locator('html')).not.toHaveAttribute('data-theme')
   })
 
-  test('shows the app and server versions in the profile', async ({ page }) => {
+  test('shows the app version in the profile, the server version to the board only', async ({
+    page,
+  }) => {
     await page.goto('/profil')
     await expect(page.getByText('GG Pocket 0.0.0')).toBeVisible()
-    await expect(page.getByText('Serveur 0.0.0')).toBeVisible()
+    await expect(page.getByText('Serveur 0.0.0')).toHaveCount(0)
   })
 
   test('an unknown address gets a friendly 404', async ({ page }) => {
@@ -81,6 +83,7 @@ test.describe('app shell', () => {
   test('keyboard users can skip straight to the content', async ({ page, isMobile }) => {
     test.skip(isMobile, 'Keyboard navigation is a desktop concern')
     await page.goto('/actu')
+    await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toBeVisible()
     await page.keyboard.press('Tab')
     const skipLink = page.getByRole('link', { name: 'Aller au contenu' })
     await expect(skipLink).toBeFocused()

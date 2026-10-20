@@ -38,6 +38,8 @@ export default defineConfigWithVueTs(
       'vue/no-useless-v-bind': 'error',
       'vue/prefer-true-attribute-shorthand': 'error',
       'vue/require-typed-ref': 'error',
+      // A label tied to its control by for/id is as good as one wrapping it.
+      'vuejs-accessibility/label-has-for': ['error', { required: { some: ['nesting', 'id'] } }],
     },
   },
 

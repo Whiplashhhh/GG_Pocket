@@ -13,12 +13,12 @@ flowchart LR
     caddy -- "/ (fichiers statiques)" --> web["Front buildé<br/>(dist/)"]
     caddy -- "/api/*" --> api["API Spring Boot<br/>Java 25"]
     api --> db[("PostgreSQL 18<br/>données + sessions")]
-    api --> files[("Volume fichiers 🔜<br/>photos, avatars")]
+    api --> files[("Volume fichiers<br/>photos, avatars")]
 ```
 
 - **Une seule origine** : le front et l'API sont servis par le même domaine (`/api` proxifié). Pas de CORS, cookie de session
   `SameSite=Lax` suffisant.
-- **Sessions serveur** (Spring Session JDBC, 🔜 phase 1) : un cookie `HttpOnly` opaque, la session vit en base. Pas de JWT.
+- **Sessions serveur** (Spring Session JDBC) : un cookie `HttpOnly` opaque, la session vit en base. Pas de JWT.
 - **En local** : `vite` (port 5173) relaie `/api` vers l'API (port 8080), comme Caddy le fera en prod.
 
 ## 2. Backend (`backend/`)
@@ -30,9 +30,9 @@ Un package par domaine sous `fr.gravelinesgrimp.pocket`, chacun découpé en cou
 | Domaine | Contenu | État |
 |---|---|---|
 | `platform` | Transverse technique : erreurs (Problem Details), sécurité, horloge, `/api/v1/meta`, marqueur d'environnement | ✅ |
-| `auth` | Inscription, connexion, sessions, codes d'inscription, réinitialisation | 🔜 phase 1 |
-| `member` | Profils, rôles, annuaire, consentements | 🔜 phase 1 |
-| `admin` | Journal d'audit, gestion des membres | 🔜 phase 1 |
+| `auth` | Connexion, sessions et appareils, inscription, codes d'inscription, code de premier démarrage, réinitialisation, limitation de débit, politique de mot de passe, configuration de Spring Security | ✅ |
+| `member` | Membre (`Member`, table `member`), rôles, profil, photos (`MediaFile`, nettoyage des images, volume de fichiers) | ✅ (annuaire en phase 5) |
+| `admin` | Gestion des membres (matrice des rôles), journal d'audit, gestion des codes d'inscription | ✅ |
 | `club` | Configuration : nom, logos, secteurs, cordes, couleurs, cotations | 🔜 phase 3 |
 | `topo` | Voies, commentaires, coups de cœur, « je sais la faire », dernière chance | 🔜 phase 3 |
 | `session` | Séances, ascensions, planning | 🔜 phase 4 |
@@ -59,8 +59,13 @@ servlet, controllers dans `api`, repositories dans `infra`, **aucune entité JPA
 - **Erreurs** : `application/problem+json` (RFC 9457) avec `code` (énumération `ErrorCode`, stable) et `errors` (champs
   invalides). Les 401/403 de la chaîne de sécurité passent par le même gestionnaire (`ProblemDetailsSecurityErrorHandler`).
   Les règles métier lèvent `BusinessException(code)` ; l'API traduit la catégorie du code en statut HTTP.
-- **Sécurité** : tout est fermé par défaut ; liste blanche : `GET /api/v1/meta`, `GET /actuator/health`, `GET /v3/api-docs`.
-  CSRF en mode SPA (jeton dans un cookie lisible, renvoyé en en-tête). Aucun utilisateur par défaut.
+- **Sécurité** (`auth/config/SecurityConfig`) : tout est fermé par défaut ; liste blanche : `GET /api/v1/meta`,
+  `GET /api/v1/auth/state`, les `POST` de connexion, déconnexion, inscription et réinitialisation, `GET /actuator/health`,
+  `GET /v3/api-docs`. CSRF en mode SPA (jeton dans le cookie `XSRF-TOKEN`, renvoyé dans l'en-tête `X-XSRF-TOKEN`).
+  Rôles hiérarchiques (`ROLE_ADMIN > ROLE_BOARD > ROLE_SETTER > ROLE_CLIMBER`) ; chaque service de gestion porte son
+  `@PreAuthorize`, et la matrice « qui gère qui » est une règle pure (`admin/domain/MemberGovernance`). Aucun utilisateur
+  ni mot de passe par défaut.
+- **Dépendances entre domaines** : `member` ne dépend de personne ; `auth` dépend de `member` ; `admin` de `auth` et `member`.
 - **Temps** : horodatages en UTC (`timestamptz`, `Instant`) ; règles calendaires en `Europe/Paris` (semaines ISO, mois).
   « Maintenant » vient toujours du bean `Clock`, pour que les tests fixent l'heure.
 - **Configuration** : préfixe `gg` (`GgProperties`), alimenté par variables d'environnement (`GG_ENVIRONMENT`, …).
@@ -90,7 +95,7 @@ src/
 │   ├── icons/    icônes dessinées pour l'appli
 │   └── layout/   app shell : header, barre d'onglets, bouton « Nouvelle séance », bandeau DEV
 ├── i18n/         fr.json (tous les textes, par écran) + configuration vue-i18n typée
-├── lib/          fonctions pures (couleurs, avatars, types métier côté client)
+├── lib/          fonctions pures et testées (installation, âge, formulaires, dates, tri des membres, photos…)
 ├── router/       routes, titres de page
 ├── stores/       Pinia : état d'interface uniquement (thème…)
 ├── styles/       tokens.css (palette par thème) + main.css (Tailwind v4, typographie)
@@ -103,8 +108,13 @@ src/
 - **Thème** : `auto` (CSS `prefers-color-scheme`), ou clair/sombre forcé via `data-theme` sur `<html>`, appliqué avant le premier
   affichage par `public/theme-init.js`.
 - **Routes** : onglets Actu (chargé d'emblée), Topo, À faire, Planning, Podium ; profil via l'avatar ; le reste en chargement différé.
+  `meta.public` (accessible sans compte), `meta.layout: 'bare'` (sans en-tête ni onglets), `meta.minRole` (gestion).
+- **PWA** : vite-plugin-pwa en mode `prompt` (bandeau « Une nouvelle version est arrivée »), seul l'app shell est mis en cache,
+  jamais les réponses de l'API. Invitation à installer selon le navigateur (`lib/install.ts`, `stores/install.ts`).
+- **E2E** : Playwright contre le build, l'API étant simulée avec état par `e2e/fakeClub.ts` (membres, codes, sessions par cookie,
+  contrôle CSRF, horloge avancée par les tests).
 
-## 4. Authentification (🔜 phase 1)
+## 4. Authentification
 
 ```mermaid
 sequenceDiagram
@@ -121,7 +131,17 @@ sequenceDiagram
     A->>D: prolonge l'échéance à chaque visite
 ```
 
-Conçu pour accueillir les passkeys (WebAuthn) plus tard sans refonte : l'identité (`User`) est séparée des moyens de connexion.
+- **Session** : nouvelle à chaque connexion ; 180 jours d'inactivité glissants avec « Rester connecté » (cookie renvoyé tous les
+  7 jours pour glisser aussi côté navigateur), 12 heures sinon (DECISIONS D-048). La session ne contient que l'identifiant du
+  membre : `CurrentMemberFilter` relit rôle et statut à chaque requête.
+- **Mes appareils** : les sessions d'un membre sont retrouvées par leur `PRINCIPAL_NAME` (l'identifiant du membre) ; chacune porte
+  un identifiant public aléatoire, jamais l'identifiant de session.
+- **Inscription** : code du club vérifié (limité en débit), formulaire, connexion immédiate. **Réinitialisation** : lien créé par la
+  direction (jeton haché, 24 h, usage unique, dans le fragment de l'URL), toutes les sessions fermées après usage.
+- **Front** : `GET /api/v1/auth/state` au démarrage (pose aussi le cookie CSRF) ; la garde du routeur envoie les visiteurs sur
+  `/accueil` ; un 401 n'importe où fait revenir à la connexion avec une explication ; sans réseau, jamais de déconnexion.
+
+Conçu pour accueillir les passkeys (WebAuthn) plus tard sans refonte : l'identité (`Member`) est séparée des moyens de connexion.
 
 ## 5. Modèle de données cible
 
@@ -156,4 +176,5 @@ erDiagram
     }
 ```
 
-Tables en place : `instance_marker` (V1). Les autres arrivent avec leur phase.
+Tables en place : `instance_marker` (V1), `member` et `media_file` (V2), `spring_session` et `spring_session_attributes` (V3),
+`registration_code` et `password_reset_token` (V4), `audit_entry` (V5). Les autres arrivent avec leur phase.

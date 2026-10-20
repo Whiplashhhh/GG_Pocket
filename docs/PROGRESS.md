@@ -4,6 +4,50 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-20 — Phase 1 (comptes et rôles)
+
+**Branche** : `feature/comptes-0.0.0` (depuis `main` après fusion de la phase 0), poussée ; PR #3 « Phase 1 — Comptes et rôles », CI verte (backend, frontend, e2e iPhone 13 + Desktop Chrome, gitleaks).
+
+### Fait
+
+- Plan de phase : `docs/plans/phase-1.md` (fichiers, migrations, endpoints, écrans, tests).
+- Backend (domaines `member`, `auth`, `admin`, `seed`) : migrations V2 à V6 ; inscription par code (vérification, verrou sur
+  l'usage), connexion, session Spring Session JDBC 180 jours glissants / 12 h sans « Rester connecté » (cookie
+  `__Host-GG_SESSION`, renvoyé tous les 7 jours), rôle et statut relus à chaque requête, « Mes appareils », changement de mot
+  de passe, lien de réinitialisation (haché, 24 h, fragment d'URL), limitation de débit, code admin de premier démarrage,
+  photo de profil nettoyée, gestion des membres (matrice D-049), journal d'audit, codes d'inscription, seed des comptes de
+  démonstration avec ses garde-fous (§17).
+- Frontend : accueil, connexion, inscription, nouveau mot de passe, « Tes données », premiers pas (photo, infos, installation),
+  profil et réglages, appareils, espace gestion (navigation latérale ≥ 1024 px), PWA (manifeste, icônes, service worker
+  `prompt`, bandeau de mise à jour), invitation à installer (Android, iOS, navigateurs intégrés, 7 jours × 3), CSRF en en-tête,
+  401 → connexion, hors ligne sans déconnexion.
+- Tests : backend 152+ (matrice d'autorisation : 18 endpoints × 5 profils), Vitest 97, e2e 25 par navigateur contre une
+  fausse API avec état (`e2e/fakeClub.ts`), dont inscription → premiers pas → installation → retour 30 jours plus tard.
+- Revues de fin de phase par sous-agents : sécurité (3 points moyens, 6 mineurs, tous corrigés sauf la limite d'entrées du
+  limiteur, notée) et UX (corrections appliquées, voir le commit `fix: apply the end-of-phase security and UX reviews`).
+- Captures relues en 360 px clair/sombre et 1280 px ; sélection dans `docs/captures/phase-1/`.
+- Docs : DECISIONS D-048 à D-058, ARCHITECTURE, ROADMAP, CHANGELOG, README (comptes de test, premier démarrage).
+
+### Reste
+
+- Relecture et fusion de la PR par Willem (squash).
+- Points de la revue UX non retenus : journal d'audit avec nom complet (le journal ne garde que le pseudo du moment, à revoir
+  si la direction le demande), format des champs date selon l'appareil (à vérifier sur téléphone réel).
+- Contrôle sur un vrai iPhone de la session après installation (D-041), sur l'environnement dev (phase 2).
+
+### Prochaine action exacte
+
+- Après fusion : `git checkout main && git pull`, brancher `chore/environnements` pour la phase 2, mode plan d'abord, puis
+  demander à Willem les infos du §20 (serveur, domaines, DNS, accès dev) dès que la liste est prête.
+
+### Points bloquants
+
+- Aucun pour la phase 1.
+- Bac à sable : réseau vers GitHub intermittent (relancer `git push`/`gh` en boucle) ; plafond de 1024 PID (~820 utilisés en fin
+  de session à cause des zombies de Chromium) : limiter les lancements Playwright.
+
+---
+
 ## 2026-10-18 — Phase 0 (fondations), session 3
 
 **Branche** : `feature/fondations-0.0.0`, poussée ; PR ouverte vers `main`.
