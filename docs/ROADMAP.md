@@ -60,21 +60,22 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 
 ## Phase 2 — Environnements et pipeline
 
-- [ ] Limiteur de débit : plafond dur du nombre de clés suivies (revue sécurité phase 1, L3)
-- [ ] Dockerfiles backend et frontend (multi-étapes, non root, version et commit injectés)
-- [ ] `compose.yml`, `compose.dev.yml`, `compose.prod.yml`, Caddy (TLS, en-têtes de sécurité, CSP stricte, `/api` proxifié)
-- [ ] Limites mémoire, `MaxRAMPercentage`, healthchecks, `restart: unless-stopped`
-- [ ] Dev déployé : aucun repli sur les identifiants locaux `ggpocket` (variables `GG_DB_*` obligatoires hors machine locale)
-- [ ] Port 8080 de l'API jamais publié ; Caddy ne relaie pas un `X-Forwarded-For` venu du client (`server.forward-headers-strategy: native` fait confiance aux réseaux privés)
-- [ ] `deploy-dev.yml` (manuel ou label `deploy:dev`, option reset + seed)
-- [ ] `prepare-release.yml`, `release.yml` (tag, branche `prod/X.Y.Z`, GitHub Release, images ghcr, déploiement approuvé)
-- [ ] Scripts `backup.sh`, `restore.sh` (testé), `deploy.sh`, `rollback.sh` ; rétention 14 j + 8 semaines
-- [ ] CI : build des images, scan Trivy, e2e contre la stack Docker
-- [ ] Dependabot ou Renovate
-- [ ] DEPLOYMENT.md
-- [ ] Demander à Willem les infos du §20 (serveur, domaines, DNS, accès dev)
+- [x] Limiteur de débit : plafond dur du nombre de clés suivies (revue sécurité phase 1, L3)
+- [x] Dockerfiles backend et frontend (multi-étapes, non root, version et commit injectés)
+- [x] `compose.yml`, `compose.dev.yml`, `compose.prod.yml`, Caddy (TLS, en-têtes de sécurité, CSP stricte, `/api` proxifié)
+- [x] Limites mémoire, `MaxRAMPercentage`, healthchecks, `restart: unless-stopped`
+- [x] Dev déployé : aucun repli sur les identifiants locaux `ggpocket` (variables `GG_DB_*` obligatoires hors machine locale)
+- [x] Port 8080 de l'API jamais publié ; Caddy ne relaie pas un `X-Forwarded-For` venu du client (`server.forward-headers-strategy: native` fait confiance aux réseaux privés)
+- [x] `deploy-dev.yml` (manuel ou label `deploy:dev`, option reset + seed)
+- [x] `prepare-release.yml`, `release.yml` (tag, branche `prod/X.Y.Z`, GitHub Release, images ghcr, déploiement approuvé)
+- [x] Scripts `backup.sh`, `restore.sh` (testé), `deploy.sh`, `rollback.sh` ; rétention 14 j + 8 semaines
+- [x] CI : build des images, scan Trivy, e2e contre la stack Docker
+- [x] Dependabot ou Renovate
+- [x] DEPLOYMENT.md
+- [x] Demander à Willem les infos du §20 (serveur, domaines, DNS, accès dev)
+- [ ] Willem : `.github/scripts/setup-github.sh --host <ip>` puis `bootstrap.sh` sur le VPS (DEPLOYMENT.md §2-3)
 - [ ] Premier déploiement dev, release de test `0.x`, rollback testé
-- [ ] Protection de branche `main` (PR + CI obligatoires)
+- [ ] Protection de branche `main` (PR + CI obligatoires) : règle en place, « Deploy config » et « Docker stack » ajoutés par `setup-github.sh`
 
 ## Phase 3 — Topo
 

@@ -1,0 +1,19 @@
+# Both images build from the repository root (they read VERSION): send only what they need.
+*
+!VERSION
+!backend/.mvn/
+!backend/mvnw
+!backend/pom.xml
+!backend/src/main/
+!frontend/
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/screenshots/
+frontend/e2e/
+frontend/e2e-stack/
+!deploy/web/
+**/*.tsbuildinfo

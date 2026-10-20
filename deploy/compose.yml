@@ -1,0 +1,137 @@
+# One GG Pocket environment: web (Caddy + PWA), api (Spring Boot), db (PostgreSQL), backup.
+# Never used alone: always with compose.dev.yml, compose.prod.yml or compose.ci.yml, through
+# scripts/lib.sh (which also passes the right --env-file). Variables: deploy/env/*.env.example.
+
+x-hardening: &hardening
+  restart: unless-stopped
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  logging:
+    driver: json-file
+    options: { max-size: 10m, max-file: "3" }
+
+services:
+  web:
+    <<: *hardening
+    image: ${GG_REGISTRY:-ghcr.io/whiplashhhh}/gg-pocket-web:${GG_IMAGE_TAG:?GG_IMAGE_TAG is required}
+    depends_on:
+      api:
+        condition: service_started
+    networks: [edge, app]
+    # Only the edge proxy reaches it, on the loopback (DECISIONS D-060).
+    ports:
+      - "127.0.0.1:${GG_WEB_PORT:?GG_WEB_PORT is required}:8080"
+    read_only: true
+    tmpfs: [/tmp, /config, /data]
+    mem_limit: 64m
+
+  api:
+    <<: *hardening
+    image: ${GG_REGISTRY:-ghcr.io/whiplashhhh}/gg-pocket-api:${GG_IMAGE_TAG:?GG_IMAGE_TAG is required}
+    depends_on:
+      db:
+        condition: service_healthy
+      media-owner:
+        condition: service_completed_successfully
+    environment:
+      SPRING_PROFILES_ACTIVE: ${GG_SPRING_PROFILE:?GG_SPRING_PROFILE is required}
+      GG_ENVIRONMENT: ${GG_ENVIRONMENT:?GG_ENVIRONMENT is required}
+      GG_DB_URL: jdbc:postgresql://db:5432/${GG_DB_NAME:-ggpocket}
+      GG_DB_USER: ${GG_DB_USER:?GG_DB_USER is required}
+      GG_DB_PASSWORD: ${GG_DB_PASSWORD:?GG_DB_PASSWORD is required}
+    volumes:
+      - media:/data/media
+    # Both networks are internal: the API never talks to the internet, and 8080 is never published.
+    networks: [app, data]
+    read_only: true
+    tmpfs: ["/tmp:size=64m"]
+    mem_limit: ${GG_API_MEMORY:-768m}
+
+  # Hands the uploaded files volume to the API's user (10001) before it starts: Docker copies the
+  # image's owner into a new volume only if the API happens to be the first container to mount it.
+  media-owner:
+    image: postgres:18-alpine
+    restart: "no"
+    user: "0:0"
+    entrypoint: ["chown", "10001:10001", "/media"]
+    volumes:
+      - media:/media
+    network_mode: none
+    cap_drop: [ALL]
+    cap_add: [CHOWN]
+    security_opt: ["no-new-privileges:true"]
+
+  db:
+    <<: *hardening
+    image: postgres:18-alpine
+    # The entrypoint drops to the postgres user itself.
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    environment:
+      POSTGRES_DB: ${GG_DB_NAME:-ggpocket}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${GG_DB_ADMIN_PASSWORD:?GG_DB_ADMIN_PASSWORD is required}
+      # The API's own role, created on the first start by db-init/10-app-role.sh.
+      GG_APP_DB_USER: ${GG_DB_USER:?GG_DB_USER is required}
+      GG_APP_DB_PASSWORD: ${GG_DB_PASSWORD:?GG_DB_PASSWORD is required}
+      TZ: UTC
+    volumes:
+      - db-data:/var/lib/postgresql
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    networks: [data]
+    shm_size: 128m
+    mem_limit: ${GG_DB_MEMORY:-512m}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Daily dump of the database and the uploaded files (prod and CI, see scripts/backup.sh).
+  backup:
+    <<: *hardening
+    image: postgres:18-alpine
+    profiles: [backup]
+    user: "70:70"
+    init: true
+    # Only effective when restore.sh runs it as root (to give the files back to the API's user).
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER]
+    entrypoint: ["/scripts/backup-loop.sh"]
+    depends_on:
+      db:
+        condition: service_healthy
+      # The API creates the media volume first, with its image's owner (uid 10001).
+      api:
+        condition: service_started
+    environment:
+      PGHOST: db
+      PGDATABASE: ${GG_DB_NAME:-ggpocket}
+      # Superuser: a restore drops and recreates the database.
+      PGUSER: postgres
+      PGPASSWORD: ${GG_DB_ADMIN_PASSWORD:?GG_DB_ADMIN_PASSWORD is required}
+      GG_APP_DB_USER: ${GG_DB_USER:?GG_DB_USER is required}
+      GG_BACKUP_DIR: /backups
+      GG_MEDIA_DIR: /media
+      TZ: Europe/Paris
+    volumes:
+      - ./scripts:/scripts:ro
+      - media:/media
+      - ${GG_BACKUP_HOST_DIR:-./backups}:/backups
+    networks: [data]
+    mem_limit: 128m
+    healthcheck:
+      test: ["CMD", "/scripts/backup-health.sh"]
+      interval: 30m
+      timeout: 10s
+      start_period: 30s
+      start_interval: 5s
+
+networks:
+  edge: {}
+  app:
+    internal: true
+  data:
+    internal: true
+
+volumes:
+  db-data:
+  media:

@@ -27,3 +27,4 @@ frontend/screenshots/
 
 # Logs
 *.log
+deploy/backups/

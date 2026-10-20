@@ -1,0 +1,139 @@
+name: Release
+
+# Spec §15.2, step 7 and 8. Merging the "Release X.Y.Z" PR changes VERSION on main: tag vX.Y.Z,
+# branch prod/X.Y.Z, GitHub Release with the CHANGELOG section, images X.Y.Z, then deployment to
+# prod once Willem approves it (environment "production").
+# By hand: redeploy an existing version to prod (for instance to go back to an older one).
+on:
+  push:
+    branches: [main]
+    paths: [VERSION]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version déjà publiée à (re)déployer en prod, par exemple 0.1.0
+        required: true
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  publish:
+    name: Tag, branch, images and GitHub Release
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Version
+        id: version
+        run: |
+          version=$(cat VERSION)
+          [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::VERSION is not X.Y.Z"; exit 1; }
+          if git ls-remote --exit-code --tags origin "v$version" >/dev/null; then
+            echo "::error::v$version already exists: change VERSION through prepare-release.yml"
+            exit 1
+          fi
+          python3 .github/scripts/changelog.py notes "$version" > "$RUNNER_TEMP/notes.md"
+          {
+            echo "version=$version"
+            echo "registry=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}"
+          } >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push the API image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: backend/Dockerfile
+          push: true
+          tags: ${{ steps.version.outputs.registry }}/gg-pocket-api:${{ steps.version.outputs.version }}
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+            GIT_COMMIT=${{ github.sha }}
+            GIT_BRANCH=prod/${{ steps.version.outputs.version }}
+          cache-from: type=gha,scope=api
+      - name: Build and push the web image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: frontend/Dockerfile
+          push: true
+          tags: ${{ steps.version.outputs.registry }}/gg-pocket-web:${{ steps.version.outputs.version }}
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+            GIT_COMMIT=${{ github.sha }}
+          cache-from: type=gha,scope=web
+      - name: Tag, prod branch and GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git push origin "HEAD:refs/tags/v$VERSION" "HEAD:refs/heads/prod/$VERSION"
+          gh release create "v$VERSION" --verify-tag --title "$VERSION" --notes-file "$RUNNER_TEMP/notes.md"
+
+  deploy:
+    name: Deploy to prod (approval required)
+    needs: publish
+    if: always() && (needs.publish.result == 'success' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    # The token sent to the server can only read the images.
+    permissions:
+      contents: read
+      packages: read
+    environment:
+      name: production
+      url: ${{ vars.GG_URL }}
+    steps:
+      - name: Version
+        id: version
+        env:
+          VERSION: ${{ needs.publish.outputs.version || inputs.version }}
+        run: |
+          [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid version '$VERSION'"; exit 1; }
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      # The deploy files of the version itself, from its tag.
+      - uses: actions/checkout@v7
+        with:
+          ref: v${{ steps.version.outputs.version }}
+      - name: Edge proxy and deployment (backup, healthcheck, smoke test, automatic rollback)
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          VERSION: ${{ steps.version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          tar -czf "$RUNNER_TEMP/bundle.tgz" -C deploy .
+          remote() {
+            ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes "deploy@$DEPLOY_HOST" "$@" < "$RUNNER_TEMP/bundle.tgz"
+          }
+          # The server pulls the images with this job's read-only token, valid until the job ends.
+          printf '%s' "$GITHUB_TOKEN" | ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes \
+            "deploy@$DEPLOY_HOST" "login $GITHUB_ACTOR"
+          remote edge
+          remote deploy "$VERSION"
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Prod : \`${{ steps.version.outputs.version }}\` (${{ job.status }})"
+            echo
+            echo "- Adresse : ${{ vars.GG_URL }}"
+            echo "- En cas d'échec, deploy.sh a remis la version précédente : voir le journal de l'étape de déploiement."
+          } >> "$GITHUB_STEP_SUMMARY"

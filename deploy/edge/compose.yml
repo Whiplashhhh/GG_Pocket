@@ -1,0 +1,31 @@
+# Edge proxy, one per server (DECISIONS D-060). Lives in /opt/gg-pocket/edge with its .env:
+#   GG_PROD_DOMAIN and GG_DEV_DOMAIN (see deploy/env/edge.env.example).
+name: gg-pocket-edge
+
+services:
+  caddy:
+    image: caddy:2.11-alpine
+    restart: unless-stopped
+    network_mode: host
+    env_file: .env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./dev.d:/etc/caddy/dev.d:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8079/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: "3" }
+
+volumes:
+  caddy-data:
+  caddy-config:

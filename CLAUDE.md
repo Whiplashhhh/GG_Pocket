@@ -54,12 +54,22 @@ dès qu'elles existent. Tiens cette section à jour.
   - `pnpm api:types` après tout changement du contrat (la CI vérifie la synchro) ;
   - `pnpm build && pnpm e2e` (Playwright iPhone 13 + Desktop Chrome) ;
   - `pnpm screenshots` → `frontend/screenshots/{mobile,desktop}-{light,dark}/` (à regarder avant de dire « fini »).
+- Déploiement (`deploy/`, pas à pas dans `docs/DEPLOYMENT.md`) :
+  - stack complète en local (avec Docker) : construire `gg-pocket/gg-pocket-{api,web}:ci` depuis la racine
+    (`docker build -f backend/Dockerfile .`, idem `frontend/Dockerfile`), puis
+    `GG_HOME=/tmp/gg GG_ENV_FILE=$PWD/deploy/env/ci.env GG_SKIP_PULL=1 deploy/scripts/deploy.sh ci ci` (http://localhost:8080) ;
+  - e2e contre cette stack : `GG_SEED_PASSWORD=ci-only-demo-password pnpm e2e:stack` (Chromium) ;
+  - scripts : `uvx --from shellcheck-py shellcheck -x --severity=warning deploy/scripts/*.sh deploy/scripts/server/*` ;
+  - workflows : `actionlint` (binaire des releases GitHub de rhysd/actionlint).
 - Environnement de Claude Code (sans Java, Docker ni accès aux navigateurs Playwright, voir DECISIONS D-030) :
   `export PATH=$HOME/.local/bin:$PATH PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=$HOME/.local/bin/gg-chromium`,
   e2e locaux limités au projet `--project="Desktop Chrome"` ; le backend est validé par la CI.
   Le bac à sable ne récupère pas les processus zombies (chaque lancement de Chromium en laisse, plafond 1024 PID/threads) :
   lancer Playwright avec `--workers=1` et `RAYON_NUM_THREADS=2 UV_THREADPOOL_SIZE=2`, et ne capturer que les écrans utiles
   (`pnpm screenshots --project=mobile-light --grep actu`). Compteur : `cat /sys/fs/cgroup/pids.current`.
+  Les journaux bruts de la CI (blob.core.windows.net) sont injoignables d'ici : lire les annotations du job
+  (`gh api repos/Whiplashhhh/GG_Pocket/check-runs/<id du job>/annotations`) ; le job « Docker stack » y met les CVE et,
+  en cas d'échec, les journaux des conteneurs. Le jeton `gh` n'a pas les droits d'administration du dépôt (D-066).
 
 <!-- COMMANDES : à compléter en phase 0 -->
 

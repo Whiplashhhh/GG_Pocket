@@ -1,0 +1,61 @@
+# Inside the gg-pocket-web image: serves the built PWA and forwards /api to the API container.
+# Plain HTTP on 8080: TLS ends at the edge proxy (deploy/edge) or, in CI, there is none.
+{
+	admin off
+	auto_https off
+	persist_config off
+	servers {
+		# The edge proxy and Docker's port forwarding sit on private addresses: keep the client
+		# address they forward. The edge itself overwrites any X-Forwarded-For sent by a client.
+		trusted_proxies static private_ranges
+		client_ip_headers X-Forwarded-For
+	}
+	log {
+		format json
+	}
+}
+
+:8080 {
+	encode zstd gzip
+
+	header {
+		# Strict CSP (spec §14): no inline script anywhere. Inline style attributes stay allowed:
+		# Vue and its UI library position popovers with them; they cannot run code.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "same-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		X-Robots-Tag "noindex, nofollow"
+		-Server
+	}
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	handle /api/* {
+		request_body {
+			max_size 12MB
+		}
+		reverse_proxy {$GG_API_UPSTREAM:api:8080}
+	}
+
+	# Hashed file names: cached forever, a new release ships new names.
+	handle /assets/* {
+		root * /srv
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+
+	# Everything else (the page, the service worker, the manifest, icons) is revalidated on each
+	# visit, or an installed app would never see a new version.
+	handle {
+		header Cache-Control "no-cache"
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

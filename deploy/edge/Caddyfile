@@ -1,0 +1,33 @@
+# Edge proxy shared by the dev and prod projects (DECISIONS D-060): the only thing on ports 80/443.
+# Runs in the host network, so it sees the real client addresses (IPv4 and IPv6), gets the
+# Let's Encrypt certificates, and forwards to each project's web container on the loopback.
+{
+	admin unix//config/caddy-admin.sock
+	log {
+		format json
+	}
+}
+
+# The security headers come from each environment's web container; the edge only hides itself.
+(quiet) {
+	header -Server
+}
+
+{$GG_PROD_DOMAIN} {
+	import quiet
+	# No trusted proxy here: whatever X-Forwarded-For a client sends is replaced by its address.
+	reverse_proxy 127.0.0.1:8180
+}
+
+{$GG_DEV_DOMAIN} {
+	import quiet
+	# Optional extra lock for dev (basic authentication, see DEPLOYMENT.md): files in dev.d/.
+	import /etc/caddy/dev.d/*.caddy
+	reverse_proxy 127.0.0.1:8181
+}
+
+# Health of the edge itself, for its Docker healthcheck only.
+http://127.0.0.1:8079 {
+	bind 127.0.0.1
+	respond "ok" 200
+}

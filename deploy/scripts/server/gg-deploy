@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# SSH gate of the "deploy" user (DECISIONS D-062), installed as /usr/local/bin/gg-deploy by
+# bootstrap.sh. Each key of /home/deploy/.ssh/authorized_keys is pinned to one environment:
+#   restrict,command="/usr/local/bin/gg-deploy dev" ssh-ed25519 AAAA... gg-pocket-dev
+# so the dev key can never touch prod. The requested command arrives in SSH_ORIGINAL_COMMAND:
+#   deploy <tag> [--reset]   bundle of the repository's deploy/ directory (tar.gz) on stdin
+#   rollback                 previous version back
+#   status                   deployed versions and containers
+#   login <user>             registry token on stdin (the job's short-lived GITHUB_TOKEN)
+#   edge                     (prod key only) edge proxy configuration from the bundle on stdin
+set -euo pipefail
+
+env=${1:-}
+case $env in
+    dev | prod) ;;
+    *)
+        echo "gg-deploy: this key is not pinned to an environment" >&2
+        exit 1
+        ;;
+esac
+home=/opt/gg-pocket/$env
+# Registry credentials per environment: a dev job never sees the prod one, nor overwrites it.
+export DOCKER_CONFIG=/home/deploy/.docker-$env
+read -r -a request <<<"${SSH_ORIGINAL_COMMAND:-status}"
+command=${request[0]:-status}
+
+valid_tag() {
+    [[ ${1:-} =~ ^([0-9]+\.[0-9]+\.[0-9]+|dev-[0-9a-f]{7,40})$ ]]
+}
+
+# Unpacks the bundle read on stdin into a fresh directory, printed on stdout.
+receive_bundle() {
+    local into=$1
+    rm -rf -- "$into"
+    mkdir -p -- "$into"
+    tar -xz --no-same-owner --no-same-permissions -C "$into" -f -
+    chmod +x "$into"/scripts/*.sh
+}
+
+case $command in
+    deploy)
+        tag=${request[1]:-}
+        option=${request[2]:-}
+        valid_tag "$tag" || { echo "gg-deploy: invalid tag '$tag'" >&2; exit 1; }
+        [[ -z $option || ($option == --reset && $env == dev) ]] || {
+            echo "gg-deploy: option '$option' refused for $env" >&2
+            exit 1
+        }
+        [[ $env == dev || $tag != dev-* ]] || { echo "gg-deploy: prod only runs releases" >&2; exit 1; }
+        receive_bundle "$home/releases/.incoming"
+        rm -rf -- "${home:?}/releases/$tag"
+        mv -- "$home/releases/.incoming" "$home/releases/$tag"
+        exec "$home/releases/$tag/scripts/deploy.sh" "$env" "$tag" ${option:+"$option"}
+        ;;
+    rollback)
+        current=$(cat "$home/current-tag")
+        exec "$home/releases/$current/scripts/rollback.sh" "$env"
+        ;;
+    login)
+        user=${request[1]:-}
+        [[ $user =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,38}(\[bot\])?$ ]] || { echo "gg-deploy: invalid user" >&2; exit 1; }
+        docker login ghcr.io --username "$user" --password-stdin
+        ;;
+    status)
+        echo "environment: $env"
+        echo "current: $(cat "$home/current-tag" 2>/dev/null || echo none)"
+        echo "previous: $(cat "$home/previous-tag" 2>/dev/null || echo none)"
+        docker ps --filter "label=com.docker.compose.project=gg-pocket-$env" \
+            --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}'
+        ;;
+    edge)
+        [[ $env == prod ]] || { echo "gg-deploy: only the prod key updates the edge proxy" >&2; exit 1; }
+        receive_bundle /opt/gg-pocket/edge/.incoming
+        cp /opt/gg-pocket/edge/.incoming/edge/Caddyfile /opt/gg-pocket/edge/.incoming/edge/compose.yml /opt/gg-pocket/edge/
+        rm -rf /opt/gg-pocket/edge/.incoming
+        cd /opt/gg-pocket/edge
+        docker compose up -d --wait
+        docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --address unix//config/caddy-admin.sock
+        echo "edge proxy configuration applied"
+        ;;
+    *)
+        echo "gg-deploy: unknown command '$command' (deploy, rollback, status, login, edge)" >&2
+        exit 1
+        ;;
+esac

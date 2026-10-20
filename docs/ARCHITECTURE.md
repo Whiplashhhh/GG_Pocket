@@ -178,3 +178,9 @@ erDiagram
 
 Tables en place : `instance_marker` (V1), `member` et `media_file` (V2), `spring_session` et `spring_session_attributes` (V3),
 `registration_code` et `password_reset_token` (V4), `audit_entry` (V5). Les autres arrivent avec leur phase.
+
+## 6. Exploitation
+
+Deux images (`gg-pocket-api`, `gg-pocket-web`), un projet Docker Compose par environnement (`deploy/compose.yml` + surcharge),
+un proxy frontal Caddy partagé (`deploy/edge/`), des scripts de déploiement, retour arrière, sauvegarde et restauration
+(`deploy/scripts/`). Schéma, choix et limites : `docs/DEPLOYMENT.md` et `DECISIONS.md` D-059 à D-070.

@@ -18,6 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
+    "e2e:stack": "playwright test --config playwright.stack.config.ts",
     "screenshots": "playwright test --config playwright.screenshots.config.ts",
     "api:types": "openapi-typescript src/api/openapi.json --output src/api/schema.d.ts && prettier --write src/api/schema.d.ts"
   },

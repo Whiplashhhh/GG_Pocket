@@ -1,0 +1,9 @@
+# CI only: the stack the end-to-end tests and the backup/restore test run against, on
+# http://localhost:8080, with images built in the same job. Project gg-pocket-ci.
+name: gg-pocket-ci
+
+services:
+  api:
+    environment:
+      GG_ALLOW_DEMO_SEED: "true"
+      GG_SEED_PASSWORD: ${GG_SEED_PASSWORD:?GG_SEED_PASSWORD is required}

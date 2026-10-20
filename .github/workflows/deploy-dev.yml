@@ -1,0 +1,138 @@
+name: Deploy dev
+
+# Spec §15.2, step 3: by hand (choose the branch) or by putting the "deploy:dev" label on a PR
+# (each new push of a labelled PR redeploys). The images are tagged dev-<commit>.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branche, tag ou commit à déployer
+        required: true
+        default: main
+      reset:
+        description: Réinitialiser la base et rejouer le seed
+        type: boolean
+        default: true
+  pull_request:
+    types: [labeled, synchronize]
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build the dev images
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       contains(github.event.pull_request.labels.*.name, 'deploy:dev') &&
+       (github.event.action != 'labeled' || github.event.label.name == 'deploy:dev'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      sha: ${{ steps.meta.outputs.sha }}
+      tag: ${{ steps.meta.outputs.tag }}
+      branch: ${{ steps.meta.outputs.branch }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.event.pull_request.head.sha }}
+      - name: Version, commit and image names
+        id: meta
+        env:
+          BRANCH: ${{ github.head_ref || inputs.ref }}
+        run: |
+          sha=$(git rev-parse HEAD)
+          {
+            echo "version=$(cat VERSION)"
+            echo "sha=$sha"
+            echo "tag=dev-${sha:0:12}"
+            echo "registry=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}"
+            echo "branch=$BRANCH"
+          } >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push the API image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.registry }}/gg-pocket-api:${{ steps.meta.outputs.tag }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            GIT_COMMIT=${{ steps.meta.outputs.sha }}
+            GIT_BRANCH=${{ steps.meta.outputs.branch }}
+          cache-from: type=gha,scope=api
+      - name: Build and push the web image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.registry }}/gg-pocket-web:${{ steps.meta.outputs.tag }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            GIT_COMMIT=${{ steps.meta.outputs.sha }}
+          cache-from: type=gha,scope=web
+  # Only this job holds the SSH key, after approval (environment "dev"), and its token can only
+  # read the images (DECISIONS D-062, D-066).
+  deploy:
+    name: Deploy to dev (approval required)
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+    environment:
+      name: dev
+      url: ${{ vars.GG_URL }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+      - name: Deploy on the server
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          RESET: ${{ github.event_name == 'pull_request' || inputs.reset }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.build.outputs.tag }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          tar -czf "$RUNNER_TEMP/bundle.tgz" -C deploy .
+          option=''
+          [[ $RESET != true ]] || option='--reset'
+          # The server pulls the images with this job's read-only token, valid until the job ends.
+          printf '%s' "$GITHUB_TOKEN" | ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes \
+            "deploy@$DEPLOY_HOST" "login $GITHUB_ACTOR"
+          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes "deploy@$DEPLOY_HOST" \
+            "deploy $TAG $option" < "$RUNNER_TEMP/bundle.tgz"
+      - name: Summary
+        env:
+          BRANCH: ${{ needs.build.outputs.branch }}
+          TAG: ${{ needs.build.outputs.tag }}
+          SHA: ${{ needs.build.outputs.sha }}
+        run: |
+          {
+            echo "### Dev déployé : \`$TAG\`"
+            echo
+            echo "- Code : \`$BRANCH\` ($SHA)"
+            echo "- Base réinitialisée et seed rejoué : ${{ github.event_name == 'pull_request' || inputs.reset }}"
+            echo "- Adresse : ${{ vars.GG_URL }}"
+          } >> "$GITHUB_STEP_SUMMARY"

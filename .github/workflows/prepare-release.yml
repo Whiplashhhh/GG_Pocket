@@ -1,0 +1,70 @@
+name: Prepare release
+
+# Spec §15.2, step 6: opens the "Release X.Y.Z" PR (VERSION + CHANGELOG). Merging it starts
+# release.yml. Refused when "Non publié" is empty.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Type de version (correctif, fonctionnalité, rupture)
+        type: choice
+        options: [patch, minor, major]
+        default: minor
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  prepare:
+    name: Open the release PR
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Next version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          next=$(python3 .github/scripts/changelog.py bump "$(cat VERSION)" "$BUMP")
+          if git ls-remote --exit-code --tags origin "v$next" >/dev/null; then
+            echo "::error::v$next already exists"
+            exit 1
+          fi
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+      - name: VERSION and CHANGELOG
+        env:
+          NEXT: ${{ steps.version.outputs.next }}
+        run: |
+          echo "$NEXT" > VERSION
+          python3 .github/scripts/changelog.py release "$NEXT" "$(TZ=Europe/Paris date +%Y-%m-%d)"
+      - name: Open the PR and run the CI on it
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEXT: ${{ steps.version.outputs.next }}
+        run: |
+          branch="release/$NEXT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -am "chore(release): $NEXT"
+          git push origin "$branch"
+          python3 .github/scripts/changelog.py notes "$NEXT" > "$RUNNER_TEMP/notes.md"
+          {
+            echo "Version **$NEXT** : \`VERSION\` et \`CHANGELOG.md\` mis à jour."
+            echo
+            echo "La fusion (squash) lance \`release.yml\` : tag \`v$NEXT\`, branche \`prod/$NEXT\`, GitHub Release, images,"
+            echo "puis le déploiement en prod qui attend l'approbation de Willem."
+            echo
+            echo "## Notes de version"
+            echo
+            cat "$RUNNER_TEMP/notes.md"
+            echo
+            echo "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+          } > "$RUNNER_TEMP/body.md"
+          gh pr create --base main --head "$branch" --title "Release $NEXT" --body-file "$RUNNER_TEMP/body.md"
+          # A push made with GITHUB_TOKEN starts no workflow: the checks required on main are run here.
+          gh workflow run ci.yml --ref "$branch"
