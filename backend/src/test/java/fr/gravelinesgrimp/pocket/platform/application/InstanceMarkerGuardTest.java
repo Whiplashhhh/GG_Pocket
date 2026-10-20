@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.mock.env.MockEnvironment;
 
+import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -92,7 +93,11 @@ class InstanceMarkerGuardTest {
 
     private InstanceMarkerGuard guardConfiguredFor(
             DeploymentEnvironment environment, MockEnvironment springEnvironment) {
-        var properties = new GgProperties(environment, new GgProperties.Git("unknown", "unknown"));
+        var properties =
+                new GgProperties(
+                        environment,
+                        new GgProperties.Git("unknown", "unknown"),
+                        new GgProperties.Media(Path.of("media")));
         return new InstanceMarkerGuard(repository, properties, clock, springEnvironment);
     }
 

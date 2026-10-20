@@ -1,8 +1,23 @@
 # Shared configuration. Environment-specific values live in application-dev.yml / application-prod.yml.
-# App settings (prefix "gg") come from environment variables: GG_ENVIRONMENT, GG_GIT_COMMIT, GG_GIT_BRANCH.
+# App settings (prefix "gg") come from environment variables: GG_ENVIRONMENT, GG_GIT_COMMIT, GG_GIT_BRANCH,
+# GG_MEDIA_ROOT.
 spring:
   application:
     name: gg-pocket-api
+  jackson:
+    # Absent optional fields are left out instead of sent as null, as the OpenAPI types describe them.
+    default-property-inclusion: non_null
+  servlet:
+    multipart:
+      # Spec §14: photos up to 10 MB at upload, resized by the server.
+      max-file-size: 10MB
+      max-request-size: 11MB
+  session:
+    # Default for sessions created at sign-in without "Rester connecté"; remembered sessions get 180 days
+    # (SessionEstablisher). Flyway creates the tables (V3).
+    timeout: 12h
+    jdbc:
+      initialize-schema: never
   threads:
     virtual:
       enabled: true
@@ -14,6 +29,21 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+
+server:
+  # Behind Caddy: the client address comes from X-Forwarded-For, trusted from private networks only.
+  forward-headers-strategy: native
+  servlet:
+    session:
+      cookie:
+        name: GG_SESSION
+        http-only: true
+        secure: true
+        same-site: lax
+
+gg:
+  media:
+    root: ${GG_MEDIA_ROOT:data/media}
 
 management:
   endpoints:

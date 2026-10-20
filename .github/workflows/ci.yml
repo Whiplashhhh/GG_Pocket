@@ -33,6 +33,15 @@ jobs:
           cache: maven
       - name: Build and test (unit + Testcontainers integration tests)
         run: ./mvnw --batch-mode --no-transfer-progress --errors verify
+      - name: Print the generated OpenAPI contract when it differs
+        if: failure()
+        run: |
+          if [ -f target/openapi.json ] && ! cmp -s target/openapi.json ../frontend/src/api/openapi.json; then
+            echo "----- BEGIN GENERATED OPENAPI (base64 gzip) -----"
+            gzip -9 -c target/openapi.json | base64 -w 0
+            echo
+            echo "----- END GENERATED OPENAPI -----"
+          fi
       - name: Keep the generated OpenAPI contract
         if: always()
         uses: actions/upload-artifact@v7

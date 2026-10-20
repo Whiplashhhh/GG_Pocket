@@ -8,6 +8,8 @@ import fr.gravelinesgrimp.pocket.platform.domain.DeploymentEnvironment;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
+
 class AppMetadataServiceTest {
 
     @Test
@@ -21,7 +23,9 @@ class AppMetadataServiceTest {
     void environmentAndGitOriginComeFromTheSettings() {
         var properties =
                 new GgProperties(
-                        DeploymentEnvironment.DEV, new GgProperties.Git("abc1234", "feature/x"));
+                        DeploymentEnvironment.DEV,
+                        new GgProperties.Git("abc1234", "feature/x"),
+                        new GgProperties.Media(Path.of("media")));
 
         var metadata = new AppMetadataService(properties).current();
 

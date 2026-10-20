@@ -13,6 +13,7 @@ Thumbs.db
 
 # Backend
 backend/target/
+backend/data/
 
 # Frontend
 frontend/node_modules/

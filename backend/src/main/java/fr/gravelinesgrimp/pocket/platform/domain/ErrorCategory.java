@@ -15,6 +15,8 @@ public enum ErrorCategory {
     NOT_FOUND,
     /** The request conflicts with the current state (409). */
     CONFLICT,
+    /** Too many attempts in a short time (429). */
+    TOO_MANY_REQUESTS,
     /** HTTP-level problem (405, 415…): the status comes from the framework. */
     PROTOCOL,
     /** Unexpected failure (500). */

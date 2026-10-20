@@ -16,7 +16,33 @@ public enum ErrorCode {
     METHOD_NOT_ALLOWED(ErrorCategory.PROTOCOL),
     UNSUPPORTED_MEDIA_TYPE(ErrorCategory.PROTOCOL),
     REQUEST_REJECTED(ErrorCategory.PROTOCOL),
-    INTERNAL_ERROR(ErrorCategory.INTERNAL);
+    PAYLOAD_TOO_LARGE(ErrorCategory.PROTOCOL),
+    INTERNAL_ERROR(ErrorCategory.INTERNAL),
+    RATE_LIMITED(ErrorCategory.TOO_MANY_REQUESTS),
+
+    // Sign-in and sessions
+    BAD_CREDENTIALS(ErrorCategory.UNAUTHENTICATED),
+    ACCOUNT_DISABLED(ErrorCategory.FORBIDDEN),
+
+    // Registration and passwords
+    REGISTRATION_CODE_INVALID(ErrorCategory.INVALID),
+    NICKNAME_TAKEN(ErrorCategory.CONFLICT),
+    EMAIL_TAKEN(ErrorCategory.CONFLICT),
+    PASSWORD_TOO_SHORT(ErrorCategory.INVALID),
+    PASSWORD_TOO_LONG(ErrorCategory.INVALID),
+    PASSWORD_TOO_COMMON(ErrorCategory.INVALID),
+    CURRENT_PASSWORD_WRONG(ErrorCategory.INVALID),
+    PARENTAL_CONSENT_REQUIRED(ErrorCategory.INVALID),
+    YEAR_IN_THE_FUTURE(ErrorCategory.INVALID),
+    PASSWORD_RESET_LINK_INVALID(ErrorCategory.INVALID),
+
+    // Photos
+    IMAGE_UNSUPPORTED(ErrorCategory.INVALID),
+    IMAGE_TOO_LARGE(ErrorCategory.INVALID),
+
+    // Member management
+    SELF_MANAGEMENT_FORBIDDEN(ErrorCategory.FORBIDDEN),
+    LAST_ADMIN(ErrorCategory.CONFLICT);
 
     private final ErrorCategory category;
 
