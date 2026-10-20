@@ -26,6 +26,11 @@
     <spotless.version>3.10.4</spotless.version>
     <!-- 1.36.1, not 1.37.x: 1.37 turned JavaFormatterOptions.Style into a record, which Spotless 3.10.4 cannot drive. -->
     <google-java-format.version>1.36.1</google-java-format.version>
+    <!-- Security fixes ahead of Spring Boot 4.1.1 (critical Tomcat CVEs, high Jackson CVEs found by Trivy in CI).
+         Remove each line once the Spring Boot parent ships the same version or newer. -->
+    <tomcat.version>11.0.25</tomcat.version>
+    <jackson-bom.version>3.1.7</jackson-bom.version>
+    <jackson-2-bom.version>2.21.7</jackson-2-bom.version>
   </properties>
 
   <dependencies>
