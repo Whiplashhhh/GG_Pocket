@@ -1,22 +1,30 @@
 #!/bin/sh
 # Runs inside the backup container. One file per backup, database and uploaded files together:
 #   $GG_BACKUP_DIR/<kind>/gg-pocket-<date>.tar = db.dump (pg_dump custom format) + media.tar.gz
-# Retention (spec §16): 14 daily, 8 weekly (Sunday's daily), 10 pre-deploy; manual ones stay.
+# Retention (spec §16): 14 daily, 8 weekly (Sunday's daily), 10 pre-deploy, 5 pre-restore;
+# manual ones stay. A backup never overwrites another one, even within the same second.
 #
-# Usage: backup.sh [daily|pre-deploy|manual]
+# Usage: backup.sh [daily|pre-deploy|pre-restore|manual]
 set -eu
 
 kind=${1:-manual}
 case $kind in
     daily) keep=14 ;;
     pre-deploy) keep=10 ;;
+    pre-restore) keep=5 ;;
     manual) keep=0 ;;
     *) echo "Unknown backup kind: $kind" >&2; exit 2 ;;
 esac
 
 root=${GG_BACKUP_DIR:?}
 umask 077
-name=gg-pocket-$(date +%Y-%m-%d_%H%M%S).tar
+stamp=gg-pocket-$(date +%Y-%m-%d_%H%M%S)
+name=$stamp.tar
+suffix=1
+while [ -e "$root/$kind/$name" ]; do
+    suffix=$((suffix + 1))
+    name=$stamp-$suffix.tar
+done
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 

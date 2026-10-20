@@ -12,7 +12,7 @@ GG_ENV=${1:-}
 backup=${2:-}
 check_env "$GG_ENV"
 [[ $GG_ENV != dev ]] || die "dev has no backups: redeploy it with --reset instead"
-[[ $backup =~ ^(daily|weekly|pre-deploy|manual)/gg-pocket-[0-9_-]+\.tar$ ]] || die "invalid backup name '$backup'"
+[[ $backup =~ ^(daily|weekly|pre-deploy|pre-restore|manual)/gg-pocket-[0-9_-]+\.tar$ ]] || die "invalid backup name '$backup'"
 export GG_IMAGE_TAG=${GG_IMAGE_TAG:-$(cat "$GG_HOME/current-tag" 2>/dev/null || true)}
 [[ -n $GG_IMAGE_TAG ]] || die "no deployed version recorded in $GG_HOME"
 
@@ -22,7 +22,8 @@ if [[ ${3:-} != --yes ]]; then
 fi
 
 log "Safety backup of the current data"
-compose run --rm --no-deps --entrypoint /scripts/backup.sh backup manual
+# In its own directory: it can never replace the backup about to be restored.
+compose run --rm --no-deps --entrypoint /scripts/backup.sh backup pre-restore
 
 log "Stopping the app"
 compose stop web api

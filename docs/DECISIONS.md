@@ -469,7 +469,8 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 ### D-063 — Sauvegardes
 - **Choix** : service `backup` (image PostgreSQL 18, uid 70) dans la prod : chaque nuit à 3 h 30 (heure de Paris), un fichier
   `tar` = `pg_dump` au format custom + archive des photos ; 14 quotidiennes, la dominicale copiée en hebdomadaire (8 gardées),
-  10 avant déploiement, les manuelles jusqu'à suppression. Le service passe `unhealthy` si la dernière quotidienne a plus de
+  10 avant déploiement, 5 avant restauration, les manuelles jusqu'à suppression ; une sauvegarde n'en écrase jamais une autre
+  (la CI a montré qu'une sauvegarde de sécurité prise dans la même seconde remplaçait celle qu'on restaurait). Le service passe `unhealthy` si la dernière quotidienne a plus de
   26 h. `restore.sh` fait une sauvegarde de l'état actuel, recrée la base,
   remplace les photos, redémarre ; il est joué à chaque CI sur une stack jetable (sonde en base et fichier).
 - **À valider** : aucune copie hors du serveur n'est automatisée (option « Backup Storage » d'OVH ou `rsync` vers une autre

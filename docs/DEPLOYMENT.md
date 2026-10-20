@@ -182,7 +182,7 @@ revenir en arrière ne touche pas aux données.
 ### Restaurer
 
 Tout est remplacé par le contenu de la sauvegarde (base **et** photos). Une sauvegarde de l'état actuel est faite juste
-avant, dans `manual/`.
+avant, dans `pre-restore/` (5 gardées) : elle ne peut pas écraser celle qu'on restaure.
 
 ```bash
 sudo ls /opt/gg-pocket/prod/backups/daily/
