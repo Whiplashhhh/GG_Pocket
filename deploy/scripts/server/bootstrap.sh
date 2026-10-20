@@ -67,6 +67,7 @@ write_env() {
         return
     fi
     sed -e "s|^GG_DB_PASSWORD=.*|GG_DB_PASSWORD=$(secret 40)|" \
+        -e "s|^GG_DB_ADMIN_PASSWORD=.*|GG_DB_ADMIN_PASSWORD=$(secret 40)|" \
         -e "s|^GG_SEED_PASSWORD=.*|GG_SEED_PASSWORD=$(secret 20)|" \
         "$repo/deploy/env/$env.env.example" >"$file"
     chown deploy:deploy "$file"

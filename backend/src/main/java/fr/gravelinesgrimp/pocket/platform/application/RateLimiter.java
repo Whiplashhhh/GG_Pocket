@@ -58,7 +58,8 @@ public class RateLimiter {
 
     /**
      * Hard ceiling on tracked keys, so a flood of addresses cannot exhaust the memory: beyond it,
-     * the keys quiet for the longest time are forgotten first (a few megabytes at most).
+     * the keys quiet for the longest time are forgotten first (a few megabytes at most). Client
+     * addresses are already grouped by IPv6 /64 (ClientAddress), so one connection cannot fill it.
      */
     static final int MAX_TRACKED_KEYS = 50_000;
 
@@ -157,17 +158,19 @@ public class RateLimiter {
         }
         var stale = now.minus(Duration.ofHours(1));
         attempts.entrySet().removeIf(entry -> lastAttempt(entry).isBefore(stale));
-        var excess = attempts.size() - maxTrackedKeys;
-        if (excess > 0) {
-            // Snapshot first: other requests keep updating the counters while this sorts.
-            attempts.entrySet().stream()
-                    .map(entry -> Map.entry(entry.getKey(), lastAttempt(entry)))
-                    .toList()
-                    .stream()
-                    .sorted(Map.Entry.comparingByValue())
-                    .limit(excess)
-                    .forEach(entry -> attempts.remove(entry.getKey()));
+        if (attempts.size() <= maxTrackedKeys) {
+            return;
         }
+        // Down to 80 % of the ceiling at once: a full table is not sorted again on every request.
+        var excess = attempts.size() - maxTrackedKeys * 4 / 5;
+        // Snapshot first: other requests keep updating the counters while this sorts.
+        attempts.entrySet().stream()
+                .map(entry -> Map.entry(entry.getKey(), lastAttempt(entry)))
+                .toList()
+                .stream()
+                .sorted(Map.Entry.comparingByValue())
+                .limit(excess)
+                .forEach(entry -> attempts.remove(entry.getKey()));
     }
 
     private static Instant lastAttempt(Map.Entry<String, Deque<Instant>> entry) {

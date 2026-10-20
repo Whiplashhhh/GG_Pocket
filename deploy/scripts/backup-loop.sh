@@ -3,6 +3,7 @@
 set -eu
 
 at=${GG_BACKUP_AT:-03:30}
+touch /tmp/backup-loop-started
 echo "Daily backups at $at ($(date +%Z))"
 while true; do
     now=$(date +%s)

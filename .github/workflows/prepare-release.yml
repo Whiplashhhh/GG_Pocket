@@ -26,8 +26,10 @@ jobs:
       - uses: actions/checkout@v7
       - name: Next version
         id: version
+        env:
+          BUMP: ${{ inputs.bump }}
         run: |
-          next=$(python3 .github/scripts/changelog.py bump "$(cat VERSION)" "${{ inputs.bump }}")
+          next=$(python3 .github/scripts/changelog.py bump "$(cat VERSION)" "$BUMP")
           if git ls-remote --exit-code --tags origin "v$next" >/dev/null; then
             echo "::error::v$next already exists"
             exit 1

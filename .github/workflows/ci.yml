@@ -165,7 +165,8 @@ jobs:
         working-directory: deploy
         run: |
           for env in dev prod; do
-            sed -e 's/^GG_DB_PASSWORD=$/GG_DB_PASSWORD=x/' -e 's/^GG_SEED_PASSWORD=$/GG_SEED_PASSWORD=x/' \
+            sed -e 's/^GG_DB_PASSWORD=$/GG_DB_PASSWORD=x/' -e 's/^GG_DB_ADMIN_PASSWORD=$/GG_DB_ADMIN_PASSWORD=x/' \
+              -e 's/^GG_SEED_PASSWORD=$/GG_SEED_PASSWORD=x/' \
               "env/$env.env.example" > "$RUNNER_TEMP/$env.env"
             GG_IMAGE_TAG=1.2.3 docker compose -f compose.yml -f "compose.$env.yml" \
               --env-file "$RUNNER_TEMP/$env.env" --profile backup config --quiet

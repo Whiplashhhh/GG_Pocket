@@ -19,10 +19,17 @@ check_tag "$tag"
 export GG_IMAGE_TAG=$tag
 
 previous=$(cat "$GG_HOME/current-tag" 2>/dev/null || true)
+# Redeploying the version in place: the way back stays the one before it.
+[[ $previous != "$tag" ]] || previous=$(cat "$GG_HOME/previous-tag" 2>/dev/null || true)
 
 roll_back() {
-    log "Deployment of $tag failed: logs of the API"
-    compose logs --no-color --tail 120 api || true
+    if [[ $GG_ENV == prod ]]; then
+        # Never in the job's public log: members' data, or the first start admin code.
+        log "Deployment of $tag failed: logs of the API on the server (sudo docker logs gg-pocket-prod-api-1)"
+    else
+        log "Deployment of $tag failed: logs of the API"
+        compose logs --no-color --tail 120 api | grep -iv 'registration code' || true
+    fi
     if [[ -n ${GG_ROLLING_BACK:-} || -z $previous || $previous == "$tag" ]]; then
         die "no previous version to go back to"
     fi
@@ -42,7 +49,13 @@ elif [[ $GG_ENV == prod && -n $(compose ps --status running --quiet db 2>/dev/nu
     compose run --rm --no-deps --entrypoint /scripts/backup.sh backup pre-deploy
 fi
 
-if [[ -z ${GG_SKIP_PULL:-} ]]; then
+# Tags are immutable (a version, or dev-<commit>): an image already here is never pulled again,
+# so a rollback from the server works after the job's registry token has expired.
+missing=0
+for image in $(compose config --images | grep -E '/gg-pocket-(api|web):'); do
+    docker image inspect "$image" >/dev/null 2>&1 || missing=1
+done
+if [[ -z ${GG_SKIP_PULL:-} && $missing == 1 ]]; then
     log "Pulling images $tag"
     compose pull --quiet web api || roll_back
 fi
@@ -59,7 +72,7 @@ case $tag in
     *) [[ $(json_field version <<<"$answer") == "$tag" ]] || roll_back ;;
 esac
 
-if [[ $previous != "$tag" ]]; then
+if [[ $(cat "$GG_HOME/current-tag" 2>/dev/null || true) != "$tag" ]]; then
     [[ -z $previous ]] || echo "$previous" >"$GG_HOME/previous-tag"
     echo "$tag" >"$GG_HOME/current-tag"
 fi

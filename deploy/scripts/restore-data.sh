@@ -12,8 +12,9 @@ tar -C "$work" -xf "$archive"
 echo "Database: recreating $PGDATABASE"
 psql -v ON_ERROR_STOP=1 -d postgres \
     -c "DROP DATABASE IF EXISTS \"$PGDATABASE\" WITH (FORCE);" \
-    -c "CREATE DATABASE \"$PGDATABASE\";"
-pg_restore --exit-on-error --no-owner --dbname="$PGDATABASE" "$work/db.dump"
+    -c "CREATE DATABASE \"$PGDATABASE\" OWNER \"${GG_APP_DB_USER:?}\";"
+# Objects belong to the API's role again, as Flyway created them.
+pg_restore --exit-on-error --no-owner --role="$GG_APP_DB_USER" --dbname="$PGDATABASE" "$work/db.dump"
 
 echo "Uploaded files: replacing"
 find "${GG_MEDIA_DIR:?}" -mindepth 1 -delete

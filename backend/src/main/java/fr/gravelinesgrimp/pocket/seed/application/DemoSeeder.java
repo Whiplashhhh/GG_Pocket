@@ -134,14 +134,17 @@ public class DemoSeeder implements ApplicationRunner {
             registry.register(member.id(), now);
             created++;
         }
-        if (!codes.existsByCode(DEMO_CODE)) {
+        // Local machine only: the code is in this public repository, and the deployed dev stays
+        // closed to strangers (spec §15.4).
+        var withCode = properties.environment() == DeploymentEnvironment.LOCAL;
+        if (withCode && !codes.existsByCode(DEMO_CODE)) {
             codes.save(
                     new RegistrationCode(
                             DEMO_CODE, "Code de démonstration", Role.CLIMBER, null, null, null));
         }
         log.info(
-                "Demo seed: {} account(s) created (admin, direction, ouvreur, grimpeur),"
-                        + " registration code DEMO-2026",
-                created);
+                "Demo seed: {} account(s) created (admin, direction, ouvreur, grimpeur){}",
+                created,
+                withCode ? ", registration code DEMO2026" : "");
     }
 }

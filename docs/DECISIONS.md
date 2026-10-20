@@ -6,7 +6,7 @@ de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision r
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
 choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase), environnements et pipeline
-(D-059 à D-070, phase 2).
+(D-059 à D-071, phase 2).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -457,8 +457,11 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   commande forcée (`gg-deploy dev|prod`, `restrict`) qui n'accepte que `deploy`, `rollback`, `status`, `login`, `edge` ;
   `authorized_keys` appartient à root. Les fichiers de déploiement voyagent avec la version (archive de `deploy/` sur l'entrée
   standard) et sont gardés par version pour les retours arrière.
-- **Limite assumée** : le groupe `docker` équivaut à root, et un déploiement exécute les scripts de la version envoyée. La
-  protection réelle : seules les Actions du dépôt ont les clés (secrets d'environnement), la prod exige l'approbation de Willem.
+- **Limite assumée** : le groupe `docker` équivaut à root, et un déploiement exécute les scripts de la branche envoyée : la
+  clé dev donne donc, de fait, la main sur la prod. La protection réelle : seuls les jobs des environnements GitHub ont les
+  clés, et **dev comme production exigent l'approbation de Willem** (revue sécurité de fin de phase). Les jetons envoyés au
+  serveur ne peuvent que lire les images (`packages: read`), et chaque environnement a son propre `DOCKER_CONFIG`.
+  Les journaux de l'API prod n'apparaissent jamais dans les jobs GitHub (dépôt public : code admin, données de membres).
 - **Alternatives** : Docker sans root (complexe, peu documenté avec Compose et le réseau hôte) ; agent de déploiement qui tire
   depuis GitHub (un service de plus à maintenir).
 - **Statut** : validée.
@@ -466,7 +469,8 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 ### D-063 — Sauvegardes
 - **Choix** : service `backup` (image PostgreSQL 18, uid 70) dans la prod : chaque nuit à 3 h 30 (heure de Paris), un fichier
   `tar` = `pg_dump` au format custom + archive des photos ; 14 quotidiennes, la dominicale copiée en hebdomadaire (8 gardées),
-  10 avant déploiement, les manuelles jusqu'à suppression. `restore.sh` fait une sauvegarde de l'état actuel, recrée la base,
+  10 avant déploiement, les manuelles jusqu'à suppression. Le service passe `unhealthy` si la dernière quotidienne a plus de
+  26 h. `restore.sh` fait une sauvegarde de l'état actuel, recrée la base,
   remplace les photos, redémarre ; il est joué à chaque CI sur une stack jetable (sonde en base et fichier).
 - **À valider** : aucune copie hors du serveur n'est automatisée (option « Backup Storage » d'OVH ou `rsync` vers une autre
   machine, DEPLOYMENT.md §8).
@@ -524,4 +528,14 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   Dependabot ouvre des PR groupées chaque lundi (Maven, npm, actions, images). CSP : aucun script en ligne ; les attributs
   `style` restent permis (`style-src-attr 'unsafe-inline'`), utilisés par Vue et Reka UI pour positionner les menus, sans
   exécution de code possible.
+- **Statut** : validée.
+
+### D-071 — Rôle de base de données de l'API sans superutilisateur
+- **Contexte** : revue sécurité de fin de phase : l'API se connectait avec le superutilisateur créé par l'image PostgreSQL ; une
+  injection SQL aurait pu exécuter des commandes (`COPY … TO PROGRAM`).
+- **Choix** : à la création du volume, `deploy/db-init/10-app-role.sh` crée le rôle de l'API (`GG_DB_USER`), propriétaire de sa
+  base, sans autre droit. Le superutilisateur `postgres` (`GG_DB_ADMIN_PASSWORD`) ne sert qu'aux sauvegardes et restaurations ;
+  la restauration recrée la base au nom du rôle de l'API (`pg_restore --role`). Le seed de démonstration ne crée plus le code
+  `DEMO2026` hors de la machine locale (le dev déployé reste fermé). Les clés IPv6 du limiteur étaient déjà regroupées par /64 ;
+  la purge du limiteur redescend désormais à 80 % du plafond d'un coup.
 - **Statut** : validée.

@@ -23,9 +23,9 @@ Internet ──80/443──► frontal Caddy (TLS Let's Encrypt)    /opt/gg-pock
 | | Dev | Prod |
 |---|---|---|
 | Adresse provisoire | `https://dev.pocket.<ip-avec-tirets>.sslip.io` | `https://pocket.<ip-avec-tirets>.sslip.io` |
-| Déclenchement | `deploy-dev.yml` (bouton ou label `deploy:dev`) | `release.yml` après la PR de release, approbation de Willem |
+| Déclenchement | `deploy-dev.yml` (bouton ou label `deploy:dev`), approbation de Willem | `release.yml` après la PR de release, approbation de Willem |
 | Données | comptes de démonstration, réinitialisables | réelles, sauvegardées chaque nuit |
-| Inscription | fermée (comptes de test) | par code du club |
+| Inscription | fermée (comptes de test, aucun code d'inscription) | par code du club |
 
 ## 2. Préparer le serveur (une seule fois)
 
@@ -43,17 +43,21 @@ Les deux clés publiques sont affichées par `setup-github.sh` (section 3), à l
 
 - crée l'utilisateur `deploy` (sans mot de passe, membre du groupe `docker`) et installe la porte `/usr/local/bin/gg-deploy` ;
 - inscrit les clés dans `/home/deploy/.ssh/authorized_keys` (fichier à root), chacune **épinglée à un environnement** :
-  la clé dev ne peut rien faire sur la prod ;
+  la porte refuse à la clé dev toute commande visant la prod (mais voir « À savoir » plus bas) ;
 - crée `/opt/gg-pocket/{edge,dev,prod}`, et `prod/backups` lisible par le seul conteneur de sauvegarde ;
-- écrit `dev/.env` et `prod/.env` (droits 600) avec des mots de passe aléatoires, s'ils n'existent pas déjà ;
+- écrit `dev/.env` et `prod/.env` (droits 600) avec des mots de passe aléatoires, s'ils n'existent pas déjà :
+  celui du rôle de l'API (propriétaire de sa base, sans droits de superutilisateur), celui du superutilisateur `postgres`
+  (sauvegardes et restaurations seulement) et, pour le dev, celui des comptes de démonstration ;
 - démarre le frontal Caddy avec les adresses `sslip.io` tirées de l'IPv4 du serveur ;
 - avec `--firewall` : `ufw` n'ouvre que SSH, HTTP et HTTPS.
 
 À faire en plus, une fois : `sudo apt install unattended-upgrades` (mises à jour de sécurité automatiques).
 
-**À savoir** : être dans le groupe `docker` revient à être root. La porte limite ce que la clé peut demander
-(`deploy`, `rollback`, `status`, `login`, `edge`), mais un déploiement exécute les scripts de la version envoyée : la vraie
-protection est que seules les GitHub Actions du dépôt ont les clés, et que la prod attend l'approbation de Willem.
+**À savoir** : être dans le groupe `docker` revient à être root sur le serveur, prod comprise. La porte limite ce que la
+clé peut demander (`deploy`, `rollback`, `status`, `login`, `edge`), mais un déploiement exécute les scripts de la branche
+envoyée : un déploiement **dev** d'une branche piégée pourrait donc lire les secrets de la prod. La vraie protection :
+seuls les jobs GitHub des environnements `dev` et `production` ont les clés, et **les deux attendent l'approbation de
+Willem**. N'approuve un déploiement dev que pour une branche dont tu connais le contenu.
 
 ## 3. GitHub (une seule fois, avant le serveur)
 
@@ -67,7 +71,8 @@ Le script (relançable) :
 
 - affiche l'empreinte SSH du serveur et demande de la comparer à celle lue sur le serveur
   (`ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`) avant de lui faire confiance ;
-- crée les environnements `dev` et `production` (ce dernier : approbation par toi, depuis `main` et les tags `v*` seulement) ;
+- crée les environnements `dev` et `production`, qui attendent tous deux ton approbation (`production` : depuis `main` et
+  les tags `v*` seulement) ;
 - génère une paire de clés SSH par environnement : la clé privée part directement dans le secret `DEPLOY_SSH_KEY`
   de l'environnement et n'est jamais écrite ailleurs ; les clés publiques s'affichent, prêtes pour `bootstrap.sh` ;
 - pose les variables `DEPLOY_HOST`, `DEPLOY_KNOWN_HOSTS`, `GG_URL` de chaque environnement ;
@@ -96,11 +101,11 @@ donnent du HTTPS valide tout de suite, indispensable pour la PWA. Le jour où le
 
 ## 5. Déployer le dev
 
-- **À la main** : Actions → « Deploy dev » → *Run workflow*, choisir la branche ; « Réinitialiser la base et rejouer le seed »
+- **À la main** (une fois `deploy-dev.yml` présent sur `main`) : Actions → « Deploy dev » → *Run workflow*, choisir la branche ; « Réinitialiser la base et rejouer le seed »
   est coché par défaut (la base dev repart des comptes de démonstration).
 - **Depuis une PR** : poser le label `deploy:dev`. Chaque nouveau push sur la PR redéploie (avec réinitialisation).
 
-Le workflow construit les images `dev-<commit>`, envoie `deploy/` au serveur et lance `deploy.sh dev` : téléchargement,
+Le déploiement attend ton approbation (Actions → le run → *Review deployments*), puis le workflow construit les images `dev-<commit>`, envoie `deploy/` au serveur et lance `deploy.sh dev` : téléchargement,
 démarrage, attente des healthchecks, test de fumée (`/api/v1/meta` doit annoncer le bon commit), retour automatique
 à la version précédente sinon.
 
@@ -167,6 +172,8 @@ revenir en arrière ne touche pas aux données.
 - Le service `backup` de la prod fait chaque nuit à 3 h 30 un fichier `gg-pocket-<date>.tar` (base au format `pg_dump`
   + photos téléversées) dans `/opt/gg-pocket/prod/backups/daily/`. Rétention : 14 jours ; celle du dimanche est copiée
   dans `weekly/` et gardée 8 semaines. Chaque déploiement prod en fait une avant de commencer (`pre-deploy/`, 10 gardées).
+- **Surveillance** : le conteneur `backup` passe à l'état `unhealthy` si la dernière sauvegarde quotidienne a plus de
+  26 heures (disque plein, base injoignable…). À regarder de temps en temps : `sudo docker ps --filter name=backup`.
 - **Copie hors du serveur, recommandée** : si le VPS disparaît, ses sauvegardes aussi. Le plus simple : l'option
   « Backup Storage » d'OVH, ou un `rsync` quotidien vers une autre machine. Non automatisé pour l'instant.
 - Sauvegarde à la demande (dans `manual/`, gardée jusqu'à suppression à la main) :
@@ -195,5 +202,6 @@ Cette restauration est testée à chaque CI (job « Docker stack » : sonde en b
 | « Refusing to fall back on the local defaults » | `.env` de l'environnement incomplet (`GG_DB_*`) : relancer `bootstrap.sh` ne l'écrase pas, le corriger à la main |
 | « belongs to the … environment » | La base n'est pas celle de cet environnement (mauvais `.env` ou sauvegarde d'un autre environnement) |
 | Certificat absent | `sudo docker logs gg-pocket-edge-caddy-1` : ports 80/443 ouverts ? DNS (ou IP du nom sslip.io) correct ? |
+| `backup` en `unhealthy` | `sudo docker logs gg-pocket-prod-backup-1` : la dernière nuit a échoué (disque, base) |
 | Plus de place disque | `sudo docker system df` ; chaque déploiement ne garde que les images de la version en place et de la précédente |
 | Mémoire | `sudo docker stats --no-stream` (budget : prod ≈ 1,5 Go, dev ≈ 1,1 Go, frontal 128 Mo) |

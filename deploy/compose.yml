@@ -68,16 +68,20 @@ services:
     cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
     environment:
       POSTGRES_DB: ${GG_DB_NAME:-ggpocket}
-      POSTGRES_USER: ${GG_DB_USER:?GG_DB_USER is required}
-      POSTGRES_PASSWORD: ${GG_DB_PASSWORD:?GG_DB_PASSWORD is required}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${GG_DB_ADMIN_PASSWORD:?GG_DB_ADMIN_PASSWORD is required}
+      # The API's own role, created on the first start by db-init/10-app-role.sh.
+      GG_APP_DB_USER: ${GG_DB_USER:?GG_DB_USER is required}
+      GG_APP_DB_PASSWORD: ${GG_DB_PASSWORD:?GG_DB_PASSWORD is required}
       TZ: UTC
     volumes:
       - db-data:/var/lib/postgresql
+      - ./db-init:/docker-entrypoint-initdb.d:ro
     networks: [data]
     shm_size: 128m
     mem_limit: ${GG_DB_MEMORY:-512m}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d \"$$POSTGRES_DB\""]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -101,8 +105,10 @@ services:
     environment:
       PGHOST: db
       PGDATABASE: ${GG_DB_NAME:-ggpocket}
-      PGUSER: ${GG_DB_USER:?GG_DB_USER is required}
-      PGPASSWORD: ${GG_DB_PASSWORD:?GG_DB_PASSWORD is required}
+      # Superuser: a restore drops and recreates the database.
+      PGUSER: postgres
+      PGPASSWORD: ${GG_DB_ADMIN_PASSWORD:?GG_DB_ADMIN_PASSWORD is required}
+      GG_APP_DB_USER: ${GG_DB_USER:?GG_DB_USER is required}
       GG_BACKUP_DIR: /backups
       GG_MEDIA_DIR: /media
       TZ: Europe/Paris
@@ -112,6 +118,12 @@ services:
       - ${GG_BACKUP_HOST_DIR:-./backups}:/backups
     networks: [data]
     mem_limit: 128m
+    healthcheck:
+      test: ["CMD", "/scripts/backup-health.sh"]
+      interval: 30m
+      timeout: 10s
+      start_period: 30s
+      start_interval: 5s
 
 networks:
   edge: {}

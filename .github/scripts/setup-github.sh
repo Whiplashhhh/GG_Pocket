@@ -4,8 +4,9 @@
 #
 #   .github/scripts/setup-github.sh --host 51.38.12.34 [--prod-url https://...] [--dev-url https://...]
 #
-# - environments "dev" and "production" (production: approval by the admin running this, from
-#   main and v* tags only);
+# - environments "dev" and "production", both approved by the admin running this (a deployment
+#   runs the scripts of the branch it ships, as root on the server: DECISIONS D-062); production
+#   from main and v* tags only;
 # - one SSH key pair per environment: private key into the environment secret DEPLOY_SSH_KEY,
 #   public key printed for bootstrap.sh, nothing left on disk;
 # - variables DEPLOY_HOST, DEPLOY_KNOWN_HOSTS (after you check the server fingerprint), GG_URL;
@@ -38,7 +39,9 @@ read -r -p "Same fingerprint? [y/N] " same
 
 say "Environments"
 admin_id=$(gh api user --jq .id)
-gh api -X PUT "repos/$repo/environments/dev" --silent
+gh api -X PUT "repos/$repo/environments/dev" --input - --silent <<JSON
+{"wait_timer": 0, "prevent_self_review": false, "reviewers": [{"type": "User", "id": $admin_id}]}
+JSON
 gh api -X PUT "repos/$repo/environments/production" --input - --silent <<JSON
 {"wait_timer": 0, "prevent_self_review": false, "reviewers": [{"type": "User", "id": $admin_id}],
  "deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}

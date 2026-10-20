@@ -19,6 +19,8 @@ case $env in
         ;;
 esac
 home=/opt/gg-pocket/$env
+# Registry credentials per environment: a dev job never sees the prod one, nor overwrites it.
+export DOCKER_CONFIG=/home/deploy/.docker-$env
 read -r -a request <<<"${SSH_ORIGINAL_COMMAND:-status}"
 command=${request[0]:-status}
 

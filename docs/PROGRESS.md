@@ -25,12 +25,15 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 - e2e contre la vraie stack (`frontend/e2e-stack/`, 5 tests, Chromium, via le frontal en HTTPS) et test
   sauvegarde → dégâts → restauration : verts. Trouvé en route : volume des photos à root (service `media-owner` ajouté).
 - `docs/DEPLOYMENT.md`, CLAUDE.md (commandes), ARCHITECTURE §6, ROADMAP, CHANGELOG.
+- Revue de sécurité de fin de phase (sous-agent) : 2 hautes, 4 moyennes, 3 basses, toutes traitées (journaux de l'API prod
+  hors des jobs publics, approbation exigée aussi sur `dev`, retour arrière sans téléchargement, pas de code d'inscription
+  sur le dev déployé, jetons en lecture seule et `DOCKER_CONFIG` par environnement, rôle de base sans superutilisateur,
+  surveillance des sauvegardes, purge du limiteur par lots) ; le point IPv6 était déjà couvert (/64). D-062, D-063, D-071.
 - Label `deploy:dev` créé. Le jeton `gh` de Claude n'a pas les droits d'administration (environnements, secrets, règles) :
   tout est dans `setup-github.sh` pour Willem.
 
 ### Reste
 
-- Revue de sécurité de la phase (sous-agent) et ses corrections.
 - Willem : `setup-github.sh --host <ip>` puis `bootstrap.sh` sur le VPS (DEPLOYMENT.md §2-3).
 - Premier déploiement dev (label `deploy:dev` sur la PR), vérification D-041 sur iPhone, fusion, release `0.1.0`,
   approbation, retour arrière testé (`release.yml` lancé à la main avec la version précédente… ou `gg-deploy rollback`).
