@@ -47,7 +47,7 @@ const canManage = computed(() => isAtLeast(member.value?.role, 'SETTER'))
           <span class="max-w-[9rem] truncate leading-tight font-semibold">{{
             member.nickname
           }}</span>
-          <RoleBadge :role="member.role" class="max-w-[9rem] truncate" />
+          <RoleBadge :role="member.role" short class="max-w-[9rem] truncate" />
         </span>
         <span
           class="rounded-full ring-brand ring-offset-2 ring-offset-bg group-aria-[current=page]:ring-2"

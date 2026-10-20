@@ -42,7 +42,7 @@ const id = useId()
 const input = useTemplateRef<HTMLInputElement>('input')
 const describedBy = computed(
   () =>
-    [props.hint ? `${id}-hint` : null, props.error ? `${id}-error` : null]
+    [props.hint && !props.error ? `${id}-hint` : null, props.error ? `${id}-error` : null]
       .filter(Boolean)
       .join(' ') || undefined,
 )
@@ -73,14 +73,15 @@ defineExpose({ focus: () => input.value?.focus() })
         :aria-describedby="describedBy"
         :autocapitalize="verbatim ? 'none' : undefined"
         :spellcheck="verbatim ? false : undefined"
-        class="min-h-12 w-full rounded-control border-2 border-rule bg-surface px-3 text-base text-ink transition-colors duration-150 placeholder:text-ink-muted focus:border-ink focus:outline-none aria-invalid:border-danger"
+        class="min-h-12 w-full rounded-control border-2 border-rule bg-surface px-3 text-base text-ink transition-colors duration-150 placeholder:text-ink-muted focus:border-ink focus:outline-none aria-invalid:border-danger aria-invalid:focus:border-danger"
         :class="{ 'pr-12': $slots.trailing }"
       />
       <div v-if="$slots.trailing" class="absolute inset-y-0 right-0 flex items-center pr-0.5">
         <slot name="trailing" />
       </div>
     </div>
-    <p v-if="hint" :id="`${id}-hint`" class="text-sm text-ink-muted">{{ hint }}</p>
+    <!-- The error replaces the hint: it says what to fix, often the same thing more precisely. -->
+    <p v-if="hint && !error" :id="`${id}-hint`" class="text-sm text-ink-muted">{{ hint }}</p>
     <p v-if="error" :id="`${id}-error`" class="text-sm font-semibold text-danger">{{ error }}</p>
   </div>
 </template>

@@ -16,7 +16,7 @@ const model = defineModel<boolean>({ required: true })
 const id = useId()
 const describedBy = computed(
   () =>
-    [props.hint ? `${id}-hint` : null, props.error ? `${id}-error` : null]
+    [props.hint && !props.error ? `${id}-hint` : null, props.error ? `${id}-error` : null]
       .filter(Boolean)
       .join(' ') || undefined,
 )
@@ -43,7 +43,7 @@ const describedBy = computed(
       </span>
       <span class="leading-snug"><slot /></span>
     </label>
-    <p v-if="hint" :id="`${id}-hint`" class="pl-9 text-sm text-ink-muted">{{ hint }}</p>
+    <p v-if="hint && !error" :id="`${id}-hint`" class="pl-9 text-sm text-ink-muted">{{ hint }}</p>
     <p v-if="error" :id="`${id}-error`" class="pl-9 text-sm font-semibold text-danger">
       {{ error }}
     </p>

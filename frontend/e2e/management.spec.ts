@@ -62,7 +62,7 @@ test.describe('the board', () => {
     await page.goto('/gestion/journal')
     await expect(page.getByText('marie a désactivé le compte de tonton.talon')).toBeVisible()
     await expect(
-      page.getByText('marie a changé le rôle de tonton.talon : Grimpeur·se → Ouvreur·se'),
+      page.getByText('marie a fait passer tonton.talon de Grimpeur·se à Ouvreur·se'),
     ).toBeVisible()
   })
 

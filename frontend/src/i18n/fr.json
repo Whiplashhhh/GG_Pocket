@@ -299,15 +299,15 @@
     "installed": "C’est fait : GG Pocket est sur ton écran d’accueil. Ouvre-la depuis là.",
     "alreadyInstalled": "Tu utilises déjà l’appli installée. Rien à faire, profite.",
     "iosIntro": "Sur iPhone et iPad, ça se fait à la main, en trois gestes :",
-    "iosStep1": "Touche le bouton Partager (le carré avec une flèche vers le haut). S’il n’est pas visible, il est derrière « ⋯ ».",
+    "iosStep1": "Touche le bouton Partager (le carré avec une flèche vers le haut). S’il n’est pas visible, il est derrière le bouton à trois points.",
     "iosStep2": "Choisis « Sur l’écran d’accueil ». Fais défiler la liste, ou touche « Afficher plus » si tu ne le vois pas.",
     "iosStep3": "Laisse « Ouvrir en tant qu’app web » activé, puis touche « Ajouter ».",
     "iosAfter": "Ouvre ensuite GG Pocket depuis ton écran d’accueil. Si elle te demande de te reconnecter une fois, c’est normal : ton trousseau remplit tout.",
     "inAppTitle": "Tu es dans le navigateur d’une autre appli",
-    "inAppBody": "WhatsApp, Instagram ou Messenger ouvrent les liens dans leur propre navigateur, qui ne sait pas installer d’appli. Touche « ⋯ » ou « ⋮ », choisis « Ouvrir dans le navigateur » (Safari ou Chrome), puis recommence là-bas.",
+    "inAppBody": "WhatsApp, Instagram ou Messenger ouvrent les liens dans leur propre navigateur, qui ne sait pas installer d’appli. Touche le bouton à trois points, choisis « Ouvrir dans le navigateur » (Safari ou Chrome), puis recommence là-bas.",
     "copyLink": "Copier le lien de l’appli",
     "macSafari": "Dans Safari sur Mac : menu Fichier, puis « Ajouter au Dock ».",
-    "menu": "Ouvre le menu de ton navigateur (⋮ ou ☰) et choisis « Installer l’appli » ou « Ajouter à l’écran d’accueil »."
+    "menu": "Ouvre le menu de ton navigateur (les trois points ou les trois traits) et choisis « Installer l’appli » ou « Ajouter à l’écran d’accueil »."
   },
   "profileEdit": {
     "title": "Modifier mon profil",
@@ -435,7 +435,7 @@
     "loadMore": "Voir plus ancien",
     "formerMember": "Un ancien membre",
     "actions": {
-      "MEMBER_ROLE_CHANGED": "{actor} a changé le rôle de {target} : {before} → {after}",
+      "MEMBER_ROLE_CHANGED": "{actor} a fait passer {target} de {before} à {after}",
       "MEMBER_DISABLED": "{actor} a désactivé le compte de {target}",
       "MEMBER_ENABLED": "{actor} a réactivé le compte de {target}",
       "PASSWORD_RESET_LINK_CREATED": "{actor} a créé un lien de réinitialisation pour {target}",
@@ -495,5 +495,11 @@
     "year": "Une année entre 1950 et cette année.",
     "number": "Un nombre entier, au moins 1.",
     "invalid": "Ce champ ne passe pas. Vérifie-le."
+  },
+  "rolesShort": {
+    "CLIMBER": "Grimpeur GG",
+    "SETTER": "Ouvreur·se",
+    "BOARD": "Direction",
+    "ADMIN": "Le Président·e"
   }
 }
