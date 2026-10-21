@@ -163,8 +163,11 @@ Les migrations de base suivent la règle « expand / contract » : la version N�
 revenir en arrière ne touche pas aux données.
 
 - **Automatique** : un déploiement qui ne passe pas les healthchecks ou le test de fumée remet la version d'avant.
-- **Version précédente** : Actions → « Release » → *Run workflow* avec le numéro de la version voulue (par exemple `0.1.0`) ;
-  la même approbation est demandée. C'est la voie normale, tracée dans GitHub.
+- **Version précédente** : Actions → « Release » → *Run workflow*, en laissant « Use workflow from » sur **`main`** (l'environnement
+  `production` refuse toute autre branche, `prod/X.Y.Z` comprise), avec le numéro de la version voulue (par exemple `0.1.0`) ;
+  la même approbation est demandée. Le workflow prend les fichiers de déploiement dans le tag `vX.Y.Z`. C'est la voie normale,
+  tracée dans GitHub. Après coup, « Serveur X.Y.Z » dans le profil (direction) donne la version de l'API ; « GG Pocket X.Y.Z »
+  est celle de l'appli du téléphone, qui suit au prochain « Recharger » du bandeau de mise à jour.
 - **Depuis le serveur, en urgence** :
   `sudo -u deploy /opt/gg-pocket/prod/releases/$(cat /opt/gg-pocket/prod/current-tag)/scripts/rollback.sh prod`.
 - **État** : `cat /opt/gg-pocket/prod/current-tag /opt/gg-pocket/prod/previous-tag`, `sudo docker ps`.

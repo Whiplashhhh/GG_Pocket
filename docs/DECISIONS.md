@@ -260,7 +260,9 @@ direction) ou **Willem**.
   - Android : `beforeinstallprompt` sur Chrome, Edge et Samsung Internet (pas Firefox). Manifeste requis (nom, icônes 192 et 512, `start_url`,
     `display`) ; Firefox Android propose aussi l'installation si le manifeste est valide.
   - Web Push sur iOS : toujours réservé aux web apps installées (phase 9).
-- **Statut** : validée comme base de travail, à recontrôler sur appareil en phase 1.
+- **Contrôle sur appareil (2026-10-21)** : sur l'iPhone de Willem (iOS 27), installer la PWA depuis Safari en étant connecté
+  ouvre l'appli installée sans redemander les identifiants : le cookie de session est bien copié.
+- **Statut** : validée (contrôlée sur appareil).
 
 ### D-042 — Branche de la phase 0
 - **Choix** : `feature/fondations-0.0.0` (la prod n'existe pas encore ; `0.0.0` est la version de base). Fusion dans `main` par PR squash.

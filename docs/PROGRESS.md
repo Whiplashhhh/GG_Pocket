@@ -4,6 +4,35 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-21 — Phase 2 terminée : 0.1.1 en prod, retour arrière testé
+
+**Branche** : `chore/release-rollback-doc` (depuis `main`).
+
+### Fait
+
+- PR #13 fusionnée, release **0.1.1** en prod. Retour arrière testé par Willem : 0.1.1 → 0.1.0 (« Serveur 0.1.0 » dans le
+  profil) → 0.1.1. Premier essai refusé : lancé depuis la branche `prod/0.1.0`, que l'environnement `production` refuse.
+  `DEPLOYMENT.md` §7 le précise maintenant, et `release.yml` échoue d'emblée avec un message clair (job « Started from main »).
+- D-041 contrôlée sur appareil : la session suit à l'installation de la PWA depuis Safari (iOS 27).
+- Dependabot #6 et #7 fusionnées par Willem (partiront dans la prochaine release).
+- ROADMAP : phases 1 et 2 entièrement cochées.
+
+### Reste
+
+- `backend/mvnw.cmd` (venu de Dependabot #6) est en LF alors que `.gitattributes` veut CRLF : git le voit modifié après
+  checkout. À renormaliser (`git add --renormalize backend/mvnw.cmd`) dans une PR à part.
+
+### Prochaine action exacte
+
+- Phase 3 (Topo), nouvelle session : branche `feature/topo-0.1.1` depuis `main`, en commençant par la configuration du club
+  (secteurs, cordes, couleurs de prises, cotations ; ROADMAP phase 3).
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-21 — Correctif iPhone et logo du club (vers 0.1.1)
 
 **Branche** : `fix/iphone-profil-0.1.0` (depuis `main` = 0.1.0), PR #13.

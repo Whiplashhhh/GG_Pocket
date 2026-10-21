@@ -55,8 +55,8 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [x] Seed des comptes (profil `dev`, `GG_ALLOW_DEMO_SEED`, refus si marqueur `prod` ou comptes non seedés)
 - [x] Tests d'autorisation pour chaque rôle sur chaque endpoint ; e2e inscription → installation → retour 30 jours plus tard (horloge simulée)
 - [x] Revues sécurité et UX de fin de phase, corrections
-- [~] PR « Phase 1 — Comptes et rôles » ouverte, à relire et fusionner par Willem
-- [ ] Contrôle sur un vrai iPhone de la copie des cookies à l'installation (D-041)
+- [x] PR « Phase 1 — Comptes et rôles » relue et fusionnée par Willem
+- [x] Contrôle sur un vrai iPhone de la copie des cookies à l'installation (D-041) : session gardée (iOS 27, 2026-10-21)
 
 ## Phase 2 — Environnements et pipeline
 
@@ -74,7 +74,7 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [x] DEPLOYMENT.md
 - [x] Demander à Willem les infos du §20 (serveur, domaines, DNS, accès dev)
 - [x] Willem : `.github/scripts/setup-github.sh --host <ip>` puis `bootstrap.sh` sur le VPS (DEPLOYMENT.md §2-3)
-- [ ] Premier déploiement dev (fait), release de test `0.1.0` (faite), rollback testé (avec la 0.1.1)
+- [x] Premier déploiement dev, release de test `0.1.0`, rollback testé (0.1.1 → 0.1.0 → 0.1.1, le 2026-10-21)
 - [x] Protection de branche `main` (PR + CI obligatoires) : règle en place, « Deploy config » et « Docker stack » ajoutés par `setup-github.sh`
 
 ## Phase 3 — Topo
