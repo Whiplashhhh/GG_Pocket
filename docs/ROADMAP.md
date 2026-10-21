@@ -79,16 +79,17 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 
 ## Phase 3 — Topo
 
-- [ ] Voie préférée dans l'onboarding et le profil (D-055)
-- [ ] Configuration du club : secteurs, cordes, couleurs de prises, cotations (seed de configuration identique dev/prod)
-- [ ] Gestion des voies (créer, modifier, dupliquer, photo, styles, conseil d'ouvreur)
-- [ ] Liste du topo : tris, filtres combinables, regroupement par secteur
-- [ ] Fiche voie, statistiques, mon historique
-- [ ] Commentaires (ajout, suppression des siens, modération)
-- [ ] Coups de cœur (limite de 2, « Ton cœur est plein »)
-- [ ] « Je sais la faire » manuel (mouli / tête)
-- [ ] Démontage, remontage, archives ; avertissement si coups de cœur
-- [ ] Dernière chance + pop-up « J'accepte leurs destins »
+- [x] Voie préférée dans l'onboarding et le profil (D-055)
+- [x] Configuration du club : secteurs, cordes, couleurs de prises, cotations (seed de configuration identique dev/prod)
+- [x] Gestion des voies (créer, modifier, dupliquer, photo, styles, conseil d'ouvreur)
+- [x] Liste du topo : tris, filtres combinables, regroupement par secteur
+- [x] Fiche voie (statistiques d'ascensions et « mon historique » en phase 4, D-080)
+- [x] Commentaires (ajout, suppression des siens, modération)
+- [x] Coups de cœur (limite de 2, « Ton cœur est plein »)
+- [x] « Je sais la faire » manuel (mouli / tête)
+- [x] Démontage, remontage, archives ; avertissement si coups de cœur
+- [x] Dernière chance + pop-up « J'accepte leurs destins »
+- [ ] Captures 360 / 1280 px, clair et sombre, regardées et corrigées (impossible dans le bac à sable saturé, voir PROGRESS)
 
 ## Phase 4 — Séances
 

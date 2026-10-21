@@ -4,6 +4,47 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-21 — Phase 3 (Topo) : code complet, CI verte, captures à faire
+
+**Branche** : `feature/topo-0.1.1` (depuis `main` = 0.1.1). PR « Phase 3 — Topo ». PR #18 à part (`mvnw.cmd`).
+
+### Fait
+
+- Backend : paquets `club` (secteurs, cordes, couleurs, cotations ; V7 avec la configuration réelle, identique dev/prod ;
+  configuration par l'admin, journalisée) et `topo` (voies, ouvreurs, styles, photo, statuts ; commentaires et modération ;
+  coups de cœur limités à 2 avec remplacement ; « je sais la faire » ; dernière chance et prises de connaissance ; voie
+  préférée ; V8). Seed de démo : 60 voies, 5 démontées, 3 en dernière chance, commentaires, cœurs pleins. Tous les points
+  d'accès dans `AuthorizationMatrixIT`. Compilé et vert en CI dès le premier passage (sauf le contrat, écrit à la main).
+- Front : topo (tri, filtres combinables dans l'URL, regroupement par secteur), archives, fiche voie en feuille, cœurs
+  (« Ton cœur est plein »), coches, commentaires, pop-up dernière chance, voie préférée (premiers pas + profil),
+  gestion des voies (création, modification, duplication, photo, dernière chance, démontage, remontage), vue dernière
+  chance (avec changement de date), configuration du club (admin). e2e : `topo.spec.ts`, `topo-management.spec.ts`,
+  94 tests verts en CI (iPhone 13 + Desktop Chrome) ; e2e de la vraie stack : connexion, pop-up, topo réel.
+- Revue sécurité (sous-agent) : aucun point critique ni haut ; 2 moyens et 6 bas corrigés (photo de voie qui survit au
+  compte, sous-échantillonnage arrondi au-dessus, 409 `CONCURRENT_CHANGE`, verrous sur les prises de connaissance,
+  envoi par lots de 50, 10 ouvreurs max, `@PlainText` contre les caractères de contrôle, modération sur voie démontée).
+- Décisions D-074 à D-082. ARCHITECTURE, CHANGELOG « Non publié », CLAUDE.md (contrat depuis le journal CI, `reap`).
+
+### Reste
+
+- **Captures non prises** : le bac à sable a 950 processus zombies (PID 1 = `sleep`, qui ne les ramasse pas) et
+  ~1000/1024 PID occupés ; Chromium ne démarre pas. Il faut redémarrer le conteneur (ou fermer les vieilles sessions
+  Claude Code) puis : `pnpm build`, `pnpm screenshots --grep "topo|gestion"` en clair et sombre, regarder 360 et 1280 px,
+  corriger, et faire la revue UX de fin de phase.
+- Ensuite : fusion de la PR par Willem, release `0.2.0` (minor : nouvelles fonctionnalités).
+
+### Prochaine action exacte
+
+- Après redémarrage du conteneur : `cd frontend && pnpm install && pnpm build && pnpm screenshots --project=mobile-light`
+  (puis `mobile-dark`, `desktop-light`, `desktop-dark`), regarder `frontend/screenshots/` pour le topo, la fiche voie, la
+  pop-up, la gestion des voies, le formulaire, la configuration du club ; corriger ; cocher la dernière ligne de la phase 3.
+
+### Points bloquants
+
+- Ressources du bac à sable (voir « Reste »).
+
+---
+
 ## 2026-10-21 — Phase 2 terminée : 0.1.1 en prod, retour arrière testé
 
 **Branche** : `chore/release-rollback-doc` (depuis `main`).

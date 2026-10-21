@@ -73,6 +73,19 @@ class RouteCommentIT {
     }
 
     @Test
+    void controlCharactersAreRefusedButLineBreaksAreWelcome() throws Exception {
+        var route = routes.create(members.create(Role.SETTER));
+        var me = members.create(Role.CLIMBER);
+        // JSON escapes: a NUL, which PostgreSQL would refuse, then a plain line break.
+        comment(me, route, "Sec\\u0000 !")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+                .andExpect(jsonPath("$.errors[0].field").value("body"))
+                .andExpect(jsonPath("$.errors[0].code").value("PlainText"));
+        comment(me, route, "Du mou !\\nBloque !").andExpect(status().isCreated());
+    }
+
+    @Test
     void aDismountedRouteTakesNoNewComment() throws Exception {
         var route = routes.create(members.create(Role.SETTER), RouteStatus.DISMOUNTED);
         comment(members.create(Role.CLIMBER), route, "Trop tard ?")
