@@ -73,9 +73,9 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [x] Dependabot ou Renovate
 - [x] DEPLOYMENT.md
 - [x] Demander à Willem les infos du §20 (serveur, domaines, DNS, accès dev)
-- [ ] Willem : `.github/scripts/setup-github.sh --host <ip>` puis `bootstrap.sh` sur le VPS (DEPLOYMENT.md §2-3)
-- [ ] Premier déploiement dev, release de test `0.x`, rollback testé
-- [ ] Protection de branche `main` (PR + CI obligatoires) : règle en place, « Deploy config » et « Docker stack » ajoutés par `setup-github.sh`
+- [x] Willem : `.github/scripts/setup-github.sh --host <ip>` puis `bootstrap.sh` sur le VPS (DEPLOYMENT.md §2-3)
+- [ ] Premier déploiement dev (fait), release de test `0.1.0` (faite), rollback testé (avec la 0.1.1)
+- [x] Protection de branche `main` (PR + CI obligatoires) : règle en place, « Deploy config » et « Docker stack » ajoutés par `setup-github.sh`
 
 ## Phase 3 — Topo
 

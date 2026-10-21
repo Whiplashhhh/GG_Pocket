@@ -28,3 +28,6 @@ frontend/screenshots/
 # Logs
 *.log
 deploy/backups/
+
+# Session handoff of the relay mode (local only)
+.relais/
