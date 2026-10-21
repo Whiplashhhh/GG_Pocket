@@ -667,3 +667,14 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   prochaine ouverture de l'appli. La pop-up n'apparaît jamais pendant la saisie d'une séance, ni par-dessus l'invitation à
   installer l'appli.
 - **Statut** : à valider.
+
+### D-083 — Revue visuelle de la phase 3 : table de gestion compacte, tampon au-dessus de l'étiquette
+- **Contexte** : à 1280 px, la table des voies débordait (huit colonnes dans ~860 px) ; le tampon « Démontée » posé sur
+  l'étiquette cachait les noms courts (DESIGN §5 : le nom reste lisible).
+- **Choix** : la table perd la colonne « Cotation » (déjà sur l'étiquette) et la colonne « Ouverture » (reprise sous le
+  statut, en date courte) ; cœurs et commentaires ont une icône pour en-tête. Le tampon « Démontée » se pose au-dessus de
+  l'étiquette, à la manière du ruban « Dernière chance ». Les tris du topo s'appellent « Secteur » et « Ouverture » (le
+  libellé long était coupé à 360 px). Les textes ont une espace insécable avant `? ! : ;` et les dates écrivent « 1er ».
+  On garde deux façons de montrer une sélection dans le formulaire de voie : coche pour les couleurs (choix exclusif),
+  aplat plein pour les styles et les ouvreur·ses (choix multiples).
+- **Statut** : validée.

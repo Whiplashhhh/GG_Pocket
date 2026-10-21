@@ -89,7 +89,7 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 - [x] « Je sais la faire » manuel (mouli / tête)
 - [x] Démontage, remontage, archives ; avertissement si coups de cœur
 - [x] Dernière chance + pop-up « J'accepte leurs destins »
-- [ ] Captures 360 / 1280 px, clair et sombre, regardées et corrigées (impossible dans le bac à sable saturé, voir PROGRESS)
+- [x] Captures 360 / 1280 px, clair et sombre, regardées et corrigées (revue UX, D-083)
 
 ## Phase 4 — Séances
 

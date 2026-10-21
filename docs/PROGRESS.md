@@ -4,6 +4,36 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-21 — Phase 3 (Topo) : revue visuelle faite, phase terminée
+
+**Branche** : `feature/topo-0.1.1`, PR #19 « Phase 3 — Topo ». PR #18 à part (`mvnw.cmd`).
+
+### Fait
+
+- Conteneur redémarré : captures 360/1280 px clair/sombre du topo, de la fiche, des archives, de la pop-up, de la
+  gestion des voies et de la configuration du club ; revue UX (sous-agent) puis corrections (D-083) :
+  table de gestion qui tenait en 1365 px (colonnes Cotation et Ouverture retirées, dates courtes, icônes) ; dialogues
+  desktop coupés (`sm:bottom-auto`) ; tampon « Démontée » au-dessus de l'étiquette ; prise noire visible en sombre ;
+  tris « Secteur » / « Ouverture » ; points « · » jamais orphelins (utilitaire `dot-list`) ; secteur non répété en tri par
+  secteur ; menu de gestion actif sur les sous-pages ; « 1er » dans les dates ; espaces insécables avant `? ! : ;` ;
+  « Prises : jaune et bleu » ; avertissements reka-ui (description de dialogue) ; captures sans animation, en fr-FR.
+- Lint, format, typecheck, Vitest (169), e2e Desktop Chrome (47) verts en local.
+
+### Reste
+
+- Willem : valider D-074..D-077, D-082 ; fusionner la PR #19 ; release `0.2.0`.
+- Les champs date des captures restent en mm/jj/aaaa ici : le Chromium du bac à sable n'a que la locale en-US.
+
+### Prochaine action exacte
+
+- Vérifier la CI de la PR #19 (iPhone 13 + Desktop), puis attaquer la phase 4 (`docs/ROADMAP.md`) après la fusion.
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-21 — Phase 3 (Topo) : code complet, CI verte, captures à faire
 
 **Branche** : `feature/topo-0.1.1` (depuis `main` = 0.1.1). PR « Phase 3 — Topo ». PR #18 à part (`mvnw.cmd`).
