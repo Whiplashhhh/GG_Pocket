@@ -6,7 +6,7 @@ de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision r
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
 choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase), environnements et pipeline
-(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072 et suivantes).
+(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072, D-073), topo (D-074 et suivantes, phase 3).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -31,7 +31,6 @@ direction) ou **Willem**.
 | D-014 | Âge masqué, accord parental sous 15 ans ? | club | Oui |
 | D-037 | Polices et étiquette de voie : le rendu plaît-il ? | club | Archivo + Kalam, à juger sur l'environnement dev |
 | D-039 | Logo vectoriel / haute définition / fond noir disponible ? | club | Détourage du JPEG fourni |
-| D-041 | Session conservée après installation sur iPhone ? | Willem + testeurs | À vérifier sur appareil réel (environnement dev, phase 2) |
 | D-043 | Nom officiel de l'association et contact RGPD ? | club | « Gravelines Grimp », contact saisi par l'admin dans l'appli |
 | D-044 | Durée de conservation des comptes inactifs ? | club | Suppression après 3 ans sans connexion |
 | D-045 | Ce que la direction voit dans la fiche d'un membre ? | club | Tout sauf la date de naissance |
@@ -40,6 +39,10 @@ direction) ou **Willem**.
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
+| D-074 | Cotations modifiables dans l'appli ? | club | Non : liste fixe 4a → 7c |
+| D-075 | Un coup de cœur remonté peut-il faire passer à 3 ? | club | Oui, toléré ; on ne peut plus en ajouter tant qu'on est à 2 ou plus |
+| D-076 | Les 14 styles de voie et 5 styles maximum par voie ? | club | Oui |
+| D-077 | Ouvreurs : responsables et plus, ou nom libre ? | club | Comptes de rôle Responsable et plus, plus un nom libre pour un ouvreur sans compte |
 
 ---
 
@@ -599,4 +602,53 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   garde ses sondes de noms, pour reconnaître le cas chez un autre membre.
 - **Vérifié sur l'iPhone de Willem (dev, 2026-10-21)** : l'avatar ouvre le profil, et « Modifier mon profil » enregistre
   (`PUT /api/v1/me/profile` passe : le filtre ne vise que les fichiers). Le filtre lui-même n'est pas identifié.
+- **Statut** : validée.
+
+### D-074 — Cotations en lecture seule
+- **Contexte** : la spec range les cotations dans la configuration du club (§5), mais l'écran de configuration (§8.11) ne cite
+  que secteurs, cordes et couleurs. Une cotation renommée ou retirée fausserait les tris, les filtres et, plus tard, le badge
+  « Première cotation » et les classements.
+- **Choix** : les 23 cotations (4a → 7c, D-002) sont créées par la migration, identiques en dev et en prod, avec un rang
+  numérique ; l'appli les lit mais ne les modifie pas. En ajouter une (8a un jour ?) se fait par une migration.
+- **Statut** : à valider.
+
+### D-075 — Coups de cœur : la limite vise les voies non démontées
+- **Choix** : deux coups de cœur au plus sur des voies non démontées (D-010). Le troisième est refusé (`FAVORITES_FULL`), sauf
+  remplacement explicite d'un des deux, fait dans la même transaction. La ligne du membre est verrouillée pendant le contrôle,
+  pour que deux requêtes simultanées ne passent pas à 3. Remonter une voie démontée peut ramener quelqu'un à 3 : c'est toléré
+  (on ne retire pas un cœur sans le dire), et il ne peut plus en ajouter tant qu'il en a 2 ou plus.
+- **Statut** : à valider.
+
+### D-076 — Styles de voie
+- **Choix** : liste fixe dans le code (`RouteStyle`) : Conti, Rési, Physique, Technique, Complexe, Dalle, Dévers, Réglettes,
+  Bacs, Pinces, Plats, Dièdre, Toit, Morpho ; cinq au plus par voie, pour que les icônes tiennent dans une ligne du topo.
+  Les libellés sont dans `fr.json`, donc renommables sans toucher aux données.
+- **Statut** : à valider.
+
+### D-077 — Ouvreurs d'une voie
+- **Choix** : un ou plusieurs comptes de rôle Responsable et plus (actifs), et/ou un nom libre pour un ouvreur sans compte
+  (invité, ancien membre). Au moins l'un des deux. La date d'ouverture ne peut pas être dans le futur.
+- **Statut** : à valider.
+
+### D-078 — Le topo trie et filtre dans le navigateur
+- **Contexte** : une salle porte une soixantaine de voies actives.
+- **Choix** : `GET /api/v1/routes` renvoie toutes les voies actives et en dernière chance avec leurs compteurs (sans requête
+  par voie), et le navigateur trie, filtre et regroupe (`lib/`, testé). Changer de tri est instantané, même avec un réseau de
+  salle. Tri et filtres vivent dans l'URL : un lien partagé ou un retour arrière les retrouve. Les archives sont chargées à
+  part, à la demande.
+- **Alternative** : tri et filtres côté serveur avec pagination, utile au-delà de quelques centaines de voies : pas le cas.
+- **Statut** : validée.
+
+### D-079 — Photo de voie
+- **Choix** : même chaîne de sécurité que la photo de profil (D-054 : type réel, plafonds avant décodage, deux décodages à la
+  fois, ré-encodage JPEG sans métadonnées) mais sans recadrage : la photo est réduite pour tenir dans 1600 px. Le navigateur la
+  réduit avant l'envoi. Servie aux seuls membres connectés.
+- **Statut** : validée.
+
+### D-080 — Statistiques d'ascensions de la fiche voie en phase 4
+- **Contexte** : la fiche voie doit montrer le nombre d'ascensions, de topées, de grimpeurs et la part en tête, ainsi que
+  « mon historique » sur la voie, et le topo doit pouvoir trier par réalisations. Tout cela se calcule sur les ascensions,
+  qui arrivent avec les séances.
+- **Choix** : en phase 3, la fiche n'affiche rien pour ces chiffres (pas de faux zéros) et le tri par réalisations n'est pas
+  proposé. Ils arrivent avec la phase 4 (ligne dans la ROADMAP).
 - **Statut** : validée.

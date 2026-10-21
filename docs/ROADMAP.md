@@ -94,6 +94,8 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 
 - [ ] Export JSON de mes données, suppression de compte (libre-service et admin) avec anonymisation « Ancien·ne membre » (D-055)
 - [ ] Colonne « séances » du tableau des membres (D-055)
+- [ ] Fiche voie : statistiques d'ascensions et « mon historique » ; tri du topo par réalisations (D-080)
+- [ ] Suppression de compte : garder les photos de voie envoyées par le membre (`media_file.owner_id` est en `on delete cascade`)
 - [ ] Nouvelle séance (sélecteur rapide, lignes d'ascension, duplication, réordonner)
 - [ ] Brouillon IndexedDB + file d'attente hors ligne (photo comprise)
 - [ ] Photo de séance (compression client, traitement serveur)
