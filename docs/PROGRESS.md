@@ -4,6 +4,34 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-21 — Correctif iPhone et logo du club (vers 0.1.1)
+
+**Branche** : `fix/iphone-profil-0.1.0` (depuis `main` = 0.1.0).
+
+### Fait
+
+- Bug iPhone (appli installée) : l'écran Profil est le seul dont le fichier change à chaque version (il affiche la version) ;
+  une appli restée en mémoire demandait l'ancien fichier (404) et la navigation échouait en silence. `router.onError` recharge
+  maintenant la page visée, sans boucle (D-073, `src/lib/stale-chunk.ts`, Vitest + e2e qui renvoie un 404 sur l'écran).
+- En-tête : logo du club (clair/sombre) à 44 px + « GG Pocket » dès 26rem ; logo retiré de l'encart Actu (D-072).
+- CHANGELOG « Non publié » à jour.
+
+### Reste
+
+- Captures non prises et e2e/build non lancés ici (bac à sable à ~980 PID sur 1024, zombies non récupérés) : la CI fait le
+  build et les e2e ; le rendu (clair/sombre, 360/1280 px) est à regarder sur le dev.
+- PR + label `deploy:dev`, validation de Willem sur iPhone, puis release 0.1.1 et test du retour arrière.
+
+### Prochaine action exacte
+
+- Suivre la CI de la PR, puis poser le label `deploy:dev` et attendre le retour de Willem sur iPhone.
+
+### Points bloquants
+
+- Aucun ; le diagnostic iPhone est déduit du code, à confirmer sur le téléphone.
+
+---
+
 ## 2026-10-21 — Fin de phase 2 : prod 0.1.0 en ligne
 
 **Branche** : `fix/iphone-profil-0.1.0` (depuis `main` = 0.1.0).
