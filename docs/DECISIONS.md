@@ -6,7 +6,7 @@ de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision r
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
 choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase), environnements et pipeline
-(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072 et suivantes).
+(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072 et D-073), outillage (D-074).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -40,6 +40,7 @@ direction) ou **Willem**.
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
+| D-074 | Graphe graphify commité dans le dépôt ? | Willem | Oui : graphe, rapport, page HTML et manifeste ; cache ignoré |
 
 ---
 
@@ -598,3 +599,14 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Vérifié sur l'iPhone de Willem (dev, 2026-10-21)** : l'avatar ouvre le profil, et « Modifier mon profil » enregistre
   (`PUT /api/v1/me/profile` passe : le filtre ne vise que les fichiers). Le filtre lui-même n'est pas identifié.
 - **Statut** : validée.
+
+### D-074 — Graphe de connaissance graphify dans le dépôt
+- **Contexte** : Willem a construit avec graphify un graphe du dépôt (code par analyse syntaxique, docs et captures lues par
+  un modèle) pour s'orienter et interroger le projet d'une session à l'autre.
+- **Choix** : `graphify-out/` est commité avec `graph.json`, `GRAPH_REPORT.md`, `graph.html` et `manifest.json` (chemins
+  relatifs, rien de personnel). Le cache d'extraction, les fichiers d'état locaux (`.graphify_*`, chemin de l'interpréteur)
+  et `cost.json` sont ignorés. Le graphe est un instantané : il n'est pas vérifié par la CI et peut retarder sur le code.
+  Mise à jour : `/graphify . --update` (code seul : sans LLM ; docs modifiées : relues par un modèle).
+- **Alternatives** : tout ignorer (chacun reconstruit, ~600 k jetons pour une passe complète) ; commiter le cache aussi
+  (4 Mo de plus, mises à jour moins chères, mais bruit dans les diffs).
+- **Statut** : à valider (Willem).

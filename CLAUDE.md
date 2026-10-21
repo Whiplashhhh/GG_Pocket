@@ -61,6 +61,8 @@ dès qu'elles existent. Tiens cette section à jour.
   - e2e contre cette stack : `GG_SEED_PASSWORD=ci-only-demo-password pnpm e2e:stack` (Chromium) ;
   - scripts : `uvx --from shellcheck-py shellcheck -x --severity=warning deploy/scripts/*.sh deploy/scripts/server/*` ;
   - workflows : `actionlint` (binaire des releases GitHub de rhysd/actionlint).
+- Graphe de connaissance (`graphify-out/`, D-074) : `GRAPH_REPORT.md` pour s'orienter, `graph.html` dans un navigateur,
+  `graphify query "<question>"` pour interroger ; `/graphify . --update` après des changements notables (code seul : sans LLM).
 - Environnement de Claude Code (sans Java, Docker ni accès aux navigateurs Playwright, voir DECISIONS D-030) :
   `export PATH=$HOME/.local/bin:$PATH PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=$HOME/.local/bin/gg-chromium`,
   e2e locaux limités au projet `--project="Desktop Chrome"` ; le backend est validé par la CI.

@@ -1,0 +1,2198 @@
+{
+  ".github/scripts/changelog.py": {
+    "mtime": 1792534870.678871,
+    "seen": 1792613044.7889447,
+    "ast_hash": "6422ccda05813cfab357d844e440ad8d",
+    "semantic_hash": "6422ccda05813cfab357d844e440ad8d"
+  },
+  ".github/scripts/setup-github.sh": {
+    "mtime": 1792535932.540217,
+    "seen": 1792613044.7889562,
+    "ast_hash": "5ae156ffa7c741536f8b3cba66ae7fa4",
+    "semantic_hash": "5ae156ffa7c741536f8b3cba66ae7fa4"
+  },
+  "backend/mvnw": {
+    "mtime": 1792394459.6186745,
+    "seen": 1792613044.7889585,
+    "ast_hash": "ab50dd89da7da2346b28003352eeeeeb",
+    "semantic_hash": "ab50dd89da7da2346b28003352eeeeeb"
+  },
+  "backend/pom.xml": {
+    "mtime": 1792534870.681871,
+    "seen": 1792613044.7889595,
+    "ast_hash": "f23414c85e559b762793b9858e59471b",
+    "semantic_hash": "f23414c85e559b762793b9858e59471b"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/GgPocketApplication.java": {
+    "mtime": 1792394459.6192145,
+    "seen": 1792613044.7889605,
+    "ast_hash": "d3b3f515deaf4a7d3ffd76af6095d046",
+    "semantic_hash": "d3b3f515deaf4a7d3ffd76af6095d046"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/AuditController.java": {
+    "mtime": 1792528723.3054268,
+    "seen": 1792613044.7889616,
+    "ast_hash": "0c28199aeecf81ea1cd60d393333190a",
+    "semantic_hash": "0c28199aeecf81ea1cd60d393333190a"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/AuditEntryResponse.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.7889624,
+    "ast_hash": "d5ede8714bb3be1783cec0cd874b766b",
+    "semantic_hash": "d5ede8714bb3be1783cec0cd874b766b"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/AuditPageResponse.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.7889633,
+    "ast_hash": "a9356e9f949e13374e6b90f49314e463",
+    "semantic_hash": "a9356e9f949e13374e6b90f49314e463"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/MemberAdminController.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.788964,
+    "ast_hash": "77ab0d959e053c4c2f3c7ce0fc418a62",
+    "semantic_hash": "77ab0d959e053c4c2f3c7ce0fc418a62"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/MemberDetailResponse.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.7889647,
+    "ast_hash": "7552ce03bbf1ca9e61b0a3f2ff00204d",
+    "semantic_hash": "7552ce03bbf1ca9e61b0a3f2ff00204d"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/MemberSummaryResponse.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.7889657,
+    "ast_hash": "38cc1496f6e3da5ccdd7fd92863dba15",
+    "semantic_hash": "38cc1496f6e3da5ccdd7fd92863dba15"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/PasswordResetLinkResponse.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.7889667,
+    "ast_hash": "3fe5766c133befde947e9492534436a2",
+    "semantic_hash": "3fe5766c133befde947e9492534436a2"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/RegistrationCodeAdminController.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.7889674,
+    "ast_hash": "738af404c0ca0343d0356308e6e4baa6",
+    "semantic_hash": "738af404c0ca0343d0356308e6e4baa6"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/RegistrationCodeRequest.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.7889678,
+    "ast_hash": "49359c3e7a5f08b7712422fed7a0e3e2",
+    "semantic_hash": "49359c3e7a5f08b7712422fed7a0e3e2"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/RegistrationCodeResponse.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.788969,
+    "ast_hash": "36aa0c28a923d6a6e95b1022ecca9da3",
+    "semantic_hash": "36aa0c28a923d6a6e95b1022ecca9da3"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/RoleChangeRequest.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.7889698,
+    "ast_hash": "cfd5dae6c6171915cf7c8edacaf26ab3",
+    "semantic_hash": "cfd5dae6c6171915cf7c8edacaf26ab3"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/api/StatusChangeRequest.java": {
+    "mtime": 1792528723.305566,
+    "seen": 1792613044.7889702,
+    "ast_hash": "df7e06c9f4982547945f86f285680f2e",
+    "semantic_hash": "df7e06c9f4982547945f86f285680f2e"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/application/AuditLog.java": {
+    "mtime": 1792528723.306241,
+    "seen": 1792613044.788971,
+    "ast_hash": "1dfc96c326bab365c8794bdb4c974aec",
+    "semantic_hash": "1dfc96c326bab365c8794bdb4c974aec"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/application/AuditQueryService.java": {
+    "mtime": 1792528723.306326,
+    "seen": 1792613044.7889717,
+    "ast_hash": "a455fdb4ee7dec2db48b9ccf4dc886b5",
+    "semantic_hash": "a455fdb4ee7dec2db48b9ccf4dc886b5"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/application/MemberAdminService.java": {
+    "mtime": 1792528723.306326,
+    "seen": 1792613044.7889726,
+    "ast_hash": "2b4735c2cee35c2570f3d590a5533599",
+    "semantic_hash": "2b4735c2cee35c2570f3d590a5533599"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/application/RegistrationCodeAdminService.java": {
+    "mtime": 1792528723.306326,
+    "seen": 1792613044.7889733,
+    "ast_hash": "2b952d02f8cb2d45cb98f19831648a11",
+    "semantic_hash": "2b952d02f8cb2d45cb98f19831648a11"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/domain/AuditAction.java": {
+    "mtime": 1792528723.306326,
+    "seen": 1792613044.788974,
+    "ast_hash": "61aada68fdcbc3631a9310b6c2fee0de",
+    "semantic_hash": "61aada68fdcbc3631a9310b6c2fee0de"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/domain/AuditEntry.java": {
+    "mtime": 1792528723.306628,
+    "seen": 1792613044.788975,
+    "ast_hash": "7f8f80c050c5d2481d396b273280249e",
+    "semantic_hash": "7f8f80c050c5d2481d396b273280249e"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/domain/AuditTargetType.java": {
+    "mtime": 1792528723.306628,
+    "seen": 1792613044.788976,
+    "ast_hash": "7a594fe862c5c6241534af6f95e0c977",
+    "semantic_hash": "7a594fe862c5c6241534af6f95e0c977"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/admin/infra/AuditEntryRepository.java": {
+    "mtime": 1792528723.306628,
+    "seen": 1792613044.7889764,
+    "ast_hash": "e76a6f68b2d18c84e4c4d2f4017d8a68",
+    "semantic_hash": "e76a6f68b2d18c84e4c4d2f4017d8a68"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/AuthController.java": {
+    "mtime": 1792528723.3068604,
+    "seen": 1792613044.7889771,
+    "ast_hash": "beba78f62390f0802b246a09f3b57f37",
+    "semantic_hash": "beba78f62390f0802b246a09f3b57f37"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/AuthStateResponse.java": {
+    "mtime": 1792528723.3069644,
+    "seen": 1792613044.7889779,
+    "ast_hash": "50893782ab1483721900e924548217b6",
+    "semantic_hash": "50893782ab1483721900e924548217b6"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/ClientAddress.java": {
+    "mtime": 1792528723.3069644,
+    "seen": 1792613044.7889783,
+    "ast_hash": "5ffc48e70ea3326242efb2aeafd80f96",
+    "semantic_hash": "5ffc48e70ea3326242efb2aeafd80f96"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/CurrentMemberFilter.java": {
+    "mtime": 1792528723.3069644,
+    "seen": 1792613044.7889793,
+    "ast_hash": "d0a40631f67c381904b0120ce37e91ee",
+    "semantic_hash": "d0a40631f67c381904b0120ce37e91ee"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/DeviceResponse.java": {
+    "mtime": 1792528723.3069644,
+    "seen": 1792613044.78898,
+    "ast_hash": "87377e3954e3b0571e8a958ea5e4110e",
+    "semantic_hash": "87377e3954e3b0571e8a958ea5e4110e"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/LoginRequest.java": {
+    "mtime": 1792528723.3069644,
+    "seen": 1792613044.7889805,
+    "ast_hash": "d2a5f97a14bd3857ce35354365afa5ab",
+    "semantic_hash": "d2a5f97a14bd3857ce35354365afa5ab"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/MySecurityController.java": {
+    "mtime": 1792528723.307241,
+    "seen": 1792613044.7889812,
+    "ast_hash": "baa84e554afc98bda8efbb0178993df4",
+    "semantic_hash": "baa84e554afc98bda8efbb0178993df4"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/PasswordChangeRequest.java": {
+    "mtime": 1792528723.307241,
+    "seen": 1792613044.788982,
+    "ast_hash": "d808d9c7551b3cf30c7381655d3178d8",
+    "semantic_hash": "d808d9c7551b3cf30c7381655d3178d8"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/PasswordResetCheckRequest.java": {
+    "mtime": 1792528723.307241,
+    "seen": 1792613044.7889829,
+    "ast_hash": "9f99b2c774da85d87c16f1b1082466da",
+    "semantic_hash": "9f99b2c774da85d87c16f1b1082466da"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/PasswordResetRequest.java": {
+    "mtime": 1792528723.307241,
+    "seen": 1792613044.7889836,
+    "ast_hash": "04d4ca5339106391b4d9bc878e937cfd",
+    "semantic_hash": "04d4ca5339106391b4d9bc878e937cfd"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/PasswordResetTargetResponse.java": {
+    "mtime": 1792528723.307241,
+    "seen": 1792613044.7889843,
+    "ast_hash": "583c8d7c72039368e2a87a9b78bae86e",
+    "semantic_hash": "583c8d7c72039368e2a87a9b78bae86e"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/RegisterRequest.java": {
+    "mtime": 1792528723.307241,
+    "seen": 1792613044.788985,
+    "ast_hash": "ea39142a42c2f122b7150978e3091203",
+    "semantic_hash": "ea39142a42c2f122b7150978e3091203"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/RegistrationCodeCheckRequest.java": {
+    "mtime": 1792528723.307241,
+    "seen": 1792613044.7889855,
+    "ast_hash": "3ec74904dd2f34cb113ccc184ffb58a0",
+    "semantic_hash": "3ec74904dd2f34cb113ccc184ffb58a0"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/api/SessionEstablisher.java": {
+    "mtime": 1792528723.307241,
+    "seen": 1792613044.7889864,
+    "ast_hash": "6c4003e5a22b7e0a8c352950bd6eba8e",
+    "semantic_hash": "6c4003e5a22b7e0a8c352950bd6eba8e"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/application/DeviceService.java": {
+    "mtime": 1792528723.307241,
+    "seen": 1792613044.7889872,
+    "ast_hash": "8710bd5b5a7c76f6fa2415088b7b17ea",
+    "semantic_hash": "8710bd5b5a7c76f6fa2415088b7b17ea"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/application/FirstStartAdminCode.java": {
+    "mtime": 1792528723.307773,
+    "seen": 1792613044.7889876,
+    "ast_hash": "fb4a99cea90f71ebc36cf15c62c979e4",
+    "semantic_hash": "fb4a99cea90f71ebc36cf15c62c979e4"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/application/LoginService.java": {
+    "mtime": 1792528723.307773,
+    "seen": 1792613044.7889884,
+    "ast_hash": "2357bc2b1eff564481639b4c3c12a88c",
+    "semantic_hash": "2357bc2b1eff564481639b4c3c12a88c"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/application/PasswordChangeService.java": {
+    "mtime": 1792528723.307773,
+    "seen": 1792613044.788989,
+    "ast_hash": "35844db28d05e81d3a033a253ce741bc",
+    "semantic_hash": "35844db28d05e81d3a033a253ce741bc"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/application/PasswordResetService.java": {
+    "mtime": 1792528723.307773,
+    "seen": 1792613044.7889905,
+    "ast_hash": "0941aef612bc1026fdda67b7a21f7378",
+    "semantic_hash": "0941aef612bc1026fdda67b7a21f7378"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/application/Registration.java": {
+    "mtime": 1792528723.307773,
+    "seen": 1792613044.7889912,
+    "ast_hash": "f145a7b72d874015e84cb83054faaa27",
+    "semantic_hash": "f145a7b72d874015e84cb83054faaa27"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/application/RegistrationService.java": {
+    "mtime": 1792528723.307773,
+    "seen": 1792613044.7889917,
+    "ast_hash": "604a387b4662eaff400b8f7e43495a4a",
+    "semantic_hash": "604a387b4662eaff400b8f7e43495a4a"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/config/HeaderOnlyCsrfTokenRequestHandler.java": {
+    "mtime": 1792528723.307773,
+    "seen": 1792613044.7889924,
+    "ast_hash": "6768142470253d563cd3028c3e41c556",
+    "semantic_hash": "6768142470253d563cd3028c3e41c556"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/config/PasswordPolicyConfig.java": {
+    "mtime": 1792528723.308241,
+    "seen": 1792613044.7889934,
+    "ast_hash": "c02405fd956bc919406127d2bebd1d5a",
+    "semantic_hash": "c02405fd956bc919406127d2bebd1d5a"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/config/SecurityConfig.java": {
+    "mtime": 1792528723.308241,
+    "seen": 1792613044.788994,
+    "ast_hash": "8cf359e0a4c8fc40e6406e492c17a330",
+    "semantic_hash": "8cf359e0a4c8fc40e6406e492c17a330"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/config/SessionCookieConfig.java": {
+    "mtime": 1792528723.308241,
+    "seen": 1792613044.7889948,
+    "ast_hash": "7034b557116929654c563467966ef923",
+    "semantic_hash": "7034b557116929654c563467966ef923"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/domain/DeviceDescription.java": {
+    "mtime": 1792528723.308241,
+    "seen": 1792613044.7889955,
+    "ast_hash": "894d1b6c7769a220e7b7c5cef355cf08",
+    "semantic_hash": "894d1b6c7769a220e7b7c5cef355cf08"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/domain/PasswordPolicy.java": {
+    "mtime": 1792528723.3085077,
+    "seen": 1792613044.788996,
+    "ast_hash": "8958864ceb8708e791b22b716afae852",
+    "semantic_hash": "8958864ceb8708e791b22b716afae852"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/domain/PasswordResetToken.java": {
+    "mtime": 1792528723.3085077,
+    "seen": 1792613044.788997,
+    "ast_hash": "426d369a783199ccfa8b8b3cf3aff114",
+    "semantic_hash": "426d369a783199ccfa8b8b3cf3aff114"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/domain/RegistrationCode.java": {
+    "mtime": 1792528723.3085077,
+    "seen": 1792613044.7889977,
+    "ast_hash": "1fc98b0ef3550cd92cf986e537c7d70c",
+    "semantic_hash": "1fc98b0ef3550cd92cf986e537c7d70c"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/domain/RegistrationCodeFormat.java": {
+    "mtime": 1792528723.3085077,
+    "seen": 1792613044.7889984,
+    "ast_hash": "5ff77d35efe80d65e030de2b3b1eba5e",
+    "semantic_hash": "5ff77d35efe80d65e030de2b3b1eba5e"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/domain/SessionAttributes.java": {
+    "mtime": 1792528723.3085077,
+    "seen": 1792613044.7889988,
+    "ast_hash": "5577f6ea004b764fdd953b8fce249b9f",
+    "semantic_hash": "5577f6ea004b764fdd953b8fce249b9f"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/domain/Sha256.java": {
+    "mtime": 1792528723.3085077,
+    "seen": 1792613044.7889998,
+    "ast_hash": "26cc245ae3e29ea1845b5936b68ee90a",
+    "semantic_hash": "26cc245ae3e29ea1845b5936b68ee90a"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/domain/StoredSession.java": {
+    "mtime": 1792528723.3085077,
+    "seen": 1792613044.7890005,
+    "ast_hash": "125ae63f6ab6735a520d3413569091ec",
+    "semantic_hash": "125ae63f6ab6735a520d3413569091ec"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/infra/MemberSessionStore.java": {
+    "mtime": 1792528723.3085077,
+    "seen": 1792613044.789001,
+    "ast_hash": "4d42d80e003afb84bcaf7b84f1401338",
+    "semantic_hash": "4d42d80e003afb84bcaf7b84f1401338"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/infra/PasswordResetTokenRepository.java": {
+    "mtime": 1792528723.3089585,
+    "seen": 1792613044.7890017,
+    "ast_hash": "c5b4eb986aecf5af3991cfa2f7f0ff28",
+    "semantic_hash": "c5b4eb986aecf5af3991cfa2f7f0ff28"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/auth/infra/RegistrationCodeRepository.java": {
+    "mtime": 1792528723.3089585,
+    "seen": 1792613044.7890048,
+    "ast_hash": "155994435d06e5c5b88c422d049a2947",
+    "semantic_hash": "155994435d06e5c5b88c422d049a2947"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/api/CurrentMemberResponse.java": {
+    "mtime": 1792528723.3090882,
+    "seen": 1792613044.7890053,
+    "ast_hash": "2888177be31d8cc90509bbb2138d28e9",
+    "semantic_hash": "2888177be31d8cc90509bbb2138d28e9"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/api/MeController.java": {
+    "mtime": 1792528723.309161,
+    "seen": 1792613044.789006,
+    "ast_hash": "145fb2e8a41b6b6f2c51aac663dd7b39",
+    "semantic_hash": "145fb2e8a41b6b6f2c51aac663dd7b39"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/api/MediaController.java": {
+    "mtime": 1792528723.309161,
+    "seen": 1792613044.789007,
+    "ast_hash": "b569ab28a3085ea62d4ee9f1d7e8e991",
+    "semantic_hash": "b569ab28a3085ea62d4ee9f1d7e8e991"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/api/MediaUrls.java": {
+    "mtime": 1792528723.309241,
+    "seen": 1792613044.7890074,
+    "ast_hash": "6194f4807f3cd48149218bf2306704c7",
+    "semantic_hash": "6194f4807f3cd48149218bf2306704c7"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/api/MyProfileResponse.java": {
+    "mtime": 1792528723.309241,
+    "seen": 1792613044.7890081,
+    "ast_hash": "76268ac78672308356145fca42ff47f7",
+    "semantic_hash": "76268ac78672308356145fca42ff47f7"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/api/ProfileUpdateRequest.java": {
+    "mtime": 1792528723.309241,
+    "seen": 1792613044.7890089,
+    "ast_hash": "d04e60e03c353f7ce612035bc14f3dc1",
+    "semantic_hash": "d04e60e03c353f7ce612035bc14f3dc1"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/application/AvatarService.java": {
+    "mtime": 1792528723.309241,
+    "seen": 1792613044.7890096,
+    "ast_hash": "c1ba592b9f73ca0d810f5c52d00e1a7a",
+    "semantic_hash": "c1ba592b9f73ca0d810f5c52d00e1a7a"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/application/CurrentMemberView.java": {
+    "mtime": 1792528723.3095257,
+    "seen": 1792613044.7890103,
+    "ast_hash": "5a6978d51a69aaa74ed58c7e3fd13690",
+    "semantic_hash": "5a6978d51a69aaa74ed58c7e3fd13690"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/application/ImageSanitizer.java": {
+    "mtime": 1792528723.3095257,
+    "seen": 1792613044.789011,
+    "ast_hash": "3e6a045ef602ab0d553ec6dd0ebc9a38",
+    "semantic_hash": "3e6a045ef602ab0d553ec6dd0ebc9a38"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/application/MediaService.java": {
+    "mtime": 1792528723.3095257,
+    "seen": 1792613044.7890115,
+    "ast_hash": "3e1460f6434b3c1c1b7415f14e877ffc",
+    "semantic_hash": "3e1460f6434b3c1c1b7415f14e877ffc"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/application/MemberAccessService.java": {
+    "mtime": 1792528723.3095257,
+    "seen": 1792613044.7890122,
+    "ast_hash": "74eb73a59d5ae1d954f910442b35b16e",
+    "semantic_hash": "74eb73a59d5ae1d954f910442b35b16e"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/application/MyProfileService.java": {
+    "mtime": 1792528723.3095257,
+    "seen": 1792613044.789013,
+    "ast_hash": "56b0b02d40251780e5f3bd4d2cd92b1f",
+    "semantic_hash": "56b0b02d40251780e5f3bd4d2cd92b1f"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/application/MyProfileView.java": {
+    "mtime": 1792528723.3095257,
+    "seen": 1792613044.7890134,
+    "ast_hash": "877b0b3dd816851f83917faa617d4546",
+    "semantic_hash": "877b0b3dd816851f83917faa617d4546"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/application/ProfileChange.java": {
+    "mtime": 1792528723.3095257,
+    "seen": 1792613044.7890143,
+    "ast_hash": "91fb1a6f78898ef951c1ac6b7e90300c",
+    "semantic_hash": "91fb1a6f78898ef951c1ac6b7e90300c"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/application/UniqueMemberFields.java": {
+    "mtime": 1792528723.3095257,
+    "seen": 1792613044.7890148,
+    "ast_hash": "a198f6cbd1871d08e65f6831715ac85d",
+    "semantic_hash": "a198f6cbd1871d08e65f6831715ac85d"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/Age.java": {
+    "mtime": 1792528723.3095257,
+    "seen": 1792613044.7890155,
+    "ast_hash": "d495ad7df2209859ad9344cc265426f7",
+    "semantic_hash": "d495ad7df2209859ad9344cc265426f7"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/MediaFile.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890162,
+    "ast_hash": "b0ad72995a988ab0ec5c1a0e6d13878a",
+    "semantic_hash": "b0ad72995a988ab0ec5c1a0e6d13878a"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/MediaUsage.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890172,
+    "ast_hash": "6935cfb7496d33dddea5518d121bf884",
+    "semantic_hash": "6935cfb7496d33dddea5518d121bf884"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/Member.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.789018,
+    "ast_hash": "2c57c2ffb44710c099924add02069141",
+    "semantic_hash": "2c57c2ffb44710c099924add02069141"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/MemberAccess.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890186,
+    "ast_hash": "902c80eae21da36091b097064d6a8066",
+    "semantic_hash": "902c80eae21da36091b097064d6a8066"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/MemberDetails.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890193,
+    "ast_hash": "61508f1b30e6e53792ef8935df0d635b",
+    "semantic_hash": "61508f1b30e6e53792ef8935df0d635b"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/MemberGovernance.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890198,
+    "ast_hash": "52c2e8e83802c00e5412830b4703b170",
+    "semantic_hash": "52c2e8e83802c00e5412830b4703b170"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/MemberIdentity.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890208,
+    "ast_hash": "79d6fa9b24af7ead8cf28e1ac7ef9dde",
+    "semantic_hash": "79d6fa9b24af7ead8cf28e1ac7ef9dde"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/MemberPrincipal.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890215,
+    "ast_hash": "7a0b997bbfffed9af01aa6fb209dbf41",
+    "semantic_hash": "7a0b997bbfffed9af01aa6fb209dbf41"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/MemberStatus.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890224,
+    "ast_hash": "c407663bbf35c9e8005bb534f6bd595b",
+    "semantic_hash": "c407663bbf35c9e8005bb534f6bd595b"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/Nickname.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890236,
+    "ast_hash": "0718f765a51e477ba734d2636014bcf1",
+    "semantic_hash": "0718f765a51e477ba734d2636014bcf1"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/domain/Role.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890246,
+    "ast_hash": "745c2468f235b2f124e409b80aad1a3c",
+    "semantic_hash": "745c2468f235b2f124e409b80aad1a3c"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/infra/MediaFileRepository.java": {
+    "mtime": 1792528723.3102133,
+    "seen": 1792613044.7890253,
+    "ast_hash": "7442ebea57c1203d3d31b816839cf61d",
+    "semantic_hash": "7442ebea57c1203d3d31b816839cf61d"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/infra/MediaStorage.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.789026,
+    "ast_hash": "c40f681b5b39c3346f2eeffb2461981e",
+    "semantic_hash": "c40f681b5b39c3346f2eeffb2461981e"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/member/infra/MemberRepository.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.7890265,
+    "ast_hash": "73de4c54294212c2cafb4d1650606caf",
+    "semantic_hash": "73de4c54294212c2cafb4d1650606caf"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/api/error/ApiExceptionHandler.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.7890272,
+    "ast_hash": "56b767b32708dfb1ff1b99f934d09ca0",
+    "semantic_hash": "56b767b32708dfb1ff1b99f934d09ca0"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/api/error/FieldViolation.java": {
+    "mtime": 1792394459.6195142,
+    "seen": 1792613044.789028,
+    "ast_hash": "88f22c8b8e9c0a9b3794f9e4957fd5f4",
+    "semantic_hash": "88f22c8b8e9c0a9b3794f9e4957fd5f4"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/api/error/ProblemDetailsSecurityErrorHandler.java": {
+    "mtime": 1792394459.6195142,
+    "seen": 1792613044.789029,
+    "ast_hash": "dc4e94ef8415b2ba75ea1ed7ba493536",
+    "semantic_hash": "dc4e94ef8415b2ba75ea1ed7ba493536"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/api/meta/MetaController.java": {
+    "mtime": 1792394459.6195142,
+    "seen": 1792613044.7890296,
+    "ast_hash": "2b3bc5e9fb7160d9791d35dca4aa6104",
+    "semantic_hash": "2b3bc5e9fb7160d9791d35dca4aa6104"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/api/meta/MetaResponse.java": {
+    "mtime": 1792394459.6197011,
+    "seen": 1792613044.7890303,
+    "ast_hash": "db4599917f6115d29f6240a95b75ab5d",
+    "semantic_hash": "db4599917f6115d29f6240a95b75ab5d"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/application/AppMetadata.java": {
+    "mtime": 1792394459.6197011,
+    "seen": 1792613044.7890313,
+    "ast_hash": "60838aa1da4469a7b2632d5a7d0bd156",
+    "semantic_hash": "60838aa1da4469a7b2632d5a7d0bd156"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/application/AppMetadataService.java": {
+    "mtime": 1792394459.6198287,
+    "seen": 1792613044.7890322,
+    "ast_hash": "26cc3b43fdcc60d15972266393e90e9c",
+    "semantic_hash": "26cc3b43fdcc60d15972266393e90e9c"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/application/InstanceMarkerGuard.java": {
+    "mtime": 1792394459.6198287,
+    "seen": 1792613044.7890332,
+    "ast_hash": "0873c340c16a76a69f264069a430b3ef",
+    "semantic_hash": "0873c340c16a76a69f264069a430b3ef"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/application/RateLimiter.java": {
+    "mtime": 1792534870.681871,
+    "seen": 1792613044.7890337,
+    "ast_hash": "d576ef51bdc907eaf5bd18d0f25820f1",
+    "semantic_hash": "d576ef51bdc907eaf5bd18d0f25820f1"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/config/DeploymentGuardConfig.java": {
+    "mtime": 1792534870.681871,
+    "seen": 1792613044.7890346,
+    "ast_hash": "e47908216c9e7f3b3e8aea5b4980756a",
+    "semantic_hash": "e47908216c9e7f3b3e8aea5b4980756a"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/config/GgProperties.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.7890353,
+    "ast_hash": "2cca3b1fcdd38536425665bfed0fcb22",
+    "semantic_hash": "2cca3b1fcdd38536425665bfed0fcb22"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/config/JpaConfig.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.7890358,
+    "ast_hash": "84d01525df80b66d1e7ed64e3d2abf69",
+    "semantic_hash": "84d01525df80b66d1e7ed64e3d2abf69"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/config/OpenApiConfig.java": {
+    "mtime": 1792394459.6200528,
+    "seen": 1792613044.7890365,
+    "ast_hash": "0275a079b33b668cd9a8abd202c52c9d",
+    "semantic_hash": "0275a079b33b668cd9a8abd202c52c9d"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/config/TimeConfig.java": {
+    "mtime": 1792394459.6200528,
+    "seen": 1792613044.7890372,
+    "ast_hash": "59692d6fac0db2f8fcdb1e5bcabbbfb6",
+    "semantic_hash": "59692d6fac0db2f8fcdb1e5bcabbbfb6"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/BusinessException.java": {
+    "mtime": 1792394459.6200528,
+    "seen": 1792613044.789038,
+    "ast_hash": "626b4ee25c7c1d4c22ee4a5dc3861994",
+    "semantic_hash": "626b4ee25c7c1d4c22ee4a5dc3861994"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/ClubTime.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.7890387,
+    "ast_hash": "6034f972c24ae2ba69d7206db88a5bce",
+    "semantic_hash": "6034f972c24ae2ba69d7206db88a5bce"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/DatabaseSettingsCheck.java": {
+    "mtime": 1792534870.681871,
+    "seen": 1792613044.7890394,
+    "ast_hash": "73f7c0cb93802755d804c0c745003b35",
+    "semantic_hash": "73f7c0cb93802755d804c0c745003b35"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/DeploymentEnvironment.java": {
+    "mtime": 1792394459.6206868,
+    "seen": 1792613044.7890399,
+    "ast_hash": "7857659b0810f38f0abe8820af78d27b",
+    "semantic_hash": "7857659b0810f38f0abe8820af78d27b"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/EnvironmentMismatchException.java": {
+    "mtime": 1792394459.6206868,
+    "seen": 1792613044.7890406,
+    "ast_hash": "7f7506710658f079448337d79222f319",
+    "semantic_hash": "7f7506710658f079448337d79222f319"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/ErrorCategory.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.7890415,
+    "ast_hash": "86dff1e9b2a9fa733ec72a0f101c84c8",
+    "semantic_hash": "86dff1e9b2a9fa733ec72a0f101c84c8"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/ErrorCode.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.7890422,
+    "ast_hash": "735c571cea075bf8126bbe09cd122027",
+    "semantic_hash": "735c571cea075bf8126bbe09cd122027"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/InstanceMarker.java": {
+    "mtime": 1792394459.6206868,
+    "seen": 1792613044.789043,
+    "ast_hash": "3195c2868f96c789829c88a97dd42b42",
+    "semantic_hash": "3195c2868f96c789829c88a97dd42b42"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/RateLimitedException.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.7890437,
+    "ast_hash": "3eb4c7f4492c6660694c33e9ec850e1c",
+    "semantic_hash": "3eb4c7f4492c6660694c33e9ec850e1c"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/domain/TimestampedEntity.java": {
+    "mtime": 1792528723.3108387,
+    "seen": 1792613044.7890441,
+    "ast_hash": "6e7a7a0ae346f9d3aef74ac3dc9fbb39",
+    "semantic_hash": "6e7a7a0ae346f9d3aef74ac3dc9fbb39"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/platform/infra/InstanceMarkerRepository.java": {
+    "mtime": 1792394459.6206868,
+    "seen": 1792613044.7890453,
+    "ast_hash": "8c180d277d470aa76ec5ec3eba770b81",
+    "semantic_hash": "8c180d277d470aa76ec5ec3eba770b81"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/seed/application/DemoSeeder.java": {
+    "mtime": 1792534870.681871,
+    "seen": 1792613044.7890463,
+    "ast_hash": "fcf11cac95ce93e057fc15da25afeaf0",
+    "semantic_hash": "fcf11cac95ce93e057fc15da25afeaf0"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/seed/domain/DemoSeedGuard.java": {
+    "mtime": 1792528723.311904,
+    "seen": 1792613044.789047,
+    "ast_hash": "aee56e665919e0eaf80451205d2980bb",
+    "semantic_hash": "aee56e665919e0eaf80451205d2980bb"
+  },
+  "backend/src/main/java/fr/gravelinesgrimp/pocket/seed/infra/DemoSeedRegistry.java": {
+    "mtime": 1792528723.311904,
+    "seen": 1792613044.7890477,
+    "ast_hash": "f2058df23d3094c5178a8b9f052da5fd",
+    "semantic_hash": "f2058df23d3094c5178a8b9f052da5fd"
+  },
+  "backend/src/main/resources/db/migration/V1__create_instance_marker.sql": {
+    "mtime": 1792394459.6215627,
+    "seen": 1792613044.7890484,
+    "ast_hash": "f62f643d2be410a7de4ac60950069821",
+    "semantic_hash": "f62f643d2be410a7de4ac60950069821"
+  },
+  "backend/src/main/resources/db/migration/V2__create_member_and_media.sql": {
+    "mtime": 1792528723.3122408,
+    "seen": 1792613044.7890491,
+    "ast_hash": "7a43e3bdda09fc405bc0e7affd57362a",
+    "semantic_hash": "7a43e3bdda09fc405bc0e7affd57362a"
+  },
+  "backend/src/main/resources/db/migration/V3__create_spring_session.sql": {
+    "mtime": 1792528723.3122408,
+    "seen": 1792613044.78905,
+    "ast_hash": "b10db48b52d0e32a347565499e9b0e2d",
+    "semantic_hash": "b10db48b52d0e32a347565499e9b0e2d"
+  },
+  "backend/src/main/resources/db/migration/V4__create_registration_and_reset.sql": {
+    "mtime": 1792528723.3122408,
+    "seen": 1792613044.789051,
+    "ast_hash": "02be078f8f4da4224035769ca547c525",
+    "semantic_hash": "02be078f8f4da4224035769ca547c525"
+  },
+  "backend/src/main/resources/db/migration/V5__create_audit_log.sql": {
+    "mtime": 1792528723.3122408,
+    "seen": 1792613044.789052,
+    "ast_hash": "4bb42f8a09ca9453981f438506349bfa",
+    "semantic_hash": "4bb42f8a09ca9453981f438506349bfa"
+  },
+  "backend/src/main/resources/db/migration/V6__create_demo_seed_entry.sql": {
+    "mtime": 1792528723.3122408,
+    "seen": 1792613044.7890525,
+    "ast_hash": "658e53a4e25cfc498c121ee670082889",
+    "semantic_hash": "658e53a4e25cfc498c121ee670082889"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/IntegrationTest.java": {
+    "mtime": 1792528723.313241,
+    "seen": 1792613044.7890532,
+    "ast_hash": "7877a1f9c057a0035909952ac3944834",
+    "semantic_hash": "7877a1f9c057a0035909952ac3944834"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/MemberFixtures.java": {
+    "mtime": 1792528723.313241,
+    "seen": 1792613044.789054,
+    "ast_hash": "7b00baae181373d2e14290b21a355b01",
+    "semantic_hash": "7b00baae181373d2e14290b21a355b01"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/RepositoryFiles.java": {
+    "mtime": 1792394459.6219597,
+    "seen": 1792613044.7890544,
+    "ast_hash": "2fb50194a8afc98177c2f8e152323993",
+    "semantic_hash": "2fb50194a8afc98177c2f8e152323993"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/TestGgPocketApplication.java": {
+    "mtime": 1792394459.6219597,
+    "seen": 1792613044.7890553,
+    "ast_hash": "d5fccddaa4e1834840b6df58093ff18d",
+    "semantic_hash": "d5fccddaa4e1834840b6df58093ff18d"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/TestcontainersConfiguration.java": {
+    "mtime": 1792394459.6219597,
+    "seen": 1792613044.789056,
+    "ast_hash": "d33a16531b45cee521743ded4ebc88dd",
+    "semantic_hash": "d33a16531b45cee521743ded4ebc88dd"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/admin/api/MemberAdminIT.java": {
+    "mtime": 1792528723.3134801,
+    "seen": 1792613044.7890565,
+    "ast_hash": "b0fa191583f4acba6f8e36e479b1da1b",
+    "semantic_hash": "b0fa191583f4acba6f8e36e479b1da1b"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/admin/api/RegistrationCodeAdminIT.java": {
+    "mtime": 1792528723.3137057,
+    "seen": 1792613044.7890573,
+    "ast_hash": "1e19032f985a882324bae541c055d21e",
+    "semantic_hash": "1e19032f985a882324bae541c055d21e"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/admin/application/AuditCursorTest.java": {
+    "mtime": 1792528723.3137057,
+    "seen": 1792613044.7890577,
+    "ast_hash": "eaab4f00ce2dd455e689f4ffe474272c",
+    "semantic_hash": "eaab4f00ce2dd455e689f4ffe474272c"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/architecture/ArchitectureTest.java": {
+    "mtime": 1792394459.6219597,
+    "seen": 1792613044.7890584,
+    "ast_hash": "ff5be5dae4a3446dbdfc5ff5b7a7f726",
+    "semantic_hash": "ff5be5dae4a3446dbdfc5ff5b7a7f726"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/api/AuthFlowIT.java": {
+    "mtime": 1792528723.313979,
+    "seen": 1792613044.7890594,
+    "ast_hash": "829b01802d8479e6b72ceb133907e673",
+    "semantic_hash": "829b01802d8479e6b72ceb133907e673"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/api/ClientAddressTest.java": {
+    "mtime": 1792528723.314109,
+    "seen": 1792613044.78906,
+    "ast_hash": "466de07b3b92f883c5841841efbd1aed",
+    "semantic_hash": "466de07b3b92f883c5841841efbd1aed"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/api/CurrentMemberFilterTest.java": {
+    "mtime": 1792528723.314109,
+    "seen": 1792613044.7890606,
+    "ast_hash": "fbaf99c26398c854f2ef6d4de3dbda05",
+    "semantic_hash": "fbaf99c26398c854f2ef6d4de3dbda05"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/api/RateLimitIT.java": {
+    "mtime": 1792528723.314241,
+    "seen": 1792613044.7890613,
+    "ast_hash": "aa32e9a4003e59351eb5416845fe6c44",
+    "semantic_hash": "aa32e9a4003e59351eb5416845fe6c44"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/api/SessionsIT.java": {
+    "mtime": 1792528723.314241,
+    "seen": 1792613044.7890623,
+    "ast_hash": "5f9746bcf6af0c0c3d5c6f34aa83e94b",
+    "semantic_hash": "5f9746bcf6af0c0c3d5c6f34aa83e94b"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/application/FirstStartAdminCodeIT.java": {
+    "mtime": 1792528723.314241,
+    "seen": 1792613044.789063,
+    "ast_hash": "12925e4f2fec55508250c450884fb527",
+    "semantic_hash": "12925e4f2fec55508250c450884fb527"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/application/FirstStartAdminCodeTest.java": {
+    "mtime": 1792528723.3145375,
+    "seen": 1792613044.7890635,
+    "ast_hash": "9186c5ebcb214d00ddb5bce1c18151a0",
+    "semantic_hash": "9186c5ebcb214d00ddb5bce1c18151a0"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/domain/DeviceDescriptionTest.java": {
+    "mtime": 1792528723.3145375,
+    "seen": 1792613044.7890642,
+    "ast_hash": "1dc2c3e9255ead66e95cf61d8cf845f6",
+    "semantic_hash": "1dc2c3e9255ead66e95cf61d8cf845f6"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/domain/PasswordPolicyTest.java": {
+    "mtime": 1792528723.3147552,
+    "seen": 1792613044.7890646,
+    "ast_hash": "248e3172d91f53936d70765fc83c9232",
+    "semantic_hash": "248e3172d91f53936d70765fc83c9232"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/auth/domain/RegistrationCodeTest.java": {
+    "mtime": 1792528723.3147552,
+    "seen": 1792613044.7890654,
+    "ast_hash": "3f73ba684d81f59bc8bed0b8c4f51b34",
+    "semantic_hash": "3f73ba684d81f59bc8bed0b8c4f51b34"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/member/api/MeIT.java": {
+    "mtime": 1792528723.3149285,
+    "seen": 1792613044.7890663,
+    "ast_hash": "bac161a7014f53ddf9da1f09d3bbeab6",
+    "semantic_hash": "bac161a7014f53ddf9da1f09d3bbeab6"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/member/application/ImageSanitizerTest.java": {
+    "mtime": 1792528723.3152409,
+    "seen": 1792613044.789067,
+    "ast_hash": "9e1180c5415595e3f3068ad0a8032826",
+    "semantic_hash": "9e1180c5415595e3f3068ad0a8032826"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/member/domain/MemberGovernanceTest.java": {
+    "mtime": 1792528723.3152409,
+    "seen": 1792613044.7890675,
+    "ast_hash": "c775fcb6c7cd554e02ea6f894be071ad",
+    "semantic_hash": "c775fcb6c7cd554e02ea6f894be071ad"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/member/domain/NicknameAndAgeTest.java": {
+    "mtime": 1792528723.315417,
+    "seen": 1792613044.7890682,
+    "ast_hash": "6b7a97eeb252613c2bb42379661c2463",
+    "semantic_hash": "6b7a97eeb252613c2bb42379661c2463"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/platform/api/OpenApiContractIT.java": {
+    "mtime": 1792394459.622465,
+    "seen": 1792613044.789069,
+    "ast_hash": "be1fb11b7930e5f73c76a5452de34b3f",
+    "semantic_hash": "be1fb11b7930e5f73c76a5452de34b3f"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/platform/api/error/ApiErrorsIT.java": {
+    "mtime": 1792528723.315417,
+    "seen": 1792613044.7890697,
+    "ast_hash": "141af21f084826524f5dc4efdc4ef0f6",
+    "semantic_hash": "141af21f084826524f5dc4efdc4ef0f6"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/platform/api/error/ApiExceptionHandlerTest.java": {
+    "mtime": 1792394459.6227355,
+    "seen": 1792613044.7890704,
+    "ast_hash": "1cf07bf94c4b8ff88a28d8f0ab7bb7f1",
+    "semantic_hash": "1cf07bf94c4b8ff88a28d8f0ab7bb7f1"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/platform/api/meta/MetaControllerIT.java": {
+    "mtime": 1792394459.6227355,
+    "seen": 1792613044.789071,
+    "ast_hash": "196e96ac3e07bf7c1fa69144a487040a",
+    "semantic_hash": "196e96ac3e07bf7c1fa69144a487040a"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/platform/application/AppMetadataServiceTest.java": {
+    "mtime": 1792528723.315417,
+    "seen": 1792613044.7890716,
+    "ast_hash": "66f0673927459d117eea774b36dfe5fd",
+    "semantic_hash": "66f0673927459d117eea774b36dfe5fd"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/platform/application/InstanceMarkerGuardIT.java": {
+    "mtime": 1792394459.6231031,
+    "seen": 1792613044.7890723,
+    "ast_hash": "b16c33e42ca962a18c92e86446a5698b",
+    "semantic_hash": "b16c33e42ca962a18c92e86446a5698b"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/platform/application/InstanceMarkerGuardTest.java": {
+    "mtime": 1792528723.315417,
+    "seen": 1792613044.7890732,
+    "ast_hash": "a845fad441850c3b512fc6bf7e8934fc",
+    "semantic_hash": "a845fad441850c3b512fc6bf7e8934fc"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/platform/application/RateLimiterTest.java": {
+    "mtime": 1792534870.6828709,
+    "seen": 1792613044.7890737,
+    "ast_hash": "e97361afeb285a66d8cb15855fda7a7e",
+    "semantic_hash": "e97361afeb285a66d8cb15855fda7a7e"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/platform/domain/DatabaseSettingsCheckTest.java": {
+    "mtime": 1792534870.6828709,
+    "seen": 1792613044.7890744,
+    "ast_hash": "77fae04defeab24a0fc36005848efb29",
+    "semantic_hash": "77fae04defeab24a0fc36005848efb29"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/security/AuthorizationMatrixIT.java": {
+    "mtime": 1792528723.316241,
+    "seen": 1792613044.7890751,
+    "ast_hash": "89d94d07b77954f48e3b1f48fe6d1e06",
+    "semantic_hash": "89d94d07b77954f48e3b1f48fe6d1e06"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/seed/application/DemoSeederDeployedDevIT.java": {
+    "mtime": 1792534870.6828709,
+    "seen": 1792613044.7890759,
+    "ast_hash": "0b48065d3a8bfcf55b17e30c5265c2b9",
+    "semantic_hash": "0b48065d3a8bfcf55b17e30c5265c2b9"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/seed/application/DemoSeederIT.java": {
+    "mtime": 1792528723.3163853,
+    "seen": 1792613044.7890768,
+    "ast_hash": "e095c45d0eea186188aafcc3aa1f0b25",
+    "semantic_hash": "e095c45d0eea186188aafcc3aa1f0b25"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/pocket/seed/domain/DemoSeedGuardTest.java": {
+    "mtime": 1792528723.3163853,
+    "seen": 1792613044.7890773,
+    "ast_hash": "6b0f4fb74766f6c1156947d2f367c7a6",
+    "semantic_hash": "6b0f4fb74766f6c1156947d2f367c7a6"
+  },
+  "backend/src/test/java/fr/gravelinesgrimp/testsupport/ErrorProbeController.java": {
+    "mtime": 1792394459.6231031,
+    "seen": 1792613044.789078,
+    "ast_hash": "69fb8c6448f18d06a8b1bc7bfe71a244",
+    "semantic_hash": "69fb8c6448f18d06a8b1bc7bfe71a244"
+  },
+  "deploy/db-init/10-app-role.sh": {
+    "mtime": 1792534870.6828709,
+    "seen": 1792613044.7890787,
+    "ast_hash": "7d40c933f70080530ba3e534c9102459",
+    "semantic_hash": "7d40c933f70080530ba3e534c9102459"
+  },
+  "deploy/scripts/backup-health.sh": {
+    "mtime": 1792534870.6841938,
+    "seen": 1792613044.7890797,
+    "ast_hash": "93a3a189a74c22cc65763ed8ef6e29ee",
+    "semantic_hash": "93a3a189a74c22cc65763ed8ef6e29ee"
+  },
+  "deploy/scripts/backup-loop.sh": {
+    "mtime": 1792534870.6844418,
+    "seen": 1792613044.7890804,
+    "ast_hash": "db9e740a0069672bfdb0cb1bc05797ef",
+    "semantic_hash": "db9e740a0069672bfdb0cb1bc05797ef"
+  },
+  "deploy/scripts/backup-now.sh": {
+    "mtime": 1792534870.6844418,
+    "seen": 1792613044.789081,
+    "ast_hash": "2aa7b7253f22efe435dfb0ef913d8751",
+    "semantic_hash": "2aa7b7253f22efe435dfb0ef913d8751"
+  },
+  "deploy/scripts/backup.sh": {
+    "mtime": 1792534870.6844418,
+    "seen": 1792613044.7890818,
+    "ast_hash": "9dd233a9ebdc199a6bc0984c7cd34bbd",
+    "semantic_hash": "9dd233a9ebdc199a6bc0984c7cd34bbd"
+  },
+  "deploy/scripts/ci-restore-test.sh": {
+    "mtime": 1792534870.6844418,
+    "seen": 1792613044.7890825,
+    "ast_hash": "8c31d84378c5ed0bbf9b480fba88c2d4",
+    "semantic_hash": "8c31d84378c5ed0bbf9b480fba88c2d4"
+  },
+  "deploy/scripts/deploy.sh": {
+    "mtime": 1792534870.6844418,
+    "seen": 1792613044.7890835,
+    "ast_hash": "ccdbf6ff310942bd1f0e4fe01d333c63",
+    "semantic_hash": "ccdbf6ff310942bd1f0e4fe01d333c63"
+  },
+  "deploy/scripts/lib.sh": {
+    "mtime": 1792534870.6844418,
+    "seen": 1792613044.7890842,
+    "ast_hash": "374aa8cb815d89c831da7c5496ed8119",
+    "semantic_hash": "374aa8cb815d89c831da7c5496ed8119"
+  },
+  "deploy/scripts/restore-data.sh": {
+    "mtime": 1792534870.6844418,
+    "seen": 1792613044.789085,
+    "ast_hash": "f734a7cfa45b5c3292a1110a16a65464",
+    "semantic_hash": "f734a7cfa45b5c3292a1110a16a65464"
+  },
+  "deploy/scripts/restore.sh": {
+    "mtime": 1792534870.6844418,
+    "seen": 1792613044.7890866,
+    "ast_hash": "88c7625fe08f2fae91d9a397e1f1537c",
+    "semantic_hash": "88c7625fe08f2fae91d9a397e1f1537c"
+  },
+  "deploy/scripts/rollback.sh": {
+    "mtime": 1792534870.6844418,
+    "seen": 1792613044.7890873,
+    "ast_hash": "0911fd3c282dc16ffd1ce8be780b0a04",
+    "semantic_hash": "0911fd3c282dc16ffd1ce8be780b0a04"
+  },
+  "deploy/scripts/server/bootstrap.sh": {
+    "mtime": 1792535932.5412169,
+    "seen": 1792613044.789088,
+    "ast_hash": "b3b5dcd1f63f80a2d4f4c980fca81ca0",
+    "semantic_hash": "b3b5dcd1f63f80a2d4f4c980fca81ca0"
+  },
+  "deploy/scripts/server/gg-deploy": {
+    "mtime": 1792534870.6849136,
+    "seen": 1792613044.7890885,
+    "ast_hash": "bdba12704defc7165f3489d98ad3119f",
+    "semantic_hash": "bdba12704defc7165f3489d98ad3119f"
+  },
+  "frontend/.prettierrc.json": {
+    "mtime": 1792394459.6319652,
+    "seen": 1792613044.7890892,
+    "ast_hash": "2f6da060d3eea2eb4dfe130340966208",
+    "semantic_hash": "2f6da060d3eea2eb4dfe130340966208"
+  },
+  "frontend/e2e-stack/stack.spec.ts": {
+    "mtime": 1792619671.8631797,
+    "seen": 1792619944.447451,
+    "ast_hash": "fbb673d6a9efac75434cd48bc1eb33e5",
+    "semantic_hash": "fbb673d6a9efac75434cd48bc1eb33e5"
+  },
+  "frontend/e2e/accounts.spec.ts": {
+    "mtime": 1792528723.3292408,
+    "seen": 1792613044.7890906,
+    "ast_hash": "d8e28ee4ab8876e62d8e84ca373ad682",
+    "semantic_hash": "d8e28ee4ab8876e62d8e84ca373ad682"
+  },
+  "frontend/e2e/app-shell.spec.ts": {
+    "mtime": 1792619671.8632758,
+    "seen": 1792619944.4474533,
+    "ast_hash": "4520b041470a2abf683513de0d18f5f9",
+    "semantic_hash": "4520b041470a2abf683513de0d18f5f9"
+  },
+  "frontend/e2e/fakeClub.ts": {
+    "mtime": 1792528723.330241,
+    "seen": 1792613044.789092,
+    "ast_hash": "4aef6343c1b6537cf5901880dc44e280",
+    "semantic_hash": "4aef6343c1b6537cf5901880dc44e280"
+  },
+  "frontend/e2e/fixtures.ts": {
+    "mtime": 1792528723.330241,
+    "seen": 1792613044.7890928,
+    "ast_hash": "7777c0adf4d6503356e7a3dd2bc41ec7",
+    "semantic_hash": "7777c0adf4d6503356e7a3dd2bc41ec7"
+  },
+  "frontend/e2e/management.spec.ts": {
+    "mtime": 1792528723.3306148,
+    "seen": 1792613044.7890937,
+    "ast_hash": "a9e52e1f43fa5547e23dcb16d43a45cc",
+    "semantic_hash": "a9e52e1f43fa5547e23dcb16d43a45cc"
+  },
+  "frontend/e2e/screenshots.spec.ts": {
+    "mtime": 1792528723.3306148,
+    "seen": 1792613044.7890942,
+    "ast_hash": "437198521976b334d9046d16a5c5285e",
+    "semantic_hash": "437198521976b334d9046d16a5c5285e"
+  },
+  "frontend/env.d.ts": {
+    "mtime": 1792528723.3306148,
+    "seen": 1792613044.789095,
+    "ast_hash": "69e86846adce8a31bcdfc2898b931c98",
+    "semantic_hash": "69e86846adce8a31bcdfc2898b931c98"
+  },
+  "frontend/eslint.config.js": {
+    "mtime": 1792528723.3306148,
+    "seen": 1792613044.7890954,
+    "ast_hash": "3c8bb330d7c4408bf19e9fc59eb82fba",
+    "semantic_hash": "3c8bb330d7c4408bf19e9fc59eb82fba"
+  },
+  "frontend/package.json": {
+    "mtime": 1792619671.8632758,
+    "seen": 1792619944.44746,
+    "ast_hash": "3a9263402c8454acd83e71d25a453bb3",
+    "semantic_hash": "3a9263402c8454acd83e71d25a453bb3"
+  },
+  "frontend/playwright.config.ts": {
+    "mtime": 1792528723.3313515,
+    "seen": 1792613044.789097,
+    "ast_hash": "25e6375d7be537504693181f3adfd349",
+    "semantic_hash": "25e6375d7be537504693181f3adfd349"
+  },
+  "frontend/playwright.screenshots.config.ts": {
+    "mtime": 1792394459.6321454,
+    "seen": 1792613044.7890978,
+    "ast_hash": "dcaea57afd8a26033970c57418f17887",
+    "semantic_hash": "dcaea57afd8a26033970c57418f17887"
+  },
+  "frontend/playwright.stack.config.ts": {
+    "mtime": 1792534870.6876144,
+    "seen": 1792613044.7890995,
+    "ast_hash": "68ff4b0048d52efd8853928362c6160a",
+    "semantic_hash": "68ff4b0048d52efd8853928362c6160a"
+  },
+  "frontend/public/theme-init.js": {
+    "mtime": 1792394459.6334069,
+    "seen": 1792613044.7891002,
+    "ast_hash": "c11973e35aaca632e498c0c694a65c7a",
+    "semantic_hash": "c11973e35aaca632e498c0c694a65c7a"
+  },
+  "frontend/src/App.vue": {
+    "mtime": 1792619671.864046,
+    "seen": 1792619944.4474647,
+    "ast_hash": "442df42123363ebd064044dbaff28e41",
+    "semantic_hash": "442df42123363ebd064044dbaff28e41"
+  },
+  "frontend/src/api/admin.ts": {
+    "mtime": 1792528723.3362408,
+    "seen": 1792613044.7891018,
+    "ast_hash": "c2b8f6056c33dfe57625675749c2886a",
+    "semantic_hash": "c2b8f6056c33dfe57625675749c2886a"
+  },
+  "frontend/src/api/auth.ts": {
+    "mtime": 1792528723.3362408,
+    "seen": 1792613044.7891028,
+    "ast_hash": "a044a82be9ed2af1a33ceb62cb5cb541",
+    "semantic_hash": "a044a82be9ed2af1a33ceb62cb5cb541"
+  },
+  "frontend/src/api/client.ts": {
+    "mtime": 1792528723.3362408,
+    "seen": 1792613044.7891035,
+    "ast_hash": "4a14ca6edc30304cc24656fb7513705b",
+    "semantic_hash": "4a14ca6edc30304cc24656fb7513705b"
+  },
+  "frontend/src/api/csrf.spec.ts": {
+    "mtime": 1792528723.3362408,
+    "seen": 1792613044.7891045,
+    "ast_hash": "4da1f7685e80c9c835820bfb478f9e6a",
+    "semantic_hash": "4da1f7685e80c9c835820bfb478f9e6a"
+  },
+  "frontend/src/api/csrf.ts": {
+    "mtime": 1792528723.3362408,
+    "seen": 1792613044.7891052,
+    "ast_hash": "4bfae23a3cf3fed6b376cfb0e9b5c241",
+    "semantic_hash": "4bfae23a3cf3fed6b376cfb0e9b5c241"
+  },
+  "frontend/src/api/errors.spec.ts": {
+    "mtime": 1792528723.3362408,
+    "seen": 1792613044.7891057,
+    "ast_hash": "37ecfe1a8d1197509fbd9e3441dffdb1",
+    "semantic_hash": "37ecfe1a8d1197509fbd9e3441dffdb1"
+  },
+  "frontend/src/api/errors.ts": {
+    "mtime": 1792528723.3362408,
+    "seen": 1792613044.7891064,
+    "ast_hash": "bf60ce302ab6dc9a5a3eaeed00c720b8",
+    "semantic_hash": "bf60ce302ab6dc9a5a3eaeed00c720b8"
+  },
+  "frontend/src/api/me.ts": {
+    "mtime": 1792528723.337241,
+    "seen": 1792613044.789107,
+    "ast_hash": "82d460a2f2669ffafff8affe4dbb0ee6",
+    "semantic_hash": "82d460a2f2669ffafff8affe4dbb0ee6"
+  },
+  "frontend/src/api/meta.ts": {
+    "mtime": 1792394459.6347628,
+    "seen": 1792613044.789108,
+    "ast_hash": "650cad1c73b29e4a33e33e40473e7fa7",
+    "semantic_hash": "650cad1c73b29e4a33e33e40473e7fa7"
+  },
+  "frontend/src/api/openapi.json": {
+    "mtime": 1792528723.337241,
+    "seen": 1792613044.7891088,
+    "ast_hash": "70b949a7e552f589c955e842c48eafe3",
+    "semantic_hash": "70b949a7e552f589c955e842c48eafe3"
+  },
+  "frontend/src/api/queryClient.ts": {
+    "mtime": 1792528723.337241,
+    "seen": 1792613044.7891092,
+    "ast_hash": "9529bd767ab6c6e398310c6f8aff5f27",
+    "semantic_hash": "9529bd767ab6c6e398310c6f8aff5f27"
+  },
+  "frontend/src/api/request.spec.ts": {
+    "mtime": 1792394459.6347628,
+    "seen": 1792613044.78911,
+    "ast_hash": "4558ffcf3918407f9353baf88b039f2b",
+    "semantic_hash": "4558ffcf3918407f9353baf88b039f2b"
+  },
+  "frontend/src/api/request.ts": {
+    "mtime": 1792528723.337241,
+    "seen": 1792613044.7891104,
+    "ast_hash": "6de4c6efbf6091640110570c18011ae6",
+    "semantic_hash": "6de4c6efbf6091640110570c18011ae6"
+  },
+  "frontend/src/api/schema.d.ts": {
+    "mtime": 1792528723.337241,
+    "seen": 1792613044.7891114,
+    "ast_hash": "2fd6b67a7cc64a8fde0f49971b5582ef",
+    "semantic_hash": "2fd6b67a7cc64a8fde0f49971b5582ef"
+  },
+  "frontend/src/components/auth/DoorHeader.vue": {
+    "mtime": 1792528723.337241,
+    "seen": 1792613044.789112,
+    "ast_hash": "17479d83031f9ea84bef90ace01456fc",
+    "semantic_hash": "17479d83031f9ea84bef90ace01456fc"
+  },
+  "frontend/src/components/icons/TabIcon.vue": {
+    "mtime": 1792394459.6358554,
+    "seen": 1792613044.7891128,
+    "ast_hash": "1ae54cb48abcc7a509ca8bb50a079280",
+    "semantic_hash": "1ae54cb48abcc7a509ca8bb50a079280"
+  },
+  "frontend/src/components/install/InstallDialog.vue": {
+    "mtime": 1792528723.337241,
+    "seen": 1792613044.7891135,
+    "ast_hash": "b32ab8d06bf55f6db1d79c29bec85511",
+    "semantic_hash": "b32ab8d06bf55f6db1d79c29bec85511"
+  },
+  "frontend/src/components/install/InstallGuide.vue": {
+    "mtime": 1792528723.3382409,
+    "seen": 1792613044.789114,
+    "ast_hash": "1f44c25b756dc12794f5c3dd93650fbe",
+    "semantic_hash": "1f44c25b756dc12794f5c3dd93650fbe"
+  },
+  "frontend/src/components/layout/AppHeader.vue": {
+    "mtime": 1792528723.3382409,
+    "seen": 1792613044.789115,
+    "ast_hash": "6e002e6e16c86261c1b454f901988ff1",
+    "semantic_hash": "6e002e6e16c86261c1b454f901988ff1"
+  },
+  "frontend/src/components/layout/AppShell.vue": {
+    "mtime": 1792528723.3382409,
+    "seen": 1792613044.7891157,
+    "ast_hash": "49a317d657299b2d7f824e75f1d2b375",
+    "semantic_hash": "49a317d657299b2d7f824e75f1d2b375"
+  },
+  "frontend/src/components/layout/BareLayout.vue": {
+    "mtime": 1792528723.3382409,
+    "seen": 1792613044.7891161,
+    "ast_hash": "b8e16da77f6dba732c5ec44bd72681d3",
+    "semantic_hash": "b8e16da77f6dba732c5ec44bd72681d3"
+  },
+  "frontend/src/components/layout/DevBanner.vue": {
+    "mtime": 1792394459.6361012,
+    "seen": 1792613044.7891169,
+    "ast_hash": "59e1c155a49a5cc0d6a9d09a71d2f582",
+    "semantic_hash": "59e1c155a49a5cc0d6a9d09a71d2f582"
+  },
+  "frontend/src/components/layout/HeaderBrand.vue": {
+    "mtime": 1792619671.864046,
+    "seen": 1792619944.4474857,
+    "ast_hash": "89d2321c17c0d6f93f9288b03900ad06",
+    "semantic_hash": "89d2321c17c0d6f93f9288b03900ad06"
+  },
+  "frontend/src/components/layout/NewSessionFab.vue": {
+    "mtime": 1792394459.6361012,
+    "seen": 1792613044.7891185,
+    "ast_hash": "100172a761137160425bfcf6829d6acb",
+    "semantic_hash": "100172a761137160425bfcf6829d6acb"
+  },
+  "frontend/src/components/layout/OfflineState.vue": {
+    "mtime": 1792528723.3382409,
+    "seen": 1792613044.7891192,
+    "ast_hash": "baddbabe9926e79b14d4170243ab3881",
+    "semantic_hash": "baddbabe9926e79b14d4170243ab3881"
+  },
+  "frontend/src/components/layout/PageTitle.vue": {
+    "mtime": 1792394459.6361012,
+    "seen": 1792613044.7891197,
+    "ast_hash": "ad1c5260476487cdf4e1df6180c8e702",
+    "semantic_hash": "ad1c5260476487cdf4e1df6180c8e702"
+  },
+  "frontend/src/components/layout/SubPageHeader.vue": {
+    "mtime": 1792528723.3382409,
+    "seen": 1792613044.7891204,
+    "ast_hash": "e9f756cb46c4be32d86140895c435428",
+    "semantic_hash": "e9f756cb46c4be32d86140895c435428"
+  },
+  "frontend/src/components/layout/TabBar.spec.ts": {
+    "mtime": 1792394459.6361012,
+    "seen": 1792613044.7891214,
+    "ast_hash": "57a4235f78bafe3fe624b7f2ed9c722c",
+    "semantic_hash": "57a4235f78bafe3fe624b7f2ed9c722c"
+  },
+  "frontend/src/components/layout/TabBar.vue": {
+    "mtime": 1792394459.6361012,
+    "seen": 1792613044.789122,
+    "ast_hash": "7d2456b53ceff93dc91048333e759ec1",
+    "semantic_hash": "7d2456b53ceff93dc91048333e759ec1"
+  },
+  "frontend/src/components/layout/UpdateBanner.vue": {
+    "mtime": 1792528723.3382409,
+    "seen": 1792613044.7891228,
+    "ast_hash": "7625e71ad53e5d2cd8ab95965c06439b",
+    "semantic_hash": "7625e71ad53e5d2cd8ab95965c06439b"
+  },
+  "frontend/src/components/profile/ProfileDetailsFields.vue": {
+    "mtime": 1792528723.3382409,
+    "seen": 1792613044.7891233,
+    "ast_hash": "5601824fee10e32d4ea7a5b0f0442041",
+    "semantic_hash": "5601824fee10e32d4ea7a5b0f0442041"
+  },
+  "frontend/src/components/profile/ProfilePhotoPicker.vue": {
+    "mtime": 1792528723.339181,
+    "seen": 1792613044.789124,
+    "ast_hash": "9d31ab076cf4fc40d31842764dba3456",
+    "semantic_hash": "9d31ab076cf4fc40d31842764dba3456"
+  },
+  "frontend/src/components/ui/CheckboxField.vue": {
+    "mtime": 1792528723.3392408,
+    "seen": 1792613044.789125,
+    "ast_hash": "ef32e9b44177d1cc7c175e9a418bd7b6",
+    "semantic_hash": "ef32e9b44177d1cc7c175e9a418bd7b6"
+  },
+  "frontend/src/components/ui/ConfirmDialog.vue": {
+    "mtime": 1792528723.3392408,
+    "seen": 1792613044.7891254,
+    "ast_hash": "a7c9f1fe8e341a482da2ff9f9c4d5dde",
+    "semantic_hash": "a7c9f1fe8e341a482da2ff9f9c4d5dde"
+  },
+  "frontend/src/components/ui/EmptyState.vue": {
+    "mtime": 1792394459.6361012,
+    "seen": 1792613044.7891262,
+    "ast_hash": "390f98f1283136dcf5960e8b820af314",
+    "semantic_hash": "390f98f1283136dcf5960e8b820af314"
+  },
+  "frontend/src/components/ui/FormAlert.vue": {
+    "mtime": 1792528723.3392408,
+    "seen": 1792613044.7891269,
+    "ast_hash": "82778eca2929749b329bb1543009f27c",
+    "semantic_hash": "82778eca2929749b329bb1543009f27c"
+  },
+  "frontend/src/components/ui/GgButton.vue": {
+    "mtime": 1792394459.6368763,
+    "seen": 1792613044.7891276,
+    "ast_hash": "5bc9b86cdec51ff439815f43fdb75207",
+    "semantic_hash": "5bc9b86cdec51ff439815f43fdb75207"
+  },
+  "frontend/src/components/ui/GgDialog.vue": {
+    "mtime": 1792528723.3392408,
+    "seen": 1792613044.7891283,
+    "ast_hash": "a6ecf9bf650777d38ec3dbaa53e2c6f8",
+    "semantic_hash": "a6ecf9bf650777d38ec3dbaa53e2c6f8"
+  },
+  "frontend/src/components/ui/GgIconButton.vue": {
+    "mtime": 1792394459.6368763,
+    "seen": 1792613044.789129,
+    "ast_hash": "cf951eca6fdf1ffa8125d0ddefdd0025",
+    "semantic_hash": "cf951eca6fdf1ffa8125d0ddefdd0025"
+  },
+  "frontend/src/components/ui/HoldSwatch.vue": {
+    "mtime": 1792394459.6368763,
+    "seen": 1792613044.7891297,
+    "ast_hash": "20fe90ca349639dab46b170361ad9ed6",
+    "semantic_hash": "20fe90ca349639dab46b170361ad9ed6"
+  },
+  "frontend/src/components/ui/PasswordField.vue": {
+    "mtime": 1792528723.3392408,
+    "seen": 1792613044.7891304,
+    "ast_hash": "5649be7a68649986aaf16a2eff5794f2",
+    "semantic_hash": "5649be7a68649986aaf16a2eff5794f2"
+  },
+  "frontend/src/components/ui/RoleBadge.vue": {
+    "mtime": 1792528723.3392408,
+    "seen": 1792613044.7891314,
+    "ast_hash": "d6d429b13234e2a18a23323fd9ab6906",
+    "semantic_hash": "d6d429b13234e2a18a23323fd9ab6906"
+  },
+  "frontend/src/components/ui/RouteLabel.spec.ts": {
+    "mtime": 1792394459.6368763,
+    "seen": 1792613044.7891324,
+    "ast_hash": "783b326aee4500795733be645db7e66d",
+    "semantic_hash": "783b326aee4500795733be645db7e66d"
+  },
+  "frontend/src/components/ui/RouteLabel.vue": {
+    "mtime": 1792394459.6368763,
+    "seen": 1792613044.789133,
+    "ast_hash": "fa40e938cd9cacdeafe1d8abcb114ea1",
+    "semantic_hash": "fa40e938cd9cacdeafe1d8abcb114ea1"
+  },
+  "frontend/src/components/ui/SegmentedControl.vue": {
+    "mtime": 1792394459.6368763,
+    "seen": 1792613044.7891338,
+    "ast_hash": "5960c97ffbbae55b47b24b941326bf51",
+    "semantic_hash": "5960c97ffbbae55b47b24b941326bf51"
+  },
+  "frontend/src/components/ui/SettingsLink.vue": {
+    "mtime": 1792528723.3392408,
+    "seen": 1792613044.7891343,
+    "ast_hash": "51127adc6a6d55b21d0b3a58bc60c1c8",
+    "semantic_hash": "51127adc6a6d55b21d0b3a58bc60c1c8"
+  },
+  "frontend/src/components/ui/SkeletonBlock.vue": {
+    "mtime": 1792394459.6368763,
+    "seen": 1792613044.7891352,
+    "ast_hash": "73d0cb91bf24b944a9391e763006fe79",
+    "semantic_hash": "73d0cb91bf24b944a9391e763006fe79"
+  },
+  "frontend/src/components/ui/TextField.vue": {
+    "mtime": 1792528723.3392408,
+    "seen": 1792613044.789136,
+    "ast_hash": "91aa92b1eb15335925883715debc0acd",
+    "semantic_hash": "91aa92b1eb15335925883715debc0acd"
+  },
+  "frontend/src/components/ui/UserAvatar.vue": {
+    "mtime": 1792394459.6368763,
+    "seen": 1792613044.7891366,
+    "ast_hash": "ebf20b52b1e692d9deb31036b49bb88b",
+    "semantic_hash": "ebf20b52b1e692d9deb31036b49bb88b"
+  },
+  "frontend/src/i18n/fr.json": {
+    "mtime": 1792619671.865152,
+    "seen": 1792619944.4475129,
+    "ast_hash": "0ba2b062d5462b9bf7c6bbd1db01d973",
+    "semantic_hash": "0ba2b062d5462b9bf7c6bbd1db01d973"
+  },
+  "frontend/src/i18n/index.ts": {
+    "mtime": 1792394459.6377258,
+    "seen": 1792613044.7891378,
+    "ast_hash": "4ad551fdee30a4e6224ea1a5f4f7f836",
+    "semantic_hash": "4ad551fdee30a4e6224ea1a5f4f7f836"
+  },
+  "frontend/src/lib/age.spec.ts": {
+    "mtime": 1792528723.3392408,
+    "seen": 1792613044.7891388,
+    "ast_hash": "51e4152a3219ca45220a9d5ed36b5dcc",
+    "semantic_hash": "51e4152a3219ca45220a9d5ed36b5dcc"
+  },
+  "frontend/src/lib/age.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891395,
+    "ast_hash": "b83ca60a1eab02b69fe896a4cb213993",
+    "semantic_hash": "b83ca60a1eab02b69fe896a4cb213993"
+  },
+  "frontend/src/lib/avatar.spec.ts": {
+    "mtime": 1792394459.6377258,
+    "seen": 1792613044.78914,
+    "ast_hash": "718cd534747f7572b115893115c1a6e6",
+    "semantic_hash": "718cd534747f7572b115893115c1a6e6"
+  },
+  "frontend/src/lib/avatar.ts": {
+    "mtime": 1792394459.637909,
+    "seen": 1792613044.7891407,
+    "ast_hash": "11a350b5451d1fed05f79aa5aa64b42a",
+    "semantic_hash": "11a350b5451d1fed05f79aa5aa64b42a"
+  },
+  "frontend/src/lib/codes.spec.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891414,
+    "ast_hash": "eedb6f8ddc889830449616683405319f",
+    "semantic_hash": "eedb6f8ddc889830449616683405319f"
+  },
+  "frontend/src/lib/codes.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891421,
+    "ast_hash": "0169a66916bb29686bdaef0dc7785ce1",
+    "semantic_hash": "0169a66916bb29686bdaef0dc7785ce1"
+  },
+  "frontend/src/lib/color.spec.ts": {
+    "mtime": 1792394459.637909,
+    "seen": 1792613044.7891428,
+    "ast_hash": "dee43fabf99fea7d32c39c8c179a52ed",
+    "semantic_hash": "dee43fabf99fea7d32c39c8c179a52ed"
+  },
+  "frontend/src/lib/color.ts": {
+    "mtime": 1792394459.637909,
+    "seen": 1792613044.7891436,
+    "ast_hash": "ae84000607b582d3d7cd5f14a40bf0b5",
+    "semantic_hash": "ae84000607b582d3d7cd5f14a40bf0b5"
+  },
+  "frontend/src/lib/format.spec.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891443,
+    "ast_hash": "09e6192db6c49900e0e22c133a7e7e6c",
+    "semantic_hash": "09e6192db6c49900e0e22c133a7e7e6c"
+  },
+  "frontend/src/lib/format.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891448,
+    "ast_hash": "b59a1bd61743e48c10460ca45c8a6426",
+    "semantic_hash": "b59a1bd61743e48c10460ca45c8a6426"
+  },
+  "frontend/src/lib/forms.spec.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891457,
+    "ast_hash": "ba535c8ab18f7f7aa0ec75a38a9eded3",
+    "semantic_hash": "ba535c8ab18f7f7aa0ec75a38a9eded3"
+  },
+  "frontend/src/lib/forms.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891464,
+    "ast_hash": "7eba95b86b8d9e55592d6e14fdcd73b3",
+    "semantic_hash": "7eba95b86b8d9e55592d6e14fdcd73b3"
+  },
+  "frontend/src/lib/install.spec.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891471,
+    "ast_hash": "85932346333756b081e1b2926e31a1e1",
+    "semantic_hash": "85932346333756b081e1b2926e31a1e1"
+  },
+  "frontend/src/lib/install.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891476,
+    "ast_hash": "fcc9c4a2838f38f3171425cb4323f8ba",
+    "semantic_hash": "fcc9c4a2838f38f3171425cb4323f8ba"
+  },
+  "frontend/src/lib/members.spec.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891486,
+    "ast_hash": "5907a555ad37982dd03a21d311f7c484",
+    "semantic_hash": "5907a555ad37982dd03a21d311f7c484"
+  },
+  "frontend/src/lib/members.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891495,
+    "ast_hash": "133eef210af5b93c0bca5c6cf032a887",
+    "semantic_hash": "133eef210af5b93c0bca5c6cf032a887"
+  },
+  "frontend/src/lib/photo.spec.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.78915,
+    "ast_hash": "f1ea8435b8e6baae2f9a839cd4a4172c",
+    "semantic_hash": "f1ea8435b8e6baae2f9a839cd4a4172c"
+  },
+  "frontend/src/lib/photo.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891507,
+    "ast_hash": "ebf6db43ff95ee3c900abb4b59fa5fec",
+    "semantic_hash": "ebf6db43ff95ee3c900abb4b59fa5fec"
+  },
+  "frontend/src/lib/profile.spec.ts": {
+    "mtime": 1792528723.340241,
+    "seen": 1792613044.7891512,
+    "ast_hash": "0e15efb3830530ea26beaabac48cdd3a",
+    "semantic_hash": "0e15efb3830530ea26beaabac48cdd3a"
+  },
+  "frontend/src/lib/profile.ts": {
+    "mtime": 1792528723.341241,
+    "seen": 1792613044.789152,
+    "ast_hash": "8a8478cc7aeb0b5a6db6dd06168783d7",
+    "semantic_hash": "8a8478cc7aeb0b5a6db6dd06168783d7"
+  },
+  "frontend/src/lib/roles.spec.ts": {
+    "mtime": 1792528723.341241,
+    "seen": 1792613044.7891529,
+    "ast_hash": "a8c1a0cfcfd20ca061aa5db2e180af48",
+    "semantic_hash": "a8c1a0cfcfd20ca061aa5db2e180af48"
+  },
+  "frontend/src/lib/roles.ts": {
+    "mtime": 1792528723.341241,
+    "seen": 1792613044.7891536,
+    "ast_hash": "b6712e9f7466eec7d216a58dcdf0c2e3",
+    "semantic_hash": "b6712e9f7466eec7d216a58dcdf0c2e3"
+  },
+  "frontend/src/lib/route.ts": {
+    "mtime": 1792394459.637909,
+    "seen": 1792613044.7891543,
+    "ast_hash": "b10ae1379c3af6bd17bdddbeb4ae0a58",
+    "semantic_hash": "b10ae1379c3af6bd17bdddbeb4ae0a58"
+  },
+  "frontend/src/main.ts": {
+    "mtime": 1792528723.341241,
+    "seen": 1792613044.789155,
+    "ast_hash": "be46a7df38233e60bcafc3faeb1ebc23",
+    "semantic_hash": "be46a7df38233e60bcafc3faeb1ebc23"
+  },
+  "frontend/src/router/guard.spec.ts": {
+    "mtime": 1792528723.341241,
+    "seen": 1792613044.7891557,
+    "ast_hash": "e42528a82ec2988a8233d5b97739cdee",
+    "semantic_hash": "e42528a82ec2988a8233d5b97739cdee"
+  },
+  "frontend/src/router/guard.ts": {
+    "mtime": 1792528723.341241,
+    "seen": 1792613044.7891564,
+    "ast_hash": "b49c4500266329d7bbb153941371df56",
+    "semantic_hash": "b49c4500266329d7bbb153941371df56"
+  },
+  "frontend/src/router/index.ts": {
+    "mtime": 1792619671.865152,
+    "seen": 1792619944.4475415,
+    "ast_hash": "36331d4b5092c4d2dce0bcb15fcad9ed",
+    "semantic_hash": "36331d4b5092c4d2dce0bcb15fcad9ed"
+  },
+  "frontend/src/stores/install.ts": {
+    "mtime": 1792619671.865152,
+    "seen": 1792619944.4475422,
+    "ast_hash": "6606dd1328118d049cf38aad412a5788",
+    "semantic_hash": "6606dd1328118d049cf38aad412a5788"
+  },
+  "frontend/src/stores/theme.spec.ts": {
+    "mtime": 1792394459.637909,
+    "seen": 1792613044.7891586,
+    "ast_hash": "a4dc73892cbd2e7f025d22a977d90f62",
+    "semantic_hash": "a4dc73892cbd2e7f025d22a977d90f62"
+  },
+  "frontend/src/stores/theme.ts": {
+    "mtime": 1792394459.6385646,
+    "seen": 1792613044.7891595,
+    "ast_hash": "ad35a422fba5a08791d28e1029104820",
+    "semantic_hash": "ad35a422fba5a08791d28e1029104820"
+  },
+  "frontend/src/test/render.ts": {
+    "mtime": 1792394459.6387563,
+    "seen": 1792613044.78916,
+    "ast_hash": "cbcdccd6c43118219ee0960f1855c434",
+    "semantic_hash": "cbcdccd6c43118219ee0960f1855c434"
+  },
+  "frontend/src/views/ActuView.vue": {
+    "mtime": 1792619671.865152,
+    "seen": 1792619944.4475484,
+    "ast_hash": "0f124e1653c920f36ec01a4d371994f0",
+    "semantic_hash": "0f124e1653c920f36ec01a4d371994f0"
+  },
+  "frontend/src/views/NewSessionView.vue": {
+    "mtime": 1792394459.6390533,
+    "seen": 1792613044.7891614,
+    "ast_hash": "14a0881d9cd5b673b6d0032715591085",
+    "semantic_hash": "14a0881d9cd5b673b6d0032715591085"
+  },
+  "frontend/src/views/NotFoundView.vue": {
+    "mtime": 1792394459.6390533,
+    "seen": 1792613044.789162,
+    "ast_hash": "4d5dd89223df5b7edb57a8214a2dc45e",
+    "semantic_hash": "4d5dd89223df5b7edb57a8214a2dc45e"
+  },
+  "frontend/src/views/PlanningView.vue": {
+    "mtime": 1792394459.6390533,
+    "seen": 1792613044.7891626,
+    "ast_hash": "6af54f21d51e7213cce5270a5faee5c3",
+    "semantic_hash": "6af54f21d51e7213cce5270a5faee5c3"
+  },
+  "frontend/src/views/PodiumView.vue": {
+    "mtime": 1792394459.6390533,
+    "seen": 1792613044.7891636,
+    "ast_hash": "81b77e5c769afa63c3e48ad0345aa07c",
+    "semantic_hash": "81b77e5c769afa63c3e48ad0345aa07c"
+  },
+  "frontend/src/views/TodoView.vue": {
+    "mtime": 1792394459.6390533,
+    "seen": 1792613044.789164,
+    "ast_hash": "85deeb1394854db6330e27bb06dad099",
+    "semantic_hash": "85deeb1394854db6330e27bb06dad099"
+  },
+  "frontend/src/views/TopoView.vue": {
+    "mtime": 1792394459.6390533,
+    "seen": 1792613044.7891648,
+    "ast_hash": "68b294dec2d17affe85f12bd344a0f41",
+    "semantic_hash": "68b294dec2d17affe85f12bd344a0f41"
+  },
+  "frontend/src/views/auth/LoginView.vue": {
+    "mtime": 1792528723.341241,
+    "seen": 1792613044.7891655,
+    "ast_hash": "e7463e07f5cdbc83dc9387fbec40b87a",
+    "semantic_hash": "e7463e07f5cdbc83dc9387fbec40b87a"
+  },
+  "frontend/src/views/auth/PrivacyView.vue": {
+    "mtime": 1792528723.3421202,
+    "seen": 1792613044.7891665,
+    "ast_hash": "f08139a71e20c72b2815c5be99ad6474",
+    "semantic_hash": "f08139a71e20c72b2815c5be99ad6474"
+  },
+  "frontend/src/views/auth/RegisterView.vue": {
+    "mtime": 1792528723.3421202,
+    "seen": 1792613044.7891672,
+    "ast_hash": "78f21f789ef76d1c506a6c8d1769e9ea",
+    "semantic_hash": "78f21f789ef76d1c506a6c8d1769e9ea"
+  },
+  "frontend/src/views/auth/ResetPasswordView.vue": {
+    "mtime": 1792528723.3422408,
+    "seen": 1792613044.7891676,
+    "ast_hash": "f17b7561d1f4f8596d863bf77f0e664f",
+    "semantic_hash": "f17b7561d1f4f8596d863bf77f0e664f"
+  },
+  "frontend/src/views/auth/WelcomeView.vue": {
+    "mtime": 1792528723.3422408,
+    "seen": 1792613044.7891684,
+    "ast_hash": "629c78f567631237d6a2d4e9cebf6cfe",
+    "semantic_hash": "629c78f567631237d6a2d4e9cebf6cfe"
+  },
+  "frontend/src/views/dev/GalleryView.vue": {
+    "mtime": 1792394459.6390533,
+    "seen": 1792613044.789169,
+    "ast_hash": "f119097846e05bcdd70520fc62a25d29",
+    "semantic_hash": "f119097846e05bcdd70520fc62a25d29"
+  },
+  "frontend/src/views/dev/galleryFixtures.ts": {
+    "mtime": 1792394459.6397543,
+    "seen": 1792613044.78917,
+    "ast_hash": "1adba7cca61f3adaa6c9b3276c8763a4",
+    "semantic_hash": "1adba7cca61f3adaa6c9b3276c8763a4"
+  },
+  "frontend/src/views/management/AuditView.vue": {
+    "mtime": 1792528723.3422408,
+    "seen": 1792613044.7891707,
+    "ast_hash": "15342366f3af73f7be55ea2eb1961437",
+    "semantic_hash": "15342366f3af73f7be55ea2eb1961437"
+  },
+  "frontend/src/views/management/ManagementHomeView.vue": {
+    "mtime": 1792528723.3425136,
+    "seen": 1792613044.7891712,
+    "ast_hash": "66701d813b6c8a836bade31f279dfb47",
+    "semantic_hash": "66701d813b6c8a836bade31f279dfb47"
+  },
+  "frontend/src/views/management/ManagementLayout.vue": {
+    "mtime": 1792528723.3425136,
+    "seen": 1792613044.789172,
+    "ast_hash": "605808cbd7fe8d1e28226b56098f2491",
+    "semantic_hash": "605808cbd7fe8d1e28226b56098f2491"
+  },
+  "frontend/src/views/management/ManagementTitle.vue": {
+    "mtime": 1792528723.3425136,
+    "seen": 1792613044.7891724,
+    "ast_hash": "db40110d7e714d0836b41e24d39b3bb5",
+    "semantic_hash": "db40110d7e714d0836b41e24d39b3bb5"
+  },
+  "frontend/src/views/management/MemberDetailView.vue": {
+    "mtime": 1792528723.3425136,
+    "seen": 1792613044.7891734,
+    "ast_hash": "49a26d08cb03f94f1c25648f1259201b",
+    "semantic_hash": "49a26d08cb03f94f1c25648f1259201b"
+  },
+  "frontend/src/views/management/MembersView.vue": {
+    "mtime": 1792528723.3425136,
+    "seen": 1792613044.789174,
+    "ast_hash": "63f16251c4406be01cd02af77926238b",
+    "semantic_hash": "63f16251c4406be01cd02af77926238b"
+  },
+  "frontend/src/views/management/RegistrationCodesView.vue": {
+    "mtime": 1792528723.3425136,
+    "seen": 1792613044.789175,
+    "ast_hash": "d630899e7c3ee8e6d3e5bfab70aea8a1",
+    "semantic_hash": "d630899e7c3ee8e6d3e5bfab70aea8a1"
+  },
+  "frontend/src/views/management/RoutesPlaceholderView.vue": {
+    "mtime": 1792528723.3425136,
+    "seen": 1792613044.7891755,
+    "ast_hash": "2782fc8abc3d31f47ad250199cf4a3ff",
+    "semantic_hash": "2782fc8abc3d31f47ad250199cf4a3ff"
+  },
+  "frontend/src/views/management/sections.ts": {
+    "mtime": 1792528723.3425136,
+    "seen": 1792613044.7891762,
+    "ast_hash": "466e6f947da55d24ddd8556ffd417443",
+    "semantic_hash": "466e6f947da55d24ddd8556ffd417443"
+  },
+  "frontend/src/views/onboarding/OnboardingView.vue": {
+    "mtime": 1792528723.3425136,
+    "seen": 1792613044.7891772,
+    "ast_hash": "1152837ac275064f2fb86a4c25a5345c",
+    "semantic_hash": "1152837ac275064f2fb86a4c25a5345c"
+  },
+  "frontend/src/views/profile/DevicesView.vue": {
+    "mtime": 1792528723.343241,
+    "seen": 1792613044.789178,
+    "ast_hash": "097fcf4da7907f7095824a7298b45af4",
+    "semantic_hash": "097fcf4da7907f7095824a7298b45af4"
+  },
+  "frontend/src/views/profile/InstallView.vue": {
+    "mtime": 1792528723.3433383,
+    "seen": 1792613044.7891786,
+    "ast_hash": "0d69fdde6f495cee1e0ef3d6f31a297a",
+    "semantic_hash": "0d69fdde6f495cee1e0ef3d6f31a297a"
+  },
+  "frontend/src/views/profile/PasswordView.vue": {
+    "mtime": 1792528723.3433383,
+    "seen": 1792613044.789179,
+    "ast_hash": "3e7d39ab30daacf368943fd31dfb4e7d",
+    "semantic_hash": "3e7d39ab30daacf368943fd31dfb4e7d"
+  },
+  "frontend/src/views/profile/ProfileEditView.vue": {
+    "mtime": 1792528723.3433383,
+    "seen": 1792613044.7891798,
+    "ast_hash": "3b8d8aa3b479489629f5e83d66c52bcf",
+    "semantic_hash": "3b8d8aa3b479489629f5e83d66c52bcf"
+  },
+  "frontend/src/views/profile/ProfileView.vue": {
+    "mtime": 1792528723.3433383,
+    "seen": 1792613044.7891808,
+    "ast_hash": "c04e3d16589325981769185e4ce97d60",
+    "semantic_hash": "c04e3d16589325981769185e4ce97d60"
+  },
+  "frontend/tsconfig.app.json": {
+    "mtime": 1792394459.6397543,
+    "seen": 1792613044.7891815,
+    "ast_hash": "740b3e2a7559d0472295e644408fe3e2",
+    "semantic_hash": "740b3e2a7559d0472295e644408fe3e2"
+  },
+  "frontend/tsconfig.json": {
+    "mtime": 1792394459.6397543,
+    "seen": 1792613044.789182,
+    "ast_hash": "036127984e6d3487d4c80f6024f2a168",
+    "semantic_hash": "036127984e6d3487d4c80f6024f2a168"
+  },
+  "frontend/tsconfig.node.json": {
+    "mtime": 1792534870.6876144,
+    "seen": 1792613044.7891827,
+    "ast_hash": "ad7924048f849cc5b593e42ce517a11d",
+    "semantic_hash": "ad7924048f849cc5b593e42ce517a11d"
+  },
+  "frontend/tsconfig.vitest.json": {
+    "mtime": 1792394459.6397543,
+    "seen": 1792613044.7891834,
+    "ast_hash": "7ac930138b3100a5af9fcf28af6e65d3",
+    "semantic_hash": "7ac930138b3100a5af9fcf28af6e65d3"
+  },
+  "frontend/vite.config.ts": {
+    "mtime": 1792619671.865152,
+    "seen": 1792619944.4475796,
+    "ast_hash": "0dbf463d3686d933e55896c2f9887cfc",
+    "semantic_hash": "0dbf463d3686d933e55896c2f9887cfc"
+  },
+  "frontend/vitest.config.ts": {
+    "mtime": 1792534870.6876144,
+    "seen": 1792613044.789185,
+    "ast_hash": "b76788b71bb1a81408e7553f5536f603",
+    "semantic_hash": "b76788b71bb1a81408e7553f5536f603"
+  },
+  ".github/dependabot.yml": {
+    "mtime": 1792535932.540217,
+    "seen": 1792613044.7891858,
+    "ast_hash": "2c8d96c359cf1bf983dca18a186af3b5",
+    "semantic_hash": "2c8d96c359cf1bf983dca18a186af3b5"
+  },
+  ".github/pull_request_template.md": {
+    "mtime": 1792394459.616407,
+    "seen": 1792613044.7891865,
+    "ast_hash": "57a7351cf9d9f1be997820ad5da005dd",
+    "semantic_hash": "57a7351cf9d9f1be997820ad5da005dd"
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1792534870.6801581,
+    "seen": 1792613044.7891874,
+    "ast_hash": "2b0907274084a7b7a202152c4550eb34",
+    "semantic_hash": "2b0907274084a7b7a202152c4550eb34"
+  },
+  ".github/workflows/deploy-dev.yml": {
+    "mtime": 1792534870.6801581,
+    "seen": 1792613044.7891881,
+    "ast_hash": "096701216c442db0cd7333f91ec3e064",
+    "semantic_hash": "096701216c442db0cd7333f91ec3e064"
+  },
+  ".github/workflows/prepare-release.yml": {
+    "mtime": 1792535932.5412169,
+    "seen": 1792613044.7891889,
+    "ast_hash": "a182778fcfc03aaffa14308d0a5ab503",
+    "semantic_hash": "a182778fcfc03aaffa14308d0a5ab503"
+  },
+  ".github/workflows/release.yml": {
+    "mtime": 1792534870.6808708,
+    "seen": 1792613044.7891896,
+    "ast_hash": "6fbeeff9b51d82ecbb33d768c90097cb",
+    "semantic_hash": "6fbeeff9b51d82ecbb33d768c90097cb"
+  },
+  "CHANGELOG.md": {
+    "mtime": 1792619671.862179,
+    "seen": 1792619944.4475818,
+    "ast_hash": "eb6eb3680849a56676c8914412428a59",
+    "semantic_hash": "eb6eb3680849a56676c8914412428a59"
+  },
+  "CLAUDE.md": {
+    "mtime": 1792534870.6808708,
+    "seen": 1792613044.789191,
+    "ast_hash": "1cf4b5538a62294c16455c30f213dc7c",
+    "semantic_hash": "1cf4b5538a62294c16455c30f213dc7c"
+  },
+  "CONTRIBUTING.md": {
+    "mtime": 1792394459.617751,
+    "seen": 1792613044.7891927,
+    "ast_hash": "9e59e891e871aa1ceb8268d8a2d51c6a",
+    "semantic_hash": "9e59e891e871aa1ceb8268d8a2d51c6a"
+  },
+  "README.md": {
+    "mtime": 1792528723.304241,
+    "seen": 1792613044.7891934,
+    "ast_hash": "d04b5263955452ce4073a88d9cf13340",
+    "semantic_hash": "d04b5263955452ce4073a88d9cf13340"
+  },
+  "backend/src/main/resources/application-dev.yml": {
+    "mtime": 1792528723.3122408,
+    "seen": 1792613044.7891943,
+    "ast_hash": "722aecc659369f2c5a7382604b4b7e72",
+    "semantic_hash": "722aecc659369f2c5a7382604b4b7e72"
+  },
+  "backend/src/main/resources/application-prod.yml": {
+    "mtime": 1792394459.6213827,
+    "seen": 1792613044.7891948,
+    "ast_hash": "b29e4807f9c7f0fec6a04bf48447e1ae",
+    "semantic_hash": "b29e4807f9c7f0fec6a04bf48447e1ae"
+  },
+  "backend/src/main/resources/application.yml": {
+    "mtime": 1792528723.3122408,
+    "seen": 1792613044.7891955,
+    "ast_hash": "154cb5497e92b1e6f92a2f3c78f27ebc",
+    "semantic_hash": "154cb5497e92b1e6f92a2f3c78f27ebc"
+  },
+  "deploy/compose.ci.yml": {
+    "mtime": 1792534870.6828709,
+    "seen": 1792613044.7891963,
+    "ast_hash": "7504a866295459d5d566a978fc921a07",
+    "semantic_hash": "7504a866295459d5d566a978fc921a07"
+  },
+  "deploy/compose.dev.yml": {
+    "mtime": 1792534870.6828709,
+    "seen": 1792613044.789197,
+    "ast_hash": "639ef1724eae667c0558addf9708d230",
+    "semantic_hash": "639ef1724eae667c0558addf9708d230"
+  },
+  "deploy/compose.local.yml": {
+    "mtime": 1792394459.6231031,
+    "seen": 1792613044.789198,
+    "ast_hash": "d61d5b2806ca3d412f75c6ba41ad0ac0",
+    "semantic_hash": "d61d5b2806ca3d412f75c6ba41ad0ac0"
+  },
+  "deploy/compose.prod.yml": {
+    "mtime": 1792534870.6828709,
+    "seen": 1792613044.7891986,
+    "ast_hash": "ba0f4b0b80ae210effefcc80da8c443a",
+    "semantic_hash": "ba0f4b0b80ae210effefcc80da8c443a"
+  },
+  "deploy/compose.yml": {
+    "mtime": 1792534870.6828709,
+    "seen": 1792613044.789199,
+    "ast_hash": "569d4b53ef6df88b2db07be16735756d",
+    "semantic_hash": "569d4b53ef6df88b2db07be16735756d"
+  },
+  "deploy/edge/compose.yml": {
+    "mtime": 1792534870.6840901,
+    "seen": 1792613044.7891998,
+    "ast_hash": "a364d7450f47b8b26ddc303d46e88899",
+    "semantic_hash": "a364d7450f47b8b26ddc303d46e88899"
+  },
+  "docs/ARCHITECTURE.md": {
+    "mtime": 1792534870.6849136,
+    "seen": 1792613044.7892005,
+    "ast_hash": "fe168cc4bb8dfbf3aee3e50ebd10af8c",
+    "semantic_hash": "fe168cc4bb8dfbf3aee3e50ebd10af8c"
+  },
+  "docs/DECISIONS.md": {
+    "mtime": 1792619671.8625305,
+    "seen": 1792619944.4475825,
+    "ast_hash": "236f1241a518222b67a7355763a9346c",
+    "semantic_hash": "236f1241a518222b67a7355763a9346c"
+  },
+  "docs/DEPLOYMENT.md": {
+    "mtime": 1792535932.5412169,
+    "seen": 1792613044.789202,
+    "ast_hash": "31d0f8f77357f87494856de5660c68ec",
+    "semantic_hash": "31d0f8f77357f87494856de5660c68ec"
+  },
+  "docs/DESIGN.md": {
+    "mtime": 1792394459.6231031,
+    "seen": 1792613044.7892027,
+    "ast_hash": "a8368d1eb984666a75f868a4595f968e",
+    "semantic_hash": "a8368d1eb984666a75f868a4595f968e"
+  },
+  "docs/KICKOFF_PROMPT.md": {
+    "mtime": 1792252567.5712779,
+    "seen": 1792613044.7892034,
+    "ast_hash": "31ca4873a91ddb0d800a935d41d25c8d",
+    "semantic_hash": "31ca4873a91ddb0d800a935d41d25c8d"
+  },
+  "docs/PROGRESS.md": {
+    "mtime": 1792619671.8630013,
+    "seen": 1792619944.4475832,
+    "ast_hash": "85eb448c22d5e870dca68f3b59cb7dd4",
+    "semantic_hash": "85eb448c22d5e870dca68f3b59cb7dd4"
+  },
+  "docs/ROADMAP.md": {
+    "mtime": 1792619671.8630013,
+    "seen": 1792619944.447584,
+    "ast_hash": "b48731d596f21c136be1279cf9431284",
+    "semantic_hash": "b48731d596f21c136be1279cf9431284"
+  },
+  "docs/plans/phase-1.md": {
+    "mtime": 1792528723.3292408,
+    "seen": 1792613044.7892056,
+    "ast_hash": "2de7f87a17af0ce7fc702f86f17c84d4",
+    "semantic_hash": "2de7f87a17af0ce7fc702f86f17c84d4"
+  },
+  "docs/plans/phase-2.md": {
+    "mtime": 1792534870.685871,
+    "seen": 1792613044.7892063,
+    "ast_hash": "779e92125e9ec7207703420df4141186",
+    "semantic_hash": "779e92125e9ec7207703420df4141186"
+  },
+  "frontend/index.html": {
+    "mtime": 1792394459.6321454,
+    "seen": 1792613044.789207,
+    "ast_hash": "91215edf7a4b1ab28f937f54eac7cc4a",
+    "semantic_hash": "91215edf7a4b1ab28f937f54eac7cc4a"
+  },
+  "frontend/pnpm-workspace.yaml": {
+    "mtime": 1792394459.6324067,
+    "seen": 1792613044.7892075,
+    "ast_hash": "db3d10e40e5930d29b0194063d58b300",
+    "semantic_hash": "db3d10e40e5930d29b0194063d58b300"
+  },
+  "docs/captures/phase-0/actu-dark.png": {
+    "mtime": 1792394459.624654,
+    "seen": 1792613044.7892084,
+    "ast_hash": "2591ebcc075256191bc466b0487bbf9a",
+    "semantic_hash": "2591ebcc075256191bc466b0487bbf9a"
+  },
+  "docs/captures/phase-0/actu-light.png": {
+    "mtime": 1792394459.625957,
+    "seen": 1792613044.7892091,
+    "ast_hash": "30a507276719ae29b8f98d5fbe9f6bff",
+    "semantic_hash": "30a507276719ae29b8f98d5fbe9f6bff"
+  },
+  "docs/captures/phase-0/labels-dark.png": {
+    "mtime": 1792394459.6274068,
+    "seen": 1792613044.7892098,
+    "ast_hash": "1c506527899458f9d4f4979b03b3c672",
+    "semantic_hash": "1c506527899458f9d4f4979b03b3c672"
+  },
+  "docs/captures/phase-0/labels-light.png": {
+    "mtime": 1792394459.6284068,
+    "seen": 1792613044.7892103,
+    "ast_hash": "d57cc2a1734b8610b799d22d62307638",
+    "semantic_hash": "d57cc2a1734b8610b799d22d62307638"
+  },
+  "docs/captures/phase-0/profil-dark.png": {
+    "mtime": 1792394459.629407,
+    "seen": 1792613044.789213,
+    "ast_hash": "dfdd86c42413cfa7da6f5120919e4c20",
+    "semantic_hash": "dfdd86c42413cfa7da6f5120919e4c20"
+  },
+  "docs/captures/phase-0/profil-light.png": {
+    "mtime": 1792394459.6304069,
+    "seen": 1792613044.7892137,
+    "ast_hash": "f875dc0af70f66f27d7acc600e60a377",
+    "semantic_hash": "f875dc0af70f66f27d7acc600e60a377"
+  },
+  "docs/captures/phase-1/desktop-dark-fiche-membre.png": {
+    "mtime": 1792528723.318241,
+    "seen": 1792613044.7892141,
+    "ast_hash": "bc7387c59295d6bb6cb07d0343c56137",
+    "semantic_hash": "bc7387c59295d6bb6cb07d0343c56137"
+  },
+  "docs/captures/phase-1/desktop-dark-journal.png": {
+    "mtime": 1792528723.318241,
+    "seen": 1792613044.7892153,
+    "ast_hash": "af49f6464aa7903973d82603b279df05",
+    "semantic_hash": "af49f6464aa7903973d82603b279df05"
+  },
+  "docs/captures/phase-1/desktop-dark-membres.png": {
+    "mtime": 1792528723.320241,
+    "seen": 1792613044.7892158,
+    "ast_hash": "1286323b58e21fe6588ca7037dff91c6",
+    "semantic_hash": "1286323b58e21fe6588ca7037dff91c6"
+  },
+  "docs/captures/phase-1/mobile-light-accueil.png": {
+    "mtime": 1792528723.321241,
+    "seen": 1792613044.7892165,
+    "ast_hash": "8677e56b40679422e7c089dc921c1b8e",
+    "semantic_hash": "8677e56b40679422e7c089dc921c1b8e"
+  },
+  "docs/captures/phase-1/mobile-light-actu-invitation.png": {
+    "mtime": 1792528723.3222408,
+    "seen": 1792613044.7892172,
+    "ast_hash": "a242e6293bbce475b9de27a5865f622f",
+    "semantic_hash": "a242e6293bbce475b9de27a5865f622f"
+  },
+  "docs/captures/phase-1/mobile-light-appareils.png": {
+    "mtime": 1792528723.323241,
+    "seen": 1792613044.789218,
+    "ast_hash": "aa934c799db4ed55b458c7837130a802",
+    "semantic_hash": "aa934c799db4ed55b458c7837130a802"
+  },
+  "docs/captures/phase-1/mobile-light-codes.png": {
+    "mtime": 1792528723.323241,
+    "seen": 1792613044.789219,
+    "ast_hash": "ea4dbb67092413dc280dd5ad733d90d5",
+    "semantic_hash": "ea4dbb67092413dc280dd5ad733d90d5"
+  },
+  "docs/captures/phase-1/mobile-light-inscription-fiche.png": {
+    "mtime": 1792528723.3252409,
+    "seen": 1792613044.7892194,
+    "ast_hash": "4b634c84871cda8d2fe50f9ec09e4862",
+    "semantic_hash": "4b634c84871cda8d2fe50f9ec09e4862"
+  },
+  "docs/captures/phase-1/mobile-light-membres.png": {
+    "mtime": 1792528723.326241,
+    "seen": 1792613044.78922,
+    "ast_hash": "4388e1c289b210d72391859c65c6123b",
+    "semantic_hash": "4388e1c289b210d72391859c65c6123b"
+  },
+  "docs/captures/phase-1/mobile-light-premiers-pas-photo.png": {
+    "mtime": 1792528723.327241,
+    "seen": 1792613044.7892208,
+    "ast_hash": "6984a6e8f53bca43bac53f20704cfe6c",
+    "semantic_hash": "6984a6e8f53bca43bac53f20704cfe6c"
+  },
+  "docs/captures/phase-1/mobile-light-profil.png": {
+    "mtime": 1792528723.3292408,
+    "seen": 1792613044.7892213,
+    "ast_hash": "2c7844f9316320b8a71b13207dac87de",
+    "semantic_hash": "2c7844f9316320b8a71b13207dac87de"
+  },
+  "docs/references/GG_logo.jpeg": {
+    "mtime": 1792252567.5709255,
+    "seen": 1792613044.7892222,
+    "ast_hash": "3d9c029588bbe831eccd6b1ce5e46130",
+    "semantic_hash": "3d9c029588bbe831eccd6b1ce5e46130"
+  },
+  "docs/references/exemple1.webp": {
+    "mtime": 1792252567.5712779,
+    "seen": 1792613044.789223,
+    "ast_hash": "bbfc44676bd17d8779bedebdbbb6c9a2",
+    "semantic_hash": "bbfc44676bd17d8779bedebdbbb6c9a2"
+  },
+  "docs/references/exemple2.webp": {
+    "mtime": 1792252567.5709255,
+    "seen": 1792613044.7892234,
+    "ast_hash": "2030646827e60afe6356128930378186",
+    "semantic_hash": "2030646827e60afe6356128930378186"
+  },
+  "docs/references/oblyk.webp": {
+    "mtime": 1792252567.5712779,
+    "seen": 1792613044.7892241,
+    "ast_hash": "8121e5a7d8f5fcbf09fc973068050592",
+    "semantic_hash": "8121e5a7d8f5fcbf09fc973068050592"
+  },
+  "docs/references/oblyk2.webp": {
+    "mtime": 1792252567.5712779,
+    "seen": 1792613044.789225,
+    "ast_hash": "a80d899a02d52dabd8f88823aed1334b",
+    "semantic_hash": "a80d899a02d52dabd8f88823aed1334b"
+  },
+  "docs/references/oblyk3.webp": {
+    "mtime": 1792252567.5709255,
+    "seen": 1792613044.789226,
+    "ast_hash": "418693a3367770bfa5325e73e188b266",
+    "semantic_hash": "418693a3367770bfa5325e73e188b266"
+  },
+  "docs/references/oblyk4.webp": {
+    "mtime": 1792252567.5709255,
+    "seen": 1792613044.7892265,
+    "ast_hash": "1a65c215058304140231c88d44a811db",
+    "semantic_hash": "1a65c215058304140231c88d44a811db"
+  },
+  "frontend/src/components/layout/LoadFailureScreen.vue": {
+    "mtime": 1792619671.864046,
+    "seen": 1792619944.447487,
+    "ast_hash": "d1774451e943a3eae83334a377f86b62",
+    "semantic_hash": "d1774451e943a3eae83334a377f86b62"
+  },
+  "frontend/src/lib/load-diagnostics.ts": {
+    "mtime": 1792619671.865152,
+    "seen": 1792619944.4475272,
+    "ast_hash": "672dce3f2345393c6d9e4917ba227667",
+    "semantic_hash": "672dce3f2345393c6d9e4917ba227667"
+  },
+  "frontend/src/lib/stale-chunk.spec.ts": {
+    "mtime": 1792619671.865152,
+    "seen": 1792619944.4475367,
+    "ast_hash": "ceabeb1daf407f3e739f2ffaff29838a",
+    "semantic_hash": "ceabeb1daf407f3e739f2ffaff29838a"
+  },
+  "frontend/src/lib/stale-chunk.ts": {
+    "mtime": 1792619671.865152,
+    "seen": 1792619944.4475377,
+    "ast_hash": "41035b3e43a9ff6bc2b62a2055b16d20",
+    "semantic_hash": "41035b3e43a9ff6bc2b62a2055b16d20"
+  }
+}

@@ -31,3 +31,8 @@ deploy/backups/
 
 # Session handoff of the relay mode (local only)
 .relais/
+
+# graphify: graph, report and manifest are committed; cache and local state are not
+graphify-out/cache/
+graphify-out/.graphify_*
+graphify-out/cost.json

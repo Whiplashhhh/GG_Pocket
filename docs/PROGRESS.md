@@ -4,6 +4,34 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-21 — Graphe de connaissance graphify
+
+**Branche** : `chore/graphify` (depuis `main` = 0.1.1).
+
+### Fait
+
+- Graphe du dépôt construit avec graphify puis mis à jour sur `main` 0.1.1 : 2 515 nœuds, 6 303 liens, 134 communautés
+  (code par analyse syntaxique ; docs, décisions et captures lues par un modèle, ~600 k jetons au total).
+- `graphify-out/` commité (graphe, rapport, page HTML, manifeste), cache et état local ignorés : D-074 (à valider).
+- Commandes ajoutées à `CLAUDE.md`.
+
+### Reste
+
+- Les icônes PWA et logos n'ont pas été lus (sans contenu utile) ; `frontend/src/styles/tokens.css` est écarté par graphify
+  (pris à tort pour un fichier sensible).
+- Une capture (`docs/captures/phase-1/mobile-light-profil.png`) montre la barre d'onglets au milieu du contenu : sans doute
+  un effet de la capture pleine page, à confirmer.
+
+### Prochaine action exacte
+
+- Willem : relire et fusionner la PR graphify ; puis reprendre la PR #16 (retour arrière, clôture de la phase 2).
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-21 — Correctif iPhone et logo du club (vers 0.1.1)
 
 **Branche** : `fix/iphone-profil-0.1.0` (depuis `main` = 0.1.0), PR #13.
