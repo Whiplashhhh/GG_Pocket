@@ -175,7 +175,7 @@ function sheetLink(item: RouteSummary) {
       </h2>
       <ul class="divide-y divide-rule border-b border-rule">
         <li v-for="item in group.routes" :key="item.id">
-          <RouteRow :route="item" :to="sheetLink(item)" />
+          <RouteRow :route="item" :to="sheetLink(item)" hide-sector />
         </li>
       </ul>
     </section>

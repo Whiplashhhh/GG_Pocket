@@ -14,7 +14,12 @@ import RouteThumbnail from './RouteThumbnail.vue'
  * One line of the topo (docs/DESIGN.md §4, wireframe « Topo »): full width, between rules, no
  * card. The whole line opens the route sheet; its name is the label's, the rest describes it.
  */
-const props = defineProps<{ route: RouteSummary; to: RouteLocationRaw }>()
+const props = defineProps<{
+  route: RouteSummary
+  to: RouteLocationRaw
+  /** The list is already grouped under the sector's heading: do not repeat it on each row. */
+  hideSector?: boolean
+}>()
 
 const { t } = useI18n()
 const labelId = useId()
@@ -38,12 +43,9 @@ const done = computed(() =>
     <RouteThumbnail :route="route" />
     <div class="flex min-w-0 flex-1 flex-col items-start gap-1.5">
       <RouteSummaryLabel :route="route" :label-id="labelId" />
-      <p :id="metaId" class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-ink-muted">
-        <span>{{ route.sectorName }}</span>
-        <template v-if="styles">
-          <span aria-hidden="true">·</span>
-          <span>{{ styles }}</span>
-        </template>
+      <p :id="metaId" class="dot-list gap-y-0.5 text-sm text-ink-muted">
+        <span v-if="!hideSector">{{ route.sectorName }}</span>
+        <span v-if="styles">{{ styles }}</span>
         <span v-if="route.favoriteCount > 0" class="inline-flex items-center gap-0.5">
           <Heart :size="14" aria-hidden="true" />
           <span aria-hidden="true">{{ route.favoriteCount }}</span>

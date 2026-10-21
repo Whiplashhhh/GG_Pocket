@@ -53,12 +53,12 @@ afterEach(() => {
 describe('RouteStatusDialogs', () => {
   it('warns explicitly when climbers have the route as a favourite (spec §8.10)', async () => {
     const text = await askToDismount(4)
-    expect(text).toContain('Démonter « Bye Bye Morice » ?')
-    expect(text).toContain('4 grimpeurs l’ont en coup de cœur. Tu es sûr·e ?')
+    expect(text).toContain('Démonter « Bye Bye Morice »\u00a0?')
+    expect(text).toContain('4 grimpeurs l’ont en coup de cœur. Tu es sûr·e\u00a0?')
   })
 
   it('says it in the singular for one climber', async () => {
-    expect(await askToDismount(1)).toContain('1 grimpeur l’a en coup de cœur. Tu es sûr·e ?')
+    expect(await askToDismount(1)).toContain('1 grimpeur l’a en coup de cœur. Tu es sûr·e\u00a0?')
   })
 
   it('does not warn about favourites nobody gave', async () => {

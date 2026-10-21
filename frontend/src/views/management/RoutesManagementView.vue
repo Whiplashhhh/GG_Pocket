@@ -4,6 +4,7 @@ import {
   ArchiveRestore,
   Copy,
   EllipsisVertical,
+  Eye,
   Heart,
   Hourglass,
   MessageCircle,
@@ -220,16 +221,14 @@ function statusLine(item: RouteSummary, format = formatDate): string {
         >
           <span class="flex min-w-0 flex-1 flex-col items-start gap-1.5">
             <RouteSummaryLabel :route="item" />
-            <span class="flex flex-wrap gap-x-2 text-sm text-ink-muted">
+            <span class="dot-list text-sm text-ink-muted">
               <span>{{ item.sectorName }}</span>
-              <span aria-hidden="true">·</span>
               <span :class="{ 'font-semibold text-brand-ink': item.status === 'LAST_CHANCE' }">{{
                 statusLine(item)
               }}</span>
-              <template v-if="item.favoriteCount > 0">
-                <span aria-hidden="true">·</span>
-                <span>{{ t('topo.row.favorites', item.favoriteCount) }}</span>
-              </template>
+              <span v-if="item.favoriteCount > 0">{{
+                t('topo.row.favorites', item.favoriteCount)
+              }}</span>
             </span>
           </span>
           <EllipsisVertical :size="20" class="shrink-0 text-ink-muted" aria-hidden="true" />
@@ -388,6 +387,7 @@ function statusLine(item: RouteSummary, format = formatDate): string {
           {{ t('routesAdmin.cancelLastChance') }}
         </GgButton>
         <GgButton variant="secondary" block :to="sheetLink(sheetRoute)">
+          <Eye :size="20" aria-hidden="true" />
           {{ t('routesAdmin.sheet') }}
         </GgButton>
         <GgButton variant="danger" block @click="ask('dismount', sheetRoute)">
@@ -401,6 +401,7 @@ function statusLine(item: RouteSummary, format = formatDate): string {
           {{ t('routesAdmin.duplicate') }}
         </GgButton>
         <GgButton variant="secondary" block :to="sheetLink(sheetRoute)">
+          <Eye :size="20" aria-hidden="true" />
           {{ t('routesAdmin.sheet') }}
         </GgButton>
         <GgButton block @click="ask('remount', sheetRoute)">

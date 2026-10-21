@@ -366,6 +366,8 @@ for (const capture of CAPTURES) {
       await page.screenshot({
         path: `screenshots/${testInfo.project.name}/${capture.name}.png`,
         fullPage: true,
+        // Finished transitions only: a chip caught mid-fade reads grey on grey.
+        animations: 'disabled',
       })
     })
   })

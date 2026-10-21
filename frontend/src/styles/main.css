@@ -156,3 +156,29 @@
 @utility pt-safe {
   padding-top: env(safe-area-inset-top);
 }
+
+/*
+ * Inline facts separated by "·" (sector · styles · hearts). Each item carries its dot on its left;
+ * the list is shifted left by one gap and clipped, so the dot of the first item of every line
+ * disappears: a wrapped line never starts or ends with a lone dot. The dots are not read aloud.
+ */
+@utility dot-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-left: -1rem;
+  clip-path: inset(0 0 0 1rem);
+
+  & > * {
+    position: relative;
+    padding-left: 1rem;
+  }
+
+  & > *::before {
+    content: '·' / '';
+    position: absolute;
+    left: 0.35rem;
+    color: var(--color-ink-muted);
+    font-weight: 400;
+  }
+}

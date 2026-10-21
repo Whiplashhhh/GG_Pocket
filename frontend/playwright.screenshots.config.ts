@@ -9,7 +9,11 @@ import baseConfig from './playwright.config.ts'
  */
 const DEV_PORT = 5174
 const chromiumExecutable = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
-const launchOptions = chromiumExecutable ? { executablePath: chromiumExecutable } : {}
+// --lang: native date fields follow the browser's language, not only the context locale.
+const launchOptions = {
+  args: ['--lang=fr-FR'],
+  ...(chromiumExecutable ? { executablePath: chromiumExecutable } : {}),
+}
 
 const variants = [
   { name: 'mobile-light', width: 360, colorScheme: 'light' },
@@ -39,6 +43,7 @@ export default defineConfig({
       isMobile: variant.width < 500,
       hasTouch: variant.width < 500,
       colorScheme: variant.colorScheme,
+      locale: 'fr-FR',
       launchOptions,
     },
   })),

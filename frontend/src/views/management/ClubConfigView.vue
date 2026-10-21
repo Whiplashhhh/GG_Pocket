@@ -188,7 +188,7 @@ function move(sector: Sector, offset: -1 | 1) {
                 :class="
                   cord.active
                     ? 'border-ink text-ink'
-                    : 'border-dashed border-rule text-ink-muted line-through'
+                    : 'border-rule bg-surface-sunken text-ink-muted line-through'
                 "
                 :aria-label="
                   t(cord.active ? 'clubConfig.editCordNamed' : 'clubConfig.editCordInactiveNamed', {

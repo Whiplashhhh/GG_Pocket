@@ -208,7 +208,9 @@ const toggleClasses = (pressed: boolean, tone: 'brand' | 'success') => [
         <div class="flex-1 overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <template v-if="detail.isPending.value">
             <DialogTitle class="sr-only">{{ t('routeSheet.title') }}</DialogTitle>
-            <p class="sr-only" role="status">{{ t('common.loading') }}</p>
+            <DialogDescription class="sr-only" role="status">
+              {{ t('common.loading') }}
+            </DialogDescription>
             <div class="flex flex-col gap-4 pt-2" aria-hidden="true">
               <SkeletonBlock class="aspect-[4/3] w-full rounded-none" />
               <SkeletonBlock class="mx-4 h-16" />

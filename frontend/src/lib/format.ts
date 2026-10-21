@@ -26,17 +26,20 @@ const HOUR_MINUTE = new Intl.DateTimeFormat('en-GB', {
 })
 const RELATIVE = new Intl.RelativeTimeFormat('fr-FR', { numeric: 'auto' })
 
+/** French writes the first day of a month "1er", which Intl does not. */
+const firstOfMonth = (formatted: string): string => formatted.replace(/^1(?= )/, '1er')
+
 /** "12 octobre 2026". Accepts an instant or a calendar date (YYYY-MM-DD). */
 export function formatDate(value: string): string {
   // A bare date is a calendar day: read it at noon UTC so no time zone moves it to another day.
   const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T12:00:00Z`) : new Date(value)
-  return DAY.format(date)
+  return firstOfMonth(DAY.format(date))
 }
 
-/** "1 sept. 2026", for tables where a long month would wrap. Same inputs as {@link formatDate}. */
+/** "1er sept. 2026", for tables where a long month would wrap. Same inputs as {@link formatDate}. */
 export function formatShortDate(value: string): string {
   const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T12:00:00Z`) : new Date(value)
-  return SHORT_DAY.format(date)
+  return firstOfMonth(SHORT_DAY.format(date))
 }
 
 /** "12 octobre à 18 h 30", "12 octobre à 10 h": the French way of writing a time. */
@@ -47,7 +50,7 @@ export function formatDateTime(value: string): string {
     minutes === '00'
       ? `${String(Number(hours))}\u00a0h`
       : `${String(Number(hours))}\u00a0h\u00a0${minutes}`
-  return `${DAY_MONTH.format(date)} à ${time}`
+  return `${firstOfMonth(DAY_MONTH.format(date))} à ${time}`
 }
 
 const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [

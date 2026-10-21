@@ -19,7 +19,7 @@ test.describe('the topo', () => {
     // Grade by default, easiest first.
     await expect(rows(page).first()).toHaveAccessibleName(/P’tite Line, 4a/)
 
-    await page.getByLabel('Trier par').selectOption({ label: 'Date d’ouverture' })
+    await page.getByLabel('Trier par').selectOption({ label: 'Ouverture' })
     await expect(page).toHaveURL(/tri=ouverture/)
     await expect(rows(page).first()).toHaveAccessibleName(/OH purée/)
 
@@ -63,7 +63,7 @@ test.describe('the topo', () => {
     const routeSheet = sheet(page, /Corde 12, Bye Bye Morice, 6b, couleur jaune et bleu/)
     await expect(routeSheet).toBeVisible()
     await expect(routeSheet.getByText('Négatif et ses 2 dièdres · corde 12')).toBeVisible()
-    await expect(routeSheet.getByText('Prises jaune et bleu')).toBeVisible()
+    await expect(routeSheet.getByText('Prises : jaune et bleu')).toBeVisible()
     await expect(routeSheet.getByText('Ouverte le 16 mai 2026 par Sam')).toBeVisible()
     await expect(routeSheet.getByText('Le conseil de l’ouvreur')).toBeVisible()
     await expect(routeSheet.getByText('« Garde du jus pour la sortie. »')).toBeVisible()

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatDate, formatDateTime, formatRelative } from './format'
+import { formatDate, formatDateTime, formatRelative, formatShortDate } from './format'
 
 describe('formatDate', () => {
   it('writes dates the French way', () => {
@@ -8,14 +8,20 @@ describe('formatDate', () => {
   })
 
   it('keeps a calendar date on its day whatever the time zone', () => {
-    expect(formatDate('2011-03-01')).toBe('1 mars 2011')
+    expect(formatDate('2011-03-01')).toBe('1er mars 2011')
   })
 
   it('uses the time in Gravelines', () => {
     // 23:30 UTC on 31 October is already 1 November in Paris (UTC+1).
-    expect(formatDate('2026-10-31T23:30:00Z')).toBe('1 novembre 2026')
+    expect(formatDate('2026-10-31T23:30:00Z')).toBe('1er novembre 2026')
     expect(formatDateTime('2026-07-14T16:30:00Z')).toBe('14 juillet à 18\u00a0h\u00a030')
     expect(formatDateTime('2026-10-21T08:00:00Z')).toBe('21 octobre à 10\u00a0h')
+  })
+
+  it('writes the first of the month "1er", and only that day', () => {
+    expect(formatShortDate('2026-09-01')).toBe('1er sept. 2026')
+    expect(formatShortDate('2026-09-11')).toBe('11 sept. 2026')
+    expect(formatDateTime('2026-11-01T09:00:00Z')).toBe('1er novembre à 10\u00a0h')
   })
 })
 

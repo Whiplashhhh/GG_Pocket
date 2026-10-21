@@ -317,7 +317,7 @@ function errorText(field: RouteFormField): string | undefined {
 
   <div
     v-else
-    class="flex flex-col gap-6 px-4 pt-2 pb-8 lg:grid lg:grid-cols-[minmax(0,36rem)_minmax(0,1fr)] lg:items-start lg:gap-10 lg:px-0 lg:pt-4"
+    class="flex flex-col gap-6 px-4 pt-2 pb-8 lg:grid lg:grid-cols-[minmax(0,32rem)_minmax(0,1fr)] lg:items-start lg:gap-8 lg:px-0 lg:pt-4"
   >
     <!-- The label as it will be taped at the foot of the route. -->
     <section
