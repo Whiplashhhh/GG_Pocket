@@ -32,6 +32,7 @@ public record MyProfileResponse(
         Integer climbingSinceYear,
         String bio,
         @Schema(requiredMode = RequiredMode.REQUIRED) boolean appearsInRankings,
+        @Schema(description = "My favourite route, possibly dismounted") UUID favoriteRouteId,
         @Schema(requiredMode = RequiredMode.REQUIRED) Instant createdAt) {
 
     public static MyProfileResponse from(MyProfileView view) {
@@ -51,6 +52,7 @@ public record MyProfileResponse(
                 view.climbingSinceYear(),
                 view.bio(),
                 view.appearsInRankings(),
+                view.favoriteRouteId(),
                 view.createdAt());
     }
 }

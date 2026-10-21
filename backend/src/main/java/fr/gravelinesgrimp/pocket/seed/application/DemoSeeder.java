@@ -7,6 +7,7 @@ import fr.gravelinesgrimp.pocket.member.domain.MemberIdentity;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.config.GgProperties;
+import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 import fr.gravelinesgrimp.pocket.platform.domain.DeploymentEnvironment;
 import fr.gravelinesgrimp.pocket.platform.domain.InstanceMarker;
 import fr.gravelinesgrimp.pocket.platform.infra.InstanceMarkerRepository;
@@ -26,12 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Demo accounts for the local machine and the dev environment (spec §17): one per role, plus a
- * registration code. Idempotent: accounts already there are left alone. The rest of the demo data
- * (routes, sessions, friends…) is added phase after phase.
+ * registration code, and the demo topo (DemoTopoSeeder). Idempotent: accounts already there are
+ * left alone, the topo is seeded only once. The rest of the demo data (sessions, friends…) is added
+ * phase after phase.
  *
  * <p>Runs before the first-start admin code, which then sees members and stays quiet.
  */
@@ -59,6 +62,7 @@ public class DemoSeeder implements ApplicationRunner {
 
     private final MemberRepository members;
     private final RegistrationCodeRepository codes;
+    private final DemoTopoSeeder topo;
     private final DemoSeedRegistry registry;
     private final InstanceMarkerRepository markers;
     private final PasswordEncoder passwordEncoder;
@@ -70,6 +74,7 @@ public class DemoSeeder implements ApplicationRunner {
     public DemoSeeder(
             MemberRepository members,
             RegistrationCodeRepository codes,
+            DemoTopoSeeder topo,
             DemoSeedRegistry registry,
             InstanceMarkerRepository markers,
             PasswordEncoder passwordEncoder,
@@ -79,6 +84,7 @@ public class DemoSeeder implements ApplicationRunner {
             @Value("${gg.demo-seed.password:}") String password) {
         this.members = members;
         this.codes = codes;
+        this.topo = topo;
         this.registry = registry;
         this.markers = markers;
         this.passwordEncoder = passwordEncoder;
@@ -142,9 +148,20 @@ public class DemoSeeder implements ApplicationRunner {
                     new RegistrationCode(
                             DEMO_CODE, "Code de démonstration", Role.CLIMBER, null, null, null));
         }
+        var accounts = new HashMap<String, Member>();
+        for (var account : ACCOUNTS) {
+            members.findByNicknameIgnoreCase(account.nickname())
+                    .ifPresent(member -> accounts.put(account.nickname(), member));
+        }
+        var routes =
+                accounts.size() == ACCOUNTS.size()
+                        ? topo.seed(accounts, now, ClubTime.today(clock))
+                        : 0;
         log.info(
-                "Demo seed: {} account(s) created (admin, direction, ouvreur, grimpeur){}",
+                "Demo seed: {} account(s) and {} route(s) created (admin, direction, ouvreur,"
+                        + " grimpeur){}",
                 created,
+                routes,
                 withCode ? ", registration code DEMO2026" : "");
     }
 }

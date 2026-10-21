@@ -76,6 +76,10 @@ public class Member extends TimestampedEntity {
     @Column(name = "last_seen_at")
     private Instant lastSeenAt;
 
+    /** A route of the topo, possibly dismounted (no association: members know nothing of it). */
+    @Column(name = "favorite_route_id")
+    private UUID favoriteRouteId;
+
     protected Member() {
         // for JPA
     }
@@ -149,6 +153,11 @@ public class Member extends TimestampedEntity {
 
     public void changeAvatar(UUID avatarId) {
         this.avatarId = avatarId;
+    }
+
+    /** The caller checks that the route exists; null clears it. */
+    public void changeFavoriteRoute(UUID routeId) {
+        this.favoriteRouteId = routeId;
     }
 
     public void markSeen(Instant now) {
@@ -233,6 +242,10 @@ public class Member extends TimestampedEntity {
 
     public Instant lastSeenAt() {
         return lastSeenAt;
+    }
+
+    public UUID favoriteRouteId() {
+        return favoriteRouteId;
     }
 
     private static String blankToNull(String value) {

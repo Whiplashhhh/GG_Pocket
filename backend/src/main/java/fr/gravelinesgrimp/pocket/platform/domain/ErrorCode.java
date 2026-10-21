@@ -42,7 +42,19 @@ public enum ErrorCode {
 
     // Member management
     SELF_MANAGEMENT_FORBIDDEN(ErrorCategory.FORBIDDEN),
-    LAST_ADMIN(ErrorCategory.CONFLICT);
+    LAST_ADMIN(ErrorCategory.CONFLICT),
+
+    // Club configuration
+    ALREADY_EXISTS(ErrorCategory.CONFLICT),
+    CLUB_ITEM_INACTIVE(ErrorCategory.INVALID),
+
+    // Topo
+    FAVORITES_FULL(ErrorCategory.CONFLICT),
+    ROUTE_DISMOUNTED(ErrorCategory.CONFLICT),
+    ROUTE_STATUS_CONFLICT(ErrorCategory.CONFLICT),
+    INVALID_SETTERS(ErrorCategory.INVALID),
+    DATE_IN_THE_FUTURE(ErrorCategory.INVALID),
+    DATE_IN_THE_PAST(ErrorCategory.INVALID);
 
     private final ErrorCategory category;
 

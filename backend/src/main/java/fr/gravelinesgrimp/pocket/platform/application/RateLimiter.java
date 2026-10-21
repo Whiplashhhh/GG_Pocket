@@ -53,6 +53,13 @@ public class RateLimiter {
     public static final Rule AVATAR_UPLOAD_PER_MEMBER =
             new Rule("avatar-upload-per-member", 10, Duration.ofHours(1));
 
+    /** A setter photographs a whole new wall in one go. */
+    public static final Rule ROUTE_PHOTO_UPLOAD_PER_MEMBER =
+            new Rule("route-photo-upload-per-member", 40, Duration.ofHours(1));
+
+    public static final Rule ROUTE_COMMENT_PER_MEMBER =
+            new Rule("route-comment-per-member", 20, Duration.ofHours(1));
+
     /** Above this many tracked keys, stale ones are dropped before adding more. */
     private static final int PURGE_THRESHOLD = 10_000;
 

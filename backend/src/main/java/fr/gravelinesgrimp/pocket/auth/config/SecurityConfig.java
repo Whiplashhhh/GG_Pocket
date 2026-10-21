@@ -74,7 +74,9 @@ class SecurityConfig {
                                         .requestMatchers("/error")
                                         .permitAll()
                                         // Second line of defence; the services check each action.
-                                        .requestMatchers("/api/v1/admin/registration-codes/**")
+                                        .requestMatchers(
+                                                "/api/v1/admin/registration-codes/**",
+                                                "/api/v1/admin/club/**")
                                         .hasRole(Role.ADMIN.name())
                                         .requestMatchers("/api/v1/admin/**")
                                         .hasRole(Role.BOARD.name())

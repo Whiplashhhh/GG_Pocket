@@ -15,10 +15,13 @@ import java.util.UUID;
 
 /**
  * Writes the audit log, inside the transaction of the change it records: both are saved, or
- * neither.
+ * neither. Texts longer than their column (a comment body, a list of sectors…) are shortened.
  */
 @Component
 public class AuditLog {
+
+    static final int LABEL_LENGTH = 100;
+    static final int VALUE_LENGTH = 200;
 
     private final AuditEntryRepository entries;
     private final Clock clock;
@@ -45,8 +48,20 @@ public class AuditLog {
                         action,
                         targetType,
                         targetId,
-                        targetLabel,
-                        before,
-                        after));
+                        shorten(targetLabel, LABEL_LENGTH),
+                        shorten(before, VALUE_LENGTH),
+                        shorten(after, VALUE_LENGTH)));
+    }
+
+    static String shorten(String text, int length) {
+        if (text == null || text.length() <= length) {
+            return text;
+        }
+        var end = length - 1;
+        // Never cut an emoji in half.
+        if (Character.isHighSurrogate(text.charAt(end - 1))) {
+            end--;
+        }
+        return text.substring(0, end) + "…";
     }
 }

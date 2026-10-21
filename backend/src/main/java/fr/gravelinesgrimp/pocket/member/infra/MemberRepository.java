@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,4 +56,17 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
 
     @Query("select m from Member m order by lower(m.lastName), lower(m.firstName)")
     List<Member> findAllForDirectory();
+
+    /**
+     * Locks one member until the end of the transaction: serializes what must stay consistent for
+     * that member (at most 2 favourites, for instance) when two requests arrive at once.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select m from Member m where m.id = :id")
+    Optional<Member> lockById(UUID id);
+
+    @Query(
+            "select m from Member m where m.role in :roles and m.status = :status"
+                    + " order by lower(m.nickname)")
+    List<Member> findAllByRolesAndStatus(Collection<Role> roles, MemberStatus status);
 }

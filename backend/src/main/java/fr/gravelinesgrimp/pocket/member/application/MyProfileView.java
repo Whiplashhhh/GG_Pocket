@@ -25,6 +25,7 @@ public record MyProfileView(
         Integer climbingSinceYear,
         String bio,
         boolean appearsInRankings,
+        UUID favoriteRouteId,
         Instant createdAt) {
 
     public static MyProfileView of(Member member, LocalDate today) {
@@ -44,6 +45,7 @@ public record MyProfileView(
                 member.climbingSinceYear(),
                 member.bio(),
                 member.appearsInRankings(),
+                member.favoriteRouteId(),
                 member.createdAt());
     }
 }

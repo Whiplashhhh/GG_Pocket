@@ -37,7 +37,7 @@ import javax.imageio.stream.ImageInputStream;
 public class ImageSanitizer {
 
     /**
-     * Beyond this, refused before decoding. The app sends at most 1024 px; a phone photo sent as is
+     * Beyond this, refused before decoding. The app sends at most 1600 px; a phone photo sent as is
      * stays well under. Decoding is also subsampled to about twice the target size.
      */
     static final long MAX_PIXELS = 16_000_000L;
@@ -52,7 +52,7 @@ public class ImageSanitizer {
     private static final float JPEG_QUALITY = 0.85f;
     private static final Color PAPER = new Color(0xFF, 0xFD, 0xF8);
 
-    /** A cleaned square JPEG. */
+    /** A cleaned JPEG. */
     public record CleanImage(byte[] jpeg, int width, int height) {}
 
     /** Detected from the first bytes of the file. */
@@ -75,23 +75,53 @@ public class ImageSanitizer {
      *     WebP, {@code IMAGE_TOO_LARGE} if it has too many pixels
      */
     public CleanImage squareJpeg(byte[] upload, int size) {
-        var type =
-                detect(upload)
-                        .orElseThrow(
-                                () ->
-                                        new BusinessException(
-                                                ErrorCode.IMAGE_UNSUPPORTED,
-                                                "Not a JPEG, PNG or WebP file"));
-        if (!decodes.tryAcquire()) {
-            throw new RateLimitedException("image-decoding", Duration.ofSeconds(5));
-        }
+        var type = detectOrRefuse(upload);
+        acquireDecoding();
         try {
-            var square = decodeCenteredSquare(upload, type, size);
+            var square = decode(upload, type, size, true);
             var target = Math.min(square.getWidth(), size);
-            var resized = resize(square, target);
+            var resized = resize(square, target, target);
             return new CleanImage(encodeJpeg(resized), target, target);
         } finally {
             decodes.release();
+        }
+    }
+
+    /**
+     * Keeps the whole photo, shrunk so that its longest side is at most {@code maxSide} pixels
+     * (never enlarged).
+     *
+     * @throws BusinessException {@code IMAGE_UNSUPPORTED} if this is not a readable JPEG, PNG or
+     *     WebP, {@code IMAGE_TOO_LARGE} if it has too many pixels
+     */
+    public CleanImage fittedJpeg(byte[] upload, int maxSide) {
+        var type = detectOrRefuse(upload);
+        acquireDecoding();
+        try {
+            var decoded = decode(upload, type, maxSide, false);
+            var longest = Math.max(decoded.getWidth(), decoded.getHeight());
+            var scale = Math.min(1.0, (double) maxSide / longest);
+            var width = Math.max(1, (int) Math.round(decoded.getWidth() * scale));
+            var height = Math.max(1, (int) Math.round(decoded.getHeight() * scale));
+            var resized = resize(decoded, width, height);
+            return new CleanImage(encodeJpeg(resized), width, height);
+        } finally {
+            decodes.release();
+        }
+    }
+
+    private static ImageType detectOrRefuse(byte[] upload) {
+        return detect(upload)
+                .orElseThrow(
+                        () ->
+                                new BusinessException(
+                                        ErrorCode.IMAGE_UNSUPPORTED,
+                                        "Not a JPEG, PNG or WebP file"));
+    }
+
+    private void acquireDecoding() {
+        if (!decodes.tryAcquire()) {
+            throw new RateLimitedException("image-decoding", Duration.ofSeconds(5));
         }
     }
 
@@ -121,10 +151,11 @@ public class ImageSanitizer {
     }
 
     /**
-     * Reads only the centred square, skipping pixels so that it comes out at most about twice the
-     * target size: memory stays small whatever the size of the photo.
+     * Reads only the centred square (or the whole picture), skipping pixels so that it comes out at
+     * most about twice the target size: memory stays small whatever the size of the photo.
      */
-    private static BufferedImage decodeCenteredSquare(byte[] upload, ImageType type, int size) {
+    private static BufferedImage decode(
+            byte[] upload, ImageType type, int size, boolean centeredSquare) {
         try (ImageInputStream input =
                 ImageIO.createImageInputStream(new ByteArrayInputStream(upload))) {
             var readers = ImageIO.getImageReadersByFormatName(type.formatName);
@@ -140,16 +171,23 @@ public class ImageSanitizer {
                     throw new BusinessException(
                             ErrorCode.IMAGE_TOO_LARGE, "Image of " + width + "x" + height);
                 }
-                var side = Math.min(width, height);
-                var step = Math.max(1, side / (2 * size));
                 var params = reader.getDefaultReadParam();
-                params.setSourceRegion(
-                        new Rectangle((width - side) / 2, (height - side) / 2, side, side));
+                int step;
+                if (centeredSquare) {
+                    var side = Math.min(width, height);
+                    step = Math.max(1, side / (2 * size));
+                    params.setSourceRegion(
+                            new Rectangle((width - side) / 2, (height - side) / 2, side, side));
+                } else {
+                    step = Math.max(1, Math.max(width, height) / (2 * size));
+                }
                 params.setSourceSubsampling(step, step, 0, 0);
                 var decoded = reader.read(0, params);
                 // Subsampling may leave a pixel more on one side: keep it square.
                 var image =
-                        decoded == null || decoded.getWidth() == decoded.getHeight()
+                        decoded == null
+                                        || !centeredSquare
+                                        || decoded.getWidth() == decoded.getHeight()
                                 ? decoded
                                 : decoded.getSubimage(
                                         0,
@@ -175,12 +213,14 @@ public class ImageSanitizer {
      * Draws the picture on an opaque RGB canvas (transparent areas become paper white), halving the
      * size step by step for a smooth result.
      */
-    private static BufferedImage resize(BufferedImage source, int target) {
+    private static BufferedImage resize(BufferedImage source, int width, int height) {
         var current = toRgb(source);
-        while (current.getWidth() / 2 >= target) {
-            current = draw(current, current.getWidth() / 2);
+        while (current.getWidth() / 2 >= width && current.getHeight() / 2 >= height) {
+            current = draw(current, current.getWidth() / 2, current.getHeight() / 2);
         }
-        return current.getWidth() == target ? current : draw(current, target);
+        return current.getWidth() == width && current.getHeight() == height
+                ? current
+                : draw(current, width, height);
     }
 
     private static BufferedImage toRgb(BufferedImage source) {
@@ -198,15 +238,15 @@ public class ImageSanitizer {
         return rgb;
     }
 
-    private static BufferedImage draw(BufferedImage source, int side) {
-        var resized = new BufferedImage(side, side, BufferedImage.TYPE_INT_RGB);
+    private static BufferedImage draw(BufferedImage source, int width, int height) {
+        var resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = resized.createGraphics();
         try {
             graphics.setRenderingHint(
                     RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             graphics.setRenderingHint(
                     RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            graphics.drawImage(source, 0, 0, side, side, null);
+            graphics.drawImage(source, 0, 0, width, height, null);
         } finally {
             graphics.dispose();
         }
