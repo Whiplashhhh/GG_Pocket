@@ -5,6 +5,7 @@ import { authStateQuery } from '@/api/auth'
 import { queryClient } from '@/api/queryClient'
 import { i18n } from '@/i18n'
 import type { Role } from '@/lib/route'
+import { reloadOnStaleChunk } from '@/lib/stale-chunk'
 import ActuView from '@/views/ActuView.vue'
 
 import { decideNavigation } from './guard'
@@ -184,6 +185,11 @@ router.beforeEach(async (to) => {
     .query({ ...authStateQuery, staleTime: 'static' })
     .catch(() => 'unknown' as const)
   return decideNavigation(to, state)
+})
+
+// A screen's code went missing with a release (installed app left open): load the page afresh.
+router.onError((error, to) => {
+  reloadOnStaleChunk(error, to.fullPath)
 })
 
 router.afterEach((to, from) => {

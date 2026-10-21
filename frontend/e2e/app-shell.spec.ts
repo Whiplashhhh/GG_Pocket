@@ -69,6 +69,17 @@ test.describe('app shell', () => {
     await expect(page.locator('html')).not.toHaveAttribute('data-theme')
   })
 
+  test('an app left open across a release still opens the profile', async ({ page }) => {
+    // Installed app on iOS: the profile screen's file of the previous version is gone (404).
+    await page.route('**/assets/ProfileView-*.js', (route) => route.fulfill({ status: 404 }), {
+      times: 1,
+    })
+    await page.goto('/actu')
+    await page.getByRole('link', { name: 'Mon profil' }).click()
+    await expect(page).toHaveURL(/\/profil$/)
+    await expect(page.getByRole('heading', { level: 1, name: 'Mon profil' })).toBeVisible()
+  })
+
   test('shows the app version in the profile, the server version to the board only', async ({
     page,
   }) => {
