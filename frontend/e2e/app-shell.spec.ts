@@ -114,6 +114,10 @@ test.describe('app shell', () => {
     await page.getByText('Détails pour la direction').click()
     await expect(page.getByText('page /profil')).toBeVisible()
     await expect(page.getByText(/ProfileView-.+\.js → 404/)).toBeVisible()
+    // The probe under another address is not caught by the route above: it loads.
+    await expect(page.getByText(/ProfileView-.+\.js\?sonde → OK/)).toBeVisible()
+
+    await expect(page.getByRole('button', { name: 'Retour à l’actu' })).toBeVisible()
 
     // Back to normal: emptying the cache reloads the screen, which loads this time. Not on WebKit,
     // which keeps the failed module for the whole tab (same file name in this test).

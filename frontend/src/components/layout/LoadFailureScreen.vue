@@ -28,6 +28,12 @@ function retry() {
   window.location.assign(props.failure.path)
 }
 
+/** A full load: after a failed first navigation, the router has no page to go back from. */
+function goHome() {
+  forgetReload()
+  window.location.assign('/actu')
+}
+
 async function repair() {
   busy.value = true
   await resetAppCaches().catch(() => undefined)
@@ -52,6 +58,9 @@ async function copy() {
         <GgButton :disabled="busy" @click="retry">{{ t('common.retry') }}</GgButton>
         <GgButton variant="secondary" :disabled="busy" @click="repair">
           {{ t('loadFailure.repair') }}
+        </GgButton>
+        <GgButton variant="ghost" :disabled="busy" @click="goHome">
+          {{ t('loadFailure.home') }}
         </GgButton>
       </div>
       <details class="mt-6">

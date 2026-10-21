@@ -574,4 +574,8 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   désinscrit le service worker et vide ses caches sans déconnecter, et des détails à copier : version, mode, état du service
   worker, caches, scripts de `/assets/` redemandés qui ne répondent pas un JavaScript en 200). Les e2e bloquent le service
   worker (`serviceWorkers: 'block'`) : c'est le premier suspect, jamais testé.
-- **Statut** : à valider : cause réelle à établir avec les détails de l'écran d'erreur sur l'iPhone.
+- **Détails reçus (iPhone, iOS « 18_7 », Safari 27, PWA déjà installée)** : aucun service worker aux commandes ; 15 scripts sur
+  16 répondent, `ProfileView-*.js` donne `Load failed` (erreur réseau, pas un code HTTP), même après « Vider le cache » et
+  relance de l'appli. Le service worker est donc écarté. L'écran d'erreur redemande maintenant le fichier avec `?sonde=` :
+  OK = adresse refusée par le téléphone ; échec = fichier qui casse en route. Bouton « Retour à l'actu » ajouté.
+- **Statut** : à valider : cause réelle à établir.

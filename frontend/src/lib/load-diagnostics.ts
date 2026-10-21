@@ -46,18 +46,32 @@ async function probeScripts(urls: string[]): Promise<string[]> {
   await Promise.all(
     urls.map(async (url) => {
       const file = new URL(url).pathname
-      try {
-        const response = await fetch(url, { cache: 'no-store' })
-        const type = response.headers.get('content-type') ?? '?'
-        if (!response.ok || !type.includes('javascript')) {
-          misfits.push(`${file} → ${String(response.status)} ${response.type} ${type}`)
-        }
-      } catch (error) {
-        misfits.push(`${file} → ${error instanceof Error ? error.message : String(error)}`)
+      const answer = await probe(url)
+      if (answer !== null) {
+        // Same file under another address: tells a refused address from a file that breaks in transit.
+        misfits.push(
+          `${file} → ${answer}`,
+          `  ${file}?sonde → ${(await probe(`${url}?sonde=${String(Date.now())}`)) ?? 'OK'}`,
+        )
       }
     }),
   )
   return [`scripts ${String(urls.length - misfits.length)}/${String(urls.length)} OK`, ...misfits]
+}
+
+/** null when the script comes back fine, else what went wrong. */
+async function probe(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url, { cache: 'no-store' })
+    const type = response.headers.get('content-type') ?? '?'
+    if (!response.ok || !type.includes('javascript')) {
+      return `${String(response.status)} ${response.type} ${type}`
+    }
+    const body = await response.text()
+    return body.length > 0 ? null : 'vide'
+  } catch (error) {
+    return error instanceof Error ? `${error.name}: ${error.message}` : String(error)
+  }
 }
 
 /** Drops the service worker and its caches: the next load comes straight from the server. */
