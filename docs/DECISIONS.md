@@ -6,7 +6,7 @@ de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision r
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
 choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase), environnements et pipeline
-(D-059 à D-071, phase 2).
+(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072 et suivantes).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -227,7 +227,8 @@ direction) ou **Willem**.
   « Gravelines GRIMP ») est illisible à 44 px de haut : on y affiche un mot-symbole composé (le sommet olive du logo dessiné
   en SVG + « Gravelines Grimp » en Archivo, « Grimp » en orange brique). En phase 8, l'admin pourra téléverser ses logos.
 - **À demander au club** : une version vectorielle (SVG, PDF, AI) ou en haute définition du logo, et la version « fond noir » qu'il utilise déjà.
-- **Statut** : à valider (rendu acceptable, mais une source vectorielle serait bien meilleure).
+- **Statut** : à valider (rendu acceptable, mais une source vectorielle serait bien meilleure). La partie « header » est
+  remplacée par D-072.
 
 ### D-040 — Ce qui est reporté hors de la phase 0
 - **Choix** :
@@ -539,4 +540,61 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   la restauration recrée la base au nom du rôle de l'API (`pg_restore --role`). Le seed de démonstration ne crée plus le code
   `DEMO2026` hors de la machine locale (le dev déployé reste fermé). Les clés IPv6 du limiteur étaient déjà regroupées par /64 ;
   la purge du limiteur redescend désormais à 80 % du plafond d'un coup.
+- **Statut** : validée.
+
+### D-072 — Logo du club dans l'en-tête, nom « GG Pocket »
+- **Contexte** : après la mise en prod de la 0.1.0, Willem préfère le vrai logo, même petit, au sommet dessiné de D-039, et le
+  nom de l'appli plutôt que celui du club ; le logo en grand de l'Actu faisait alors doublon.
+- **Choix** : l'en-tête affiche le logo détouré (clair ou sombre) à 44 px de haut, puis « GG Pocket » à partir de 26rem de
+  large (sous cette largeur, le pseudo et l'avatar prennent la place). Le logo est décoratif (`alt=""`) : le lien porte le nom
+  « GG Pocket, retour à l'actu ». L'encart de l'Actu ne garde que sa phrase d'accroche. Les écrans d'accueil et de connexion
+  (`DoorHeader`) ne changent pas.
+- **Statut** : validée (Willem).
+
+### D-073 — Recharger la page quand le code d'un écran a disparu
+- **Contexte** : dans l'appli installée sur iPhone, toucher l'avatar ne faisait plus rien après la 0.1.0. L'écran Profil est le
+  seul à contenir le numéro de version (`__APP_VERSION__`), donc le nom de son fichier change à chaque version. iOS garde l'appli
+  en mémoire pendant des jours : l'ancien code tourne encore quand le nouveau service worker a déjà vidé l'ancien cache, et le
+  serveur répond 404 sur l'ancien fichier. La navigation échouait sans aucun message, alors que les écrans inchangés marchaient.
+- **Choix** : `router.onError` reconnaît l'échec de chargement d'un écran (messages de Chromium, WebKit, Firefox et Vite) et
+  recharge la page visée (`src/lib/stale-chunk.ts`). Un deuxième échec dans les 30 secondes n'entraîne pas de nouveau
+  rechargement, pour éviter une boucle si le serveur est en panne ou le téléphone hors ligne. Caddy ne met plus le cache d'un
+  an (`immutable`) sur un fichier `/assets/` absent : un 404 part en `no-store`.
+- **Limite du test** : WebKit garde en mémoire, pour tout l'onglet, l'échec d'un module à une URL donnée, et ne la redemande
+  pas après le rechargement, même en `no-store`. L'e2e recharge le même build, donc le même nom de fichier : sur iPhone 13, il
+  vérifie seulement que la page est bien rechargée, et que le profil s'affiche sur Chromium. En vrai, le nouvel `index.html`
+  pointe vers un fichier au nouveau nom, que WebKit va chercher.
+- **Alternatives** : garder les fichiers des anciennes versions sur le serveur (images Docker plus lourdes, ménage à prévoir) ;
+  sortir la version du fichier du Profil (ne règle que ce cas, n'importe quel écran modifié a le même problème).
+- **Retour du dev (2026-10-21)** : sur l'iPhone de Willem (PWA du dev), toucher l'avatar donne un écran noir. Le rechargement a
+  lieu, mais le fichier du Profil échoue encore : ce n'est pas (seulement) une appli périmée, ce fichier ne se charge pas dans
+  la PWA. L'écran noir vient de `App.vue`, qui n'affiche rien tant que la première navigation n'a pas abouti.
+- **Suite** : au second échec, l'appli affiche `LoadFailureScreen` (« Réessayer », « Vider le cache et réessayer », qui
+  désinscrit le service worker et vide ses caches sans déconnecter, et des détails à copier : version, mode, état du service
+  worker, caches, scripts de `/assets/` redemandés qui ne répondent pas un JavaScript en 200). Les e2e bloquent le service
+  worker (`serviceWorkers: 'block'`) : c'est le premier suspect, jamais testé.
+- **Détails reçus (iPhone, iOS « 18_7 », Safari 27, PWA déjà installée)** : aucun service worker aux commandes ; 15 scripts sur
+  16 répondent, `ProfileView-*.js` donne `Load failed` (erreur réseau, pas un code HTTP), même après « Vider le cache » et
+  relance de l'appli. Le service worker est donc écarté. L'écran d'erreur redemande maintenant le fichier avec `?sonde=` :
+  OK = adresse refusée par le téléphone ; échec = fichier qui casse en route. Bouton « Retour à l'actu » ajouté.
+- **Sonde (2e envoi)** : `?sonde` échoue aussi (`TypeError: Load failed`), et Safari hors PWA échoue de même, Tailscale coupé
+  ou non. Ce n'est donc ni l'adresse, ni la PWA, ni la taille (les deux scripts de plus de 120 ko passent) : c'est le contenu
+  de ce fichier qui casse à la réception. La seule transformation qui dépend du contenu est la compression : Caddy envoyait du
+  zstd, que Safari 27 accepte. Hypothèse : défaut du décodeur zstd de Safari 27 sur ce flux précis. Les e2e ne le voyaient pas
+  (`vite preview` ne compresse pas en zstd, l'e2e de la stack tourne sous Chromium).
+- **Essai gzip (réfuté)** : avec `encode gzip` seulement, l'iPhone de Willem (iOS 27.0) échoue toujours, même après un
+  redémarrage, alors que des amis (dont un en iOS 27.0.1) installent la PWA du dev sans souci. Le zstd est rétabli.
+- **Piste suivante** : un filtre propre à ce téléphone (bloqueur de contenu, protection contre le pistage, Temps d'écran,
+  profil VPN ou DNS), qui juge sur l'URL : les deux adresses testées contiennent `ProfileView`. Les détails de l'écran
+  d'erreur demandent maintenant des fichiers inexistants (`ProfileView-sonde.js`, `profile-sonde.js`, `Profil-sonde.js`,
+  `Temoin-sonde.js`) : 404 = le serveur a répondu ; `Load failed` = refusé sur le téléphone avant d'arriver au serveur.
+- **Cause trouvée (iOS 27.0.1, après mise à jour)** : `ProfileView-sonde.js`, `profile-sonde.js` et `Profil-sonde.js` →
+  `Load failed` ; `Temoin-sonde.js` → 404. Le téléphone refuse, avant même de demander au serveur, toute requête de script ou
+  `fetch()` dont l'URL contient « profil » (sans tenir compte des majuscules). Le réseau ne voit pas les chemins en HTTPS :
+  c'est un filtre sur le téléphone (Safari et PWA), absent chez les amis de Willem.
+- **Choix** : fichiers construits nommés par leur seule empreinte (`assets/[hash].js`, `vite.config.ts`), puisque les listes
+  de blocage jugent les noms et pas le contenu. Les e2e reconnaissent le script du Profil à son contenu. L'écran d'erreur
+  garde ses sondes de noms, pour reconnaître le cas chez un autre membre.
+- **Vérifié sur l'iPhone de Willem (dev, 2026-10-21)** : l'avatar ouvre le profil, et « Modifier mon profil » enregistre
+  (`PUT /api/v1/me/profile` passe : le filtre ne vise que les fichiers). Le filtre lui-même n'est pas identifié.
 - **Statut** : validée.

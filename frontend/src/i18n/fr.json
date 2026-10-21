@@ -4,9 +4,7 @@
     "clubName": "Gravelines Grimp",
     "skipToContent": "Aller au contenu",
     "versionFooter": "GG Pocket {version}",
-    "serverVersion": "Serveur {version}",
-    "clubNameFirst": "Gravelines",
-    "clubNameSecond": "Grimp"
+    "serverVersion": "Serveur {version}"
   },
   "nav": {
     "label": "Navigation principale",
@@ -17,7 +15,7 @@
     "podium": "Podium"
   },
   "header": {
-    "homeLink": "Gravelines Grimp, retour à l’actu",
+    "homeLink": "GG Pocket, retour à l’actu",
     "profileLink": "Mon profil",
     "management": "Espace gestion"
   },
@@ -158,6 +156,13 @@
     "topped": "Topée",
     "empty": "État vide",
     "skeleton": "Chargement"
+  },
+  "loadFailure": {
+    "title": "Cet écran est resté au pied de la voie",
+    "body": "Son code ne s’est pas chargé, même après un nouvel essai. Vérifie ta connexion et réessaie. Si ça coince encore, vide le cache de l’appli : tu restes connecté·e.",
+    "repair": "Vider le cache et réessayer",
+    "home": "Retour à l’actu",
+    "details": "Détails pour la direction"
   },
   "common": {
     "save": "Enregistrer",

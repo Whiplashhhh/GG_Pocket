@@ -4,6 +4,65 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-21 — Correctif iPhone et logo du club (vers 0.1.1)
+
+**Branche** : `fix/iphone-profil-0.1.0` (depuis `main` = 0.1.0), PR #13.
+
+### Fait
+
+- Bug iPhone : un filtre du téléphone de Willem (Safari et PWA) refusait tout fichier dont l'URL contient « profil », avant
+  même le serveur. Trouvé grâce aux sondes de l'écran d'erreur, après deux fausses pistes (appli périmée, zstd) : D-073.
+  Correctif : fichiers construits nommés par leur seule empreinte (`vite.config.ts`). Vérifié par Willem sur le dev : le profil
+  s'ouvre, l'enregistrement du profil passe.
+- Au passage : `router.onError` recharge la page quand le code d'un écran manque ; au second échec, `LoadFailureScreen`
+  (réessayer, vider le cache, retour à l'actu, détails copiables) au lieu d'un écran vide ; Caddy met un 404 de `/assets/` en
+  `no-store`.
+- En-tête : logo du club (clair/sombre) + « GG Pocket » ; logo retiré de l'encart Actu (D-072).
+- CI verte (e2e iPhone 13 + Desktop Chrome, stack Docker). CHANGELOG « Non publié » à jour.
+
+### Reste
+
+- Captures non prises ici (bac à sable saturé de processus) : rendu du logo à confirmer par Willem.
+- Fusion de la PR #13, release 0.1.1, test du retour arrière (dernier point de la phase 2).
+
+### Prochaine action exacte
+
+- Willem : fusionner la PR #13, Actions → « Prepare release » en `patch` (0.1.1), fusionner la PR de release, approuver la
+  prod ; puis Actions → Release → Run workflow avec `0.1.0`, vérifier la version dans le profil, et redéployer 0.1.1.
+
+### Points bloquants
+
+- Aucun.
+
+---
+
+## 2026-10-21 — Fin de phase 2 : prod 0.1.0 en ligne
+
+**Branche** : `fix/iphone-profil-0.1.0` (depuis `main` = 0.1.0).
+
+### Fait
+
+- PR #4 (phase 2) fusionnée, puis #9 (pipeline : PR de release, Dependabot sur les LTS, clés gardées par `setup-github.sh`) et
+  #11 (test e2e de version lisant `VERSION`). Dependabot #5 et #8 (Node 26) fermées.
+- Willem : `setup-github.sh` + `bootstrap.sh` sur le VPS OVH (51.68.44.88). Dev déployé depuis la PR (label), puis release
+  **0.1.0** en prod (https://pocket.51-68-44-88.sslip.io) après régénération des clés prod (`--new-keys`).
+- Corrigé en route : sauvegarde de sécurité de `restore.sh` qui pouvait écraser la sauvegarde restaurée (dossier `pre-restore/`).
+
+### Reste
+
+- Bug iPhone (PWA seulement) : l'avatar de l'en-tête n'ouvre pas le profil. Logo du club dans l'en-tête, nom « GG Pocket »,
+  logo retiré de l'encart Actu. → release 0.1.1, qui sert aussi au test de retour arrière (dernier point de la phase 2).
+
+### Prochaine action exacte
+
+- Nouvelle session : lire `.relais/HANDOFF.md` (local, non versionné) et suivre « Prochaine étape ».
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-20 — Phase 2 (environnements et pipeline)
 
 **Branche** : `chore/environnements` (depuis `main` après fusion de la phase 1), poussée.

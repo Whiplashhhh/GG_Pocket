@@ -75,6 +75,16 @@ export function createViteConfig({
     define: {
       __APP_VERSION__: JSON.stringify(appVersion),
     },
+    build: {
+      rolldownOptions: {
+        output: {
+          // Hashes only, no screen names: a filter on one iPhone refused every file named
+          // "…profil…" (docs/DECISIONS.md D-073). Blocker lists judge names, not content.
+          chunkFileNames: 'assets/[hash].js',
+          assetFileNames: 'assets/[hash][extname]',
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
