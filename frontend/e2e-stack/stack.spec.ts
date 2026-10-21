@@ -109,7 +109,7 @@ test('static assets are cached for good, the service worker never', async ({ pag
   const asset = await request.get(script ?? '')
   expect(asset.headers()['cache-control']).toContain('immutable')
   // A file of a previous version, asked for by an app left open: never cached.
-  const gone = await request.get('/assets/ProfileView-oldhash.js')
+  const gone = await request.get('/assets/0ldH4sh0.js')
   expect(gone.status()).toBe(404)
   expect(gone.headers()['cache-control']).toBe('no-store')
   const worker = await request.get('/sw.js')

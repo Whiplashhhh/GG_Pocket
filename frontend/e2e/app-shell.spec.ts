@@ -1,10 +1,30 @@
 import { readFileSync } from 'node:fs'
 
+import type { Page } from '@playwright/test'
+
 import { expect, test } from './fixtures'
 
 const APP_VERSION = readFileSync(new URL('../../VERSION', import.meta.url), 'utf8').trim()
 
 const FAILURE_TITLE = 'Cet écran est resté au pied de la voie'
+
+/**
+ * Answers 404 for the profile screen's script, `times` times (always by default). File names are
+ * only hashes: the script is recognised by its content.
+ */
+async function failProfileScript(page: Page, times = Infinity) {
+  let left = times
+  await page.route('**/assets/*.js', async (route) => {
+    const response = await route.fetch()
+    const body = await response.text()
+    if (left > 0 && body.includes('mon-identite')) {
+      left -= 1
+      await route.fulfill({ status: 404, headers: { 'cache-control': 'no-store' } })
+    } else {
+      await route.fulfill({ response, body })
+    }
+  })
+}
 
 test.describe('app shell', () => {
   test('opens on Actu with the five tabs at hand', async ({ page }) => {
@@ -82,11 +102,7 @@ test.describe('app shell', () => {
     browserName,
   }) => {
     // Installed app on iOS: the profile screen's file of the previous version is gone (404).
-    await page.route(
-      '**/assets/ProfileView-*.js',
-      (route) => route.fulfill({ status: 404, headers: { 'cache-control': 'no-store' } }),
-      { times: 1 },
-    )
+    await failProfileScript(page, 1)
     await page.goto('/actu')
     await page.evaluate(() => Object.assign(window, { e2eBeforeReload: true }))
     await page.getByRole('link', { name: 'Mon profil' }).click()
@@ -104,18 +120,16 @@ test.describe('app shell', () => {
     page,
     browserName,
   }) => {
-    await page.route('**/assets/ProfileView-*.js', (route) =>
-      route.fulfill({ status: 404, headers: { 'cache-control': 'no-store' } }),
-    )
+    await failProfileScript(page)
     await page.goto('/actu')
     await page.getByRole('link', { name: 'Mon profil' }).click()
     await expect(page.getByRole('heading', { level: 1, name: FAILURE_TITLE })).toBeVisible()
 
     await page.getByText('Détails pour la direction').click()
     await expect(page.getByText('page /profil')).toBeVisible()
-    await expect(page.getByText(/ProfileView-.+\.js → 404/)).toBeVisible()
+    await expect(page.getByText(/\/assets\/[\w-]+\.js → 404/)).toBeVisible()
     // The probe under another address is not caught by the route above: it loads.
-    await expect(page.getByText(/ProfileView-.+\.js\?sonde → OK/)).toBeVisible()
+    await expect(page.getByText(/\.js\?sonde → OK/)).toBeVisible()
     // Missing files under telling names: the server answers (404 from Caddy, the app page from
     // vite preview), no filter in this browser refuses them.
     await expect(page.getByText(/nom ProfileView-sonde\.js → \d{3}/)).toBeVisible()

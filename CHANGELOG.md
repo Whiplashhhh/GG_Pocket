@@ -11,9 +11,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ### Corrigé
 
-- Sur iPhone, dans l'appli installée, toucher ton avatar ne menait plus à ton profil. Maintenant, si un écran refuse de
-  se charger, l'appli recharge la page toute seule ; s'il résiste encore, elle te le dit au lieu de rester muette, avec un
-  bouton pour vider son cache sans te déconnecter.
+- Sur certains iPhone, toucher ton avatar ne menait nulle part : un filtre du téléphone refusait tout fichier dont le nom
+  contenait « profil ». Les fichiers de l'appli ont maintenant des noms qui ne disent rien à personne.
+- Si un écran refuse quand même de se charger, l'appli recharge la page toute seule. S'il résiste encore, elle te le dit au
+  lieu de rester muette, avec un retour à l'actu et un bouton pour vider son cache sans te déconnecter.
 
 ## 0.1.0 — 2026-10-21
 
