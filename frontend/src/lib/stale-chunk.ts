@@ -6,11 +6,13 @@
  * the new version.
  */
 
+import { shallowRef } from 'vue'
+
 /** Messages of a failed `import()`: Chromium, WebKit, Firefox, then Vite's CSS preload. */
 const CHUNK_ERROR =
   /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Unable to preload CSS/i
 
-export function isStaleChunkError(error: unknown): boolean {
+export function isStaleChunkError(error: unknown): error is Error {
   return error instanceof Error && CHUNK_ERROR.test(error.message)
 }
 
@@ -32,6 +34,14 @@ export function shouldReload(storage: Pick<Storage, 'getItem' | 'setItem'>, now:
   return true
 }
 
+export interface ScreenLoadFailure {
+  path: string
+  message: string
+}
+
+/** Set when a screen still fails right after a reload: the app shows why instead of a blank page. */
+export const screenLoadFailure = shallowRef<ScreenLoadFailure | null>(null)
+
 /** `router.onError` handler: loads `path` from the server when a screen's code is missing. */
 export function reloadOnStaleChunk(error: unknown, path: string): void {
   if (!isStaleChunkError(error)) {
@@ -45,5 +55,16 @@ export function reloadOnStaleChunk(error: unknown, path: string): void {
   }
   if (storage === undefined || shouldReload(storage, Date.now())) {
     window.location.assign(path)
+  } else {
+    screenLoadFailure.value = { path, message: error.message }
+  }
+}
+
+/** Forgets the last reload, so that the next failure reloads again. */
+export function forgetReload(): void {
+  try {
+    window.sessionStorage.removeItem(LAST_RELOAD_KEY)
+  } catch {
+    // Nothing stored then.
   }
 }

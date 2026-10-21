@@ -157,6 +157,12 @@
     "empty": "État vide",
     "skeleton": "Chargement"
   },
+  "loadFailure": {
+    "title": "Cet écran est resté au pied de la voie",
+    "body": "Son code ne s’est pas chargé, même après un nouvel essai. Vérifie ta connexion et réessaie. Si ça coince encore, vide le cache de l’appli : tu restes connecté·e.",
+    "repair": "Vider le cache et réessayer",
+    "details": "Détails pour la direction"
+  },
   "common": {
     "save": "Enregistrer",
     "cancel": "Annuler",

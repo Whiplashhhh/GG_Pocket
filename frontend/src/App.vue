@@ -5,7 +5,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { signOut, useAuthState } from '@/api/auth'
 import AppShell from '@/components/layout/AppShell.vue'
 import BareLayout from '@/components/layout/BareLayout.vue'
+import LoadFailureScreen from '@/components/layout/LoadFailureScreen.vue'
 import UpdateBanner from '@/components/layout/UpdateBanner.vue'
+import { screenLoadFailure } from '@/lib/stale-chunk'
 import { RETURN_PARAM, WELCOME } from '@/router/guard'
 import { useThemeStore } from '@/stores/theme'
 
@@ -40,13 +42,18 @@ const bare = computed(() => route.meta.layout === 'bare')
 
 // Nothing until the first navigation is settled: the layout depends on the page, and the page on
 // whether the member is signed in.
+// A failed first navigation (a screen's code that will not load) shows LoadFailureScreen.
 const ready = ref(false)
-void router.isReady().then(() => (ready.value = true))
+router.isReady().then(
+  () => (ready.value = true),
+  () => undefined,
+)
 </script>
 
 <template>
   <UpdateBanner />
-  <template v-if="ready">
+  <LoadFailureScreen v-if="screenLoadFailure" :failure="screenLoadFailure" />
+  <template v-else-if="ready">
     <BareLayout v-if="bare" />
     <AppShell v-else />
   </template>

@@ -1,6 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { isStaleChunkError, shouldReload } from './stale-chunk'
+import {
+  forgetReload,
+  isStaleChunkError,
+  reloadOnStaleChunk,
+  screenLoadFailure,
+  shouldReload,
+} from './stale-chunk'
 
 function memoryStorage() {
   const items = new Map<string, string>()
@@ -51,5 +57,36 @@ describe('shouldReload', () => {
       },
     }
     expect(shouldReload(throwing, 1_000_000)).toBe(true)
+  })
+})
+
+describe('reloadOnStaleChunk', () => {
+  const missing = new TypeError('Importing a module script failed.')
+
+  afterEach(() => {
+    forgetReload()
+    screenLoadFailure.value = null
+    vi.restoreAllMocks()
+  })
+
+  it('reloads the target page the first time, shows the failure the second', () => {
+    const assign = vi.fn()
+    vi.spyOn(window, 'location', 'get').mockReturnValue({ assign } as unknown as Location)
+
+    reloadOnStaleChunk(missing, '/profil')
+    expect(assign).toHaveBeenCalledExactlyOnceWith('/profil')
+    expect(screenLoadFailure.value).toBeNull()
+
+    reloadOnStaleChunk(missing, '/profil')
+    expect(assign).toHaveBeenCalledOnce()
+    expect(screenLoadFailure.value).toEqual({
+      path: '/profil',
+      message: 'Importing a module script failed.',
+    })
+  })
+
+  it('leaves other navigation errors alone', () => {
+    reloadOnStaleChunk(new Error('boom'), '/profil')
+    expect(screenLoadFailure.value).toBeNull()
   })
 })

@@ -11,8 +11,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ### Corrigé
 
-- Sur iPhone, dans l'appli installée, toucher ton avatar ne menait plus à ton profil après une mise à jour. Maintenant,
-  si un écran a changé pendant que l'appli dormait, elle recharge la page toute seule.
+- Sur iPhone, dans l'appli installée, toucher ton avatar ne menait plus à ton profil. Maintenant, si un écran refuse de
+  se charger, l'appli recharge la page toute seule ; s'il résiste encore, elle te le dit au lieu de rester muette, avec un
+  bouton pour vider son cache sans te déconnecter.
 
 ## 0.1.0 — 2026-10-21
 

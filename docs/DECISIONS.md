@@ -40,6 +40,7 @@ direction) ou **Willem**.
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
+| D-073 | Pourquoi le Profil ne se charge pas dans la PWA iPhone ? | Willem | Rechargement, puis écran d'erreur avec détails |
 
 ---
 
@@ -566,5 +567,11 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   pointe vers un fichier au nouveau nom, que WebKit va chercher.
 - **Alternatives** : garder les fichiers des anciennes versions sur le serveur (images Docker plus lourdes, ménage à prévoir) ;
   sortir la version du fichier du Profil (ne règle que ce cas, n'importe quel écran modifié a le même problème).
-- **Statut** : validée. Le diagnostic est déduit du code, sans accès aux outils de développement de l'iPhone : confirmation
-  attendue sur le dev.
+- **Retour du dev (2026-10-21)** : sur l'iPhone de Willem (PWA du dev), toucher l'avatar donne un écran noir. Le rechargement a
+  lieu, mais le fichier du Profil échoue encore : ce n'est pas (seulement) une appli périmée, ce fichier ne se charge pas dans
+  la PWA. L'écran noir vient de `App.vue`, qui n'affiche rien tant que la première navigation n'a pas abouti.
+- **Suite** : au second échec, l'appli affiche `LoadFailureScreen` (« Réessayer », « Vider le cache et réessayer », qui
+  désinscrit le service worker et vide ses caches sans déconnecter, et des détails à copier : version, mode, état du service
+  worker, caches, scripts de `/assets/` redemandés qui ne répondent pas un JavaScript en 200). Les e2e bloquent le service
+  worker (`serviceWorkers: 'block'`) : c'est le premier suspect, jamais testé.
+- **Statut** : à valider : cause réelle à établir avec les détails de l'écran d'erreur sur l'iPhone.

@@ -4,6 +4,8 @@ import { expect, test } from './fixtures'
 
 const APP_VERSION = readFileSync(new URL('../../VERSION', import.meta.url), 'utf8').trim()
 
+const FAILURE_TITLE = 'Cet écran est resté au pied de la voie'
+
 test.describe('app shell', () => {
   test('opens on Actu with the five tabs at hand', async ({ page }) => {
     await page.goto('/')
@@ -92,11 +94,33 @@ test.describe('app shell', () => {
     // A fresh page, not an in-app navigation: the new version is fetched.
     await expect.poll(() => page.evaluate(() => 'e2eBeforeReload' in window)).toBe(false)
 
-    // WebKit remembers a failed module for the whole tab and does not ask again after the reload.
-    // Real releases never hit this: the new page points to a file with a new name.
-    if (browserName !== 'webkit') {
-      await expect(page.getByRole('heading', { level: 1, name: 'Mon profil' })).toBeVisible()
-    }
+    // WebKit remembers a failed module for the whole tab and does not ask again after the reload:
+    // it ends on the failure screen. A real release points to a file with a new name.
+    const heading = browserName === 'webkit' ? FAILURE_TITLE : 'Mon profil'
+    await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible()
+  })
+
+  test('a screen that will not load says so instead of a blank page', async ({
+    page,
+    browserName,
+  }) => {
+    await page.route('**/assets/ProfileView-*.js', (route) =>
+      route.fulfill({ status: 404, headers: { 'cache-control': 'no-store' } }),
+    )
+    await page.goto('/actu')
+    await page.getByRole('link', { name: 'Mon profil' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: FAILURE_TITLE })).toBeVisible()
+
+    await page.getByText('Détails pour la direction').click()
+    await expect(page.getByText('page /profil')).toBeVisible()
+    await expect(page.getByText(/ProfileView-.+\.js → 404/)).toBeVisible()
+
+    // Back to normal: emptying the cache reloads the screen, which loads this time. Not on WebKit,
+    // which keeps the failed module for the whole tab (same file name in this test).
+    if (browserName === 'webkit') return
+    await page.unrouteAll()
+    await page.getByRole('button', { name: 'Vider le cache et réessayer' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Mon profil' })).toBeVisible()
   })
 
   test('shows the app version in the profile, the server version to the board only', async ({

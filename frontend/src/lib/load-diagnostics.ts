@@ -1,0 +1,71 @@
+import { isStandalone } from '@/stores/install'
+
+import type { ScreenLoadFailure } from './stale-chunk'
+
+/**
+ * What a member can copy and send when a screen refuses to load: no personal data, only the app's
+ * own files and how the phone answered for them.
+ */
+export async function collectLoadDiagnostics(failure: ScreenLoadFailure): Promise<string[]> {
+  const lines = [
+    `version ${__APP_VERSION__}`,
+    `page ${failure.path}`,
+    `erreur ${failure.message}`,
+    `mode ${isStandalone() ? 'appli installée' : 'navigateur'}`,
+    `navigateur ${navigator.userAgent}`,
+  ]
+  // Absent outside HTTPS and localhost.
+  const controller = 'serviceWorker' in navigator ? navigator.serviceWorker.controller : null
+  lines.push(`service worker ${controller ? controller.state : 'aucun'}`)
+  if ('caches' in window) {
+    lines.push(`caches ${(await caches.keys()).join(', ') || 'aucun'}`)
+  }
+  lines.push(...(await probeScripts(scriptUrls())))
+  return lines
+}
+
+/** The app's scripts this page asked for, plus those it was about to load. */
+export function scriptUrls(): string[] {
+  const urls = new Set<string>()
+  for (const entry of performance.getEntriesByType('resource')) {
+    if (isAppScript(entry.name)) urls.add(entry.name)
+  }
+  for (const link of document.querySelectorAll<HTMLLinkElement>('link[rel="modulepreload"]')) {
+    if (isAppScript(link.href)) urls.add(link.href)
+  }
+  return [...urls]
+}
+
+function isAppScript(url: string): boolean {
+  return new URL(url, window.location.href).pathname.match(/^\/assets\/.+\.js$/) !== null
+}
+
+/** Asks for each script again (through the service worker, like the page does) and reports misfits. */
+async function probeScripts(urls: string[]): Promise<string[]> {
+  const misfits: string[] = []
+  await Promise.all(
+    urls.map(async (url) => {
+      const file = new URL(url).pathname
+      try {
+        const response = await fetch(url, { cache: 'no-store' })
+        const type = response.headers.get('content-type') ?? '?'
+        if (!response.ok || !type.includes('javascript')) {
+          misfits.push(`${file} → ${String(response.status)} ${response.type} ${type}`)
+        }
+      } catch (error) {
+        misfits.push(`${file} → ${error instanceof Error ? error.message : String(error)}`)
+      }
+    }),
+  )
+  return [`scripts ${String(urls.length - misfits.length)}/${String(urls.length)} OK`, ...misfits]
+}
+
+/** Drops the service worker and its caches: the next load comes straight from the server. */
+export async function resetAppCaches(): Promise<void> {
+  const registrations =
+    'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistrations() : []
+  await Promise.all(registrations.map((registration) => registration.unregister()))
+  if ('caches' in window) {
+    await Promise.all((await caches.keys()).map((name) => caches.delete(name)))
+  }
+}
