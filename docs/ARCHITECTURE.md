@@ -33,8 +33,8 @@ Un package par domaine sous `fr.gravelinesgrimp.pocket`, chacun découpé en cou
 | `auth` | Connexion, sessions et appareils, inscription, codes d'inscription, code de premier démarrage, réinitialisation, limitation de débit, politique de mot de passe, configuration de Spring Security | ✅ |
 | `member` | Membre (`Member`, table `member`), rôles, profil, photos (`MediaFile`, nettoyage des images, volume de fichiers) | ✅ (annuaire en phase 5) |
 | `admin` | Gestion des membres (matrice des rôles), journal d'audit, gestion des codes d'inscription | ✅ |
-| `club` | Configuration : nom, logos, secteurs, cordes, couleurs, cotations | 🔜 phase 3 |
-| `topo` | Voies, commentaires, coups de cœur, « je sais la faire », dernière chance | 🔜 phase 3 |
+| `club` | Configuration du topo : secteurs, cordes, couleurs de prises, cotations (nom et logos en phase 8) | ✅ |
+| `topo` | Voies (ouvreurs, styles, photo, statuts), commentaires, coups de cœur, « je sais la faire », dernière chance, voie préférée | ✅ |
 | `session` | Séances, ascensions, planning | 🔜 phase 4 |
 | `social` | Amitiés, fil, réactions, commentaires de séance | 🔜 phase 5 |
 | `ranking` | Classements mensuels, clôture | 🔜 phase 6 |
@@ -65,7 +65,9 @@ servlet, controllers dans `api`, repositories dans `infra`, **aucune entité JPA
   Rôles hiérarchiques (`ROLE_ADMIN > ROLE_BOARD > ROLE_SETTER > ROLE_CLIMBER`) ; chaque service de gestion porte son
   `@PreAuthorize`, et la matrice « qui gère qui » est une règle pure (`admin/domain/MemberGovernance`). Aucun utilisateur
   ni mot de passe par défaut.
-- **Dépendances entre domaines** : `member` ne dépend de personne ; `auth` dépend de `member` ; `admin` de `auth` et `member`.
+- **Dépendances entre domaines** : `member` ne dépend de personne ; `auth` dépend de `member` ; `admin` de `auth` et `member` ;
+  `club` de `member` et `admin` (journal d'audit) ; `topo` de `club`, `member` et `admin`. `member` ne porte que l'identifiant
+  de la voie préférée (`member.favorite_route_id`), sans association : c'est `topo` qui la choisit et la vérifie.
 - **Temps** : horodatages en UTC (`timestamptz`, `Instant`) ; règles calendaires en `Europe/Paris` (semaines ISO, mois).
   « Maintenant » vient toujours du bean `Clock`, pour que les tests fixent l'heure.
 - **Configuration** : préfixe `gg` (`GgProperties`), alimenté par variables d'environnement (`GG_ENVIRONMENT`, …).
@@ -177,7 +179,13 @@ erDiagram
 ```
 
 Tables en place : `instance_marker` (V1), `member` et `media_file` (V2), `spring_session` et `spring_session_attributes` (V3),
-`registration_code` et `password_reset_token` (V4), `audit_entry` (V5). Les autres arrivent avec leur phase.
+`registration_code` et `password_reset_token` (V4), `audit_entry` (V5), `demo_seed_entry` (V6), `sector`, `cord`, `hold_color` et
+`grade` avec la configuration réelle du club, identique en dev et en prod (V7), `route`, `route_setter`, `route_style`,
+`route_comment`, `favorite`, `route_check` et `last_chance_ack` (V8). Les autres arrivent avec leur phase.
+
+Le topo (`GET /api/v1/routes`) renvoie toutes les voies au mur avec leurs compteurs en quelques requêtes groupées ; le
+navigateur trie, filtre et regroupe (D-078). Une voie démontée est en lecture seule ; rien ne se supprime dans la
+configuration (on désactive une corde ou une couleur) pour que l'historique reste juste.
 
 ## 6. Exploitation
 

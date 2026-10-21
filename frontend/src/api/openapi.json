@@ -1,1134 +1,13 @@
 {
-  "components" : {
-    "schemas" : {
-      "AuditEntry" : {
-        "description" : "Who did what, to whom, when.",
-        "properties" : {
-          "action" : {
-            "enum" : [ "MEMBER_ROLE_CHANGED", "MEMBER_DISABLED", "MEMBER_ENABLED", "PASSWORD_RESET_LINK_CREATED", "REGISTRATION_CODE_CREATED", "REGISTRATION_CODE_UPDATED", "ROUTE_DISMOUNTED", "ROUTE_REMOUNTED", "ROUTE_COMMENT_DELETED", "CLUB_SECTOR_CREATED", "CLUB_SECTOR_UPDATED", "CLUB_CORD_CREATED", "CLUB_CORD_UPDATED", "CLUB_HOLD_COLOR_CREATED", "CLUB_HOLD_COLOR_UPDATED", "CLUB_SECTORS_REORDERED" ],
-            "type" : "string"
-          },
-          "actorId" : {
-            "description" : "Absent if that member was deleted since",
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "actorNickname" : {
-            "description" : "Nickname at the time of the action",
-            "type" : "string"
-          },
-          "after" : {
-            "type" : "string"
-          },
-          "before" : {
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "occurredAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "targetId" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "targetLabel" : {
-            "description" : "Name at the time of the action",
-            "type" : "string"
-          },
-          "targetType" : {
-            "enum" : [ "MEMBER", "REGISTRATION_CODE", "ROUTE", "ROUTE_COMMENT", "SECTOR", "CORD", "HOLD_COLOR" ],
-            "type" : "string"
-          }
-        },
-        "required" : [ "action", "id", "occurredAt", "targetLabel", "targetType" ],
-        "type" : "object"
-      },
-      "AuditPage" : {
-        "description" : "Newest first.",
-        "properties" : {
-          "entries" : {
-            "items" : {
-              "$ref" : "#/components/schemas/AuditEntry"
-            },
-            "type" : "array"
-          },
-          "nextCursor" : {
-            "description" : "Pass it as ?cursor= for the next page; absent on the last page",
-            "type" : "string"
-          }
-        },
-        "required" : [ "entries" ],
-        "type" : "object"
-      },
-      "AuthState" : {
-        "description" : "Whether this browser is signed in, and as whom.",
-        "properties" : {
-          "authenticated" : {
-            "type" : "boolean"
-          },
-          "member" : {
-            "$ref" : "#/components/schemas/CurrentMember",
-            "description" : "Present when signed in"
-          }
-        },
-        "required" : [ "authenticated" ],
-        "type" : "object"
-      },
-      "Cord" : {
-        "properties" : {
-          "active" : {
-            "type" : "boolean"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "number" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "sectorId" : {
-            "format" : "uuid",
-            "type" : "string"
-          }
-        },
-        "required" : [ "active", "id", "number", "sectorId" ],
-        "type" : "object"
-      },
-      "CordSettings" : {
-        "properties" : {
-          "active" : {
-            "type" : "boolean"
-          },
-          "number" : {
-            "format" : "int32",
-            "maximum" : 99,
-            "minimum" : 1,
-            "type" : "integer"
-          },
-          "sectorId" : {
-            "format" : "uuid",
-            "type" : "string"
-          }
-        },
-        "required" : [ "active", "number", "sectorId" ],
-        "type" : "object"
-      },
-      "CurrentMember" : {
-        "description" : "The signed-in member, as shown in the app shell.",
-        "properties" : {
-          "avatarUrl" : {
-            "description" : "Profile photo, absent when the member has none",
-            "type" : "string"
-          },
-          "firstName" : {
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "lastName" : {
-            "type" : "string"
-          },
-          "nickname" : {
-            "type" : "string"
-          },
-          "role" : {
-            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
-            "type" : "string"
-          }
-        },
-        "required" : [ "firstName", "id", "lastName", "nickname", "role" ],
-        "type" : "object"
-      },
-      "Device" : {
-        "description" : "An open session of the member (\"Mes appareils\").",
-        "properties" : {
-          "browser" : {
-            "enum" : [ "SAFARI", "CHROME", "FIREFOX", "EDGE", "SAMSUNG_INTERNET", "OPERA", "OTHER" ],
-            "type" : "string"
-          },
-          "current" : {
-            "description" : "The device making this request",
-            "type" : "boolean"
-          },
-          "id" : {
-            "description" : "Opaque id, not the session id",
-            "type" : "string"
-          },
-          "lastActiveAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "platform" : {
-            "enum" : [ "IPHONE", "IPAD", "ANDROID", "MAC", "WINDOWS", "LINUX", "OTHER" ],
-            "type" : "string"
-          },
-          "signedInAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          }
-        },
-        "required" : [ "browser", "current", "id", "lastActiveAt", "platform", "signedInAt" ],
-        "type" : "object"
-      },
-      "FavoriteRequest" : {
-        "properties" : {
-          "replaceRouteId" : {
-            "description" : "One of my active favourites to give up for this one",
-            "format" : "uuid",
-            "type" : "string"
-          }
-        },
-        "required" : [ ],
-        "type" : "object"
-      },
-      "FavoriteRouteRequest" : {
-        "properties" : {
-          "routeId" : {
-            "format" : "uuid",
-            "type" : "string"
-          }
-        },
-        "required" : [ "routeId" ],
-        "type" : "object"
-      },
-      "Grade" : {
-        "properties" : {
-          "code" : {
-            "example" : "6a+",
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "rank" : {
-            "description" : "1 for the easiest grade",
-            "format" : "int32",
-            "type" : "integer"
-          }
-        },
-        "required" : [ "code", "id", "rank" ],
-        "type" : "object"
-      },
-      "HoldColor" : {
-        "properties" : {
-          "active" : {
-            "type" : "boolean"
-          },
-          "hex" : {
-            "example" : "#F5C518",
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "label" : {
-            "type" : "string"
-          },
-          "multicolor" : {
-            "type" : "boolean"
-          },
-          "position" : {
-            "format" : "int32",
-            "type" : "integer"
-          }
-        },
-        "required" : [ "active", "hex", "id", "label", "multicolor", "position" ],
-        "type" : "object"
-      },
-      "HoldColorSettings" : {
-        "properties" : {
-          "active" : {
-            "type" : "boolean"
-          },
-          "hex" : {
-            "example" : "#F5C518",
-            "pattern" : "^#[0-9A-Fa-f]{6}$",
-            "type" : "string"
-          },
-          "label" : {
-            "maxLength" : 30,
-            "minLength" : 1,
-            "type" : "string"
-          },
-          "multicolor" : {
-            "type" : "boolean"
-          }
-        },
-        "required" : [ "active", "hex", "label", "multicolor" ],
-        "type" : "object"
-      },
-      "LastChanceAcknowledgement" : {
-        "properties" : {
-          "routeIds" : {
-            "items" : {
-              "format" : "uuid",
-              "type" : "string"
-            },
-            "maxItems" : 50,
-            "minItems" : 1,
-            "type" : "array"
-          }
-        },
-        "required" : [ "routeIds" ],
-        "type" : "object"
-      },
-      "LastChanceRoute" : {
-        "properties" : {
-          "acknowledgedCount" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "route" : {
-            "$ref" : "#/components/schemas/RouteSummary"
-          }
-        },
-        "required" : [ "acknowledgedCount", "route" ],
-        "type" : "object"
-      },
-      "LastChanceSettings" : {
-        "properties" : {
-          "plannedDismountOn" : {
-            "description" : "Optional, today or later",
-            "format" : "date",
-            "type" : "string"
-          }
-        },
-        "required" : [ ],
-        "type" : "object"
-      },
-      "LoginRequest" : {
-        "properties" : {
-          "nickname" : {
-            "maxLength" : 100,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "password" : {
-            "maxLength" : 200,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "rememberMe" : {
-            "description" : "\"Rester connecté\": 180 days instead of the browser session",
-            "type" : "boolean"
-          }
-        },
-        "required" : [ "nickname", "password" ],
-        "type" : "object"
-      },
-      "MemberDetail" : {
-        "description" : "The member sheet, with what the caller may do.",
-        "properties" : {
-          "climbingSinceYear" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "clubArrivalYear" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "email" : {
-            "type" : "string"
-          },
-          "member" : {
-            "$ref" : "#/components/schemas/MemberSummary"
-          },
-          "permissions" : {
-            "$ref" : "#/components/schemas/MemberPermissions"
-          },
-          "underFifteenWithParentalConsent" : {
-            "description" : "Under 15, with a parental consent declared (no birth date)",
-            "type" : "boolean"
-          }
-        },
-        "required" : [ "member", "permissions", "underFifteenWithParentalConsent" ],
-        "type" : "object"
-      },
-      "MemberPermissions" : {
-        "properties" : {
-          "assignableRoles" : {
-            "items" : {
-              "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
-              "type" : "string"
-            },
-            "type" : "array"
-          },
-          "canCreateResetLink" : {
-            "type" : "boolean"
-          },
-          "canDisable" : {
-            "type" : "boolean"
-          },
-          "canEnable" : {
-            "type" : "boolean"
-          }
-        },
-        "required" : [ "assignableRoles", "canCreateResetLink", "canDisable", "canEnable" ],
-        "type" : "object"
-      },
-      "MemberRef" : {
-        "properties" : {
-          "avatarUrl" : {
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "nickname" : {
-            "type" : "string"
-          }
-        },
-        "required" : [ "id", "nickname" ],
-        "type" : "object"
-      },
-      "MemberSummary" : {
-        "description" : "A line of the members table.",
-        "properties" : {
-          "avatarUrl" : {
-            "type" : "string"
-          },
-          "firstName" : {
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "lastName" : {
-            "type" : "string"
-          },
-          "lastSeenAt" : {
-            "description" : "Roughly, to the hour; absent if never seen since registration",
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "nickname" : {
-            "type" : "string"
-          },
-          "registeredAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "role" : {
-            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
-            "type" : "string"
-          },
-          "status" : {
-            "enum" : [ "ACTIVE", "DISABLED" ],
-            "type" : "string"
-          }
-        },
-        "required" : [ "firstName", "id", "lastName", "nickname", "registeredAt", "role", "status" ],
-        "type" : "object"
-      },
-      "Meta" : {
-        "description" : "What is running on the server.",
-        "properties" : {
-          "branch" : {
-            "description" : "Git branch, or 'unknown'",
-            "type" : "string"
-          },
-          "commit" : {
-            "description" : "Git commit, or 'unknown'",
-            "type" : "string"
-          },
-          "environment" : {
-            "enum" : [ "local", "dev", "prod" ],
-            "type" : "string"
-          },
-          "version" : {
-            "example" : "1.0.0",
-            "type" : "string"
-          }
-        },
-        "required" : [ "branch", "commit", "environment", "version" ],
-        "type" : "object"
-      },
-      "MyProfile" : {
-        "description" : "Everything the member may see and edit about themselves.",
-        "properties" : {
-          "age" : {
-            "description" : "Age today, when the birth date is known",
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "appearsInRankings" : {
-            "type" : "boolean"
-          },
-          "avatarUrl" : {
-            "type" : "string"
-          },
-          "bio" : {
-            "type" : "string"
-          },
-          "birthDate" : {
-            "format" : "date",
-            "type" : "string"
-          },
-          "climbingSinceYear" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "clubArrivalYear" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "createdAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "email" : {
-            "type" : "string"
-          },
-          "favoriteRouteId" : {
-            "description" : "My favourite route, possibly dismounted",
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "firstName" : {
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "lastName" : {
-            "type" : "string"
-          },
-          "nickname" : {
-            "type" : "string"
-          },
-          "parentalConsent" : {
-            "description" : "A parent or legal guardian agreed (declared under 15)",
-            "type" : "boolean"
-          },
-          "role" : {
-            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
-            "type" : "string"
-          },
-          "showAge" : {
-            "type" : "boolean"
-          }
-        },
-        "required" : [ "appearsInRankings", "createdAt", "firstName", "id", "lastName", "nickname", "parentalConsent", "role", "showAge" ],
-        "type" : "object"
-      },
-      "PasswordChange" : {
-        "properties" : {
-          "currentPassword" : {
-            "maxLength" : 200,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "newPassword" : {
-            "maxLength" : 200,
-            "minLength" : 0,
-            "type" : "string"
-          }
-        },
-        "required" : [ "currentPassword", "newPassword" ],
-        "type" : "object"
-      },
-      "PasswordReset" : {
-        "properties" : {
-          "newPassword" : {
-            "maxLength" : 200,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "token" : {
-            "maxLength" : 100,
-            "minLength" : 0,
-            "type" : "string"
-          }
-        },
-        "required" : [ "newPassword", "token" ],
-        "type" : "object"
-      },
-      "PasswordResetCheck" : {
-        "properties" : {
-          "token" : {
-            "maxLength" : 100,
-            "minLength" : 0,
-            "type" : "string"
-          }
-        },
-        "required" : [ "token" ],
-        "type" : "object"
-      },
-      "PasswordResetLink" : {
-        "description" : "The secret of a reset link, shown once. The app builds the link with its own address: /nouveau-mot-de-passe#<token>.",
-        "properties" : {
-          "expiresAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "token" : {
-            "type" : "string"
-          }
-        },
-        "required" : [ "expiresAt", "token" ],
-        "type" : "object"
-      },
-      "PasswordResetTarget" : {
-        "description" : "Who a valid reset link is for.",
-        "properties" : {
-          "firstName" : {
-            "type" : "string"
-          },
-          "nickname" : {
-            "description" : "Their login, as a reminder",
-            "type" : "string"
-          }
-        },
-        "required" : [ "firstName", "nickname" ],
-        "type" : "object"
-      },
-      "ProfileUpdate" : {
-        "description" : "The whole editable profile, as the member wants it.",
-        "properties" : {
-          "appearsInRankings" : {
-            "type" : "boolean"
-          },
-          "bio" : {
-            "maxLength" : 160,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "birthDate" : {
-            "format" : "date",
-            "type" : "string"
-          },
-          "climbingSinceYear" : {
-            "format" : "int32",
-            "maximum" : 2100,
-            "minimum" : 1950,
-            "type" : "integer"
-          },
-          "clubArrivalYear" : {
-            "format" : "int32",
-            "maximum" : 2100,
-            "minimum" : 1950,
-            "type" : "integer"
-          },
-          "email" : {
-            "format" : "email",
-            "maxLength" : 254,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "firstName" : {
-            "maxLength" : 50,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "lastName" : {
-            "maxLength" : 50,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "nickname" : {
-            "pattern" : "^[A-Za-z0-9._-]{3,20}$",
-            "type" : "string"
-          },
-          "parentalConsent" : {
-            "description" : "Declares that a parent agreed; required once under 15",
-            "type" : "boolean"
-          },
-          "showAge" : {
-            "type" : "boolean"
-          }
-        },
-        "required" : [ "firstName", "lastName", "nickname" ],
-        "type" : "object"
-      },
-      "RegisterRequest" : {
-        "description" : "The one-page registration form (spec §6).",
-        "properties" : {
-          "birthDate" : {
-            "format" : "date",
-            "type" : "string"
-          },
-          "code" : {
-            "maxLength" : 32,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "email" : {
-            "format" : "email",
-            "maxLength" : 254,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "firstName" : {
-            "maxLength" : 50,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "lastName" : {
-            "maxLength" : 50,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "nickname" : {
-            "pattern" : "^[A-Za-z0-9._-]{3,20}$",
-            "type" : "string"
-          },
-          "parentalConsent" : {
-            "description" : "Required when the birth date says under 15",
-            "type" : "boolean"
-          },
-          "password" : {
-            "description" : "8 characters minimum, not a common password",
-            "maxLength" : 200,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "privacyAccepted" : {
-            "description" : "\"Tes données\" accepted",
-            "type" : "boolean"
-          },
-          "rememberMe" : {
-            "type" : "boolean"
-          }
-        },
-        "required" : [ "code", "firstName", "lastName", "nickname", "password", "privacyAccepted" ],
-        "type" : "object"
-      },
-      "RegistrationCode" : {
-        "properties" : {
-          "active" : {
-            "type" : "boolean"
-          },
-          "code" : {
-            "example" : "K7XM-P2QA",
-            "type" : "string"
-          },
-          "createdAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "expiresAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "label" : {
-            "type" : "string"
-          },
-          "maxUses" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "state" : {
-            "enum" : [ "USABLE", "INACTIVE", "EXPIRED", "EXHAUSTED" ],
-            "type" : "string"
-          },
-          "useCount" : {
-            "format" : "int32",
-            "type" : "integer"
-          }
-        },
-        "required" : [ "active", "code", "createdAt", "id", "label", "state", "useCount" ],
-        "type" : "object"
-      },
-      "RegistrationCodeCheck" : {
-        "properties" : {
-          "code" : {
-            "example" : "K7XM-P2QA",
-            "maxLength" : 32,
-            "minLength" : 0,
-            "type" : "string"
-          }
-        },
-        "required" : [ "code" ],
-        "type" : "object"
-      },
-      "RegistrationCodeSettings" : {
-        "description" : "Absent expiry or maximum: no limit.",
-        "properties" : {
-          "active" : {
-            "type" : "boolean"
-          },
-          "expiresAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "label" : {
-            "example" : "Affiche de la salle, saison 2026",
-            "maxLength" : 80,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "maxUses" : {
-            "format" : "int32",
-            "maximum" : 10000,
-            "minimum" : 1,
-            "type" : "integer"
-          }
-        },
-        "required" : [ "active", "label" ],
-        "type" : "object"
-      },
-      "RoleChange" : {
-        "properties" : {
-          "role" : {
-            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ],
-            "type" : "string"
-          }
-        },
-        "required" : [ "role" ],
-        "type" : "object"
-      },
-      "RouteComment" : {
-        "properties" : {
-          "author" : {
-            "$ref" : "#/components/schemas/MemberRef"
-          },
-          "body" : {
-            "type" : "string"
-          },
-          "createdAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "deletable" : {
-            "description" : "Whether I may delete it",
-            "type" : "boolean"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          }
-        },
-        "required" : [ "author", "body", "createdAt", "deletable", "id" ],
-        "type" : "object"
-      },
-      "RouteCommentRequest" : {
-        "properties" : {
-          "body" : {
-            "maxLength" : 500,
-            "minLength" : 1,
-            "type" : "string"
-          }
-        },
-        "required" : [ "body" ],
-        "type" : "object"
-      },
-      "RouteDetail" : {
-        "properties" : {
-          "advice" : {
-            "type" : "string"
-          },
-          "cordId" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "createdAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "gradeId" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "route" : {
-            "$ref" : "#/components/schemas/RouteSummary"
-          },
-          "setterNote" : {
-            "description" : "Setter without an account",
-            "type" : "string"
-          },
-          "setters" : {
-            "items" : {
-              "$ref" : "#/components/schemas/MemberRef"
-            },
-            "type" : "array"
-          }
-        },
-        "required" : [ "cordId", "createdAt", "gradeId", "route", "setters" ],
-        "type" : "object"
-      },
-      "RouteHold" : {
-        "properties" : {
-          "hex" : {
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "label" : {
-            "type" : "string"
-          },
-          "multicolor" : {
-            "type" : "boolean"
-          }
-        },
-        "required" : [ "hex", "id", "label", "multicolor" ],
-        "type" : "object"
-      },
-      "RouteSettings" : {
-        "description" : "At least one setter or a setter note.",
-        "properties" : {
-          "advice" : {
-            "maxLength" : 500,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "cordId" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "gradeId" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "holdColorIds" : {
-            "items" : {
-              "format" : "uuid",
-              "type" : "string"
-            },
-            "maxItems" : 2,
-            "minItems" : 1,
-            "type" : "array"
-          },
-          "name" : {
-            "maxLength" : 60,
-            "minLength" : 1,
-            "type" : "string"
-          },
-          "openedOn" : {
-            "format" : "date",
-            "type" : "string"
-          },
-          "setterIds" : {
-            "items" : {
-              "format" : "uuid",
-              "type" : "string"
-            },
-            "type" : "array"
-          },
-          "setterNote" : {
-            "maxLength" : 60,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "styles" : {
-            "items" : {
-              "enum" : [ "CONTINUITY", "ENDURANCE", "PHYSICAL", "TECHNICAL", "COMPLEX", "SLAB", "OVERHANG", "CRIMPS", "JUGS", "PINCHES", "SLOPERS", "DIHEDRAL", "ROOF", "REACHY" ],
-              "type" : "string"
-            },
-            "maxItems" : 5,
-            "minItems" : 0,
-            "type" : "array"
-          }
-        },
-        "required" : [ "cordId", "gradeId", "holdColorIds", "name", "openedOn", "setterIds", "styles" ],
-        "type" : "object"
-      },
-      "RouteSummary" : {
-        "description" : "A route as listed in the topo, with my own marks.",
-        "properties" : {
-          "checks" : {
-            "description" : "Modes in which I can climb it",
-            "items" : {
-              "enum" : [ "TOP_ROPE", "LEAD" ],
-              "type" : "string"
-            },
-            "type" : "array"
-          },
-          "commentCount" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "cordNumber" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "dismountedAt" : {
-            "format" : "date-time",
-            "type" : "string"
-          },
-          "favorite" : {
-            "description" : "Whether it is one of my favourites",
-            "type" : "boolean"
-          },
-          "favoriteCount" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "grade" : {
-            "type" : "string"
-          },
-          "gradeRank" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "holds" : {
-            "description" : "One or two hold colours",
-            "items" : {
-              "$ref" : "#/components/schemas/RouteHold"
-            },
-            "type" : "array"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "name" : {
-            "type" : "string"
-          },
-          "openedOn" : {
-            "format" : "date",
-            "type" : "string"
-          },
-          "photoUrl" : {
-            "type" : "string"
-          },
-          "plannedDismountOn" : {
-            "format" : "date",
-            "type" : "string"
-          },
-          "sectorId" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "sectorName" : {
-            "type" : "string"
-          },
-          "sectorPosition" : {
-            "format" : "int32",
-            "type" : "integer"
-          },
-          "status" : {
-            "enum" : [ "ACTIVE", "LAST_CHANCE", "DISMOUNTED" ],
-            "type" : "string"
-          },
-          "styles" : {
-            "items" : {
-              "enum" : [ "CONTINUITY", "ENDURANCE", "PHYSICAL", "TECHNICAL", "COMPLEX", "SLAB", "OVERHANG", "CRIMPS", "JUGS", "PINCHES", "SLOPERS", "DIHEDRAL", "ROOF", "REACHY" ],
-              "type" : "string"
-            },
-            "type" : "array"
-          }
-        },
-        "required" : [ "checks", "commentCount", "cordNumber", "favorite", "favoriteCount", "grade", "gradeRank", "holds", "id", "name", "openedOn", "sectorId", "sectorName", "sectorPosition", "status", "styles" ],
-        "type" : "object"
-      },
-      "Sector" : {
-        "properties" : {
-          "cords" : {
-            "description" : "Sorted by number",
-            "items" : {
-              "$ref" : "#/components/schemas/Cord"
-            },
-            "type" : "array"
-          },
-          "description" : {
-            "type" : "string"
-          },
-          "id" : {
-            "format" : "uuid",
-            "type" : "string"
-          },
-          "name" : {
-            "type" : "string"
-          },
-          "position" : {
-            "format" : "int32",
-            "type" : "integer"
-          }
-        },
-        "required" : [ "cords", "id", "name", "position" ],
-        "type" : "object"
-      },
-      "SectorOrder" : {
-        "properties" : {
-          "sectorIds" : {
-            "description" : "Every sector, in the new order",
-            "items" : {
-              "format" : "uuid",
-              "type" : "string"
-            },
-            "type" : "array"
-          }
-        },
-        "required" : [ "sectorIds" ],
-        "type" : "object"
-      },
-      "SectorSettings" : {
-        "properties" : {
-          "description" : {
-            "maxLength" : 160,
-            "minLength" : 0,
-            "type" : "string"
-          },
-          "name" : {
-            "maxLength" : 60,
-            "minLength" : 1,
-            "type" : "string"
-          }
-        },
-        "required" : [ "name" ],
-        "type" : "object"
-      },
-      "StatusChange" : {
-        "properties" : {
-          "status" : {
-            "enum" : [ "ACTIVE", "DISABLED" ],
-            "type" : "string"
-          }
-        },
-        "required" : [ "status" ],
-        "type" : "object"
-      },
-      "TopoConfig" : {
-        "description" : "The club layout: sectors and their cords, hold colours, grades.",
-        "properties" : {
-          "grades" : {
-            "items" : {
-              "$ref" : "#/components/schemas/Grade"
-            },
-            "type" : "array"
-          },
-          "holdColors" : {
-            "items" : {
-              "$ref" : "#/components/schemas/HoldColor"
-            },
-            "type" : "array"
-          },
-          "sectors" : {
-            "items" : {
-              "$ref" : "#/components/schemas/Sector"
-            },
-            "type" : "array"
-          }
-        },
-        "required" : [ "grades", "holdColors", "sectors" ],
-        "type" : "object"
-      }
-    }
-  },
+  "openapi" : "3.1.0",
   "info" : {
     "description" : "API of GG Pocket, the Gravelines Grimp club app.",
     "title" : "GG Pocket API",
     "version" : "v1"
   },
-  "openapi" : "3.1.0",
+  "servers" : [ {
+    "url" : "/"
+  } ],
   "paths" : {
     "/api/v1/admin/audit" : {
       "get" : {
@@ -1145,9 +24,9 @@
           "name" : "size",
           "required" : false,
           "schema" : {
-            "default" : 50,
+            "type" : "integer",
             "format" : "int32",
-            "type" : "integer"
+            "default" : 50
           }
         } ],
         "responses" : {
@@ -1203,8 +82,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -1270,8 +149,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -1366,8 +245,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -1404,10 +283,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/MemberSummary"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -1426,8 +305,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -1454,8 +333,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -1482,8 +361,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -1520,8 +399,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -1558,10 +437,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/RegistrationCode"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -1607,8 +486,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -1842,14 +721,14 @@
           "content" : {
             "multipart/form-data" : {
               "schema" : {
+                "type" : "object",
                 "properties" : {
                   "file" : {
-                    "format" : "binary",
-                    "type" : "string"
+                    "type" : "string",
+                    "format" : "binary"
                   }
                 },
-                "required" : [ "file" ],
-                "type" : "object"
+                "required" : [ "file" ]
               }
             }
           }
@@ -1878,10 +757,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/Device"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -1964,10 +843,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/RouteSummary"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -2037,8 +916,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -2046,8 +925,8 @@
             "content" : {
               "image/jpeg" : {
                 "schema" : {
-                  "format" : "byte",
-                  "type" : "string"
+                  "type" : "string",
+                  "format" : "byte"
                 }
               }
             },
@@ -2085,8 +964,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -2106,10 +985,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/RouteSummary"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -2155,10 +1034,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/RouteSummary"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -2177,10 +1056,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/LastChanceRoute"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -2221,10 +1100,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/RouteSummary"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -2243,10 +1122,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/MemberRef"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -2265,8 +1144,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -2291,8 +1170,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -2329,16 +1208,16 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         }, {
           "in" : "path",
           "name" : "mode",
           "required" : true,
           "schema" : {
-            "enum" : [ "TOP_ROPE", "LEAD" ],
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "TOP_ROPE", "LEAD" ]
           }
         } ],
         "responses" : {
@@ -2356,16 +1235,16 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         }, {
           "in" : "path",
           "name" : "mode",
           "required" : true,
           "schema" : {
-            "enum" : [ "TOP_ROPE", "LEAD" ],
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "TOP_ROPE", "LEAD" ]
           }
         } ],
         "responses" : {
@@ -2385,8 +1264,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -2394,10 +1273,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
+                  "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/RouteComment"
-                  },
-                  "type" : "array"
+                  }
                 }
               }
             },
@@ -2414,8 +1293,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -2452,8 +1331,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -2480,8 +1359,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -2499,8 +1378,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -2530,8 +1409,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -2556,8 +1435,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
@@ -2594,8 +1473,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -2613,22 +1492,22 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "requestBody" : {
           "content" : {
             "multipart/form-data" : {
               "schema" : {
+                "type" : "object",
                 "properties" : {
                   "file" : {
-                    "format" : "binary",
-                    "type" : "string"
+                    "type" : "string",
+                    "format" : "binary"
                   }
                 },
-                "required" : [ "file" ],
-                "type" : "object"
+                "required" : [ "file" ]
               }
             }
           }
@@ -2657,8 +1536,8 @@
           "name" : "id",
           "required" : true,
           "schema" : {
-            "format" : "uuid",
-            "type" : "string"
+            "type" : "string",
+            "format" : "uuid"
           }
         } ],
         "responses" : {
@@ -2697,7 +1576,1126 @@
       }
     }
   },
-  "servers" : [ {
-    "url" : "/"
-  } ]
+  "components" : {
+    "schemas" : {
+      "AuditEntry" : {
+        "type" : "object",
+        "description" : "Who did what, to whom, when.",
+        "properties" : {
+          "action" : {
+            "type" : "string",
+            "enum" : [ "MEMBER_ROLE_CHANGED", "MEMBER_DISABLED", "MEMBER_ENABLED", "PASSWORD_RESET_LINK_CREATED", "REGISTRATION_CODE_CREATED", "REGISTRATION_CODE_UPDATED", "ROUTE_DISMOUNTED", "ROUTE_REMOUNTED", "ROUTE_COMMENT_DELETED", "CLUB_SECTOR_CREATED", "CLUB_SECTOR_UPDATED", "CLUB_SECTORS_REORDERED", "CLUB_CORD_CREATED", "CLUB_CORD_UPDATED", "CLUB_HOLD_COLOR_CREATED", "CLUB_HOLD_COLOR_UPDATED" ]
+          },
+          "actorId" : {
+            "type" : "string",
+            "format" : "uuid",
+            "description" : "Absent if that member was deleted since"
+          },
+          "actorNickname" : {
+            "type" : "string",
+            "description" : "Nickname at the time of the action"
+          },
+          "after" : {
+            "type" : "string"
+          },
+          "before" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "occurredAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "targetId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "targetLabel" : {
+            "type" : "string",
+            "description" : "Name at the time of the action"
+          },
+          "targetType" : {
+            "type" : "string",
+            "enum" : [ "MEMBER", "REGISTRATION_CODE", "ROUTE", "ROUTE_COMMENT", "SECTOR", "CORD", "HOLD_COLOR" ]
+          }
+        },
+        "required" : [ "action", "id", "occurredAt", "targetLabel", "targetType" ]
+      },
+      "AuditPage" : {
+        "type" : "object",
+        "description" : "Newest first.",
+        "properties" : {
+          "entries" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AuditEntry"
+            }
+          },
+          "nextCursor" : {
+            "type" : "string",
+            "description" : "Pass it as ?cursor= for the next page; absent on the last page"
+          }
+        },
+        "required" : [ "entries" ]
+      },
+      "AuthState" : {
+        "type" : "object",
+        "description" : "Whether this browser is signed in, and as whom.",
+        "properties" : {
+          "authenticated" : {
+            "type" : "boolean"
+          },
+          "member" : {
+            "$ref" : "#/components/schemas/CurrentMember",
+            "description" : "Present when signed in"
+          }
+        },
+        "required" : [ "authenticated" ]
+      },
+      "Cord" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "number" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "sectorId" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        },
+        "required" : [ "active", "id", "number", "sectorId" ]
+      },
+      "CordSettings" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "number" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 99,
+            "minimum" : 1
+          },
+          "sectorId" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        },
+        "required" : [ "active", "number", "sectorId" ]
+      },
+      "CurrentMember" : {
+        "type" : "object",
+        "description" : "The signed-in member, as shown in the app shell.",
+        "properties" : {
+          "avatarUrl" : {
+            "type" : "string",
+            "description" : "Profile photo, absent when the member has none"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ]
+          }
+        },
+        "required" : [ "firstName", "id", "lastName", "nickname", "role" ]
+      },
+      "Device" : {
+        "type" : "object",
+        "description" : "An open session of the member (\"Mes appareils\").",
+        "properties" : {
+          "browser" : {
+            "type" : "string",
+            "enum" : [ "SAFARI", "CHROME", "FIREFOX", "EDGE", "SAMSUNG_INTERNET", "OPERA", "OTHER" ]
+          },
+          "current" : {
+            "type" : "boolean",
+            "description" : "The device making this request"
+          },
+          "id" : {
+            "type" : "string",
+            "description" : "Opaque id, not the session id"
+          },
+          "lastActiveAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "platform" : {
+            "type" : "string",
+            "enum" : [ "IPHONE", "IPAD", "ANDROID", "MAC", "WINDOWS", "LINUX", "OTHER" ]
+          },
+          "signedInAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "browser", "current", "id", "lastActiveAt", "platform", "signedInAt" ]
+      },
+      "FavoriteRequest" : {
+        "type" : "object",
+        "properties" : {
+          "replaceRouteId" : {
+            "type" : "string",
+            "format" : "uuid",
+            "description" : "One of my active favourites to give up for this one"
+          }
+        }
+      },
+      "FavoriteRouteRequest" : {
+        "type" : "object",
+        "properties" : {
+          "routeId" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        },
+        "required" : [ "routeId" ]
+      },
+      "Grade" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "example" : "6a+"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "rank" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "1 for the easiest grade"
+          }
+        },
+        "required" : [ "code", "id", "rank" ]
+      },
+      "HoldColor" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "hex" : {
+            "type" : "string",
+            "example" : "#F5C518"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "multicolor" : {
+            "type" : "boolean"
+          },
+          "position" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "active", "hex", "id", "label", "multicolor", "position" ]
+      },
+      "HoldColorSettings" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "hex" : {
+            "type" : "string",
+            "example" : "#F5C518",
+            "pattern" : "^#[0-9A-Fa-f]{6}$"
+          },
+          "label" : {
+            "type" : "string",
+            "maxLength" : 30,
+            "minLength" : 1
+          },
+          "multicolor" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "active", "hex", "label", "multicolor" ]
+      },
+      "LastChanceAcknowledgement" : {
+        "type" : "object",
+        "properties" : {
+          "routeIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "format" : "uuid"
+            },
+            "maxItems" : 50,
+            "minItems" : 1
+          }
+        },
+        "required" : [ "routeIds" ]
+      },
+      "LastChanceRoute" : {
+        "type" : "object",
+        "properties" : {
+          "acknowledgedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "route" : {
+            "$ref" : "#/components/schemas/RouteSummary"
+          }
+        },
+        "required" : [ "acknowledgedCount", "route" ]
+      },
+      "LastChanceSettings" : {
+        "type" : "object",
+        "properties" : {
+          "plannedDismountOn" : {
+            "type" : "string",
+            "format" : "date",
+            "description" : "Optional, today or later"
+          }
+        }
+      },
+      "LoginRequest" : {
+        "type" : "object",
+        "properties" : {
+          "nickname" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "password" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "rememberMe" : {
+            "type" : "boolean",
+            "description" : "\"Rester connecté\": 180 days instead of the browser session"
+          }
+        },
+        "required" : [ "nickname", "password" ]
+      },
+      "MemberDetail" : {
+        "type" : "object",
+        "description" : "The member sheet, with what the caller may do.",
+        "properties" : {
+          "climbingSinceYear" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "clubArrivalYear" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "member" : {
+            "$ref" : "#/components/schemas/MemberSummary"
+          },
+          "permissions" : {
+            "$ref" : "#/components/schemas/MemberPermissions"
+          },
+          "underFifteenWithParentalConsent" : {
+            "type" : "boolean",
+            "description" : "Under 15, with a parental consent declared (no birth date)"
+          }
+        },
+        "required" : [ "member", "permissions", "underFifteenWithParentalConsent" ]
+      },
+      "MemberPermissions" : {
+        "type" : "object",
+        "properties" : {
+          "assignableRoles" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ]
+            }
+          },
+          "canCreateResetLink" : {
+            "type" : "boolean"
+          },
+          "canDisable" : {
+            "type" : "boolean"
+          },
+          "canEnable" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "assignableRoles", "canCreateResetLink", "canDisable", "canEnable" ]
+      },
+      "MemberRef" : {
+        "type" : "object",
+        "properties" : {
+          "avatarUrl" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "nickname" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "id", "nickname" ]
+      },
+      "MemberSummary" : {
+        "type" : "object",
+        "description" : "A line of the members table.",
+        "properties" : {
+          "avatarUrl" : {
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "lastSeenAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Roughly, to the hour; absent if never seen since registration"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "registeredAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ]
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "DISABLED" ]
+          }
+        },
+        "required" : [ "firstName", "id", "lastName", "nickname", "registeredAt", "role", "status" ]
+      },
+      "Meta" : {
+        "type" : "object",
+        "description" : "What is running on the server.",
+        "properties" : {
+          "branch" : {
+            "type" : "string",
+            "description" : "Git branch, or 'unknown'"
+          },
+          "commit" : {
+            "type" : "string",
+            "description" : "Git commit, or 'unknown'"
+          },
+          "environment" : {
+            "type" : "string",
+            "enum" : [ "local", "dev", "prod" ]
+          },
+          "version" : {
+            "type" : "string",
+            "example" : "1.0.0"
+          }
+        },
+        "required" : [ "branch", "commit", "environment", "version" ]
+      },
+      "MyProfile" : {
+        "type" : "object",
+        "description" : "Everything the member may see and edit about themselves.",
+        "properties" : {
+          "age" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Age today, when the birth date is known"
+          },
+          "appearsInRankings" : {
+            "type" : "boolean"
+          },
+          "avatarUrl" : {
+            "type" : "string"
+          },
+          "bio" : {
+            "type" : "string"
+          },
+          "birthDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "climbingSinceYear" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "clubArrivalYear" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "favoriteRouteId" : {
+            "type" : "string",
+            "format" : "uuid",
+            "description" : "My favourite route, possibly dismounted"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "parentalConsent" : {
+            "type" : "boolean",
+            "description" : "A parent or legal guardian agreed (declared under 15)"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ]
+          },
+          "showAge" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "appearsInRankings", "createdAt", "firstName", "id", "lastName", "nickname", "parentalConsent", "role", "showAge" ]
+      },
+      "PasswordChange" : {
+        "type" : "object",
+        "properties" : {
+          "currentPassword" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "newPassword" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "currentPassword", "newPassword" ]
+      },
+      "PasswordReset" : {
+        "type" : "object",
+        "properties" : {
+          "newPassword" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "token" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "newPassword", "token" ]
+      },
+      "PasswordResetCheck" : {
+        "type" : "object",
+        "properties" : {
+          "token" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "token" ]
+      },
+      "PasswordResetLink" : {
+        "type" : "object",
+        "description" : "The secret of a reset link, shown once. The app builds the link with its own address: /nouveau-mot-de-passe#<token>.",
+        "properties" : {
+          "expiresAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "token" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "expiresAt", "token" ]
+      },
+      "PasswordResetTarget" : {
+        "type" : "object",
+        "description" : "Who a valid reset link is for.",
+        "properties" : {
+          "firstName" : {
+            "type" : "string"
+          },
+          "nickname" : {
+            "type" : "string",
+            "description" : "Their login, as a reminder"
+          }
+        },
+        "required" : [ "firstName", "nickname" ]
+      },
+      "ProfileUpdate" : {
+        "type" : "object",
+        "description" : "The whole editable profile, as the member wants it.",
+        "properties" : {
+          "appearsInRankings" : {
+            "type" : "boolean"
+          },
+          "bio" : {
+            "type" : "string",
+            "maxLength" : 160,
+            "minLength" : 0
+          },
+          "birthDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "climbingSinceYear" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 2100,
+            "minimum" : 1950
+          },
+          "clubArrivalYear" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 2100,
+            "minimum" : 1950
+          },
+          "email" : {
+            "type" : "string",
+            "format" : "email",
+            "maxLength" : 254,
+            "minLength" : 0
+          },
+          "firstName" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "nickname" : {
+            "type" : "string",
+            "pattern" : "^[A-Za-z0-9._-]{3,20}$"
+          },
+          "parentalConsent" : {
+            "type" : "boolean",
+            "description" : "Declares that a parent agreed; required once under 15"
+          },
+          "showAge" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "firstName", "lastName", "nickname" ]
+      },
+      "RegisterRequest" : {
+        "type" : "object",
+        "description" : "The one-page registration form (spec §6).",
+        "properties" : {
+          "birthDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "code" : {
+            "type" : "string",
+            "maxLength" : 32,
+            "minLength" : 0
+          },
+          "email" : {
+            "type" : "string",
+            "format" : "email",
+            "maxLength" : 254,
+            "minLength" : 0
+          },
+          "firstName" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "nickname" : {
+            "type" : "string",
+            "pattern" : "^[A-Za-z0-9._-]{3,20}$"
+          },
+          "parentalConsent" : {
+            "type" : "boolean",
+            "description" : "Required when the birth date says under 15"
+          },
+          "password" : {
+            "type" : "string",
+            "description" : "8 characters minimum, not a common password",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "privacyAccepted" : {
+            "type" : "boolean",
+            "description" : "\"Tes données\" accepted"
+          },
+          "rememberMe" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "code", "firstName", "lastName", "nickname", "password", "privacyAccepted" ]
+      },
+      "RegistrationCode" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "code" : {
+            "type" : "string",
+            "example" : "K7XM-P2QA"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "expiresAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "maxUses" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "state" : {
+            "type" : "string",
+            "enum" : [ "USABLE", "INACTIVE", "EXPIRED", "EXHAUSTED" ]
+          },
+          "useCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "active", "code", "createdAt", "id", "label", "state", "useCount" ]
+      },
+      "RegistrationCodeCheck" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "example" : "K7XM-P2QA",
+            "maxLength" : 32,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "code" ]
+      },
+      "RegistrationCodeSettings" : {
+        "type" : "object",
+        "description" : "Absent expiry or maximum: no limit.",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "expiresAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "label" : {
+            "type" : "string",
+            "example" : "Affiche de la salle, saison 2026",
+            "maxLength" : 80,
+            "minLength" : 0
+          },
+          "maxUses" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 10000,
+            "minimum" : 1
+          }
+        },
+        "required" : [ "active", "label" ]
+      },
+      "RoleChange" : {
+        "type" : "object",
+        "properties" : {
+          "role" : {
+            "type" : "string",
+            "enum" : [ "CLIMBER", "SETTER", "BOARD", "ADMIN" ]
+          }
+        },
+        "required" : [ "role" ]
+      },
+      "RouteComment" : {
+        "type" : "object",
+        "properties" : {
+          "author" : {
+            "$ref" : "#/components/schemas/MemberRef"
+          },
+          "body" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "deletable" : {
+            "type" : "boolean",
+            "description" : "Whether I may delete it"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        },
+        "required" : [ "author", "body", "createdAt", "deletable", "id" ]
+      },
+      "RouteCommentRequest" : {
+        "type" : "object",
+        "properties" : {
+          "body" : {
+            "type" : "string",
+            "maxLength" : 500,
+            "minLength" : 1
+          }
+        },
+        "required" : [ "body" ]
+      },
+      "RouteDetail" : {
+        "type" : "object",
+        "properties" : {
+          "advice" : {
+            "type" : "string"
+          },
+          "cordId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "gradeId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "route" : {
+            "$ref" : "#/components/schemas/RouteSummary"
+          },
+          "setterNote" : {
+            "type" : "string",
+            "description" : "Setter without an account"
+          },
+          "setters" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/MemberRef"
+            }
+          }
+        },
+        "required" : [ "cordId", "createdAt", "gradeId", "route", "setters" ]
+      },
+      "RouteHold" : {
+        "type" : "object",
+        "properties" : {
+          "hex" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "multicolor" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "hex", "id", "label", "multicolor" ]
+      },
+      "RouteSettings" : {
+        "type" : "object",
+        "description" : "At least one setter or a setter note.",
+        "properties" : {
+          "advice" : {
+            "type" : "string",
+            "maxLength" : 500,
+            "minLength" : 0
+          },
+          "cordId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "gradeId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "holdColorIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "format" : "uuid"
+            },
+            "maxItems" : 2,
+            "minItems" : 1
+          },
+          "name" : {
+            "type" : "string",
+            "maxLength" : 60,
+            "minLength" : 1
+          },
+          "openedOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "setterIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "format" : "uuid"
+            }
+          },
+          "setterNote" : {
+            "type" : "string",
+            "maxLength" : 60,
+            "minLength" : 0
+          },
+          "styles" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "CONTINUITY", "ENDURANCE", "PHYSICAL", "TECHNICAL", "COMPLEX", "SLAB", "OVERHANG", "CRIMPS", "JUGS", "PINCHES", "SLOPERS", "DIHEDRAL", "ROOF", "REACHY" ]
+            },
+            "maxItems" : 5,
+            "minItems" : 0
+          }
+        },
+        "required" : [ "cordId", "gradeId", "holdColorIds", "name", "openedOn", "setterIds", "styles" ]
+      },
+      "RouteSummary" : {
+        "type" : "object",
+        "description" : "A route as listed in the topo, with my own marks.",
+        "properties" : {
+          "checks" : {
+            "type" : "array",
+            "description" : "Modes in which I can climb it",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "TOP_ROPE", "LEAD" ]
+            }
+          },
+          "commentCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "cordNumber" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "dismountedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "favorite" : {
+            "type" : "boolean",
+            "description" : "Whether it is one of my favourites"
+          },
+          "favoriteCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "grade" : {
+            "type" : "string"
+          },
+          "gradeRank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "holds" : {
+            "type" : "array",
+            "description" : "One or two hold colours",
+            "items" : {
+              "$ref" : "#/components/schemas/RouteHold"
+            }
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "openedOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "photoUrl" : {
+            "type" : "string"
+          },
+          "plannedDismountOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "sectorId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "sectorName" : {
+            "type" : "string"
+          },
+          "sectorPosition" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "LAST_CHANCE", "DISMOUNTED" ]
+          },
+          "styles" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "CONTINUITY", "ENDURANCE", "PHYSICAL", "TECHNICAL", "COMPLEX", "SLAB", "OVERHANG", "CRIMPS", "JUGS", "PINCHES", "SLOPERS", "DIHEDRAL", "ROOF", "REACHY" ]
+            }
+          }
+        },
+        "required" : [ "checks", "commentCount", "cordNumber", "favorite", "favoriteCount", "grade", "gradeRank", "holds", "id", "name", "openedOn", "sectorId", "sectorName", "sectorPosition", "status", "styles" ]
+      },
+      "Sector" : {
+        "type" : "object",
+        "properties" : {
+          "cords" : {
+            "type" : "array",
+            "description" : "Sorted by number",
+            "items" : {
+              "$ref" : "#/components/schemas/Cord"
+            }
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "position" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "cords", "id", "name", "position" ]
+      },
+      "SectorOrder" : {
+        "type" : "object",
+        "properties" : {
+          "sectorIds" : {
+            "type" : "array",
+            "description" : "Every sector, in the new order",
+            "items" : {
+              "type" : "string",
+              "format" : "uuid"
+            }
+          }
+        },
+        "required" : [ "sectorIds" ]
+      },
+      "SectorSettings" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "maxLength" : 160,
+            "minLength" : 0
+          },
+          "name" : {
+            "type" : "string",
+            "maxLength" : 60,
+            "minLength" : 1
+          }
+        },
+        "required" : [ "name" ]
+      },
+      "StatusChange" : {
+        "type" : "object",
+        "properties" : {
+          "status" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "DISABLED" ]
+          }
+        },
+        "required" : [ "status" ]
+      },
+      "TopoConfig" : {
+        "type" : "object",
+        "description" : "The club layout: sectors and their cords, hold colours, grades.",
+        "properties" : {
+          "grades" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Grade"
+            }
+          },
+          "holdColors" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/HoldColor"
+            }
+          },
+          "sectors" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Sector"
+            }
+          }
+        },
+        "required" : [ "grades", "holdColors", "sectors" ]
+      }
+    }
+  }
 }

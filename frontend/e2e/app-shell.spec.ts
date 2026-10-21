@@ -26,6 +26,12 @@ async function failProfileScript(page: Page, times = Infinity) {
   })
 }
 
+// A script request still in `failProfileScript` when a test ends would fail the run on a
+// disposed response: drop the handlers without waiting for them.
+test.afterEach(async ({ page }) => {
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+})
+
 test.describe('app shell', () => {
   test('opens on Actu with the five tabs at hand', async ({ page }) => {
     await page.goto('/')

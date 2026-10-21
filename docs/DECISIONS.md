@@ -43,6 +43,7 @@ direction) ou **Willem**.
 | D-075 | Un coup de cœur remonté peut-il faire passer à 3 ? | club | Oui, toléré ; on ne peut plus en ajouter tant qu'on est à 2 ou plus |
 | D-076 | Les 14 styles de voie et 5 styles maximum par voie ? | club | Oui |
 | D-077 | Ouvreurs : responsables et plus, ou nom libre ? | club | Comptes de rôle Responsable et plus, plus un nom libre pour un ouvreur sans compte |
+| D-082 | Pop-up dernière chance : bouton « Me le redire plus tard » ? | club | Oui, elle revient à la prochaine ouverture |
 
 ---
 
@@ -652,3 +653,16 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Choix** : en phase 3, la fiche n'affiche rien pour ces chiffres (pas de faux zéros) et le tri par réalisations n'est pas
   proposé. Ils arrivent avec la phase 4 (ligne dans la ROADMAP).
 - **Statut** : validée.
+
+### D-081 — Une voie démontée est en lecture seule
+- **Choix** : sur une voie démontée, on ne modifie rien (fiche, photo, commentaires, coups de cœur, « je sais la faire »,
+  dernière chance) : refus `ROUTE_DISMOUNTED`. Seul le remontage la rend de nouveau modifiable. Un coup de cœur posé avant
+  le démontage reste donc dans l'historique du profil (D-010), sans compter dans la limite de deux.
+- **Statut** : validée.
+
+### D-082 — Pop-up « dernière chance » : « Me le redire plus tard »
+- **Contexte** : la spec prévoit un seul bouton, « J'accepte leurs destins », qui enregistre la prise de connaissance.
+- **Choix** : un second bouton, « Me le redire plus tard », ferme la pop-up sans rien enregistrer : elle revient à la
+  prochaine ouverture de l'appli. La pop-up n'apparaît jamais pendant la saisie d'une séance, ni par-dessus l'invitation à
+  installer l'appli.
+- **Statut** : à valider.

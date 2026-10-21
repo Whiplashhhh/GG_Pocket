@@ -866,11 +866,11 @@ export interface components {
         | 'ROUTE_COMMENT_DELETED'
         | 'CLUB_SECTOR_CREATED'
         | 'CLUB_SECTOR_UPDATED'
+        | 'CLUB_SECTORS_REORDERED'
         | 'CLUB_CORD_CREATED'
         | 'CLUB_CORD_UPDATED'
         | 'CLUB_HOLD_COLOR_CREATED'
         | 'CLUB_HOLD_COLOR_UPDATED'
-        | 'CLUB_SECTORS_REORDERED'
       /**
        * Format: uuid
        * @description Absent if that member was deleted since

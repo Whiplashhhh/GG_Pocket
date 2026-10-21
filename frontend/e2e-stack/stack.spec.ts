@@ -80,6 +80,16 @@ test('a demo climber signs in, browses and signs out without any CSP violation',
   expect((await login.allHeaders())['set-cookie'], 'session cookie').toContain('__Host-GG_SESSION=')
   const navigation = page.getByRole('navigation', { name: 'Navigation principale' })
   await page.waitForLoadState('networkidle')
+  // The demo seed puts three routes in last chance: the pop-up greets the climber once.
+  const lastChance = page.getByRole('dialog', { name: 'Dernière chance !' })
+  if (await lastChance.isVisible()) {
+    const [acknowledged] = await Promise.all([
+      page.waitForResponse('**/api/v1/routes/last-chance/acknowledgements'),
+      lastChance.getByRole('button', { name: 'J’accepte leurs destins' }).click(),
+    ])
+    expect(acknowledged.status()).toBe(204)
+    await expect(lastChance).toBeHidden()
+  }
   const where = [
     page.url(),
     `h1: ${(await page.locator('h1').allTextContents()).join(' / ')}`,
@@ -98,6 +108,15 @@ test('a demo climber signs in, browses and signs out without any CSP violation',
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await page.goto('/profil/appareils')
   await expect(page.getByRole('heading', { level: 1, name: 'Mes appareils' })).toBeVisible()
+  // The real topo: the seeded routes, and the sheet of one of them with its comments.
+  await page.goto('/topo')
+  const firstRoute = page.getByRole('link', { name: /^Corde \d+,/ }).first()
+  await expect(firstRoute).toBeVisible()
+  const [comments] = await Promise.all([
+    page.waitForResponse(/\/api\/v1\/routes\/[0-9a-f-]+\/comments$/),
+    firstRoute.click(),
+  ])
+  expect(comments.status()).toBe(200)
 
   expect(violations).toEqual([])
 })
