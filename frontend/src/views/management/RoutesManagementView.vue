@@ -4,7 +4,9 @@ import {
   ArchiveRestore,
   Copy,
   EllipsisVertical,
+  Heart,
   Hourglass,
+  MessageCircle,
   Pencil,
   Plus,
   Search,
@@ -29,7 +31,7 @@ import SelectField from '@/components/ui/SelectField.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import TextField from '@/components/ui/TextField.vue'
 import { orderedSectors } from '@/lib/clubConfig'
-import { formatDate } from '@/lib/format'
+import { formatDate, formatShortDate } from '@/lib/format'
 import type { RouteStatusAction } from '@/lib/route'
 import { filterManagedRoutes, sortRoutes } from '@/lib/topo'
 
@@ -124,16 +126,16 @@ const duplicateLink = (item: RouteSummary): RouteLocationRaw => ({
 const sheetLink = (item: RouteSummary): RouteLocationRaw =>
   item.status === 'DISMOUNTED' ? `/topo/archives/voies/${item.id}` : `/topo/voies/${item.id}`
 
-function statusLine(item: RouteSummary): string {
+function statusLine(item: RouteSummary, format = formatDate): string {
   if (item.status === 'DISMOUNTED' && item.dismountedAt) {
-    return t('routesAdmin.dismountedOn', { date: formatDate(item.dismountedAt) })
+    return t('routesAdmin.dismountedOn', { date: format(item.dismountedAt) })
   }
   if (item.status === 'LAST_CHANCE') {
     return item.plannedDismountOn
-      ? t('routesAdmin.plannedOn', { date: formatDate(item.plannedDismountOn) })
+      ? t('routesAdmin.plannedOn', { date: format(item.plannedDismountOn) })
       : t('routesAdmin.noPlannedDate')
   }
-  return t('routesAdmin.openedOn', { date: formatDate(item.openedOn) })
+  return t('routesAdmin.openedOn', { date: format(item.openedOn) })
 }
 </script>
 
@@ -237,116 +239,124 @@ function statusLine(item: RouteSummary): string {
     </ul>
 
     <!-- Large screens: a table with the actions on each row. -->
-    <table class="hidden w-full border-collapse text-left lg:table">
-      <thead>
-        <tr class="border-b-2 border-ink">
-          <th scope="col" class="py-2 pr-3 font-semibold">{{ t('routesAdmin.columns.route') }}</th>
-          <th scope="col" class="py-2 pr-3 font-semibold">{{ t('routesAdmin.columns.sector') }}</th>
-          <th scope="col" class="py-2 pr-3 font-semibold">{{ t('routesAdmin.columns.grade') }}</th>
-          <th scope="col" class="py-2 pr-3 font-semibold">
-            {{ t('routesAdmin.columns.openedOn') }}
-          </th>
-          <th scope="col" class="py-2 pr-3 text-right font-semibold">
-            {{ t('routesAdmin.columns.favorites') }}
-          </th>
-          <th scope="col" class="py-2 pr-3 text-right font-semibold">
-            {{ t('routesAdmin.columns.comments') }}
-          </th>
-          <th scope="col" class="py-2 pr-3 font-semibold">{{ t('routesAdmin.columns.status') }}</th>
-          <th scope="col" class="py-2 text-right font-semibold">
-            {{ t('routesAdmin.columns.actions') }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="item in shown"
-          :key="item.id"
-          class="border-b border-rule hover:bg-surface-sunken"
-        >
-          <th scope="row" class="max-w-80 py-2 pr-3 font-normal">
-            <RouteSummaryLabel :route="item" />
-          </th>
-          <td class="py-2 pr-3">{{ item.sectorName }}</td>
-          <td class="py-2 pr-3 text-lg font-grade">{{ item.grade }}</td>
-          <td class="py-2 pr-3 tabular-nums">{{ formatDate(item.openedOn) }}</td>
-          <td class="py-2 pr-3 text-right tabular-nums">{{ item.favoriteCount }}</td>
-          <td class="py-2 pr-3 text-right tabular-nums">{{ item.commentCount }}</td>
-          <td class="py-2 pr-3">
-            <span
-              class="font-semibold"
-              :class="{
-                'text-brand-ink': item.status === 'LAST_CHANCE',
-                'text-ink-muted': item.status === 'DISMOUNTED',
-              }"
-              >{{ t(`routesAdmin.status.${item.status}`) }}</span
-            >
-            <span v-if="item.status !== 'ACTIVE'" class="block text-sm text-ink-muted">{{
-              statusLine(item)
-            }}</span>
-          </td>
-          <td class="py-2">
-            <div class="flex justify-end gap-1">
-              <template v-if="item.status !== 'DISMOUNTED'">
-                <GgIconButton
-                  :to="editLink(item)"
-                  :label="t('routesAdmin.editNamed', { name: item.name })"
-                  :title="t('routesAdmin.edit')"
-                >
-                  <Pencil :size="20" aria-hidden="true" />
-                </GgIconButton>
-                <GgIconButton
-                  :to="duplicateLink(item)"
-                  :label="t('routesAdmin.duplicateNamed', { name: item.name })"
-                  :title="t('routesAdmin.duplicate')"
-                >
-                  <Copy :size="20" aria-hidden="true" />
-                </GgIconButton>
-                <GgIconButton
-                  v-if="item.status === 'ACTIVE'"
-                  :label="t('routesAdmin.lastChanceNamed', { name: item.name })"
-                  :title="t('routesAdmin.lastChance')"
-                  @click="ask('lastChance', item)"
-                >
-                  <Hourglass :size="20" aria-hidden="true" />
-                </GgIconButton>
-                <GgIconButton
-                  v-else
-                  :label="t('routesAdmin.cancelLastChanceNamed', { name: item.name })"
-                  :title="t('routesAdmin.cancelLastChance')"
-                  @click="cancel(item)"
-                >
-                  <TimerOff :size="20" aria-hidden="true" />
-                </GgIconButton>
-                <GgIconButton
-                  :label="t('routesAdmin.dismountNamed', { name: item.name })"
-                  :title="t('routesAdmin.dismount')"
-                  @click="ask('dismount', item)"
-                >
-                  <Archive :size="20" aria-hidden="true" />
-                </GgIconButton>
-              </template>
-              <template v-else>
-                <GgIconButton
-                  :to="duplicateLink(item)"
-                  :label="t('routesAdmin.duplicateNamed', { name: item.name })"
-                  :title="t('routesAdmin.duplicate')"
-                >
-                  <Copy :size="20" aria-hidden="true" />
-                </GgIconButton>
-                <GgIconButton
-                  :label="t('routesAdmin.remountNamed', { name: item.name })"
-                  :title="t('routesAdmin.remount')"
-                  @click="ask('remount', item)"
-                >
-                  <ArchiveRestore :size="20" aria-hidden="true" />
-                </GgIconButton>
-              </template>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="hidden overflow-x-auto lg:block">
+      <table class="w-full border-collapse text-left">
+        <thead>
+          <tr class="border-b-2 border-ink">
+            <th scope="col" class="py-2 pr-3 font-semibold">
+              {{ t('routesAdmin.columns.route') }}
+            </th>
+            <th scope="col" class="py-2 pr-3 font-semibold">
+              {{ t('routesAdmin.columns.sector') }}
+            </th>
+            <th scope="col" class="py-2 pr-3 text-right font-semibold">
+              <span :title="t('routesAdmin.columns.favorites')" class="inline-flex">
+                <Heart :size="18" aria-hidden="true" />
+                <span class="sr-only">{{ t('routesAdmin.columns.favorites') }}</span>
+              </span>
+            </th>
+            <th scope="col" class="py-2 pr-3 text-right font-semibold">
+              <span :title="t('routesAdmin.columns.comments')" class="inline-flex">
+                <MessageCircle :size="18" aria-hidden="true" />
+                <span class="sr-only">{{ t('routesAdmin.columns.comments') }}</span>
+              </span>
+            </th>
+            <th scope="col" class="py-2 pr-3 font-semibold">
+              {{ t('routesAdmin.columns.status') }}
+            </th>
+            <th scope="col" class="py-2 text-right font-semibold whitespace-nowrap">
+              {{ t('routesAdmin.columns.actions') }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="item in shown"
+            :key="item.id"
+            class="border-b border-rule hover:bg-surface-sunken"
+          >
+            <th scope="row" class="max-w-80 py-2 pr-3 font-normal">
+              <RouteSummaryLabel :route="item" />
+            </th>
+            <td class="min-w-28 py-2 pr-3">{{ item.sectorName }}</td>
+            <td class="py-2 pr-3 text-right tabular-nums">{{ item.favoriteCount }}</td>
+            <td class="py-2 pr-3 text-right tabular-nums">{{ item.commentCount }}</td>
+            <td class="min-w-46 py-2 pr-3">
+              <span
+                class="font-semibold"
+                :class="{
+                  'text-brand-ink': item.status === 'LAST_CHANCE',
+                  'text-ink-muted': item.status === 'DISMOUNTED',
+                }"
+                >{{ t(`routesAdmin.status.${item.status}`) }}</span
+              >
+              <span class="block text-sm text-ink-muted">{{
+                statusLine(item, formatShortDate)
+              }}</span>
+            </td>
+            <td class="py-2">
+              <div class="flex justify-end gap-1">
+                <template v-if="item.status !== 'DISMOUNTED'">
+                  <GgIconButton
+                    :to="editLink(item)"
+                    :label="t('routesAdmin.editNamed', { name: item.name })"
+                    :title="t('routesAdmin.edit')"
+                  >
+                    <Pencil :size="20" aria-hidden="true" />
+                  </GgIconButton>
+                  <GgIconButton
+                    :to="duplicateLink(item)"
+                    :label="t('routesAdmin.duplicateNamed', { name: item.name })"
+                    :title="t('routesAdmin.duplicate')"
+                  >
+                    <Copy :size="20" aria-hidden="true" />
+                  </GgIconButton>
+                  <GgIconButton
+                    v-if="item.status === 'ACTIVE'"
+                    :label="t('routesAdmin.lastChanceNamed', { name: item.name })"
+                    :title="t('routesAdmin.lastChance')"
+                    @click="ask('lastChance', item)"
+                  >
+                    <Hourglass :size="20" aria-hidden="true" />
+                  </GgIconButton>
+                  <GgIconButton
+                    v-else
+                    :label="t('routesAdmin.cancelLastChanceNamed', { name: item.name })"
+                    :title="t('routesAdmin.cancelLastChance')"
+                    @click="cancel(item)"
+                  >
+                    <TimerOff :size="20" aria-hidden="true" />
+                  </GgIconButton>
+                  <GgIconButton
+                    :label="t('routesAdmin.dismountNamed', { name: item.name })"
+                    :title="t('routesAdmin.dismount')"
+                    @click="ask('dismount', item)"
+                  >
+                    <Archive :size="20" aria-hidden="true" />
+                  </GgIconButton>
+                </template>
+                <template v-else>
+                  <GgIconButton
+                    :to="duplicateLink(item)"
+                    :label="t('routesAdmin.duplicateNamed', { name: item.name })"
+                    :title="t('routesAdmin.duplicate')"
+                  >
+                    <Copy :size="20" aria-hidden="true" />
+                  </GgIconButton>
+                  <GgIconButton
+                    :label="t('routesAdmin.remountNamed', { name: item.name })"
+                    :title="t('routesAdmin.remount')"
+                    @click="ask('remount', item)"
+                  >
+                    <ArchiveRestore :size="20" aria-hidden="true" />
+                  </GgIconButton>
+                </template>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </template>
 
   <GgDialog

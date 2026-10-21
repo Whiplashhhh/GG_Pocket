@@ -7,6 +7,12 @@ const DAY = new Intl.DateTimeFormat('fr-FR', {
   year: 'numeric',
   timeZone: ZONE,
 })
+const SHORT_DAY = new Intl.DateTimeFormat('fr-FR', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: ZONE,
+})
 const DAY_MONTH = new Intl.DateTimeFormat('fr-FR', {
   day: 'numeric',
   month: 'long',
@@ -25,6 +31,12 @@ export function formatDate(value: string): string {
   // A bare date is a calendar day: read it at noon UTC so no time zone moves it to another day.
   const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T12:00:00Z`) : new Date(value)
   return DAY.format(date)
+}
+
+/** "1 sept. 2026", for tables where a long month would wrap. Same inputs as {@link formatDate}. */
+export function formatShortDate(value: string): string {
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T12:00:00Z`) : new Date(value)
+  return SHORT_DAY.format(date)
 }
 
 /** "12 octobre à 18 h 30", "12 octobre à 10 h": the French way of writing a time. */

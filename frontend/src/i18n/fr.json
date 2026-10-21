@@ -645,8 +645,6 @@
     "columns": {
       "route": "Voie",
       "sector": "Secteur",
-      "grade": "Cotation",
-      "openedOn": "Ouverture",
       "favorites": "Coups de cœur",
       "comments": "Commentaires",
       "status": "Statut",
