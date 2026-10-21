@@ -558,7 +558,8 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   serveur répond 404 sur l'ancien fichier. La navigation échouait sans aucun message, alors que les écrans inchangés marchaient.
 - **Choix** : `router.onError` reconnaît l'échec de chargement d'un écran (messages de Chromium, WebKit, Firefox et Vite) et
   recharge la page visée (`src/lib/stale-chunk.ts`). Un deuxième échec dans les 30 secondes n'entraîne pas de nouveau
-  rechargement, pour éviter une boucle si le serveur est en panne ou le téléphone hors ligne.
+  rechargement, pour éviter une boucle si le serveur est en panne ou le téléphone hors ligne. Caddy ne met plus le cache d'un
+  an (`immutable`) sur un fichier `/assets/` absent : un 404 part en `no-store`.
 - **Alternatives** : garder les fichiers des anciennes versions sur le serveur (images Docker plus lourdes, ménage à prévoir) ;
   sortir la version du fichier du Profil (ne règle que ce cas, n'importe quel écran modifié a le même problème).
 - **Statut** : validée. Le diagnostic est déduit du code, sans accès aux outils de développement de l'iPhone : confirmation
