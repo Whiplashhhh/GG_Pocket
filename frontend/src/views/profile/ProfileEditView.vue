@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { errorMessageKey } from '@/api/errors'
 import { useMyProfile, useUpdateProfile } from '@/api/me'
 import SubPageHeader from '@/components/layout/SubPageHeader.vue'
+import FavoriteRouteSetting from '@/components/profile/FavoriteRouteSetting.vue'
 import ProfileDetailsFields from '@/components/profile/ProfileDetailsFields.vue'
 import ProfilePhotoPicker from '@/components/profile/ProfilePhotoPicker.vue'
 import CheckboxField from '@/components/ui/CheckboxField.vue'
@@ -122,6 +123,8 @@ function submit() {
       <h2 id="photo-title" class="sr-only">{{ t('profileEdit.photo') }}</h2>
       <ProfilePhotoPicker />
     </section>
+
+    <FavoriteRouteSetting />
 
     <form class="flex flex-col gap-5 px-4 pb-10" novalidate @submit.prevent="submit">
       <FormAlert v-if="general">{{ t(general.key) }}</FormAlert>

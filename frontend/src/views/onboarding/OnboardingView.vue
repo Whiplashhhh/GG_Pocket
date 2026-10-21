@@ -4,10 +4,13 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useCurrentMember } from '@/api/auth'
+import { errorMessageKey } from '@/api/errors'
 import { useMyProfile, useUpdateProfile } from '@/api/me'
+import { useSetFavoriteRoute } from '@/api/topo'
 import InstallGuide from '@/components/install/InstallGuide.vue'
 import ProfileDetailsFields from '@/components/profile/ProfileDetailsFields.vue'
 import ProfilePhotoPicker from '@/components/profile/ProfilePhotoPicker.vue'
+import RoutePicker from '@/components/topo/RoutePicker.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import { serverFieldErrors, type FieldErrors, type Message } from '@/lib/forms'
@@ -15,10 +18,10 @@ import { toForm, toUpdate, type ProfileDetails } from '@/lib/profile'
 import { useInstallStore } from '@/stores/install'
 
 /**
- * Right after registration (spec §6): photo, a few details, then the invitation to install.
- * Every step can be skipped.
+ * Right after registration (spec §6): photo, a few details, the favourite route (D-055), then
+ * the invitation to install. Every step can be skipped.
  */
-const STEPS = ['photo', 'infos', 'installer'] as const
+const STEPS = ['photo', 'infos', 'voie', 'installer'] as const
 type Step = (typeof STEPS)[number]
 
 const { t } = useI18n()
@@ -28,6 +31,7 @@ const member = useCurrentMember()
 const profile = useMyProfile()
 const update = useUpdateProfile()
 const install = useInstallStore()
+const setFavoriteRoute = useSetFavoriteRoute()
 
 const step = computed(() => route.params.step as Step)
 const position = computed(() => STEPS.indexOf(step.value) + 1)
@@ -36,6 +40,7 @@ const titleKey = computed(
     ({
       photo: 'onboarding.photoTitle',
       infos: 'onboarding.infosTitle',
+      voie: 'onboarding.favoriteTitle',
       installer: 'install.title',
     })[step.value],
 )
@@ -43,10 +48,12 @@ const titleKey = computed(
 const details = ref<ProfileDetails>({ clubArrivalYear: '', climbingSinceYear: '', bio: '' })
 const errors = ref<FieldErrors<keyof ProfileDetails>>({})
 const general = ref<Message | null>(null)
+const favoriteRouteId = ref<string | undefined>(undefined)
 watch(
   () => profile.data.value,
   (loaded) => {
     if (loaded) {
+      favoriteRouteId.value ??= loaded.favoriteRouteId
       const form = toForm(loaded)
       details.value = {
         clubArrivalYear: form.clubArrivalYear,
@@ -65,7 +72,7 @@ function goTo(next: Step | 'done') {
 function saveDetails() {
   const loaded = profile.data.value
   if (loaded === undefined) {
-    goTo('installer')
+    goTo('voie')
     return
   }
   general.value = null
@@ -76,7 +83,7 @@ function saveDetails() {
   }
   update.mutate(result.update, {
     onSuccess: () => {
-      goTo('installer')
+      goTo('voie')
     },
     onError: (error) => {
       const placed = serverFieldErrors(error, [
@@ -86,6 +93,19 @@ function saveDetails() {
       ] as const)
       errors.value = placed.fields
       general.value = placed.general
+    },
+  })
+}
+
+function saveFavoriteRoute() {
+  const routeId = favoriteRouteId.value
+  if (routeId === undefined || routeId === profile.data.value?.favoriteRouteId) {
+    goTo('installer')
+    return
+  }
+  setFavoriteRoute.mutate(routeId, {
+    onSuccess: () => {
+      goTo('installer')
     },
   })
 }
@@ -152,11 +172,33 @@ function finish() {
         <GgButton type="submit" size="lg" block :disabled="update.isPending.value">
           {{ t('onboarding.next') }}
         </GgButton>
-        <GgButton variant="ghost" block @click="goTo('installer')">
+        <GgButton variant="ghost" block @click="goTo('voie')">
           {{ t('onboarding.later') }}
         </GgButton>
       </div>
     </form>
+
+    <template v-else-if="step === 'voie'">
+      <p class="mt-2 text-ink-muted">{{ t('onboarding.favoriteBody') }}</p>
+      <div class="mt-5"><RoutePicker v-model="favoriteRouteId" /></div>
+      <div v-if="setFavoriteRoute.isError.value" class="mt-4">
+        <FormAlert>{{ t(errorMessageKey(setFavoriteRoute.error.value)) }}</FormAlert>
+      </div>
+      <div class="mt-auto flex flex-col gap-2 pt-8">
+        <GgButton
+          v-if="favoriteRouteId"
+          size="lg"
+          block
+          :disabled="setFavoriteRoute.isPending.value"
+          @click="saveFavoriteRoute"
+        >
+          {{ t('onboarding.favoriteSave') }}
+        </GgButton>
+        <GgButton variant="ghost" block @click="goTo('installer')">
+          {{ t('onboarding.later') }}
+        </GgButton>
+      </div>
+    </template>
 
     <template v-else>
       <div class="mt-4"><InstallGuide /></div>

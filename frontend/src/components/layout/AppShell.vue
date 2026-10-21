@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 
 import { useAuthState } from '@/api/auth'
 import InstallDialog from '@/components/install/InstallDialog.vue'
+import LastChanceDialog from '@/components/topo/LastChanceDialog.vue'
 import { useInstallStore } from '@/stores/install'
 
 import AppHeader from './AppHeader.vue'
@@ -36,6 +37,12 @@ watch(
   },
   { immediate: true },
 )
+
+// Spec §8.9: routes about to be dismounted, once the install invitation is out of the way and
+// never over the session entry.
+const lastChanceEnabled = computed(
+  () => auth.value?.authenticated === true && !inviting.value && !route.path.startsWith('/seance'),
+)
 </script>
 
 <template>
@@ -59,4 +66,5 @@ watch(
   <!-- Large management screens have their own navigation; the brand link leads back to the app. -->
   <TabBar :class="{ 'lg:hidden': route.meta.wide }" />
   <InstallDialog v-model:open="inviting" />
+  <LastChanceDialog :enabled="lastChanceEnabled" />
 </template>

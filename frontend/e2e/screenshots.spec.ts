@@ -12,8 +12,21 @@ interface Capture {
   /** Management screens are also captured at 1280 px. */
   desktop?: boolean
   installInvite?: boolean
+  lastChancePopup?: boolean
   prepare?: (club: FakeClub) => void
   act?: (page: Page) => Promise<void>
+}
+
+/** Marie's own marks on the topo: favourites (one dismounted since), routes she can climb. */
+const marieOnTheWall = (club: FakeClub) => {
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  if (marie === undefined) return
+  club.topo.favorite(marie, 'Schtroumpfs')
+  club.topo.favorite(marie, 'Bye Bye Morice')
+  club.topo.favorite(marie, 'Réglisse')
+  club.topo.check(marie, 'Bye Bye Morice', 'LEAD')
+  club.topo.check(marie, 'Iron Man', 'TOP_ROPE')
+  marie.favoriteRouteId = club.topo.route('Tonton Talon').id
 }
 
 const someMembers = (club: FakeClub) => {
@@ -66,10 +79,76 @@ const CAPTURES: Capture[] = [
   },
   { name: 'premiers-pas-photo', path: '/premiers-pas/photo', as: 'CLIMBER' },
   { name: 'premiers-pas-infos', path: '/premiers-pas/infos', as: 'CLIMBER' },
+  { name: 'premiers-pas-voie', path: '/premiers-pas/voie', as: 'CLIMBER' },
   { name: 'premiers-pas-installer', path: '/premiers-pas/installer', as: 'CLIMBER' },
   { name: 'actu-invitation', path: '/actu', as: 'CLIMBER', installInvite: true },
-  { name: 'profil', path: '/profil', as: 'BOARD' },
-  { name: 'profil-modifier', path: '/profil/modifier', as: 'CLIMBER' },
+  { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
+  { name: 'topo', path: '/topo', as: 'CLIMBER', prepare: marieOnTheWall },
+  { name: 'topo-secteurs', path: '/topo?tri=secteur', as: 'CLIMBER', prepare: marieOnTheWall },
+  {
+    name: 'topo-filtres',
+    path: '/topo',
+    as: 'CLIMBER',
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Filtres' }).click()
+      await page.getByRole('button', { name: 'Grand dévers' }).click()
+      await page.getByRole('button', { name: 'Dévers', exact: true }).click()
+    },
+  },
+  {
+    name: 'topo-fiche',
+    path: '/topo',
+    as: 'CLIMBER',
+    prepare: marieOnTheWall,
+    act: async (page) => {
+      await page.getByRole('link', { name: /Bye Bye Morice/ }).click()
+      await page.getByRole('dialog').getByText('Le conseil de l’ouvreur').waitFor()
+    },
+  },
+  {
+    name: 'topo-fiche-photo',
+    path: '/topo',
+    as: 'CLIMBER',
+    act: async (page) => {
+      await page.getByRole('link', { name: /OH purée/ }).click()
+      await page.getByRole('dialog').getByText('Commentaires (0)').waitFor()
+    },
+  },
+  {
+    name: 'topo-coeur-plein',
+    path: '/topo',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      const marie = club.members.find((member) => member.nickname === 'marie')
+      if (marie === undefined) return
+      club.topo.favorite(marie, 'Réglisse')
+      club.topo.favorite(marie, 'Iron Man')
+    },
+    act: async (page) => {
+      await page.getByRole('link', { name: /Du mou/ }).click()
+      await page.getByRole('button', { name: 'Coup de cœur' }).click()
+      await page.getByRole('dialog', { name: /Ton cœur est plein/ }).waitFor()
+    },
+  },
+  {
+    name: 'topo-archives',
+    path: '/topo/archives',
+    as: 'CLIMBER',
+  },
+  {
+    name: 'topo-fiche-demontee',
+    path: '/topo/archives',
+    as: 'CLIMBER',
+    act: async (page) => {
+      await page.getByRole('link', { name: /Schtroumpfs/ }).click()
+      await page
+        .getByRole('dialog')
+        .getByText(/^Démontée le/)
+        .waitFor()
+    },
+  },
+  { name: 'topo-derniere-chance', path: '/actu', as: 'CLIMBER', lastChancePopup: true },
+  { name: 'profil-modifier', path: '/profil/modifier', as: 'CLIMBER', prepare: marieOnTheWall },
   { name: 'appareils', path: '/profil/appareils', as: 'CLIMBER' },
   { name: 'gestion', path: '/gestion', as: 'ADMIN', desktop: true },
   { name: 'membres', path: '/gestion/membres', as: 'BOARD', desktop: true, prepare: someMembers },
@@ -116,7 +195,11 @@ test.use({ meta: { environment: 'dev', branch: 'feature/comptes-0.0.0', commit: 
 
 for (const capture of CAPTURES) {
   test.describe(capture.name, () => {
-    test.use({ signedInAs: capture.as, installInvite: capture.installInvite ?? false })
+    test.use({
+      signedInAs: capture.as,
+      installInvite: capture.installInvite ?? false,
+      lastChancePopup: capture.lastChancePopup ?? false,
+    })
 
     test(`capture ${capture.name}`, async ({ page, club, isMobile }, testInfo) => {
       test.skip(!isMobile && capture.desktop !== true, 'Phone screens are reviewed at 360 px')

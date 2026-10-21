@@ -2,6 +2,8 @@ import type { Page, Route } from '@playwright/test'
 
 import type { components } from '../src/api/schema'
 
+import { FakeTopo } from './fakeTopo'
+
 type Schemas = components['schemas']
 type Role = Schemas['CurrentMember']['role']
 
@@ -29,6 +31,7 @@ export interface FakeMember {
   climbingSinceYear?: number
   bio?: string
   avatarUrl?: string
+  favoriteRouteId?: string
   registeredAt: string
   lastSeenAt?: string
 }
@@ -71,6 +74,11 @@ export class FakeClub {
   /** The session of the browser under test, as its cookie would carry it. */
   private browserSession: string | undefined
   private sequence = 0
+  /** Sectors, routes, comments, favourites… (phase 3). */
+  readonly topo = new FakeTopo(
+    () => this.nextId(),
+    () => this.now,
+  )
 
   addMember(overrides: Partial<FakeMember> & Pick<FakeMember, 'nickname'>): FakeMember {
     const member: FakeMember = {
@@ -178,6 +186,7 @@ export class FakeClub {
       clubArrivalYear: member.clubArrivalYear,
       climbingSinceYear: member.climbingSinceYear,
       bio: member.bio,
+      favoriteRouteId: member.favoriteRouteId,
       createdAt: member.registeredAt,
     }
   }
@@ -350,6 +359,11 @@ export class FakeClub {
 
     const me = this.current()
     if (me === undefined) return fail(401, 'UNAUTHENTICATED')
+
+    const topo = this.topo.handle(me, method, path, method === 'GET' ? undefined : body())
+    if (topo?.kind === 'json') return json(topo.data, topo.status)
+    if (topo?.kind === 'empty') return route.fulfill({ status: 204 })
+    if (topo?.kind === 'problem') return fail(topo.status, topo.code)
 
     if (path === '/me' && method === 'GET') return json(this.profile(me))
     if (path === '/me/profile') {

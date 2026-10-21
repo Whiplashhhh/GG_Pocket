@@ -7,7 +7,9 @@ import { useI18n } from 'vue-i18n'
 import { useLogout } from '@/api/auth'
 import { useMyProfile } from '@/api/me'
 import { useMetaQuery } from '@/api/meta'
+import { useMyFavorites, useRouteDetail } from '@/api/topo'
 import PageTitle from '@/components/layout/PageTitle.vue'
+import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
@@ -21,12 +23,20 @@ import { formatDate } from '@/lib/format'
 import { isAtLeast } from '@/lib/roles'
 import { useThemeStore, type ThemePreference } from '@/stores/theme'
 
-/** Spec §8.8: my profile and settings. Favourites, badges and key figures come with later phases. */
+/** Spec §8.8: my profile and settings. Badges and key figures come with later phases. */
 const { t } = useI18n()
 const { data: profile, isPending, isError, error, refetch } = useMyProfile()
 const { data: meta } = useMetaQuery()
 const { preference } = storeToRefs(useThemeStore())
 const logout = useLogout()
+const favoriteRoute = useRouteDetail(() => profile.value?.favoriteRouteId)
+const favorites = useMyFavorites()
+const activeFavorites = computed(() =>
+  (favorites.data.value ?? []).filter((route) => route.status !== 'DISMOUNTED'),
+)
+const pastFavorites = computed(() =>
+  (favorites.data.value ?? []).filter((route) => route.status === 'DISMOUNTED'),
+)
 const confirmingLogout = ref(false)
 
 const appVersion = __APP_VERSION__
@@ -88,7 +98,61 @@ const facts = computed(() => {
     <GgButton to="/profil/modifier" variant="secondary" class="mt-5">
       {{ t('profile.edit') }}
     </GgButton>
-    <p class="mt-5 text-sm text-ink-muted">{{ t('profile.comingSoon') }}</p>
+  </section>
+
+  <section
+    v-if="profile?.favoriteRouteId && favoriteRoute.data.value"
+    class="border-t border-rule px-4 pt-5 pb-6"
+    aria-labelledby="voie-preferee"
+  >
+    <h2 id="voie-preferee" class="text-lg font-title">{{ t('profile.favoriteRoute') }}</h2>
+    <RouterLink
+      :to="`/topo/voies/${favoriteRoute.data.value.route.id}`"
+      aria-labelledby="voie-preferee-nom"
+      class="mt-3 flex max-w-full pt-2"
+    >
+      <RouteSummaryLabel :route="favoriteRoute.data.value.route" label-id="voie-preferee-nom" />
+    </RouterLink>
+  </section>
+
+  <section v-if="profile" class="border-t border-rule pt-5 pb-6" aria-labelledby="coups-de-coeur">
+    <h2 id="coups-de-coeur" class="px-4 text-lg font-title">{{ t('profile.favorites') }}</h2>
+    <div v-if="favorites.isPending.value" class="px-4 pt-3" aria-hidden="true">
+      <SkeletonBlock class="h-11 w-full max-w-72" />
+    </div>
+    <p v-else-if="favorites.data.value?.length === 0" class="max-w-prose px-4 pt-2 text-ink-muted">
+      {{ t('profile.favoritesEmpty') }}
+    </p>
+    <template v-else-if="favorites.data.value">
+      <ul class="mt-2 flex flex-col">
+        <li v-for="route in activeFavorites" :key="route.id">
+          <RouterLink
+            :to="`/topo/voies/${route.id}`"
+            :aria-labelledby="`coeur-${route.id}`"
+            class="flex px-4 pt-4 pb-1"
+          >
+            <RouteSummaryLabel :route="route" :label-id="`coeur-${route.id}`" />
+          </RouterLink>
+        </li>
+      </ul>
+      <template v-if="pastFavorites.length > 0">
+        <h3 class="px-4 pt-5 text-sm font-semibold text-ink-muted">
+          {{ t('profile.pastFavorites') }}
+        </h3>
+        <ul class="flex flex-col">
+          <li v-for="route in pastFavorites" :key="route.id">
+            <RouterLink
+              :to="`/topo/voies/${route.id}`"
+              :aria-labelledby="`coeur-${route.id}`"
+              class="flex px-4 pt-3 pb-1"
+            >
+              <RouteSummaryLabel :route="route" size="sm" :label-id="`coeur-${route.id}`" />
+            </RouterLink>
+          </li>
+        </ul>
+      </template>
+    </template>
+    <p class="mt-5 px-4 text-sm text-ink-muted">{{ t('profile.comingSoon') }}</p>
   </section>
 
   <section class="border-t border-rule" aria-labelledby="reglages">

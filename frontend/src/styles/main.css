@@ -71,6 +71,20 @@
   --shadow-fab: var(--gg-shadow-fab);
 }
 
+/* The route sheet slides up from the bottom (docs/DESIGN.md §8); reduced motion: instant. */
+@theme {
+  --animate-sheet-up: sheet-up 200ms ease-out;
+
+  @keyframes sheet-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
+
 @layer base {
   html {
     background-color: var(--gg-bg);

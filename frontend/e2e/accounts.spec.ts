@@ -101,10 +101,12 @@ test.describe('joining the club', () => {
 
     // First steps: photo (skipped), details, invitation to install.
     await expect(page).toHaveURL(/\/premiers-pas\/photo$/)
-    await expect(page.getByText('Étape 1 sur 3')).toBeVisible()
+    await expect(page.getByText('Étape 1 sur 4')).toBeVisible()
     await page.getByRole('button', { name: 'Passer cette étape' }).click()
     await page.getByLabel('Je grimpe depuis').fill('2015')
     await page.getByRole('button', { name: 'Continuer' }).click()
+    await expect(page.getByRole('heading', { name: 'Ta voie préférée ?' })).toBeVisible()
+    await page.getByRole('button', { name: 'Passer cette étape' }).click()
     await expect(page.getByRole('heading', { name: 'Installe GG Pocket' })).toBeVisible()
     if (isMobile) {
       await expect(page.getByText('Sur iPhone et iPad, ça se fait à la main')).toBeVisible()

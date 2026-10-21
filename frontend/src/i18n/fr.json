@@ -42,8 +42,146 @@
   },
   "topo": {
     "title": "Topo",
+    "count": "Aucune voie | 1 voie | {n} voies",
+    "countFiltered": "{shown} sur {total}",
+    "loading": "On sort le topo du sac…",
     "emptyTitle": "Le mur est tout nu.",
-    "emptyBody": "Aucune voie ouverte pour l’instant. L’équipe d’ouverture a sûrement la visseuse à la main."
+    "emptyBody": "Aucune voie ouverte pour l’instant. L’équipe d’ouverture a sûrement la visseuse à la main.",
+    "noMatchTitle": "Aucune voie ne passe tous ces filtres.",
+    "noMatchBody": "Desserre un peu les filtres, ou efface-les pour revoir tout le mur.",
+    "toolbar": "Tri et filtres",
+    "sortBy": "Trier par",
+    "sorts": {
+      "grade": "Cotation",
+      "opened": "Date d’ouverture",
+      "sector": "Secteur et corde",
+      "favorites": "Coups de cœur",
+      "comments": "Commentaires"
+    },
+    "directionAsc": "Ordre croissant, toucher pour inverser",
+    "directionDesc": "Ordre décroissant, toucher pour inverser",
+    "filters": "Filtres",
+    "filtersActive": "Filtres, {count} actif | Filtres, {count} actif | Filtres, {count} actifs",
+    "filtersTitle": "Filtrer le topo",
+    "filtersDescription": "Les filtres se combinent : seules les voies qui passent tout restent affichées.",
+    "filterSectors": "Secteurs",
+    "filterGrades": "Cotation",
+    "gradeMin": "De",
+    "gradeMax": "À",
+    "gradeAny": "Peu importe",
+    "filterColors": "Couleur des prises",
+    "filterStyles": "Style",
+    "notDoneByMe": "Pas encore faite par moi",
+    "notDoneByMeHint": "Ni en mouli ni en tête, d’après tes « Je sais la faire ».",
+    "clearFilters": "Tout effacer",
+    "showResults": "Aucune voie à voir | Voir la voie | Voir les {n} voies",
+    "row": {
+      "favorites": "Aucun coup de cœur | 1 coup de cœur | {n} coups de cœur",
+      "comments": "Aucun commentaire | 1 commentaire | {n} commentaires",
+      "doneTopRope": "mouli",
+      "doneLead": "tête",
+      "doneTopRopeLong": "Je sais la faire en mouli",
+      "doneLeadLong": "Je sais la faire en tête",
+      "plannedDismount": "Démontage prévu le {date}",
+      "dismountedOn": "Démontée le {date}"
+    },
+    "archivesLink": "Voies démontées (archives)"
+  },
+  "archives": {
+    "title": "Voies démontées",
+    "intro": "Elles ne sont plus au mur, mais on se souvient d’elles. En lecture seule.",
+    "emptyTitle": "Rien aux archives.",
+    "emptyBody": "Aucune voie démontée pour l’instant : tout ce qui a été ouvert est encore au mur.",
+    "back": "Retour au topo"
+  },
+  "routeSheet": {
+    "title": "Fiche voie",
+    "close": "Fermer la fiche",
+    "expand": "Agrandir la fiche",
+    "shrink": "Réduire la fiche",
+    "openPhoto": "Voir la photo de {name} en grand",
+    "photoTitle": "Photo de {name}",
+    "closePhoto": "Fermer la photo",
+    "cord": "corde {number}",
+    "holds": "Prises {colors}",
+    "openedOn": "Ouverte le {date}",
+    "openedBy": "Ouverte le {date} par {setters}",
+    "styles": "Styles",
+    "advice": "Le conseil de l’ouvreur",
+    "adviceQuote": "« {advice} »",
+    "favorites": "Aucun coup de cœur pour l’instant | 1 coup de cœur | {n} coups de cœur",
+    "heart": "Coup de cœur",
+    "checks": "Je sais la faire",
+    "checkTopRope": "Je sais la faire en mouli",
+    "checkLead": "Je sais la faire en tête",
+    "lastChancePlanned": "Dernière chance : démontage prévu le {date}. Va la grimper tant qu’elle est au mur !",
+    "lastChanceSoon": "Dernière chance : elle sera bientôt démontée. Va la grimper tant qu’elle est au mur !",
+    "dismounted": "Démontée le {date}. Elle reste ici pour la mémoire : plus de cœur, de coche ni de commentaire.",
+    "loadError": "Impossible d’ouvrir cette fiche.",
+    "notFoundTitle": "Cette voie a disparu du topo.",
+    "notFoundBody": "Le lien est peut-être faux, ou la voie a été retirée. Retourne au topo pour en choisir une autre.",
+    "heartFullTitle": "Ton cœur est plein. Lequel tu lâches ?",
+    "heartFullBody": "Deux coups de cœur au maximum sur les voies au mur. Choisis celui que « {name} » remplace.",
+    "heartFullRelease": "Lâcher",
+    "heartFullKeep": "Je garde les deux",
+    "heartReplaced": "C’est fait : « {name} » a pris la place."
+  },
+  "comments": {
+    "title": "Commentaires ({count})",
+    "empty": "Pas encore de commentaire. Lance la discussion : une méthode, un pied caché, un « ça force » ?",
+    "label": "Ton commentaire",
+    "placeholder": "Une méthode, un pied caché, un avis…",
+    "counter": "{count} sur {max} caractères",
+    "send": "Publier",
+    "deleteNamed": "Supprimer le commentaire de {nickname}",
+    "deleteConfirmTitle": "Supprimer ce commentaire ?",
+    "deleteConfirmBody": "Il disparaîtra de la fiche pour tout le monde.",
+    "delete": "Supprimer",
+    "deleted": "Commentaire supprimé.",
+    "required": "Écris quelque chose avant de publier.",
+    "loadError": "Les commentaires ne se chargent pas."
+  },
+  "lastChance": {
+    "title": "Dernière chance !",
+    "body": "Ces voies vont bientôt être démontées. Grimpe-les tant qu’elles sont au mur : après, ce sera trop tard.",
+    "planned": "Démontage prévu le {date}",
+    "noDate": "Date de démontage pas encore fixée",
+    "favorites": "Aucun coup de cœur | 1 coup de cœur | {n} coups de cœur",
+    "accept": "J’accepte leurs destins",
+    "later": "Me le redire plus tard"
+  },
+  "favoriteRoute": {
+    "none": "Pas encore de voie préférée.",
+    "choose": "Choisir ma voie préférée",
+    "change": "Changer de voie préférée",
+    "clear": "Retirer ma voie préférée",
+    "saved": "Voie préférée enregistrée.",
+    "cleared": "Voie préférée retirée.",
+    "dismounted": "Elle a été démontée, mais elle reste ta préférée tant que tu n’en choisis pas une autre."
+  },
+  "routePicker": {
+    "search": "Chercher une voie",
+    "searchHint": "Numéro de corde, nom, couleur ou cotation.",
+    "results": "Aucune voie trouvée | 1 voie trouvée | {n} voies trouvées",
+    "noMatch": "Aucune voie ne correspond. Essaie un numéro de corde ou une couleur.",
+    "more": "Et {n} autres : affine ta recherche pour les voir.",
+    "loadError": "Impossible de charger les voies."
+  },
+  "routeStyles": {
+    "CONTINUITY": "Conti",
+    "ENDURANCE": "Rési",
+    "PHYSICAL": "Physique",
+    "TECHNICAL": "Technique",
+    "COMPLEX": "Complexe",
+    "SLAB": "Dalle",
+    "OVERHANG": "Dévers",
+    "CRIMPS": "Réglettes",
+    "JUGS": "Bacs",
+    "PINCHES": "Pinces",
+    "SLOPERS": "Plats",
+    "DIHEDRAL": "Dièdre",
+    "ROOF": "Toit",
+    "REACHY": "Morpho"
   },
   "todo": {
     "title": "À faire",
@@ -67,7 +205,7 @@
     "climbingSince": "Grimpe depuis {year}",
     "clubSince": "Au club depuis {year}",
     "age": "{age} ans",
-    "comingSoon": "Coups de cœur, badges et chiffres clés arrivent avec le topo et les séances.",
+    "comingSoon": "Badges et chiffres clés arrivent avec les séances.",
     "settings": "Réglages",
     "password": "Mot de passe",
     "devices": "Mes appareils",
@@ -76,7 +214,11 @@
     "logout": "Redescendre",
     "logoutConfirmTitle": "Tu redescends ?",
     "logoutConfirmBody": "Ta session sera fermée sur cet appareil.",
-    "management": "Espace gestion"
+    "management": "Espace gestion",
+    "favoriteRoute": "Voie préférée",
+    "favorites": "Mes coups de cœur",
+    "favoritesEmpty": "Aucun coup de cœur pour l’instant. Touche le cœur d’une voie du topo pour lui déclarer ta flamme (deux au maximum).",
+    "pastFavorites": "Anciens coups de cœur, démontés depuis"
   },
   "theme": {
     "label": "Thème",
@@ -134,7 +276,15 @@
     "IMAGE_UNSUPPORTED": "Cette image ne passe pas : choisis une photo JPEG, PNG ou WebP.",
     "IMAGE_TOO_LARGE": "Cette photo est trop grande. Choisis-en une plus petite.",
     "SELF_MANAGEMENT_FORBIDDEN": "Personne ne modifie son propre rôle ni son propre compte, même pas toi.",
-    "LAST_ADMIN": "Il faut toujours au moins un·e Président·e actif·ve : nomme quelqu’un d’autre avant."
+    "LAST_ADMIN": "Il faut toujours au moins un·e Président·e actif·ve : nomme quelqu’un d’autre avant.",
+    "FAVORITES_FULL": "Ton cœur est plein : deux coups de cœur au maximum. Lâches-en un pour faire de la place.",
+    "ROUTE_DISMOUNTED": "Cette voie a été démontée : elle est en lecture seule.",
+    "ROUTE_STATUS_CONFLICT": "La voie a changé d’état entre-temps. Recharge la fiche et réessaie.",
+    "ALREADY_EXISTS": "Ça existe déjà : choisis un autre nom ou un autre numéro.",
+    "CLUB_ITEM_INACTIVE": "Cette corde ou cette couleur est désactivée. Choisis-en une active.",
+    "INVALID_SETTERS": "Il faut au moins un ouvreur : un membre ouvreur actif, ou un nom libre.",
+    "DATE_IN_THE_FUTURE": "Cette date n’est pas encore arrivée. Choisis aujourd’hui ou avant.",
+    "DATE_IN_THE_PAST": "Cette date est déjà passée. Choisis aujourd’hui ou plus tard."
   },
   "gallery": {
     "title": "Galerie des composants",
@@ -276,7 +426,10 @@
     "infosBody": "Tout est facultatif et modifiable plus tard dans ton profil.",
     "later": "Passer cette étape",
     "next": "Continuer",
-    "finish": "C’est parti !"
+    "finish": "C’est parti !",
+    "favoriteTitle": "Ta voie préférée ?",
+    "favoriteBody": "Celle que tu refais toujours avec le sourire. Facultatif, et modifiable dans ton profil.",
+    "favoriteSave": "Choisir cette voie"
   },
   "photo": {
     "choose": "Choisir une photo",
@@ -319,7 +472,8 @@
     "photo": "Photo",
     "identity": "Identité",
     "about": "À propos de toi",
-    "visibility": "Ce que les autres voient"
+    "visibility": "Ce que les autres voient",
+    "favoriteRoute": "Voie préférée"
   },
   "password": {
     "title": "Changer de mot de passe",
@@ -448,7 +602,17 @@
       "MEMBER_ENABLED": "{actor} a réactivé le compte de {target}",
       "PASSWORD_RESET_LINK_CREATED": "{actor} a créé un lien de réinitialisation pour {target}",
       "REGISTRATION_CODE_CREATED": "{actor} a créé le code d’inscription « {target} »",
-      "REGISTRATION_CODE_UPDATED": "{actor} a modifié le code d’inscription « {target} »"
+      "REGISTRATION_CODE_UPDATED": "{actor} a modifié le code d’inscription « {target} »",
+      "ROUTE_DISMOUNTED": "{actor} a démonté la voie « {target} »",
+      "ROUTE_REMOUNTED": "{actor} a remonté la voie « {target} »",
+      "ROUTE_COMMENT_DELETED": "{actor} a supprimé un commentaire sur « {target} »",
+      "CLUB_SECTOR_CREATED": "{actor} a créé le secteur « {target} »",
+      "CLUB_SECTOR_UPDATED": "{actor} a modifié le secteur « {target} »",
+      "CLUB_CORD_CREATED": "{actor} a créé la corde {target}",
+      "CLUB_CORD_UPDATED": "{actor} a modifié la corde {target}",
+      "CLUB_HOLD_COLOR_CREATED": "{actor} a créé la couleur de prises « {target} »",
+      "CLUB_HOLD_COLOR_UPDATED": "{actor} a modifié la couleur de prises « {target} »",
+      "CLUB_SECTORS_REORDERED": "{actor} a réordonné les secteurs"
     }
   },
   "codes": {

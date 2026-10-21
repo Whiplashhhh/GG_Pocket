@@ -19,8 +19,10 @@ const props = withDefaults(
     holds: HoldColor[]
     status?: RouteStatus
     size?: 'sm' | 'md' | 'lg'
+    /** id of the accessible name, for a link or button named by the label (aria-labelledby). */
+    labelId?: string
   }>(),
-  { status: 'ACTIVE', size: 'md' },
+  { status: 'ACTIVE', size: 'md', labelId: undefined },
 )
 
 const { t } = useI18n()
@@ -85,7 +87,7 @@ const dismounted = computed(() => props.status === 'DISMOUNTED')
     class="relative inline-flex max-w-full items-stretch rounded-paper border border-label-edge bg-label-paper text-label-ink shadow-paper"
     :class="sizing.root"
   >
-    <span class="sr-only">{{ accessibleName }}</span>
+    <span :id="labelId" class="sr-only">{{ accessibleName }}</span>
 
     <span
       v-if="size === 'lg'"
