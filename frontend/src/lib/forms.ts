@@ -46,12 +46,14 @@ const MESSAGE_OF_CONSTRAINT: Record<string, string> = {
 
 /**
  * Splits a server error between the fields of a form and a general message. Field names follow
- * the API; `aliases` maps an API field to the form field that shows it (password → newPassword).
+ * the API; `aliases` maps an API field to the form field that shows it (password → newPassword),
+ * `codeFields` a business error to the field it belongs to in this form (ALREADY_EXISTS → name).
  */
 export function serverFieldErrors<F extends string>(
   error: unknown,
   fields: readonly F[],
   aliases: Partial<Record<string, F>> = {},
+  codeFields: Partial<Record<ErrorCode, F>> = {},
 ): { fields: FieldErrors<F>; general: Message | null } {
   if (!(error instanceof ApiError)) {
     return { fields: {}, general: { key: 'errors.UNKNOWN' } }
@@ -75,14 +77,19 @@ export function serverFieldErrors<F extends string>(
     }
     return { fields: result, general: placedAll ? null : { key: 'errors.VALIDATION_FAILED' } }
   }
-  const field = FIELD_OF_CODE[error.code]
+  const field = codeFields[error.code] ?? FIELD_OF_CODE[error.code]
   if (field !== undefined && place(field, { key: `errors.${error.code}` })) {
     return { fields: result, general: null }
   }
   return { fields: result, general: { key: `errors.${error.code}` } }
 }
 
-/** After a refused submit, put the focus on the first field to fix (screen readers read it). */
+/**
+ * After a refused submit, put the focus on the first field to fix (screen readers read it).
+ * A group of choices (colours, styles) marks itself with data-invalid and tabindex="-1".
+ */
 export function focusFirstInvalid(root: ParentNode = document): void {
-  void nextTick(() => root.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus())
+  void nextTick(() =>
+    root.querySelector<HTMLElement>('[aria-invalid="true"], [data-invalid="true"]')?.focus(),
+  )
 }

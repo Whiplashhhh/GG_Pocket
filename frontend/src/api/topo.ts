@@ -45,10 +45,11 @@ export function useRoutes(enabled: MaybeRefOrGetter<boolean> = true) {
   })
 }
 
-export function useDismountedRoutes() {
+export function useDismountedRoutes(enabled: MaybeRefOrGetter<boolean> = true) {
   return useQuery({
     queryKey: ARCHIVE_KEY,
     queryFn: ({ signal }) => request(api.GET('/api/v1/routes/archive', { signal })),
+    enabled: computed(() => toValue(enabled)),
   })
 }
 

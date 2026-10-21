@@ -47,4 +47,17 @@ describe('serverFieldErrors', () => {
       key: 'errors.UNKNOWN',
     })
   })
+
+  it('puts a business error on the field this form says', () => {
+    const conflict = new ApiError('ALREADY_EXISTS', { status: 409 })
+    expect(
+      serverFieldErrors(conflict, ['label', 'hex'] as const, {}, { ALREADY_EXISTS: 'label' }),
+    ).toEqual({
+      fields: { label: { key: 'errors.ALREADY_EXISTS' } },
+      general: null,
+    })
+    expect(serverFieldErrors(conflict, ['label', 'hex'] as const).general).toEqual({
+      key: 'errors.ALREADY_EXISTS',
+    })
+  })
 })

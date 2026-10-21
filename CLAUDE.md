@@ -67,9 +67,15 @@ dès qu'elles existent. Tiens cette section à jour.
   Le bac à sable ne récupère pas les processus zombies (chaque lancement de Chromium en laisse, plafond 1024 PID/threads) :
   lancer Playwright avec `--workers=1` et `RAYON_NUM_THREADS=2 UV_THREADPOOL_SIZE=2`, et ne capturer que les écrans utiles
   (`pnpm screenshots --project=mobile-light --grep actu`). Compteur : `cat /sys/fs/cgroup/pids.current`.
-  Les journaux bruts de la CI (blob.core.windows.net) sont injoignables d'ici : lire les annotations du job
+  Les artefacts de la CI (blob.core.windows.net) sont injoignables d'ici ; les journaux le sont parfois
+  (`gh run view <run> --job <job> --log`), sinon lire les annotations du job
   (`gh api repos/Whiplashhhh/GG_Pocket/check-runs/<id du job>/annotations`) ; le job « Docker stack » y met les CVE et,
-  en cas d'échec, les journaux des conteneurs. Le jeton `gh` n'a pas les droits d'administration du dépôt (D-066).
+  en cas d'échec, les journaux des conteneurs. Contrat OpenAPI généré : dans le journal complet du job Backend, la ligne
+  après `BEGIN GENERATED OPENAPI`, à passer dans `base64 -d | gunzip`. Le jeton `gh` n'a pas les droits d'administration du dépôt (D-066).
+  Si `pids.current` approche 1024, `pnpm` ne démarre plus : lancer les outils directement
+  (`NODE_OPTIONS=--v8-pool-size=1 UV_THREADPOOL_SIZE=1 node_modules/.bin/vue-tsc --build`, idem eslint, prettier, vitest
+  `--pool=threads --maxWorkers=1`), sous un « subreaper » qui ramasse les orphelins (`~/.local/bin/reap <commande>`,
+  petit script Python utilisant `prctl(PR_SET_CHILD_SUBREAPER)`).
 
 <!-- COMMANDES : à compléter en phase 0 -->
 

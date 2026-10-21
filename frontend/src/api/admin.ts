@@ -13,7 +13,8 @@ export type RegistrationCodeSettings = components['schemas']['RegistrationCodeSe
 type Role = MemberSummary['role']
 
 const MEMBERS_KEY = ['admin', 'members'] as const
-const AUDIT_KEY = ['admin', 'audit'] as const
+/** The audit log: refreshed after every audited action (roles, codes, dismounts, club config). */
+export const AUDIT_KEY = ['admin', 'audit'] as const
 const CODES_KEY = ['admin', 'registration-codes'] as const
 
 export const AUDIT_PAGE_SIZE = 50

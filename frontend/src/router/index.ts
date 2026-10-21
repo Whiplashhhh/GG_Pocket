@@ -156,8 +156,23 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'voies',
-        component: () => import('@/views/management/RoutesPlaceholderView.vue'),
+        component: () => import('@/views/management/RoutesManagementView.vue'),
         meta: { titleKey: 'management.routes', minRole: 'SETTER', wide: true },
+      },
+      {
+        path: 'voies/nouvelle',
+        component: () => import('@/views/management/RouteFormView.vue'),
+        meta: { titleKey: 'routeForm.createTitle', minRole: 'SETTER', wide: true },
+      },
+      {
+        path: 'voies/:id/modifier',
+        component: () => import('@/views/management/RouteFormView.vue'),
+        meta: { titleKey: 'management.routes', minRole: 'SETTER', wide: true },
+      },
+      {
+        path: 'derniere-chance',
+        component: () => import('@/views/management/LastChanceManagementView.vue'),
+        meta: { titleKey: 'lastChanceAdmin.title', minRole: 'SETTER', wide: true },
       },
       {
         path: 'membres',
@@ -178,6 +193,11 @@ const routes: RouteRecordRaw[] = [
         path: 'codes',
         component: () => import('@/views/management/RegistrationCodesView.vue'),
         meta: { titleKey: 'codes.title', minRole: 'ADMIN', wide: true },
+      },
+      {
+        path: 'club',
+        component: () => import('@/views/management/ClubConfigView.vue'),
+        meta: { titleKey: 'clubConfig.title', minRole: 'ADMIN', wide: true },
       },
     ],
   },

@@ -5,6 +5,7 @@ import type { RouteSummary } from '@/api/topo'
 import {
   activeFilterCount,
   applyTopoView,
+  filterManagedRoutes,
   filterRoutes,
   groupBySector,
   NO_FILTERS,
@@ -290,6 +291,21 @@ describe('searchRoutes', () => {
       'Réglisse',
       'Bye Bye Morice',
       'Tonton Talon',
+    ])
+  })
+})
+
+describe('filterManagedRoutes', () => {
+  it('searches within one sector, or everywhere, keeping the order', () => {
+    expect(names(filterManagedRoutes(ALL, '', NEUTRAL.sectorId))).toEqual([
+      'OH purée !',
+      'Réglisse',
+    ])
+    expect(names(filterManagedRoutes(ALL, 'bleu', NEUTRAL.sectorId))).toEqual(['Réglisse'])
+    expect(names(filterManagedRoutes(ALL, 'bleu'))).toEqual([
+      'Bye Bye Morice',
+      'Tonton Talon',
+      'Réglisse',
     ])
   })
 })

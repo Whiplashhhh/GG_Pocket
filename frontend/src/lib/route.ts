@@ -15,6 +15,12 @@ export type HoldColor = Pick<components['schemas']['RouteHold'], 'label' | 'hex'
 
 export type Role = components['schemas']['CurrentMember']['role']
 
+/** A status change of one route, asked from a management screen (last chance, dismount, remount). */
+export interface RouteStatusAction {
+  kind: 'lastChance' | 'dismount' | 'remount'
+  route: RouteSummary
+}
+
 /** Every route style, in the order the club reads them (DECISIONS D-076). Exhaustive by type. */
 const STYLE_ORDER = {
   CONTINUITY: 1,

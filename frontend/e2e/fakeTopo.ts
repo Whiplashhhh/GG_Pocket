@@ -14,6 +14,18 @@ export interface TopoMember {
   favoriteRouteId?: string
 }
 
+/** Every member of the club, as the topo sees them (openers of a route). */
+export interface TopoPerson extends TopoMember {
+  status: 'ACTIVE' | 'DISABLED'
+}
+
+/** Writes a line in the audit log of {@link FakeClub}. */
+export type AuditRecorder = (
+  actor: TopoMember,
+  action: Schemas['AuditEntry']['action'],
+  target: string,
+) => void
+
 export interface FakeRoute {
   id: string
   name: string
@@ -26,11 +38,14 @@ export interface FakeRoute {
   plannedDismountOn?: string
   dismountedAt?: string
   styles: RouteStyle[]
+  setterIds: string[]
   setterNote?: string
   advice?: string
   photo: boolean
   /** Hearts of members who are not part of the test. */
   othersFavorites: number
+  /** Last chance acknowledgements of members who are not part of the test. */
+  othersAcknowledged: number
 }
 
 interface FakeComment {
@@ -104,8 +119,9 @@ const GRADES = [
   '7c',
 ]
 
-type Seed = Omit<FakeRoute, 'id' | 'photo' | 'othersFavorites' | 'status' | 'openedOn'> &
-  Partial<Pick<FakeRoute, 'photo' | 'othersFavorites' | 'status' | 'openedOn'>>
+type Defaulted =
+  'photo' | 'othersFavorites' | 'othersAcknowledged' | 'status' | 'openedOn' | 'setterIds'
+type Seed = Omit<FakeRoute, 'id' | Defaulted> & Partial<Pick<FakeRoute, Defaulted>>
 
 /** A dozen routes in the spirit of the club: on the wall, in last chance, dismounted. */
 const ROUTES: Seed[] = [
@@ -141,6 +157,7 @@ const ROUTES: Seed[] = [
     styles: ['PHYSICAL', 'OVERHANG'],
     setterNote: 'Tonton',
     othersFavorites: 2,
+    othersAcknowledged: 12,
   },
   {
     name: 'Avant-bras en béton',
@@ -208,6 +225,25 @@ const ROUTES: Seed[] = [
 ]
 
 const ROLES: Role[] = ['CLIMBER', 'SETTER', 'BOARD', 'ADMIN']
+const STYLES: RouteStyle[] = [
+  'CONTINUITY',
+  'ENDURANCE',
+  'PHYSICAL',
+  'TECHNICAL',
+  'COMPLEX',
+  'SLAB',
+  'OVERHANG',
+  'CRIMPS',
+  'JUGS',
+  'PINCHES',
+  'SLOPERS',
+  'DIHEDRAL',
+  'ROOF',
+  'REACHY',
+]
+
+const atLeast = (role: Role, minimum: Role) => ROLES.indexOf(role) >= ROLES.indexOf(minimum)
+const sameText = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
 /**
  * The topo part of {@link FakeClub} (phase 3): configuration, routes, comments, favourites with
@@ -227,6 +263,8 @@ export class FakeTopo {
   constructor(
     private readonly nextId: () => string,
     private readonly clock: () => number,
+    private readonly people: () => TopoPerson[] = () => [],
+    private readonly audit: AuditRecorder = () => undefined,
   ) {
     const holdColors = COLORS.map(([label, hex], index) => ({
       id: nextId(),
@@ -253,6 +291,8 @@ export class FakeTopo {
         openedOn: '2026-09-01',
         photo: false,
         othersFavorites: 0,
+        othersAcknowledged: 0,
+        setterIds: [],
         ...seed,
         id: nextId(),
       })
@@ -333,15 +373,339 @@ export class FakeTopo {
     const cord = this.config.sectors
       .flatMap((sector) => sector.cords)
       .find((candidate) => candidate.number === route.cordNumber)
+    const people = this.people()
     return {
       route: summary,
       gradeId: grade?.id ?? '',
       cordId: cord?.id ?? '',
-      setters: [],
+      setters: route.setterIds
+        .map((id) => people.find((person) => person.id === id))
+        .filter((person): person is TopoPerson => person !== undefined)
+        .map((person) => this.memberRef(person)),
       ...(route.setterNote ? { setterNote: route.setterNote } : {}),
       ...(route.advice ? { advice: route.advice } : {}),
       createdAt: `${route.openedOn}T10:00:00Z`,
     }
+  }
+
+  private memberRef(person: TopoMember): Schemas['MemberRef'] {
+    return {
+      id: person.id,
+      nickname: person.nickname,
+      ...(person.avatarUrl ? { avatarUrl: person.avatarUrl } : {}),
+    }
+  }
+
+  /** Today in Gravelines, by the test's clock. */
+  private today(): string {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(this.clock())
+  }
+
+  private cords() {
+    return this.config.sectors.flatMap((sector) => sector.cords)
+  }
+
+  /**
+   * Checks route settings like the backend (RouteService): a problem code, or the route fields.
+   * A deactivated cord or colour is only accepted when the route already had it.
+   */
+  private readRouteSettings(
+    sent: Record<string, unknown>,
+    current?: FakeRoute,
+  ):
+    | TopoAnswer
+    | Pick<
+        FakeRoute,
+        | 'name'
+        | 'grade'
+        | 'cordNumber'
+        | 'colors'
+        | 'openedOn'
+        | 'setterIds'
+        | 'setterNote'
+        | 'advice'
+        | 'styles'
+      > {
+    const settings = sent as Partial<Schemas['RouteSettings']>
+    const invalid: TopoAnswer = { kind: 'problem', status: 400, code: 'VALIDATION_FAILED' }
+    const name = typeof settings.name === 'string' ? settings.name.trim() : ''
+    if (name.length === 0 || name.length > 60) return invalid
+    const grade = this.config.grades.find((candidate) => candidate.id === settings.gradeId)
+    const cord = this.cords().find((candidate) => candidate.id === settings.cordId)
+    const colorIds = Array.isArray(settings.holdColorIds) ? settings.holdColorIds : []
+    const colors = colorIds.map((id) => this.config.holdColors.find((color) => color.id === id))
+    if (grade === undefined || cord === undefined || colors.some((color) => color === undefined)) {
+      return invalid
+    }
+    if (colors.length < 1 || colors.length > 2 || new Set(colorIds).size !== colorIds.length) {
+      return invalid
+    }
+    const labels = colors.map((color) => color?.label ?? '')
+    const cordChanged = cord.number !== current?.cordNumber
+    const colorsChanged = labels.some((label) => !(current?.colors ?? []).includes(label))
+    if (
+      (cordChanged && !cord.active) ||
+      (colorsChanged && colors.some((color) => color?.active === false))
+    ) {
+      return { kind: 'problem', status: 400, code: 'CLUB_ITEM_INACTIVE' }
+    }
+    const openedOn = typeof settings.openedOn === 'string' ? settings.openedOn : ''
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(openedOn)) return invalid
+    if (openedOn > this.today()) {
+      return { kind: 'problem', status: 400, code: 'DATE_IN_THE_FUTURE' }
+    }
+    const setterIds = Array.isArray(settings.setterIds) ? settings.setterIds : []
+    const setterNote = settings.setterNote?.trim() ?? ''
+    const openers = this.people().filter(
+      (person) => person.status === 'ACTIVE' && atLeast(person.role, 'SETTER'),
+    )
+    if (
+      (setterIds.length === 0 && setterNote === '') ||
+      setterIds.some((id) => !openers.some((person) => person.id === id))
+    ) {
+      return { kind: 'problem', status: 400, code: 'INVALID_SETTERS' }
+    }
+    const styles = Array.isArray(settings.styles) ? settings.styles : []
+    if (styles.length > 5 || styles.some((style) => !STYLES.includes(style))) return invalid
+    const advice = settings.advice?.trim() ?? ''
+    if (advice.length > 500 || setterNote.length > 60) return invalid
+    return {
+      name,
+      grade: grade.code,
+      cordNumber: cord.number,
+      colors: labels,
+      openedOn,
+      setterIds,
+      setterNote: setterNote === '' ? undefined : setterNote,
+      advice: advice === '' ? undefined : advice,
+      styles,
+    }
+  }
+
+  /** Leaving the last chance forgets who had seen it: if it comes back, so does the pop-up. */
+  private leaveLastChance(route: FakeRoute) {
+    delete route.plannedDismountOn
+    route.othersAcknowledged = 0
+    for (const key of [...this.acknowledgements]) {
+      if (key.endsWith(`:${route.id}`)) this.acknowledgements.delete(key)
+    }
+  }
+
+  /** The admin's club configuration (spec §8.11): sectors, cords, hold colours. */
+  private handleClubConfig(
+    me: TopoMember,
+    method: string,
+    path: string,
+    sent: Record<string, unknown>,
+  ): TopoAnswer | undefined {
+    const json = (data: unknown, status?: number): TopoAnswer => ({ kind: 'json', data, status })
+    const problem = (status: number, code: string): TopoAnswer => ({
+      kind: 'problem',
+      status,
+      code,
+    })
+    if (!atLeast(me.role, 'ADMIN')) return problem(403, 'ACCESS_DENIED')
+    const invalid = problem(400, 'VALIDATION_FAILED')
+    const [, kind, id] = /^\/admin\/club\/([a-z-]+)(?:\/([^/]+))?$/.exec(path) ?? []
+    const { sectors, holdColors } = this.config
+
+    if (kind === 'sector-order' && method === 'PUT') {
+      const ids = Array.isArray(sent.sectorIds) ? (sent.sectorIds as string[]) : []
+      if (ids.length !== sectors.length || !sectors.every((sector) => ids.includes(sector.id))) {
+        return invalid
+      }
+      for (const sector of sectors) sector.position = ids.indexOf(sector.id) + 1
+      sectors.sort((a, b) => a.position - b.position)
+      this.audit(me, 'CLUB_SECTORS_REORDERED', '')
+      return json(this.config)
+    }
+    if (kind === 'sectors') {
+      const name = typeof sent.name === 'string' ? sent.name.trim() : ''
+      const description = typeof sent.description === 'string' ? sent.description.trim() : ''
+      if (name.length === 0 || name.length > 60 || description.length > 160) return invalid
+      if (sectors.some((sector) => sector.id !== id && sameText(sector.name, name))) {
+        return problem(409, 'ALREADY_EXISTS')
+      }
+      const details = { name, ...(description === '' ? {} : { description }) }
+      if (method === 'POST') {
+        const sector = { id: this.nextId(), position: sectors.length + 1, cords: [], ...details }
+        sectors.push(sector)
+        this.audit(me, 'CLUB_SECTOR_CREATED', name)
+        return json(sector, 201)
+      }
+      const sector = sectors.find((candidate) => candidate.id === id)
+      if (sector === undefined) return problem(404, 'NOT_FOUND')
+      delete sector.description
+      Object.assign(sector, details)
+      this.audit(me, 'CLUB_SECTOR_UPDATED', name)
+      return json(sector)
+    }
+    if (kind === 'cords') {
+      const number = sent.number
+      const sector = sectors.find((candidate) => candidate.id === sent.sectorId)
+      if (typeof number !== 'number' || !Number.isInteger(number) || number < 1 || number > 99) {
+        return invalid
+      }
+      if (sector === undefined || typeof sent.active !== 'boolean') return invalid
+      if (this.cords().some((cord) => cord.id !== id && cord.number === number)) {
+        return problem(409, 'ALREADY_EXISTS')
+      }
+      let cord = this.cords().find((candidate) => candidate.id === id)
+      if (method === 'POST') {
+        cord = { id: this.nextId(), number, sectorId: sector.id, active: sent.active }
+        this.audit(me, 'CLUB_CORD_CREATED', String(number))
+      } else if (cord === undefined) {
+        return problem(404, 'NOT_FOUND')
+      } else {
+        // The routes follow their cord, renumbered or moved.
+        const before = cord.number
+        for (const route of this.routes) if (route.cordNumber === before) route.cordNumber = number
+        Object.assign(cord, { number, sectorId: sector.id, active: sent.active })
+        this.audit(me, 'CLUB_CORD_UPDATED', String(number))
+      }
+      const saved = cord
+      for (const candidate of sectors) {
+        candidate.cords = candidate.cords.filter((existing) => existing.id !== saved.id)
+      }
+      sector.cords.push(saved)
+      sector.cords.sort((a, b) => a.number - b.number)
+      return json(saved, method === 'POST' ? 201 : 200)
+    }
+    if (kind === 'hold-colors') {
+      const label = typeof sent.label === 'string' ? sent.label.trim() : ''
+      const hex = typeof sent.hex === 'string' ? sent.hex : ''
+      if (label.length === 0 || label.length > 30 || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return invalid
+      if (typeof sent.multicolor !== 'boolean' || typeof sent.active !== 'boolean') return invalid
+      if (holdColors.some((color) => color.id !== id && sameText(color.label, label))) {
+        return problem(409, 'ALREADY_EXISTS')
+      }
+      const details = { label, hex, multicolor: sent.multicolor, active: sent.active }
+      if (method === 'POST') {
+        const color = { id: this.nextId(), position: holdColors.length + 1, ...details }
+        holdColors.push(color)
+        this.audit(me, 'CLUB_HOLD_COLOR_CREATED', label)
+        return json(color, 201)
+      }
+      const color = holdColors.find((candidate) => candidate.id === id)
+      if (color === undefined) return problem(404, 'NOT_FOUND')
+      for (const route of this.routes) {
+        route.colors = route.colors.map((existing) => (existing === color.label ? label : existing))
+      }
+      Object.assign(color, details)
+      this.audit(me, 'CLUB_HOLD_COLOR_UPDATED', label)
+      return json(color)
+    }
+    return undefined
+  }
+
+  /** What setters do to routes (spec §8.10): create, edit, photo, last chance, dismount, remount. */
+  private handleRouteManagement(
+    me: TopoMember,
+    method: string,
+    path: string,
+    sent: Record<string, unknown>,
+  ): TopoAnswer | undefined {
+    const json = (data: unknown, status?: number): TopoAnswer => ({ kind: 'json', data, status })
+    const problem = (status: number, code: string): TopoAnswer => ({
+      kind: 'problem',
+      status,
+      code,
+    })
+    const setter = atLeast(me.role, 'SETTER')
+
+    if (path === '/routes/setters' && method === 'GET') {
+      if (!setter) return problem(403, 'ACCESS_DENIED')
+      return json(
+        this.people()
+          .filter((person) => person.status === 'ACTIVE' && atLeast(person.role, 'SETTER'))
+          .sort((a, b) => a.nickname.localeCompare(b.nickname))
+          .map((person) => this.memberRef(person)),
+      )
+    }
+    if (path === '/routes/last-chance' && method === 'GET') {
+      if (!setter) return problem(403, 'ACCESS_DENIED')
+      return json(
+        this.routes
+          .filter((route) => route.status === 'LAST_CHANCE')
+          .map((route) => ({
+            route: this.summary(me, route),
+            acknowledgedCount:
+              route.othersAcknowledged +
+              [...this.acknowledgements].filter((key) => key.endsWith(`:${route.id}`)).length,
+          })),
+      )
+    }
+    if (path === '/routes' && method === 'POST') {
+      if (!setter) return problem(403, 'ACCESS_DENIED')
+      const fields = this.readRouteSettings(sent)
+      if ('kind' in fields) return fields
+      const route: FakeRoute = {
+        id: this.nextId(),
+        status: 'ACTIVE',
+        photo: false,
+        othersFavorites: 0,
+        othersAcknowledged: 0,
+        ...fields,
+      }
+      this.routes.push(route)
+      return json(this.detail(me, route), 201)
+    }
+
+    const match = /^\/routes\/([^/]+)\/(photo|last-chance|dismount|remount)$/.exec(path)
+    const editing = /^\/routes\/([^/]+)$/.exec(path) !== null && method === 'PUT'
+    if (match === null && !editing) return undefined
+    if (!setter) return problem(403, 'ACCESS_DENIED')
+    const id = path.split('/')[2]
+    const route = this.routes.find((candidate) => candidate.id === id)
+    if (route === undefined) return problem(404, 'NOT_FOUND')
+    const part = match?.[2]
+
+    if (part === 'remount') {
+      if (route.status !== 'DISMOUNTED') return problem(409, 'ROUTE_STATUS_CONFLICT')
+      route.status = 'ACTIVE'
+      delete route.dismountedAt
+      this.audit(me, 'ROUTE_REMOUNTED', route.name)
+      return json(this.detail(me, route))
+    }
+    if (route.status === 'DISMOUNTED') {
+      return problem(409, part === 'dismount' ? 'ROUTE_STATUS_CONFLICT' : 'ROUTE_DISMOUNTED')
+    }
+    if (editing) {
+      const fields = this.readRouteSettings(sent, route)
+      if ('kind' in fields) return fields
+      delete route.setterNote
+      delete route.advice
+      Object.assign(route, fields)
+      return json(this.detail(me, route))
+    }
+    if (part === 'photo') {
+      route.photo = method === 'PUT'
+      return method === 'PUT' ? json(this.detail(me, route)) : { kind: 'empty' }
+    }
+    if (part === 'last-chance') {
+      if (method === 'DELETE') {
+        if (route.status !== 'LAST_CHANCE') return problem(409, 'ROUTE_STATUS_CONFLICT')
+        route.status = 'ACTIVE'
+        this.leaveLastChance(route)
+        return json(this.detail(me, route))
+      }
+      const planned = sent.plannedDismountOn
+      if (typeof planned === 'string' && planned < this.today()) {
+        return problem(400, 'DATE_IN_THE_PAST')
+      }
+      route.status = 'LAST_CHANCE'
+      if (typeof planned === 'string') route.plannedDismountOn = planned
+      else delete route.plannedDismountOn
+      return json(this.detail(me, route))
+    }
+    if (part === 'dismount' && method === 'POST') {
+      if (route.status === 'LAST_CHANCE') this.leaveLastChance(route)
+      route.status = 'DISMOUNTED'
+      route.dismountedAt = new Date(this.clock()).toISOString()
+      this.audit(me, 'ROUTE_DISMOUNTED', route.name)
+      return json(this.detail(me, route))
+    }
+    return undefined
   }
 
   private comment(me: TopoMember, comment: FakeComment): Schemas['RouteComment'] {
@@ -366,6 +730,9 @@ export class FakeTopo {
     const sent = (body ?? {}) as Record<string, unknown>
 
     if (path === '/topo/config') return json(this.config)
+    if (path.startsWith('/admin/club/')) return this.handleClubConfig(me, method, path, sent)
+    const managed = this.handleRouteManagement(me, method, path, sent)
+    if (managed !== undefined) return managed
     if (path === '/routes' && method === 'GET') {
       return json(
         this.routes

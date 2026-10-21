@@ -56,11 +56,13 @@ function sentence(entry: AuditEntry): string {
         :key="entry.id"
         class="flex flex-col gap-0.5 border-b border-rule px-4 py-3 lg:flex-row lg:gap-6 lg:px-0"
       >
-        <time
-          :datetime="entry.occurredAt"
-          class="shrink-0 text-sm text-ink-muted tabular-nums lg:w-44"
-          >{{ formatDateTime(entry.occurredAt) }}</time
-        >
+        <p class="flex shrink-0 gap-2 text-sm text-ink-muted lg:w-60">
+          <time :datetime="entry.occurredAt" class="tabular-nums">{{
+            formatDateTime(entry.occurredAt)
+          }}</time>
+          <span aria-hidden="true">·</span>
+          <span>{{ t(`audit.targets.${entry.targetType}`) }}</span>
+        </p>
         <p>{{ sentence(entry) }}</p>
       </li>
     </ol>

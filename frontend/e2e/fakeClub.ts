@@ -56,6 +56,19 @@ const PIXEL = Buffer.from(
   'base64',
 )
 
+type AuditAction = Schemas['AuditEntry']['action']
+
+/** What an audited action is about, as the backend records it. */
+function targetOf(action: AuditAction): Schemas['AuditEntry']['targetType'] {
+  if (action.startsWith('REGISTRATION')) return 'REGISTRATION_CODE'
+  if (action === 'ROUTE_COMMENT_DELETED') return 'ROUTE_COMMENT'
+  if (action.startsWith('ROUTE')) return 'ROUTE'
+  if (action.startsWith('CLUB_SECTOR')) return 'SECTOR'
+  if (action.startsWith('CLUB_CORD')) return 'CORD'
+  if (action.startsWith('CLUB_HOLD_COLOR')) return 'HOLD_COLOR'
+  return 'MEMBER'
+}
+
 const problem = (status: number, code: string) => ({
   status,
   contentType: 'application/problem+json',
@@ -78,6 +91,10 @@ export class FakeClub {
   readonly topo = new FakeTopo(
     () => this.nextId(),
     () => this.now,
+    () => this.members,
+    (actor, action, target) => {
+      this.record(actor, action, target)
+    },
   )
 
   addMember(overrides: Partial<FakeMember> & Pick<FakeMember, 'nickname'>): FakeMember {
@@ -232,7 +249,7 @@ export class FakeClub {
   }
 
   private record(
-    actor: FakeMember,
+    actor: Pick<FakeMember, 'id' | 'nickname'>,
     action: Schemas['AuditEntry']['action'],
     target: string,
     before?: string,
@@ -244,7 +261,7 @@ export class FakeClub {
       actorId: actor.id,
       actorNickname: actor.nickname,
       action,
-      targetType: action.startsWith('REGISTRATION') ? 'REGISTRATION_CODE' : 'MEMBER',
+      targetType: targetOf(action),
       targetLabel: target,
       before,
       after,

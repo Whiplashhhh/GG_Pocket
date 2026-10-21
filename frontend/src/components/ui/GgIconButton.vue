@@ -23,7 +23,7 @@ withDefaults(
     v-else
     type="button"
     :aria-label="label"
-    class="inline-flex size-11 items-center justify-center rounded-control text-ink hover:bg-surface-sunken"
+    class="inline-flex size-11 items-center justify-center rounded-control text-ink enabled:hover:bg-surface-sunken disabled:cursor-not-allowed disabled:text-ink-muted disabled:opacity-50"
   >
     <slot />
   </button>

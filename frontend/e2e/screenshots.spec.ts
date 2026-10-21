@@ -14,7 +14,7 @@ interface Capture {
   installInvite?: boolean
   lastChancePopup?: boolean
   prepare?: (club: FakeClub) => void
-  act?: (page: Page) => Promise<void>
+  act?: (page: Page, club: FakeClub) => Promise<void>
 }
 
 /** Marie's own marks on the topo: favourites (one dismounted since), routes she can climb. */
@@ -47,6 +47,42 @@ const someMembers = (club: FakeClub) => {
     email: 'lea@example.org',
     lastSeenAt: '2026-10-20T07:30:00Z',
   })
+}
+
+/** Openers with an account, Sam credited on Bye Bye Morice; a cord and a colour put away. */
+const settersAndAWornWall = (club: FakeClub) => {
+  const sam = club.addMember({
+    nickname: 'sam',
+    firstName: 'Sam',
+    lastName: 'Ouvre',
+    role: 'SETTER',
+  })
+  club.addMember({
+    nickname: 'tonton.talon',
+    firstName: 'Tonton',
+    lastName: 'Talon',
+    role: 'BOARD',
+  })
+  club.topo.route('Bye Bye Morice').setterIds = [sam.id]
+  const cord = club.topo.config.sectors
+    .flatMap((sector) => sector.cords)
+    .find((candidate) => candidate.number === 7)
+  if (cord) cord.active = false
+  const grey = club.topo.config.holdColors.find((color) => color.label === 'gris')
+  if (grey) grey.active = false
+}
+
+/** Large screens act from the table, phones from the actions sheet of the route. */
+const routeActionOf = async (page: Page, name: string, word: string, label: string) => {
+  if ((page.viewportSize()?.width ?? 0) >= 1024) {
+    await page.getByLabel(label, { exact: true }).click()
+  } else {
+    await page
+      .getByRole('main')
+      .getByRole('button', { name: new RegExp(name) })
+      .click()
+    await page.getByRole('dialog').getByText(word, { exact: true }).click()
+  }
 }
 
 /** Screens captured for visual review (the gallery only exists on the dev server). */
@@ -178,6 +214,125 @@ const CAPTURES: Capture[] = [
     },
   },
   {
+    name: 'gestion-voies',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    prepare: settersAndAWornWall,
+  },
+  {
+    name: 'gestion-voies-archives',
+    path: '/gestion/voies?vue=archives',
+    as: 'SETTER',
+    desktop: true,
+  },
+  {
+    name: 'gestion-voies-actions',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    act: async (page) => {
+      if ((page.viewportSize()?.width ?? 0) < 1024) {
+        await page
+          .getByRole('main')
+          .getByRole('button', { name: /Bye Bye Morice/ })
+          .click()
+        await page.getByRole('dialog', { name: 'Actions pour Bye Bye Morice' }).waitFor()
+      }
+    },
+  },
+  {
+    name: 'gestion-voie-demonter',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    act: async (page) => {
+      await routeActionOf(page, 'Bye Bye Morice', 'Démonter', 'Démonter Bye Bye Morice')
+      await page.getByRole('alertdialog').waitFor()
+    },
+  },
+  {
+    name: 'gestion-voie-derniere-chance',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    act: async (page) => {
+      await routeActionOf(page, 'Réglisse', 'Dernière chance', 'Passer Réglisse en dernière chance')
+      await page.getByRole('dialog', { name: /Dernière chance pour/ }).waitFor()
+    },
+  },
+  {
+    name: 'gestion-voie-nouvelle',
+    path: '/gestion/voies/nouvelle',
+    as: 'SETTER',
+    desktop: true,
+    prepare: settersAndAWornWall,
+    act: async (page) => {
+      await page.getByLabel('Nom de la voie').fill('Avale la corde')
+      await page.getByLabel('Cotation').selectOption({ label: '5c' })
+      await page.getByLabel('Corde', { exact: true }).selectOption({ label: 'Corde 4' })
+      await page
+        .getByRole('group', { name: 'Couleur des prises' })
+        .getByText('vert', { exact: true })
+        .click()
+      await page.getByRole('button', { name: 'Dalle', exact: true }).click()
+    },
+  },
+  {
+    name: 'gestion-voie-erreurs',
+    path: '/gestion/voies/nouvelle',
+    as: 'SETTER',
+    desktop: true,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Enregistrer la voie' }).click()
+      await page.getByText('Choisis une cotation.').waitFor()
+    },
+  },
+  {
+    name: 'gestion-voie-modifier',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    prepare: settersAndAWornWall,
+    act: async (page, club) => {
+      await page.goto(`/gestion/voies/${club.topo.route('Bye Bye Morice').id}/modifier`)
+      await page.getByLabel('Nom de la voie').waitFor()
+    },
+  },
+  {
+    name: 'gestion-derniere-chance',
+    path: '/gestion/derniere-chance',
+    as: 'SETTER',
+    desktop: true,
+  },
+  {
+    name: 'gestion-club',
+    path: '/gestion/club',
+    as: 'ADMIN',
+    desktop: true,
+    prepare: settersAndAWornWall,
+  },
+  {
+    name: 'gestion-club-couleur',
+    path: '/gestion/club',
+    as: 'ADMIN',
+    desktop: true,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Modifier la couleur bleu clair' }).click()
+      await page.getByRole('dialog', { name: 'Couleur bleu clair' }).waitFor()
+    },
+  },
+  {
+    name: 'gestion-club-corde',
+    path: '/gestion/club',
+    as: 'ADMIN',
+    desktop: true,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Modifier la corde 12' }).click()
+      await page.getByRole('dialog', { name: 'Corde 12' }).waitFor()
+    },
+  },
+  {
     name: 'codes',
     path: '/gestion/codes',
     as: 'ADMIN',
@@ -206,7 +361,7 @@ for (const capture of CAPTURES) {
       capture.prepare?.(club)
       await page.goto(capture.path)
       await expect(page.locator('h1').first()).toBeVisible()
-      await capture.act?.(page)
+      await capture.act?.(page, club)
       await page.evaluate(() => document.fonts.ready)
       await page.screenshot({
         path: `screenshots/${testInfo.project.name}/${capture.name}.png`,

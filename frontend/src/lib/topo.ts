@@ -236,3 +236,15 @@ export function searchRoutes(routes: readonly RouteSummary[], search: string): R
     .filter((route) => matchesRouteSearch(route, search))
     .sort((a, b) => byCord(a, b) || byGrade(a, b) || byName(a, b))
 }
+
+/** Management list (spec §8.10): the same search, optionally within one sector; order kept. */
+export function filterManagedRoutes(
+  routes: readonly RouteSummary[],
+  search: string,
+  sectorId = '',
+): RouteSummary[] {
+  return routes.filter(
+    (route) =>
+      (sectorId === '' || route.sectorId === sectorId) && matchesRouteSearch(route, search),
+  )
+}
