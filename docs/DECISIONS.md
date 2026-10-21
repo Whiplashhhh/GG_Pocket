@@ -578,4 +578,11 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   16 répondent, `ProfileView-*.js` donne `Load failed` (erreur réseau, pas un code HTTP), même après « Vider le cache » et
   relance de l'appli. Le service worker est donc écarté. L'écran d'erreur redemande maintenant le fichier avec `?sonde=` :
   OK = adresse refusée par le téléphone ; échec = fichier qui casse en route. Bouton « Retour à l'actu » ajouté.
-- **Statut** : à valider : cause réelle à établir.
+- **Sonde (2e envoi)** : `?sonde` échoue aussi (`TypeError: Load failed`), et Safari hors PWA échoue de même, Tailscale coupé
+  ou non. Ce n'est donc ni l'adresse, ni la PWA, ni la taille (les deux scripts de plus de 120 ko passent) : c'est le contenu
+  de ce fichier qui casse à la réception. La seule transformation qui dépend du contenu est la compression : Caddy envoyait du
+  zstd, que Safari 27 accepte. Hypothèse : défaut du décodeur zstd de Safari 27 sur ce flux précis. Les e2e ne le voyaient pas
+  (`vite preview` ne compresse pas en zstd, l'e2e de la stack tourne sous Chromium).
+- **Choix** : `encode gzip` seulement dans `deploy/web/Caddyfile` (le gain de zstd est négligeable pour une appli de cette
+  taille), vérifié par `e2e-stack/stack.spec.ts`. L'écran d'erreur et ses détails restent : ils ont permis le diagnostic.
+- **Statut** : à valider : confirmation attendue sur l'iPhone après déploiement.

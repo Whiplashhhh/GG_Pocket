@@ -108,6 +108,11 @@ test('static assets are cached for good, the service worker never', async ({ pag
   expect(script).toMatch(/^\/assets\//)
   const asset = await request.get(script ?? '')
   expect(asset.headers()['cache-control']).toContain('immutable')
+  // gzip even when the browser offers zstd, which Safari 27 failed to decode (DECISIONS D-073).
+  const compressed = await request.get(script ?? '', {
+    headers: { 'accept-encoding': 'gzip, deflate, br, zstd' },
+  })
+  expect(compressed.headers()['content-encoding']).toBe('gzip')
   // A file of a previous version, asked for by an app left open: never cached.
   const gone = await request.get('/assets/ProfileView-oldhash.js')
   expect(gone.status()).toBe(404)
