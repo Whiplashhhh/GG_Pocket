@@ -560,6 +560,10 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   recharge la page visée (`src/lib/stale-chunk.ts`). Un deuxième échec dans les 30 secondes n'entraîne pas de nouveau
   rechargement, pour éviter une boucle si le serveur est en panne ou le téléphone hors ligne. Caddy ne met plus le cache d'un
   an (`immutable`) sur un fichier `/assets/` absent : un 404 part en `no-store`.
+- **Limite du test** : WebKit garde en mémoire, pour tout l'onglet, l'échec d'un module à une URL donnée, et ne la redemande
+  pas après le rechargement, même en `no-store`. L'e2e recharge le même build, donc le même nom de fichier : sur iPhone 13, il
+  vérifie seulement que la page est bien rechargée, et que le profil s'affiche sur Chromium. En vrai, le nouvel `index.html`
+  pointe vers un fichier au nouveau nom, que WebKit va chercher.
 - **Alternatives** : garder les fichiers des anciennes versions sur le serveur (images Docker plus lourdes, ménage à prévoir) ;
   sortir la version du fichier du Profil (ne règle que ce cas, n'importe quel écran modifié a le même problème).
 - **Statut** : validée. Le diagnostic est déduit du code, sans accès aux outils de développement de l'iPhone : confirmation

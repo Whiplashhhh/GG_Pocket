@@ -75,47 +75,27 @@ test.describe('app shell', () => {
     await expect(page).toHaveURL(/\/actu$/)
   })
 
-  test('an app left open across a release still opens the profile', async ({ page }) => {
+  test('an app left open across a release still opens the profile', async ({
+    page,
+    browserName,
+  }) => {
     // Installed app on iOS: the profile screen's file of the previous version is gone (404).
-    // Same file name after the reload here: no-store, as Caddy answers, or WebKit reuses the 404.
     await page.route(
       '**/assets/ProfileView-*.js',
       (route) => route.fulfill({ status: 404, headers: { 'cache-control': 'no-store' } }),
       { times: 1 },
     )
-    // What happened, in the failure message: the CI's raw logs are out of reach (DECISIONS D-030).
-    const trail: string[] = []
-    page.on('request', (request) => {
-      if (request.url().includes('/ProfileView-')) trail.push(`request ${request.url()}`)
-    })
-    page.on('response', (response) => {
-      if (response.url().includes('/ProfileView-')) {
-        trail.push(`response ${String(response.status())} ${response.url()}`)
-      }
-    })
-    page.on('requestfailed', (request) => {
-      trail.push(`failed ${request.url()} ${request.failure()?.errorText ?? ''}`)
-    })
-    page.on('pageerror', (error) => trail.push(`pageerror ${error.message}`))
-    page.on('console', (message) => {
-      if (message.type() === 'error' || message.type() === 'warning') {
-        trail.push(`console ${message.type()} ${message.text()}`)
-      }
-    })
-    page.on('framenavigated', (frame) => {
-      if (frame === page.mainFrame()) trail.push(`navigated ${frame.url()}`)
-    })
-
     await page.goto('/actu')
+    await page.evaluate(() => Object.assign(window, { e2eBeforeReload: true }))
     await page.getByRole('link', { name: 'Mon profil' }).click()
     await expect(page).toHaveURL(/\/profil$/)
-    try {
-      await expect(page.getByRole('heading', { level: 1, name: 'Mon profil' })).toBeVisible({
-        timeout: 10_000,
-      })
-    } catch (error) {
-      const body = (await page.locator('body').innerText()).slice(0, 400)
-      throw new Error(`${String(error)}\nTrail:\n${trail.join('\n')}\nPage:\n${body}`)
+    // A fresh page, not an in-app navigation: the new version is fetched.
+    await expect.poll(() => page.evaluate(() => 'e2eBeforeReload' in window)).toBe(false)
+
+    // WebKit remembers a failed module for the whole tab and does not ask again after the reload.
+    // Real releases never hit this: the new page points to a file with a new name.
+    if (browserName !== 'webkit') {
+      await expect(page.getByRole('heading', { level: 1, name: 'Mon profil' })).toBeVisible()
     }
   })
 
