@@ -16,9 +16,7 @@
 }
 
 :8080 {
-	# gzip only: Safari 27 on iPhone failed to load one zstd-compressed script ("Load failed"),
-	# always the same file whatever its address (docs/DECISIONS.md D-073).
-	encode gzip
+	encode zstd gzip
 
 	header {
 		# Strict CSP (spec §14): no inline script anywhere. Inline style attributes stay allowed:

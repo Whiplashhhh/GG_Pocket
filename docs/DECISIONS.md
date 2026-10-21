@@ -583,6 +583,10 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   de ce fichier qui casse à la réception. La seule transformation qui dépend du contenu est la compression : Caddy envoyait du
   zstd, que Safari 27 accepte. Hypothèse : défaut du décodeur zstd de Safari 27 sur ce flux précis. Les e2e ne le voyaient pas
   (`vite preview` ne compresse pas en zstd, l'e2e de la stack tourne sous Chromium).
-- **Choix** : `encode gzip` seulement dans `deploy/web/Caddyfile` (le gain de zstd est négligeable pour une appli de cette
-  taille), vérifié par `e2e-stack/stack.spec.ts`. L'écran d'erreur et ses détails restent : ils ont permis le diagnostic.
-- **Statut** : à valider : confirmation attendue sur l'iPhone après déploiement.
+- **Essai gzip (réfuté)** : avec `encode gzip` seulement, l'iPhone de Willem (iOS 27.0) échoue toujours, même après un
+  redémarrage, alors que des amis (dont un en iOS 27.0.1) installent la PWA du dev sans souci. Le zstd est rétabli.
+- **Piste suivante** : un filtre propre à ce téléphone (bloqueur de contenu, protection contre le pistage, Temps d'écran,
+  profil VPN ou DNS), qui juge sur l'URL : les deux adresses testées contiennent `ProfileView`. Les détails de l'écran
+  d'erreur demandent maintenant des fichiers inexistants (`ProfileView-sonde.js`, `profile-sonde.js`, `Profil-sonde.js`,
+  `Temoin-sonde.js`) : 404 = le serveur a répondu ; `Load failed` = refusé sur le téléphone avant d'arriver au serveur.
+- **Statut** : à valider : cause propre à l'iPhone de Willem, à établir (mise à jour vers iOS 27.0.1 en cours).

@@ -20,7 +20,7 @@ export async function collectLoadDiagnostics(failure: ScreenLoadFailure): Promis
   if ('caches' in window) {
     lines.push(`caches ${(await caches.keys()).join(', ') || 'aucun'}`)
   }
-  lines.push(...(await probeScripts(scriptUrls())))
+  lines.push(...(await probeScripts(scriptUrls())), ...(await probeNames()))
   return lines
 }
 
@@ -57,6 +57,30 @@ async function probeScripts(urls: string[]): Promise<string[]> {
     }),
   )
   return [`scripts ${String(urls.length - misfits.length)}/${String(urls.length)} OK`, ...misfits]
+}
+
+/**
+ * Files that do not exist: the server answers 404 for all of them. A filter on the phone (content
+ * blocker, tracking protection, parental control) refuses some names before asking (`Load failed`).
+ */
+const NAME_PROBES = [
+  'ProfileView-sonde.js',
+  'profile-sonde.js',
+  'Profil-sonde.js',
+  'Temoin-sonde.js',
+]
+
+async function probeNames(): Promise<string[]> {
+  return Promise.all(
+    NAME_PROBES.map(async (name) => {
+      try {
+        const response = await fetch(`/assets/${name}`, { cache: 'no-store' })
+        return `nom ${name} → ${String(response.status)}`
+      } catch (error) {
+        return `nom ${name} → ${error instanceof Error ? `${error.name}: ${error.message}` : String(error)}`
+      }
+    }),
+  )
 }
 
 /** null when the script comes back fine, else what went wrong. */

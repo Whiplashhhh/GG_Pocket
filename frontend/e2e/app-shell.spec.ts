@@ -116,6 +116,8 @@ test.describe('app shell', () => {
     await expect(page.getByText(/ProfileView-.+\.js → 404/)).toBeVisible()
     // The probe under another address is not caught by the route above: it loads.
     await expect(page.getByText(/ProfileView-.+\.js\?sonde → OK/)).toBeVisible()
+    // Missing files under telling names: the server's 404, no filter in this browser.
+    await expect(page.getByText('nom Temoin-sonde.js → 404')).toBeVisible()
 
     await expect(page.getByRole('button', { name: 'Retour à l’actu' })).toBeVisible()
 
