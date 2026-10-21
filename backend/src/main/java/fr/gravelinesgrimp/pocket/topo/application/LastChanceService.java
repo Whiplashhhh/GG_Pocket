@@ -87,7 +87,11 @@ public class LastChanceService {
             return;
         }
         var inLastChance =
-                routes.findIdsByStatusAndIdIn(RouteStatus.LAST_CHANCE, new HashSet<>(routeIds));
+                routes
+                        .lockAllByStatusAndIdIn(RouteStatus.LAST_CHANCE, new HashSet<>(routeIds))
+                        .stream()
+                        .map(Route::id)
+                        .toList();
         if (inLastChance.isEmpty()) {
             return;
         }

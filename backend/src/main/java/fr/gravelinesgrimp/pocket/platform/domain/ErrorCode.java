@@ -19,6 +19,7 @@ public enum ErrorCode {
     PAYLOAD_TOO_LARGE(ErrorCategory.PROTOCOL),
     INTERNAL_ERROR(ErrorCategory.INTERNAL),
     RATE_LIMITED(ErrorCategory.TOO_MANY_REQUESTS),
+    CONCURRENT_CHANGE(ErrorCategory.CONFLICT),
 
     // Sign-in and sessions
     BAD_CREDENTIALS(ErrorCategory.UNAUTHENTICATED),

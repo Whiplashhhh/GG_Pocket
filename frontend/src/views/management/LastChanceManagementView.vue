@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Archive, TimerOff } from 'lucide-vue-next'
+import { Archive, CalendarClock, TimerOff } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -19,7 +19,8 @@ import ManagementTitle from './ManagementTitle.vue'
 
 /**
  * Spec §8.10: the routes in last chance, with how many climbers have seen the news (« accepté
- * son destin » in the pop-up). Cancel or dismount from here; announcing starts from the routes.
+ * son destin » in the pop-up). Move the planned date, cancel or dismount from here; announcing
+ * starts from the routes.
  */
 const { t } = useI18n()
 const routes = useLastChanceRoutes()
@@ -97,6 +98,14 @@ function cancel(route: RouteSummary) {
         </p>
       </div>
       <div class="flex flex-wrap gap-2">
+        <GgButton
+          variant="secondary"
+          :aria-label="t('routesAdmin.changeDateNamed', { name: item.route.name })"
+          @click="statusAction = { kind: 'lastChance', route: item.route }"
+        >
+          <CalendarClock :size="20" aria-hidden="true" />
+          {{ t('routesAdmin.changeDate') }}
+        </GgButton>
         <GgButton
           variant="secondary"
           :aria-label="t('routesAdmin.cancelLastChanceNamed', { name: item.route.name })"

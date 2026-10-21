@@ -3,7 +3,10 @@ package fr.gravelinesgrimp.pocket.topo.infra;
 import fr.gravelinesgrimp.pocket.topo.domain.Route;
 import fr.gravelinesgrimp.pocket.topo.domain.RouteStatus;
 
+import jakarta.persistence.LockModeType;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
@@ -31,7 +34,17 @@ public interface RouteRepository extends JpaRepository<Route, UUID> {
                     + " where a.routeId = r.id and a.memberId = :memberId)")
     List<Route> findAllWithStylesByStatusNotAcknowledgedBy(RouteStatus status, UUID memberId);
 
-    /** Callers never pass an empty collection. */
-    @Query("select r.id from Route r where r.status = :status and r.id in :ids")
-    List<UUID> findIdsByStatusAndIdIn(RouteStatus status, Collection<UUID> ids);
+    /**
+     * Shared lock on the routes still in this status: a concurrent status change (which takes
+     * {@link #lockById}) waits for the caller, or makes it see the new status. Callers never pass
+     * an empty collection.
+     */
+    @Lock(LockModeType.PESSIMISTIC_READ)
+    @Query("select r from Route r where r.status = :status and r.id in :ids")
+    List<Route> lockAllByStatusAndIdIn(RouteStatus status, Collection<UUID> ids);
+
+    /** Exclusive lock before a status change that also touches the acknowledgements. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select r from Route r where r.id = :id")
+    Optional<Route> lockById(UUID id);
 }

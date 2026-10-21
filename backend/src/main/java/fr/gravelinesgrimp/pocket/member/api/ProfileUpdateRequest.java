@@ -4,6 +4,7 @@ import fr.gravelinesgrimp.pocket.member.application.ProfileChange;
 import fr.gravelinesgrimp.pocket.member.domain.MemberDetails;
 import fr.gravelinesgrimp.pocket.member.domain.MemberIdentity;
 import fr.gravelinesgrimp.pocket.member.domain.Nickname;
+import fr.gravelinesgrimp.pocket.platform.api.validation.PlainText;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
@@ -23,8 +24,10 @@ import java.time.LocalDate;
 public record ProfileUpdateRequest(
         @Schema(requiredMode = RequiredMode.REQUIRED) @NotNull @Pattern(regexp = Nickname.PATTERN)
                 String nickname,
-        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @Size(max = 50) String firstName,
-        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @Size(max = 50) String lastName,
+        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @PlainText @Size(max = 50)
+                String firstName,
+        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @PlainText @Size(max = 50)
+                String lastName,
         @Email @Size(max = 254) String email,
         @Past LocalDate birthDate,
         @Schema(description = "Declares that a parent agreed; required once under 15")
@@ -32,7 +35,7 @@ public record ProfileUpdateRequest(
         boolean showAge,
         @Min(1950) @Max(2100) Integer clubArrivalYear,
         @Min(1950) @Max(2100) Integer climbingSinceYear,
-        @Size(max = 160) String bio,
+        @PlainText @Size(max = 160) String bio,
         boolean appearsInRankings) {
 
     ProfileChange toChange() {

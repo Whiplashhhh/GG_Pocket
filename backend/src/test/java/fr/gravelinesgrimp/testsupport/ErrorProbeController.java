@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +38,11 @@ public class ErrorProbeController {
     @GetMapping("/denied")
     public void denied() {
         throw new AccessDeniedException("Denied by a method security rule");
+    }
+
+    @GetMapping("/stale")
+    public void stale() {
+        throw new OptimisticLockingFailureException("Route was updated by another transaction");
     }
 
     @GetMapping("/boom")

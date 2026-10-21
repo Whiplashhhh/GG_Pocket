@@ -6,8 +6,11 @@ import { defineComponent } from 'vue'
 import { api } from './client'
 import { ApiError } from './errors'
 import {
+  ACKNOWLEDGEMENT_BATCH,
   MY_FAVORITES_KEY,
   ROUTES_KEY,
+  UNACKNOWLEDGED_LAST_CHANCE_KEY,
+  useAcknowledgeLastChance,
   useAddFavorite,
   useToggleCheck,
   type RouteSummary,
@@ -142,5 +145,25 @@ describe('useAddFavorite', () => {
       favorite: false,
       favoriteCount: 3,
     })
+  })
+})
+
+describe('useAcknowledgeLastChance', () => {
+  it('sends long lists in batches the server accepts, then forgets them', async () => {
+    vi.mocked(api.POST).mockResolvedValue(noContent)
+    const { result, queryClient } = withQueries(() => useAcknowledgeLastChance())
+    const ids = Array.from({ length: ACKNOWLEDGEMENT_BATCH + 3 }, (_, index) => `r${String(index)}`)
+    queryClient.setQueryData(
+      UNACKNOWLEDGED_LAST_CHANCE_KEY,
+      ids.map((id) => route(id, { status: 'LAST_CHANCE' })),
+    )
+
+    result.mutate(ids)
+    await flushPromises()
+    const batches = vi
+      .mocked(api.POST)
+      .mock.calls.map((call) => (call[1] as { body: { routeIds: string[] } }).body.routeIds.length)
+    expect(batches).toEqual([ACKNOWLEDGEMENT_BATCH, 3])
+    expect(routesIn(queryClient, UNACKNOWLEDGED_LAST_CHANCE_KEY)).toEqual([])
   })
 })

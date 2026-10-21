@@ -152,7 +152,8 @@ public class ImageSanitizer {
 
     /**
      * Reads only the centred square (or the whole picture), skipping pixels so that it comes out at
-     * most about twice the target size: memory stays small whatever the size of the photo.
+     * most twice the target size (rounding the step up): memory stays small whatever the size of
+     * the photo, even for a 16-bit PNG with transparency.
      */
     private static BufferedImage decode(
             byte[] upload, ImageType type, int size, boolean centeredSquare) {
@@ -175,11 +176,11 @@ public class ImageSanitizer {
                 int step;
                 if (centeredSquare) {
                     var side = Math.min(width, height);
-                    step = Math.max(1, side / (2 * size));
+                    step = Math.max(1, Math.ceilDiv(side, 2 * size));
                     params.setSourceRegion(
                             new Rectangle((width - side) / 2, (height - side) / 2, side, side));
                 } else {
-                    step = Math.max(1, Math.max(width, height) / (2 * size));
+                    step = Math.max(1, Math.ceilDiv(Math.max(width, height), 2 * size));
                 }
                 params.setSourceSubsampling(step, step, 0, 0);
                 var decoded = reader.read(0, params);

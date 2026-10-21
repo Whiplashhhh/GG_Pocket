@@ -112,3 +112,11 @@ alter table member
 alter table media_file drop constraint media_file_usage_check;
 alter table media_file
     add constraint media_file_usage_check check (usage in ('AVATAR', 'ROUTE_PHOTO'));
+
+-- A route photo belongs to the club, not to the setter who sent it: it outlives the account.
+-- (Deleting an account must remove its avatar file and row itself: files are not in the database.)
+alter table media_file alter column owner_id drop not null;
+alter table media_file drop constraint media_file_owner_id_fkey;
+alter table media_file
+    add constraint media_file_owner_id_fkey
+        foreign key (owner_id) references member (id) on delete set null;

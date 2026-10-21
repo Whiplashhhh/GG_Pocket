@@ -15,7 +15,8 @@ import { formatDateTime, formatRelative } from '@/lib/format'
 
 /**
  * Comments of the route sheet: oldest first, mine (or anyone's for the board, as the server says
- * with `deletable`) can be deleted. A dismounted route is read-only.
+ * with `deletable`) can be deleted. A dismounted route takes no new comment, but its comments can
+ * still be deleted (D-081).
  */
 const props = defineProps<{ routeId: string; readOnly: boolean; count: number }>()
 
@@ -124,7 +125,7 @@ function confirmDelete() {
           <p class="mt-0.5 break-words whitespace-pre-line">{{ comment.body }}</p>
         </div>
         <GgIconButton
-          v-if="comment.deletable && !readOnly"
+          v-if="comment.deletable"
           :label="t('comments.deleteNamed', { nickname: comment.author.nickname })"
           class="shrink-0 text-ink-muted"
           @click="askDelete(comment)"

@@ -254,13 +254,20 @@ export function useDeleteComment(routeId: MaybeRefOrGetter<string>) {
 }
 
 /** "J'accepte leurs destins": the pop-up only comes back for routes announced afterwards. */
+/** The server takes at most this many routes per acknowledgement. */
+export const ACKNOWLEDGEMENT_BATCH = 50
+
 export function useAcknowledgeLastChance() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (routeIds: string[]) =>
-      requestNoContent(
-        api.POST('/api/v1/routes/last-chance/acknowledgements', { body: { routeIds } }),
-      ),
+    mutationFn: async (routeIds: string[]) => {
+      for (let start = 0; start < routeIds.length; start += ACKNOWLEDGEMENT_BATCH) {
+        const batch = routeIds.slice(start, start + ACKNOWLEDGEMENT_BATCH)
+        await requestNoContent(
+          api.POST('/api/v1/routes/last-chance/acknowledgements', { body: { routeIds: batch } }),
+        )
+      }
+    },
     onSuccess: (_nothing, routeIds) => {
       queryClient.setQueryData<RouteSummary[]>(UNACKNOWLEDGED_LAST_CHANCE_KEY, (routes) =>
         routes?.filter((route) => !routeIds.includes(route.id)),

@@ -655,8 +655,9 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Statut** : validée.
 
 ### D-081 — Une voie démontée est en lecture seule
-- **Choix** : sur une voie démontée, on ne modifie rien (fiche, photo, commentaires, coups de cœur, « je sais la faire »,
-  dernière chance) : refus `ROUTE_DISMOUNTED`. Seul le remontage la rend de nouveau modifiable. Un coup de cœur posé avant
+- **Choix** : sur une voie démontée, on ne modifie rien (fiche, photo, nouveaux commentaires, coups de cœur, « je sais la
+  faire », dernière chance) : refus `ROUTE_DISMOUNTED`. Seul le remontage la rend de nouveau modifiable. Exception : un
+  commentaire peut toujours être supprimé (par son auteur, ou par la direction pour modérer). Un coup de cœur posé avant
   le démontage reste donc dans l'historique du profil (D-010), sans compter dans la limite de deux.
 - **Statut** : validée.
 

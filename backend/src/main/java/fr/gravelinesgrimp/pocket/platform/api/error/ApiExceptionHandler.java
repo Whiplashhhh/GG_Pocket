@@ -7,6 +7,9 @@ import fr.gravelinesgrimp.pocket.platform.domain.RateLimitedException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -83,6 +86,23 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 .header(HttpHeaders.RETRY_AFTER, Long.toString(retryAfterSeconds))
                 .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(problem);
+    }
+
+    /**
+     * Two people changed the same thing at the same moment: the stale version lost (optimistic
+     * lock) or the other one took the unique name first. The loser is asked to reload, instead of
+     * getting a server error. Services translate the conflicts they expect into precise codes.
+     */
+    @ExceptionHandler({
+        OptimisticLockingFailureException.class,
+        DataIntegrityViolationException.class
+    })
+    ResponseEntity<ProblemDetail> handleConcurrentChange(DataAccessException ex) {
+        log.warn("Concurrent change refused: {}", ex.getMessage());
+        return problem(
+                HttpStatus.CONFLICT,
+                ErrorCode.CONCURRENT_CHANGE,
+                "Someone changed this at the same time: reload and try again.");
     }
 
     @ExceptionHandler(AuthenticationException.class)

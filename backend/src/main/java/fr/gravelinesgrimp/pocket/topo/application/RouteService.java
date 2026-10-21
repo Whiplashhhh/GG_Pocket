@@ -141,7 +141,7 @@ public class RouteService {
     @PreAuthorize("hasRole('SETTER')")
     @Transactional
     public RouteDetailView cancelLastChance(UUID actorId, UUID routeId) {
-        var route = load(routeId);
+        var route = lock(routeId);
         route.cancelLastChance();
         acknowledgements.deleteByRoute(routeId);
         return views.detail(route, actorId);
@@ -151,7 +151,7 @@ public class RouteService {
     @Transactional
     public RouteDetailView dismount(UUID actorId, UUID routeId) {
         var actor = loadMember(actorId);
-        var route = load(routeId);
+        var route = lock(routeId);
         var before = route.status();
         route.dismount(clock.instant());
         acknowledgements.deleteByRoute(routeId);
@@ -227,6 +227,12 @@ public class RouteService {
 
     private Route load(UUID routeId) {
         return routes.findById(routeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No route"));
+    }
+
+    /** Like {@link #load}, holding the row until commit (the last chance pop-up relies on it). */
+    private Route lock(UUID routeId) {
+        return routes.lockById(routeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No route"));
     }
 

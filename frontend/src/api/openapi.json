@@ -2496,7 +2496,9 @@
             "items" : {
               "type" : "string",
               "format" : "uuid"
-            }
+            },
+            "maxItems" : 10,
+            "minItems" : 0
           },
           "setterNote" : {
             "type" : "string",

@@ -42,6 +42,7 @@ const MESSAGE_OF_CONSTRAINT: Record<string, string> = {
   AssertTrue: 'validation.privacy',
   Min: 'validation.year',
   Max: 'validation.year',
+  PlainText: 'validation.plainText',
 }
 
 /**

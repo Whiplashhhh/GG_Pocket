@@ -3,6 +3,7 @@ package fr.gravelinesgrimp.pocket.auth.api;
 import fr.gravelinesgrimp.pocket.auth.application.Registration;
 import fr.gravelinesgrimp.pocket.member.domain.MemberIdentity;
 import fr.gravelinesgrimp.pocket.member.domain.Nickname;
+import fr.gravelinesgrimp.pocket.platform.api.validation.PlainText;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
@@ -19,9 +20,12 @@ import java.time.LocalDate;
 
 @Schema(name = "RegisterRequest", description = "The one-page registration form (spec §6).")
 public record RegisterRequest(
-        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @Size(max = 32) String code,
-        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @Size(max = 50) String firstName,
-        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @Size(max = 50) String lastName,
+        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @PlainText @Size(max = 32)
+                String code,
+        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @PlainText @Size(max = 50)
+                String firstName,
+        @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @PlainText @Size(max = 50)
+                String lastName,
         @Schema(requiredMode = RequiredMode.REQUIRED) @NotNull @Pattern(regexp = Nickname.PATTERN)
                 String nickname,
         @Email @Size(max = 254) String email,

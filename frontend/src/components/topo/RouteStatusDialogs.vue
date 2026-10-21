@@ -58,6 +58,8 @@ const dismountOpen = openFor('dismount')
 const remountOpen = openFor('remount')
 
 const name = computed(() => target.value?.name ?? '')
+/** Already in last chance: the dialog only moves the planned date (nobody is warned again). */
+const redating = computed(() => target.value?.status === 'LAST_CHANCE')
 const dismountBody = computed(() => {
   const favorites = target.value?.favoriteCount ?? 0
   const body = t('routeStatus.dismountBody')
@@ -77,7 +79,10 @@ function announceLastChance() {
     {
       onSuccess: () => {
         action.value = null
-        emit('done', t('routeStatus.announced', { name: route.name }))
+        emit(
+          'done',
+          t(redating.value ? 'routeStatus.redated' : 'routeStatus.announced', { name: route.name }),
+        )
       },
       onError: (error) => {
         const { fields } = serverFieldErrors(
@@ -130,8 +135,8 @@ function confirmRemount() {
 <template>
   <GgDialog
     v-model:open="lastChanceOpen"
-    :title="t('routeStatus.lastChanceTitle', { name })"
-    :description="t('routeStatus.lastChanceBody')"
+    :title="t(redating ? 'routeStatus.redateTitle' : 'routeStatus.lastChanceTitle', { name })"
+    :description="t(redating ? 'routeStatus.redateBody' : 'routeStatus.lastChanceBody')"
   >
     <form class="flex flex-col gap-5" novalidate @submit.prevent="announceLastChance">
       <RouteSummaryLabel v-if="target" :route="target" />
@@ -149,7 +154,7 @@ function confirmRemount() {
           {{ t('common.cancel') }}
         </GgButton>
         <GgButton type="submit" :disabled="announce.isPending.value">
-          {{ t('routeStatus.announce') }}
+          {{ t(redating ? 'routeStatus.redate' : 'routeStatus.announce') }}
         </GgButton>
       </div>
     </form>

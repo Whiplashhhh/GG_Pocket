@@ -261,6 +261,7 @@
     "UNKNOWN": "Quelque chose a lâché. Réessaie dans un instant.",
     "PAYLOAD_TOO_LARGE": "C’est trop lourd à envoyer : 10 Mo maximum.",
     "RATE_LIMITED": "Doucement sur la corde : trop d’essais d’un coup. Patiente quelques minutes, puis réessaie.",
+    "CONCURRENT_CHANGE": "Quelqu’un a modifié la même chose au même moment. Recharge la page pour voir la dernière version, puis réessaie.",
     "BAD_CREDENTIALS": "Ce pseudo et ce mot de passe ne s’assurent pas mutuellement. Réessaie.",
     "ACCOUNT_DISABLED": "Ce compte est désactivé. Si c’est une erreur, vois avec la direction du club.",
     "REGISTRATION_CODE_INVALID": "Ce code ne mène nulle part : il est faux, expiré ou épuisé. Vérifie-le, ou demande le code du moment à la salle.",
@@ -671,6 +672,8 @@
     "lastChanceNamed": "Passer {name} en dernière chance",
     "cancelLastChance": "Annuler la dernière chance",
     "cancelLastChanceNamed": "Annuler la dernière chance de {name}",
+    "changeDate": "Changer la date",
+    "changeDateNamed": "Changer la date de démontage de {name}",
     "dismount": "Démonter",
     "dismountNamed": "Démonter {name}",
     "remount": "Remonter",
@@ -683,6 +686,10 @@
     "plannedDismountHint": "Aujourd’hui ou plus tard. Sans date, on annonce juste « bientôt ».",
     "announce": "Annoncer la dernière chance",
     "announced": "« {name} » est en dernière chance : les grimpeurs vont être prévenus.",
+    "redateTitle": "Nouvelle date pour « {name} »",
+    "redateBody": "La voie reste en dernière chance. Ceux qui ont déjà accepté son destin ne revoient pas la pop-up : la date est dans la fiche.",
+    "redate": "Enregistrer la date",
+    "redated": "Nouvelle date enregistrée pour « {name} ».",
     "cancelled": "Dernière chance annulée : « {name} » reste au mur.",
     "dismountTitle": "Démonter « {name} » ?",
     "dismountWarning": "1 grimpeur l’a en coup de cœur. Tu es sûr·e ? | {n} grimpeurs l’ont en coup de cœur. Tu es sûr·e ?",
@@ -876,7 +883,8 @@
     "tooLong": "Trop long : {max} caractères maximum.",
     "year": "Une année entre 1950 et cette année.",
     "number": "Un nombre entier, au moins 1.",
-    "invalid": "Ce champ ne passe pas. Vérifie-le."
+    "invalid": "Ce champ ne passe pas. Vérifie-le.",
+    "plainText": "Un caractère invisible s’est glissé dans ce texte. Efface-le ou retape le texte."
   },
   "rolesShort": {
     "CLIMBER": "Grimpeur GG",

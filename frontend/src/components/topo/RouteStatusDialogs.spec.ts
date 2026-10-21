@@ -11,7 +11,10 @@ vi.mock('@/api/client', () => ({
   api: { GET: vi.fn(), PUT: vi.fn(), DELETE: vi.fn(), POST: vi.fn() },
 }))
 
-const morice = (favoriteCount: number): RouteSummary => ({
+const morice = (
+  favoriteCount: number,
+  status: RouteSummary['status'] = 'ACTIVE',
+): RouteSummary => ({
   id: 'r1',
   name: 'Bye Bye Morice',
   grade: '6b',
@@ -21,7 +24,7 @@ const morice = (favoriteCount: number): RouteSummary => ({
   sectorName: 'Négatif et ses 2 dièdres',
   sectorPosition: 4,
   holds: [{ id: 'c1', label: 'jaune', hex: '#f5c518', multicolor: false }],
-  status: 'ACTIVE',
+  status,
   openedOn: '2026-05-16',
   styles: [],
   favoriteCount,
@@ -30,15 +33,18 @@ const morice = (favoriteCount: number): RouteSummary => ({
   checks: [],
 })
 
-async function askToDismount(favoriteCount: number): Promise<string> {
+async function ask(action: { kind: 'dismount' | 'lastChance'; route: RouteSummary }) {
   mountWithApp(RouteStatusDialogs, {
-    props: { action: { kind: 'dismount', route: morice(favoriteCount) } },
+    props: { action },
     attachTo: document.body,
     global: { plugins: [[VueQueryPlugin, { queryClient: new QueryClient() }]] },
   })
   await flushPromises()
   return document.body.textContent
 }
+
+const askToDismount = (favoriteCount: number) =>
+  ask({ kind: 'dismount', route: morice(favoriteCount) })
 
 afterEach(() => {
   document.body.innerHTML = ''
@@ -59,5 +65,17 @@ describe('RouteStatusDialogs', () => {
     const text = await askToDismount(0)
     expect(text).toContain('Elle part aux archives')
     expect(text).not.toContain('coup de cœur')
+  })
+
+  it('announces the last chance of a route on the wall', async () => {
+    const text = await ask({ kind: 'lastChance', route: morice(0) })
+    expect(text).toContain('Dernière chance pour « Bye Bye Morice »')
+    expect(text).toContain('Annoncer la dernière chance')
+  })
+
+  it('only moves the date of a route already in last chance', async () => {
+    const text = await ask({ kind: 'lastChance', route: morice(0, 'LAST_CHANCE') })
+    expect(text).toContain('Nouvelle date pour « Bye Bye Morice »')
+    expect(text).toContain('Enregistrer la date')
   })
 })
