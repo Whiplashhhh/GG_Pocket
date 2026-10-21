@@ -83,10 +83,40 @@ test.describe('app shell', () => {
       (route) => route.fulfill({ status: 404, headers: { 'cache-control': 'no-store' } }),
       { times: 1 },
     )
+    // What happened, in the failure message: the CI's raw logs are out of reach (DECISIONS D-030).
+    const trail: string[] = []
+    page.on('request', (request) => {
+      if (request.url().includes('/ProfileView-')) trail.push(`request ${request.url()}`)
+    })
+    page.on('response', (response) => {
+      if (response.url().includes('/ProfileView-')) {
+        trail.push(`response ${String(response.status())} ${response.url()}`)
+      }
+    })
+    page.on('requestfailed', (request) => {
+      trail.push(`failed ${request.url()} ${request.failure()?.errorText ?? ''}`)
+    })
+    page.on('pageerror', (error) => trail.push(`pageerror ${error.message}`))
+    page.on('console', (message) => {
+      if (message.type() === 'error' || message.type() === 'warning') {
+        trail.push(`console ${message.type()} ${message.text()}`)
+      }
+    })
+    page.on('framenavigated', (frame) => {
+      if (frame === page.mainFrame()) trail.push(`navigated ${frame.url()}`)
+    })
+
     await page.goto('/actu')
     await page.getByRole('link', { name: 'Mon profil' }).click()
     await expect(page).toHaveURL(/\/profil$/)
-    await expect(page.getByRole('heading', { level: 1, name: 'Mon profil' })).toBeVisible()
+    try {
+      await expect(page.getByRole('heading', { level: 1, name: 'Mon profil' })).toBeVisible({
+        timeout: 10_000,
+      })
+    } catch (error) {
+      const body = (await page.locator('body').innerText()).slice(0, 400)
+      throw new Error(`${String(error)}\nTrail:\n${trail.join('\n')}\nPage:\n${body}`)
+    }
   })
 
   test('shows the app version in the profile, the server version to the board only', async ({
