@@ -83,10 +83,26 @@ jobs:
           git push origin "HEAD:refs/tags/v$VERSION" "HEAD:refs/heads/prod/$VERSION"
           gh release create "v$VERSION" --verify-tag --title "$VERSION" --notes-file "$RUNNER_TEMP/notes.md"
 
+  # The production environment refuses any other branch before the deploy job even starts, with
+  # an obscure message: say what to do instead.
+  ref:
+    name: Started from main
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - run: |
+          [[ $GITHUB_REF == refs/heads/main ]] || {
+            echo "::error::Start this workflow from main (« Use workflow from »), not $GITHUB_REF; the version to deploy goes in the field (DEPLOYMENT.md §7)."
+            exit 1
+          }
+
   deploy:
     name: Deploy to prod (approval required)
-    needs: publish
-    if: always() && (needs.publish.result == 'success' || github.event_name == 'workflow_dispatch')
+    needs: [publish, ref]
+    if: >-
+      always() && needs.ref.result == 'success'
+      && (needs.publish.result == 'success' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     # The token sent to the server can only read the images.
