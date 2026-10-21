@@ -4,9 +4,7 @@
     "clubName": "Gravelines Grimp",
     "skipToContent": "Aller au contenu",
     "versionFooter": "GG Pocket {version}",
-    "serverVersion": "Serveur {version}",
-    "clubNameFirst": "Gravelines",
-    "clubNameSecond": "Grimp"
+    "serverVersion": "Serveur {version}"
   },
   "nav": {
     "label": "Navigation principale",
@@ -17,7 +15,7 @@
     "podium": "Podium"
   },
   "header": {
-    "homeLink": "Gravelines Grimp, retour à l’actu",
+    "homeLink": "GG Pocket, retour à l’actu",
     "profileLink": "Mon profil",
     "management": "Espace gestion"
   },

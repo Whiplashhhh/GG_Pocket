@@ -5,6 +5,15 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Modifié
+
+- Le vrai logo du club s'accroche en haut de chaque page, à côté de « GG Pocket ». L'Actu n'a plus besoin de le répéter.
+
+### Corrigé
+
+- Sur iPhone, dans l'appli installée, toucher ton avatar ne menait plus à ton profil après une mise à jour. Maintenant,
+  si un écran a changé pendant que l'appli dormait, elle recharge la page toute seule.
+
 ## 0.1.0 — 2026-10-21
 
 ### Ajouté

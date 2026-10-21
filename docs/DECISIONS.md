@@ -6,7 +6,7 @@ de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision r
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
 choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase), environnements et pipeline
-(D-059 à D-071, phase 2).
+(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072 et suivantes).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -227,7 +227,8 @@ direction) ou **Willem**.
   « Gravelines GRIMP ») est illisible à 44 px de haut : on y affiche un mot-symbole composé (le sommet olive du logo dessiné
   en SVG + « Gravelines Grimp » en Archivo, « Grimp » en orange brique). En phase 8, l'admin pourra téléverser ses logos.
 - **À demander au club** : une version vectorielle (SVG, PDF, AI) ou en haute définition du logo, et la version « fond noir » qu'il utilise déjà.
-- **Statut** : à valider (rendu acceptable, mais une source vectorielle serait bien meilleure).
+- **Statut** : à valider (rendu acceptable, mais une source vectorielle serait bien meilleure). La partie « header » est
+  remplacée par D-072.
 
 ### D-040 — Ce qui est reporté hors de la phase 0
 - **Choix** :
@@ -540,3 +541,25 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   `DEMO2026` hors de la machine locale (le dev déployé reste fermé). Les clés IPv6 du limiteur étaient déjà regroupées par /64 ;
   la purge du limiteur redescend désormais à 80 % du plafond d'un coup.
 - **Statut** : validée.
+
+### D-072 — Logo du club dans l'en-tête, nom « GG Pocket »
+- **Contexte** : après la mise en prod de la 0.1.0, Willem préfère le vrai logo, même petit, au sommet dessiné de D-039, et le
+  nom de l'appli plutôt que celui du club ; le logo en grand de l'Actu faisait alors doublon.
+- **Choix** : l'en-tête affiche le logo détouré (clair ou sombre) à 44 px de haut, puis « GG Pocket » à partir de 26rem de
+  large (sous cette largeur, le pseudo et l'avatar prennent la place). Le logo est décoratif (`alt=""`) : le lien porte le nom
+  « GG Pocket, retour à l'actu ». L'encart de l'Actu ne garde que sa phrase d'accroche. Les écrans d'accueil et de connexion
+  (`DoorHeader`) ne changent pas.
+- **Statut** : validée (Willem).
+
+### D-073 — Recharger la page quand le code d'un écran a disparu
+- **Contexte** : dans l'appli installée sur iPhone, toucher l'avatar ne faisait plus rien après la 0.1.0. L'écran Profil est le
+  seul à contenir le numéro de version (`__APP_VERSION__`), donc le nom de son fichier change à chaque version. iOS garde l'appli
+  en mémoire pendant des jours : l'ancien code tourne encore quand le nouveau service worker a déjà vidé l'ancien cache, et le
+  serveur répond 404 sur l'ancien fichier. La navigation échouait sans aucun message, alors que les écrans inchangés marchaient.
+- **Choix** : `router.onError` reconnaît l'échec de chargement d'un écran (messages de Chromium, WebKit, Firefox et Vite) et
+  recharge la page visée (`src/lib/stale-chunk.ts`). Un deuxième échec dans les 30 secondes n'entraîne pas de nouveau
+  rechargement, pour éviter une boucle si le serveur est en panne ou le téléphone hors ligne.
+- **Alternatives** : garder les fichiers des anciennes versions sur le serveur (images Docker plus lourdes, ménage à prévoir) ;
+  sortir la version du fichier du Profil (ne règle que ce cas, n'importe quel écran modifié a le même problème).
+- **Statut** : validée. Le diagnostic est déduit du code, sans accès aux outils de développement de l'iPhone : confirmation
+  attendue sur le dev.

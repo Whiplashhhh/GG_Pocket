@@ -69,6 +69,12 @@ test.describe('app shell', () => {
     await expect(page.locator('html')).not.toHaveAttribute('data-theme')
   })
 
+  test('the club logo in the header leads back to the feed', async ({ page }) => {
+    await page.goto('/profil')
+    await page.getByRole('link', { name: 'GG Pocket, retour à l’actu' }).click()
+    await expect(page).toHaveURL(/\/actu$/)
+  })
+
   test('an app left open across a release still opens the profile', async ({ page }) => {
     // Installed app on iOS: the profile screen's file of the previous version is gone (404).
     await page.route('**/assets/ProfileView-*.js', (route) => route.fulfill({ status: 404 }), {

@@ -1,28 +1,23 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
+import logoDark from '@/assets/brand/logo-dark.webp'
+import logoLight from '@/assets/brand/logo-light.webp'
+
 /**
- * Compact club mark for the header: the olive summit of the logo next to the club name. The full
- * logo is unreadable at header height (docs/DECISIONS.md D-039); it appears full size on Actu.
+ * Header mark: the club logo, small, next to the app name (docs/DECISIONS.md D-072). Decorative:
+ * the enclosing link carries the accessible name.
  */
 const { t } = useI18n()
 </script>
 
 <template>
   <span class="flex items-center gap-2">
-    <svg width="34" height="26" viewBox="0 0 34 26" fill="none" aria-hidden="true">
-      <path
-        d="M2 23 9.5 12.5l3 4 5.5-13.5 5 10 2.5-2 6.5 12"
-        stroke="var(--gg-olive)"
-        stroke-width="3"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-    <!-- At phone width the header also holds the nickname and avatar: the summit says enough. -->
-    <span class="hidden text-lg leading-none font-title min-[26rem]:inline">
-      {{ t('app.clubNameFirst') }}
-      <span class="text-brand-ink">{{ t('app.clubNameSecond') }}</span>
-    </span>
+    <img :src="logoLight" alt="" width="44" height="43" class="h-11 w-auto dark:hidden" />
+    <img :src="logoDark" alt="" width="44" height="43" class="hidden h-11 w-auto dark:block" />
+    <!-- At phone width the header also holds the nickname and avatar: the logo says enough. -->
+    <span class="hidden text-lg leading-none font-title min-[26rem]:inline">{{
+      t('app.name')
+    }}</span>
   </span>
 </template>
