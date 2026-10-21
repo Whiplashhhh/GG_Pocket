@@ -40,7 +40,6 @@ direction) ou **Willem**.
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
-| D-073 | Quel filtre bloque « profil » sur l'iPhone de Willem ? L'API du profil passe-t-elle ? | Willem | Fichiers nommés par leur empreinte, écran d'erreur avec détails |
 
 ---
 
@@ -596,6 +595,6 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Choix** : fichiers construits nommés par leur seule empreinte (`assets/[hash].js`, `vite.config.ts`), puisque les listes
   de blocage jugent les noms et pas le contenu. Les e2e reconnaissent le script du Profil à son contenu. L'écran d'erreur
   garde ses sondes de noms, pour reconnaître le cas chez un autre membre.
-- **Reste à vérifier** : l'API `PUT /api/v1/me/profile` contient aussi « profil » : à tester chez Willem (modifier son profil).
-  Si elle est bloquée, renommer le chemin côté serveur.
-- **Statut** : à valider : nom du filtre à trouver chez Willem, enregistrement du profil à tester.
+- **Vérifié sur l'iPhone de Willem (dev, 2026-10-21)** : l'avatar ouvre le profil, et « Modifier mon profil » enregistre
+  (`PUT /api/v1/me/profile` passe : le filtre ne vise que les fichiers). Le filtre lui-même n'est pas identifié.
+- **Statut** : validée.

@@ -6,31 +6,33 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ## 2026-10-21 — Correctif iPhone et logo du club (vers 0.1.1)
 
-**Branche** : `fix/iphone-profil-0.1.0` (depuis `main` = 0.1.0).
+**Branche** : `fix/iphone-profil-0.1.0` (depuis `main` = 0.1.0), PR #13.
 
 ### Fait
 
-- Bug iPhone (appli installée) : l'écran Profil est le seul dont le fichier change à chaque version (il affiche la version) ;
-  une appli restée en mémoire demandait l'ancien fichier (404) et la navigation échouait en silence. `router.onError` recharge
-  maintenant la page visée, sans boucle (D-073, `src/lib/stale-chunk.ts`, Vitest + e2e qui renvoie un 404 sur l'écran).
-  Caddy ne met plus le cache d'un an sur un `/assets/` absent (404 en `no-store`, e2e stack).
-- En-tête : logo du club (clair/sombre) à 44 px + « GG Pocket » dès 26rem ; logo retiré de l'encart Actu (D-072).
-- CHANGELOG « Non publié » à jour.
+- Bug iPhone : un filtre du téléphone de Willem (Safari et PWA) refusait tout fichier dont l'URL contient « profil », avant
+  même le serveur. Trouvé grâce aux sondes de l'écran d'erreur, après deux fausses pistes (appli périmée, zstd) : D-073.
+  Correctif : fichiers construits nommés par leur seule empreinte (`vite.config.ts`). Vérifié par Willem sur le dev : le profil
+  s'ouvre, l'enregistrement du profil passe.
+- Au passage : `router.onError` recharge la page quand le code d'un écran manque ; au second échec, `LoadFailureScreen`
+  (réessayer, vider le cache, retour à l'actu, détails copiables) au lieu d'un écran vide ; Caddy met un 404 de `/assets/` en
+  `no-store`.
+- En-tête : logo du club (clair/sombre) + « GG Pocket » ; logo retiré de l'encart Actu (D-072).
+- CI verte (e2e iPhone 13 + Desktop Chrome, stack Docker). CHANGELOG « Non publié » à jour.
 
 ### Reste
 
-- Captures non prises ici (bac à sable à ~980 PID sur 1024, zombies non récupérés) : le rendu du logo (clair/sombre,
-  360/1280 px) est à regarder sur le dev. CI de la PR #13 verte (build, e2e iPhone 13 + Desktop Chrome, stack Docker).
-- Validation de Willem sur iPhone, fusion, release 0.1.1, test du retour arrière.
+- Captures non prises ici (bac à sable saturé de processus) : rendu du logo à confirmer par Willem.
+- Fusion de la PR #13, release 0.1.1, test du retour arrière (dernier point de la phase 2).
 
 ### Prochaine action exacte
 
-- Willem : approuver « Deploy to dev » de la PR #13, puis sur l'iPhone (appli installée) vérifier le logo en clair et en
-  sombre et que l'avatar ouvre le profil. Si c'est bon : fusionner, « Prepare release » en `patch` (0.1.1), retour arrière.
+- Willem : fusionner la PR #13, Actions → « Prepare release » en `patch` (0.1.1), fusionner la PR de release, approuver la
+  prod ; puis Actions → Release → Run workflow avec `0.1.0`, vérifier la version dans le profil, et redéployer 0.1.1.
 
 ### Points bloquants
 
-- Aucun ; le diagnostic iPhone est déduit du code, à confirmer sur le téléphone.
+- Aucun.
 
 ---
 
