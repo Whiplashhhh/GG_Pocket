@@ -39,11 +39,6 @@ direction) ou **Willem**.
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
-| D-074 | Cotations modifiables dans l'appli ? | club | Non : liste fixe 4a- → 7c+ |
-| D-075 | Un coup de cœur remonté peut-il faire passer à 3 ? | club | Oui, toléré ; on ne peut plus en ajouter tant qu'on est à 2 ou plus |
-| D-076 | Les 14 styles de voie et 5 styles maximum par voie ? | club | Oui |
-| D-077 | Ouvreurs : responsables et plus, ou nom libre ? | club | Comptes de rôle Responsable et plus, plus un nom libre pour un ouvreur sans compte |
-| D-082 | Pop-up dernière chance : bouton « Me le redire plus tard » ? | club | Oui, elle revient à la prochaine ouverture |
 
 ---
 
@@ -614,25 +609,25 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   « Première cotation » et les classements.
 - **Choix** : les 36 cotations (4a- → 7c+, D-002) sont créées par la migration, identiques en dev et en prod, avec un rang
   numérique ; l'appli les lit mais ne les modifie pas. En ajouter une (8a un jour ?) se fait par une migration.
-- **Statut** : à valider.
+- **Statut** : validée (Willem, 2026-10-23).
 
 ### D-075 — Coups de cœur : la limite vise les voies non démontées
 - **Choix** : deux coups de cœur au plus sur des voies non démontées (D-010). Le troisième est refusé (`FAVORITES_FULL`), sauf
   remplacement explicite d'un des deux, fait dans la même transaction. La ligne du membre est verrouillée pendant le contrôle,
   pour que deux requêtes simultanées ne passent pas à 3. Remonter une voie démontée peut ramener quelqu'un à 3 : c'est toléré
   (on ne retire pas un cœur sans le dire), et il ne peut plus en ajouter tant qu'il en a 2 ou plus.
-- **Statut** : à valider.
+- **Statut** : validée (Willem, 2026-10-23).
 
 ### D-076 — Styles de voie
 - **Choix** : liste fixe dans le code (`RouteStyle`) : Conti, Rési, Physique, Technique, Complexe, Dalle, Dévers, Réglettes,
   Bacs, Pinces, Plats, Dièdre, Toit, Morpho ; cinq au plus par voie, pour que les icônes tiennent dans une ligne du topo.
   Les libellés sont dans `fr.json`, donc renommables sans toucher aux données.
-- **Statut** : à valider.
+- **Statut** : validée (Willem, 2026-10-23).
 
 ### D-077 — Ouvreurs d'une voie
 - **Choix** : un ou plusieurs comptes de rôle Responsable et plus (actifs), et/ou un nom libre pour un ouvreur sans compte
   (invité, ancien membre). Au moins l'un des deux. La date d'ouverture ne peut pas être dans le futur.
-- **Statut** : à valider.
+- **Statut** : validée (Willem, 2026-10-23).
 
 ### D-078 — Le topo trie et filtre dans le navigateur
 - **Contexte** : une salle porte une soixantaine de voies actives.
@@ -669,7 +664,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Choix** : un second bouton, « Me le redire plus tard », ferme la pop-up sans rien enregistrer : elle revient à la
   prochaine ouverture de l'appli. La pop-up n'apparaît jamais pendant la saisie d'une séance, ni par-dessus l'invitation à
   installer l'appli.
-- **Statut** : à valider.
+- **Statut** : validée (Willem, 2026-10-23).
 
 ### D-083 — Revue visuelle de la phase 3 : table de gestion compacte, tampon au-dessus de l'étiquette
 - **Contexte** : à 1280 px, la table des voies débordait (huit colonnes dans ~860 px) ; le tampon « Démontée » posé sur
