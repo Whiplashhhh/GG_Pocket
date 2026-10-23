@@ -13,11 +13,14 @@ import { ascentOutcome, sessionDay } from '@/lib/sessionView'
  * The climber's name joins it with the feed (phase 5): until then, all sessions are mine.
  */
 const props = withDefaults(
-  defineProps<{ session: Session; linked?: boolean; maxLines?: number }>(),
-  {
-    linked: false,
-    maxLines: undefined,
-  },
+  defineProps<{
+    session: Session
+    linked?: boolean
+    maxLines?: number
+    /** h3 under a list heading, h2 on its own page. */
+    headingLevel?: 2 | 3
+  }>(),
+  { linked: false, maxLines: undefined, headingLevel: 2 },
 )
 
 const { t } = useI18n()
@@ -44,7 +47,7 @@ const summary = computed(() => props.session.summary)
     :aria-labelledby="titleId"
   >
     <header class="flex items-baseline justify-between gap-3">
-      <h2 :id="titleId" class="text-lg font-title">
+      <component :is="`h${headingLevel}`" :id="titleId" class="text-lg font-title">
         <RouterLink
           v-if="linked"
           :to="`/seances/${session.id}`"
@@ -52,7 +55,7 @@ const summary = computed(() => props.session.summary)
           >{{ t('session.cardTitle', { day }) }}</RouterLink
         >
         <template v-else>{{ t('session.cardTitle', { day }) }}</template>
-      </h2>
+      </component>
       <span
         v-if="session.visibility === 'PRIVATE'"
         class="inline-flex shrink-0 items-center gap-1 text-sm text-ink-muted"
@@ -87,11 +90,7 @@ const summary = computed(() => props.session.summary)
     />
 
     <ul class="flex flex-col gap-2">
-      <li
-        v-for="ascent in lines"
-        :key="ascent.id"
-        class="flex flex-wrap items-center gap-x-3 gap-y-1"
-      >
+      <li v-for="ascent in lines" :key="ascent.id" class="flex flex-col items-start gap-1">
         <RouteSummaryLabel :route="ascent.route" size="sm" />
         <span class="text-sm text-ink-muted">
           {{ ascent.mode === 'LEAD' ? t('session.lead') : t('session.topRope') }} ·

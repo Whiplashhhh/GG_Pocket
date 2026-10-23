@@ -56,6 +56,7 @@ useIntersectionObserver(sentinel, ([entry]) => {
       :session="session"
       linked
       :max-lines="5"
+      :heading-level="3"
     />
     <div ref="sentinel" class="flex justify-center px-4 py-4">
       <GgButton

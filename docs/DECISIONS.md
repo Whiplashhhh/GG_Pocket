@@ -6,7 +6,7 @@ de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision r
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
 choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase), environnements et pipeline
-(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072, D-073), topo (D-074 et suivantes, phase 3).
+(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072, D-073), topo (D-074 à D-083, phase 3), séances (D-084 et suivantes, phase 4).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -39,6 +39,8 @@ direction) ou **Willem**.
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
+| D-087 | En attendant les amis, Actu montre mes séances ? | Willem | Oui, « Mes séances » en haut du fil |
+| D-090 | « Réalisations » du topo = ascensions topées ? | club | Oui, par tout le monde, répétitions comprises |
 
 ---
 
@@ -676,3 +678,54 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   On garde deux façons de montrer une sélection dans le formulaire de voie : coche pour les couleurs (choix exclusif),
   aplat plein pour les styles et les ouvreur·ses (choix multiples).
 - **Statut** : validée.
+
+### D-084 — Mois figé calculé d'après la date, avant la clôture de la phase 6
+- **Contexte** : la spec fige un mois le 8 du mois suivant à 04:00 (D-009), par une tâche qui écrit les classements
+  (phase 6). Les séances (phase 4) doivent déjà refuser les changements d'un mois figé.
+- **Choix** : `SessionCalendar.isFrozen` calcule la règle sur l'horloge (Europe/Paris) : un mois est figé dès le 8 suivant
+  à 04:00, que la tâche ait tourné ou non. La tâche de la phase 6 figera les classements au même instant, sans changer
+  cette règle. Création : aujourd'hui à 7 jours en arrière (`SESSION_TOO_OLD`), jamais demain (`DATE_IN_THE_FUTURE`),
+  jamais dans un mois figé (`MONTH_FROZEN`). Modification et suppression : mois de la date actuelle non figé ; une
+  nouvelle date suit les règles d'une création (une séance peut donc garder son jour même au-delà de 7 jours).
+- **Statut** : validée (application directe de D-009).
+
+### D-085 — Envoi idempotent des séances (`clientRef`)
+- **Contexte** : la file hors ligne renvoie une séance si la réponse s'est perdue ; il ne faut pas de doublon.
+- **Choix** : l'appli tire un UUID par nouvelle séance (`clientRef`, unique par membre). Un second `POST` avec la même
+  référence renvoie la séance déjà enregistrée (200) sans rien changer. La photo part ensuite (`PUT …/photo`), et repart
+  avec sa séance si elle s'est perdue. Les écritures de séances verrouillent la ligne du membre (une à la fois).
+- **Alternative** : en-tête `Idempotency-Key` générique : plus lourd pour un seul usage.
+- **Statut** : validée.
+
+### D-086 — « Je sais la faire » automatique et décochage
+- **Choix** : une ascension enchaînée coche la voie dans son mode (source `ASCENT`) ; plus d'ascension enchaînée, la
+  coche `ASCENT` part ; une coche manuelle (`MANUAL`) n'est jamais touchée par les séances. Décocher à la main une voie
+  enchaînée dans ce mode est refusé (`CHECK_FROM_ASCENT`, 409) : la coche reviendrait à la séance suivante ; on modifie la
+  séance à la place. « Sue en tête implique sue en mouli » reste une règle d'affichage (À faire, PR 4.2).
+- **Statut** : validée.
+
+### D-087 — Actu montre mes séances en attendant le fil
+- **Contexte** : le fil des amis arrive en phase 5 ; il faut d'ici là retrouver, modifier et supprimer ses séances.
+- **Choix** : Actu liste « Mes séances » (pagination par curseur, carte façon Strava) ; une séance a sa page
+  (`/seances/:id`) avec Modifier et Supprimer. Lecture réservée au propriétaire (404 pour tout autre, direction comprise)
+  tant que les amis n'existent pas ; la photo de séance suit la même règle (`PrivateMediaAccess`).
+- **Statut** : à valider (Willem).
+
+### D-088 — Ressenti en curseur, pas en dix pastilles
+- **Contexte** : la spec laisse le choix « curseur ou 10 pastilles » ; dix cibles de 44 px ne tiennent pas en 360 px.
+- **Choix** : un curseur 0 à 10, où 0 veut dire « pas noté » (le ressenti reste facultatif), pour chaque voie et pour la
+  séance. Une nouvelle ligne est « topée » par défaut, dans le mode de la ligne d'avant.
+- **Statut** : validée.
+
+### D-089 — Voie démontée dans une séance notée après coup
+- **Choix** : une séance peut être notée jusqu'à 7 jours après ; une voie démontée y est acceptée si elle a été démontée
+  le jour de la séance ou après, refusée sinon (`ROUTE_DISMOUNTED`). Le sélecteur rapide ne propose que les voies au mur.
+  Une séance compte 1 à 50 ascensions, 0 à 99 chutes par ascension.
+- **Statut** : validée.
+
+### D-090 — « Réalisations » = ascensions topées
+- **Contexte** : la spec prévoit un tri du topo « nombre de réalisations » sans le définir.
+- **Choix** : le nombre d'ascensions topées par tout le monde, répétitions comprises (comme les compteurs du §9.1). La
+  fiche voie montre aussi ascensions, topées, grimpeur·ses différent·es et part en tête : des agrégats sans nom, qui
+  comptent aussi les séances « juste moi ».
+- **Statut** : à valider (club).

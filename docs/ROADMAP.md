@@ -99,12 +99,12 @@ créée depuis `main` à jour.
 
 ### PR 4.1 — Séances (`feature/seances-0.2.0`)
 
-- [ ] Nouvelle séance (sélecteur rapide, lignes d'ascension, duplication, réordonner)
-- [ ] Brouillon IndexedDB + file d'attente hors ligne (photo comprise)
-- [ ] Photo de séance (compression client, traitement serveur)
-- [ ] Modification / suppression (mois non figé)
-- [ ] « Je sais la faire » automatique (source `ASCENT`)
-- [ ] Fiche voie : statistiques d'ascensions et « mon historique » ; tri du topo par réalisations (D-080)
+- [x] Nouvelle séance (sélecteur rapide, lignes d'ascension, duplication, réordonner)
+- [x] Brouillon IndexedDB + file d'attente hors ligne (photo comprise)
+- [x] Photo de séance (compression client, traitement serveur)
+- [x] Modification / suppression (mois non figé)
+- [x] « Je sais la faire » automatique (source `ASCENT`)
+- [x] Fiche voie : statistiques d'ascensions et « mon historique » ; tri du topo par réalisations (D-080)
 
 ### PR 4.2 — Planning, À faire, Carnet
 

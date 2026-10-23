@@ -384,6 +384,9 @@ export class FakeClub {
     const me = this.current()
     if (me === undefined) return fail(401, 'UNAUTHENTICATED')
 
+    if (this.climbs.offline && path.startsWith('/sessions') && method !== 'GET') {
+      return route.abort('internetdisconnected')
+    }
     const search = new URL(request.url()).search
     const climbs = this.climbs.handle(
       me,

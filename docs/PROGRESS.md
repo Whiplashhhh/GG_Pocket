@@ -4,6 +4,41 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-24 — PR 4.1 Séances
+
+**Branche** : `feature/seances-0.2.0` (depuis `main` = 0.2.0).
+
+### Fait
+
+- Backend : V9 (`climbing_session`, `ascent`, `media_file.usage` + `SESSION_PHOTO`), paquet `session` : création
+  idempotente par `clientRef` (D-085), lecture, modification, suppression, photo, mes séances par curseur, mes voies
+  grimpées. Mois figé et fenêtre de 7 jours côté serveur (D-084), voie démontée acceptée si démontée après la séance
+  (D-089), « je sais la faire » automatique + `CHECK_FROM_ASCENT` (D-086), statistiques de la fiche voie et `toppedCount`
+  (via `RouteAscentStats`, D-090), photo de séance réservée au propriétaire (`PrivateMediaAccess`, D-087).
+  Seed : `DemoSessionSeeder` (10 semaines de séances pour grimpeur, direction, ouvreur). CI backend verte (SessionIT 13,
+  matrice 295), contrat régénéré depuis le journal.
+- Front : feuille de saisie (`/seance/nouvelle`, `/seances/:id/modifier`), brouillon IndexedDB, file hors ligne avec
+  photo (bandeau dans l'app), page d'une séance, Actu « Mes séances », fiche voie « Au compteur » + « Mon historique »,
+  tri « Réalisations ». Vitest 192, e2e Desktop Chrome 54 (dont 7 séances), captures 360 px clair/sombre regardées
+  (saisie, Actu, détail, attente, fiche voie).
+
+### Reste
+
+- CI de la PR, déploiement dev (label `deploy:dev`) et essai par Willem ; fusion ; puis PR 4.2 (Planning, À faire,
+  Carnet) sur une nouvelle branche depuis `main`.
+- D-087 et D-090 à valider ; PR #17 (graphify) toujours en suspens.
+
+### Prochaine action exacte
+
+- `gh pr checks <n°>` sur la PR 4.1 ; si vert, demander à Willem d'approuver le déploiement dev et de tester la saisie
+  sur téléphone (dont le mode avion).
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-23 — Phase 3 publiée (0.2.0), phase 4 découpée en trois PR
 
 **Branche** : `feature/seances-0.2.0` (depuis `main` = 0.2.0), créée pour démarrer la phase 4.

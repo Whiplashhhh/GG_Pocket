@@ -78,7 +78,10 @@ const bounds = computed(() => {
   return { min: saved !== undefined && saved < min ? saved : min, max }
 })
 
+let loading = false
 async function load() {
+  if (loading) return
+  loading = true
   const restored = await draft.restore()
   if (!restored && editing.value && existing.data.value !== undefined) {
     form.value = sessionToForm(existing.data.value)

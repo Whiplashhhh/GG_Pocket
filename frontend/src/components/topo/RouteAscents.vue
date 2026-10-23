@@ -18,7 +18,7 @@ const mineId = useId()
 </script>
 
 <template>
-  <section class="mt-8 border-t border-rule pt-6" :aria-labelledby="statsId">
+  <section class="mt-8 border-t border-rule px-4 pt-6" :aria-labelledby="statsId">
     <h3 :id="statsId" class="text-lg font-title">{{ t('routeSheet.statsTitle') }}</h3>
     <p v-if="stats.ascentCount === 0" class="mt-2 text-ink-muted">{{ t('routeSheet.noAscent') }}</p>
     <dl v-else class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -43,7 +43,7 @@ const mineId = useId()
     </dl>
   </section>
 
-  <section class="mt-6" :aria-labelledby="mineId">
+  <section class="mt-6 px-4" :aria-labelledby="mineId">
     <h3 :id="mineId" class="text-lg font-title">{{ t('routeSheet.mineTitle') }}</h3>
     <p v-if="mine.length === 0" class="mt-2 text-ink-muted">{{ t('routeSheet.mineEmpty') }}</p>
     <ul v-else class="mt-2 divide-y divide-rule border-y border-rule">

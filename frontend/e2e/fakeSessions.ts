@@ -29,6 +29,8 @@ const DAY = 24 * 3600 * 1000
  */
 export class FakeSessions implements AscentSource {
   readonly sessions: FakeSession[] = []
+  /** No network for the session writes: the requests fail like in a dead zone of the gym. */
+  offline = false
 
   constructor(
     private readonly nextId: () => string,
