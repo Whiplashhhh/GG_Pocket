@@ -42,6 +42,7 @@ const detail = (photoUrl?: string): RouteDetail => ({
     styles: [],
     favoriteCount: 0,
     commentCount: 0,
+    toppedCount: 0,
     favorite: false,
     checks: [],
   },
@@ -49,6 +50,8 @@ const detail = (photoUrl?: string): RouteDetail => ({
   cordId: 'c',
   setters: [],
   createdAt: '2026-10-20T08:00:00Z',
+  stats: { ascentCount: 0, toppedCount: 0, climberCount: 0 },
+  myAscents: [],
 })
 
 const ok = (data: unknown, status = 200) => ({

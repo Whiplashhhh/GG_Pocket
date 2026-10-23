@@ -22,6 +22,7 @@ const tonton: RouteSummary = {
   styles: ['PHYSICAL', 'OVERHANG'],
   favoriteCount: 2,
   commentCount: 0,
+  toppedCount: 0,
   favorite: false,
   checks: ['LEAD'],
 }

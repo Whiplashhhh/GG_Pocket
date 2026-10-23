@@ -7,9 +7,9 @@ import { ROUTE_STYLES, type RouteStyle } from './route'
 /**
  * Sorting, filtering and grouping of the topo, done in the browser (DECISIONS D-078), with their
  * state kept in the URL query so a shared link or a step back finds the same list.
- * Sorting by ascents arrives with sessions (phase 4, D-080).
+ * "Réalisations" counts the topped ascents of everyone (D-080).
  */
-export const TOPO_SORTS = ['grade', 'opened', 'sector', 'favorites', 'comments'] as const
+export const TOPO_SORTS = ['grade', 'opened', 'sector', 'topped', 'favorites', 'comments'] as const
 export type TopoSort = (typeof TOPO_SORTS)[number]
 export type SortDirection = 'asc' | 'desc'
 
@@ -37,6 +37,7 @@ const DEFAULT_DIRECTION: Record<TopoSort, SortDirection> = {
   grade: 'asc',
   opened: 'desc',
   sector: 'asc',
+  topped: 'desc',
   favorites: 'desc',
   comments: 'desc',
 }
@@ -68,6 +69,7 @@ const SORT_PARAM: Record<TopoSort, string> = {
   grade: 'cotation',
   opened: 'ouverture',
   sector: 'secteur',
+  topped: 'realisations',
   favorites: 'coups-de-coeur',
   comments: 'commentaires',
 }
@@ -161,6 +163,7 @@ const MAIN_KEY: Record<TopoSort, Compare> = {
   grade: byGrade,
   opened: (a, b) => a.openedOn.localeCompare(b.openedOn),
   sector: (a, b) => bySector(a, b) || byCord(a, b),
+  topped: (a, b) => a.toppedCount - b.toppedCount,
   favorites: (a, b) => a.favoriteCount - b.favoriteCount,
   comments: (a, b) => a.commentCount - b.commentCount,
 }

@@ -57,6 +57,13 @@ interface FakeComment {
   deleted: boolean
 }
 
+/** The ascents logged in sessions, as the topo shows them (see FakeSessions). */
+export interface AscentSource {
+  toppedCount(routeId: string): number
+  stats(routeId: string): Schemas['RouteStats']
+  mine(memberId: string, routeId: string): Schemas['MyRouteAscent'][]
+}
+
 /** What a handler answers: a body (status 200 unless said), or 204, or a Problem Details code. */
 export type TopoAnswer =
   | { kind: 'json'; data: unknown; status?: number }
@@ -272,6 +279,8 @@ export class FakeTopo {
   readonly acknowledgements = new Set<string>()
   /** Most tests are not about the last chance pop-up: it stays quiet unless asked. */
   quietLastChance = true
+  /** Set by FakeClub once the sessions exist. */
+  ascents: AscentSource | undefined
 
   constructor(
     private readonly nextId: () => string,
@@ -346,7 +355,7 @@ export class FakeTopo {
     })
   }
 
-  private summary(me: TopoMember, route: FakeRoute): Schemas['RouteSummary'] {
+  summary(me: TopoMember, route: FakeRoute): Schemas['RouteSummary'] {
     const sector = this.config.sectors.find((candidate) =>
       candidate.cords.some((cord) => cord.number === route.cordNumber),
     )
@@ -373,6 +382,7 @@ export class FakeTopo {
       commentCount: this.comments.filter(
         (comment) => comment.routeId === route.id && !comment.deleted,
       ).length,
+      toppedCount: this.ascents?.toppedCount(route.id) ?? 0,
       favorite: (this.favorites.get(me.id) ?? []).includes(route.id),
       checks: (['TOP_ROPE', 'LEAD'] as const).filter((mode) =>
         this.checks.has(`${me.id}:${route.id}:${mode}`),
@@ -398,6 +408,12 @@ export class FakeTopo {
       ...(route.setterNote ? { setterNote: route.setterNote } : {}),
       ...(route.advice ? { advice: route.advice } : {}),
       createdAt: `${route.openedOn}T10:00:00Z`,
+      stats: this.ascents?.stats(route.id) ?? {
+        ascentCount: 0,
+        toppedCount: 0,
+        climberCount: 0,
+      },
+      myAscents: this.ascents?.mine(me.id, route.id) ?? [],
     }
   }
 

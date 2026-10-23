@@ -78,6 +78,7 @@ const MORICE: RouteDetail = {
     styles: ['ENDURANCE', 'CONTINUITY'],
     favoriteCount: 5,
     commentCount: 1,
+    toppedCount: 0,
     favorite: false,
     checks: [],
   },
@@ -87,6 +88,8 @@ const MORICE: RouteDetail = {
   setterNote: 'Tonton',
   advice: 'Garde du jus pour la sortie.',
   createdAt: '2026-05-16T10:00:00Z',
+  stats: { ascentCount: 0, toppedCount: 0, climberCount: 0 },
+  myAscents: [],
 }
 
 const filled = (overrides: Partial<RouteForm> = {}): RouteForm => ({

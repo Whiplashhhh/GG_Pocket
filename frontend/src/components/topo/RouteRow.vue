@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check, Heart, MessageCircle } from 'lucide-vue-next'
+import { Check, Flag, Heart, MessageCircle } from 'lucide-vue-next'
 import { computed, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { RouteLocationRaw } from 'vue-router'
@@ -46,6 +46,11 @@ const done = computed(() =>
       <p :id="metaId" class="dot-list gap-y-0.5 text-sm text-ink-muted">
         <span v-if="!hideSector">{{ route.sectorName }}</span>
         <span v-if="styles">{{ styles }}</span>
+        <span v-if="route.toppedCount > 0" class="inline-flex items-center gap-0.5">
+          <Flag :size="14" aria-hidden="true" />
+          <span aria-hidden="true">{{ route.toppedCount }}</span>
+          <span class="sr-only">{{ t('topo.row.topped', route.toppedCount) }}</span>
+        </span>
         <span v-if="route.favoriteCount > 0" class="inline-flex items-center gap-0.5">
           <Heart :size="14" aria-hidden="true" />
           <span aria-hidden="true">{{ route.favoriteCount }}</span>
