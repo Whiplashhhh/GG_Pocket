@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Routes created straight in the database, on the club configuration seeded by the migrations
- * (cords 1 to 29, the 14 colours, grades 4a to 7c).
+ * (cords 1 to 29, the 14 colours, grades 4a- to 7c+).
  */
 @TestComponent
 public class RouteFixtures {

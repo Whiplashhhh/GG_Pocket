@@ -47,10 +47,10 @@ class ClubAdminIT {
     void everyMemberReadsTheRealClubLayout() throws Exception {
         mockMvc.perform(get("/api/v1/topo/config").with(as(members.create(Role.CLIMBER))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.grades", hasSize(23)))
-                .andExpect(jsonPath("$.grades[0].code").value("4a"))
-                .andExpect(jsonPath("$.grades[22].code").value("7c"))
-                .andExpect(jsonPath("$.grades[22].rank").value(23))
+                .andExpect(jsonPath("$.grades", hasSize(36)))
+                .andExpect(jsonPath("$.grades[0].code").value("4a-"))
+                .andExpect(jsonPath("$.grades[35].code").value("7c+"))
+                .andExpect(jsonPath("$.grades[35].rank").value(36))
                 .andExpect(
                         jsonPath("$.sectors[?(@.name == 'Neutre 8 m')].cords[*].number")
                                 .value(hasItems(1, 2, 3)))

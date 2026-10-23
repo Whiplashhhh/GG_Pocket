@@ -16,7 +16,7 @@ direction) ou **Willem**.
 | Décision | Question | Qui | Choix appliqué en attendant |
 |---|---|---|---|
 | D-001 | Barre d'onglets à 5 entrées ? | club | Actu, Topo, À faire, Planning, Podium ; profil via l'avatar |
-| D-002 | Cotations avec les « + » ? | club | 4a à 7c avec les « + » (23 niveaux) |
+| D-002 | Cotations avec les « + » ? | club | 4a- à 7c+ avec les « - » et les « + » (36 niveaux, révisé le 2026-10-23) |
 | D-003 | Classement « voies » : ascensions ou voies distinctes ? | club | Ascensions topées, répétitions comprises |
 | D-004 | Séances comptées en jours de grimpe ? | club | Oui : deux séances le même jour = une |
 | D-005 | Seuil du badge « Mois complet » ? | club | 10 jours de grimpe |
@@ -39,7 +39,7 @@ direction) ou **Willem**.
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
-| D-074 | Cotations modifiables dans l'appli ? | club | Non : liste fixe 4a → 7c |
+| D-074 | Cotations modifiables dans l'appli ? | club | Non : liste fixe 4a- → 7c+ |
 | D-075 | Un coup de cœur remonté peut-il faire passer à 3 ? | club | Oui, toléré ; on ne peut plus en ajouter tant qu'on est à 2 ou plus |
 | D-076 | Les 14 styles de voie et 5 styles maximum par voie ? | club | Oui |
 | D-077 | Ouvreurs : responsables et plus, ou nom libre ? | club | Comptes de rôle Responsable et plus, plus un nom libre pour un ouvreur sans compte |
@@ -58,6 +58,9 @@ direction) ou **Willem**.
 ### D-002 — Cotations avec les « + » de 4a à 7c
 - **Contexte** : le cahier des charges cite des cotations de 4a à 7c sans préciser les « + ».
 - **Choix** : 23 cotations (4a, 4a+, … 7c), stockées avec un rang numérique. Badge « Première cotation » étendu jusqu'à 7c.
+- **Révision (2026-10-23, Willem)** : le club utilise aussi les « - ». La liste devient 4a-, 4a, 4a+, … 7c-, 7c, 7c+
+  (36 cotations, « - » avant la cotation simple, « + » après). Le badge « Première cotation » va jusqu'à 7c+.
+  Faite dans V7, pas encore en prod.
 - **Alternatives** : sans « + » (12 cotations).
 - **Statut** : à valider.
 
@@ -609,7 +612,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Contexte** : la spec range les cotations dans la configuration du club (§5), mais l'écran de configuration (§8.11) ne cite
   que secteurs, cordes et couleurs. Une cotation renommée ou retirée fausserait les tris, les filtres et, plus tard, le badge
   « Première cotation » et les classements.
-- **Choix** : les 23 cotations (4a → 7c, D-002) sont créées par la migration, identiques en dev et en prod, avec un rang
+- **Choix** : les 36 cotations (4a- → 7c+, D-002) sont créées par la migration, identiques en dev et en prod, avec un rang
   numérique ; l'appli les lit mais ne les modifie pas. En ajouter une (8a un jour ?) se fait par une migration.
 - **Statut** : à valider.
 

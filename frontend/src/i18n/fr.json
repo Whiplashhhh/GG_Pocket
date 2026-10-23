@@ -822,7 +822,7 @@
     "colorUpdated": "Couleur « {label} » mise à jour.",
     "inactive": "Désactivée",
     "grades": "Cotations",
-    "gradesFixed": "Les cotations sont fixes, de 4a à 7c : elles servent aux tris, aux filtres et bientôt aux classements. Pour en ajouter une, vois avec l’équipe de l’appli.",
+    "gradesFixed": "Les cotations sont fixes, de 4a- à 7c+ : elles servent aux tris, aux filtres et bientôt aux classements. Pour en ajouter une, vois avec l’équipe de l’appli.",
     "errors": {
       "cordNumber": "Un numéro entier entre 1 et {max}.",
       "hex": "Un code couleur du type #F28C28."

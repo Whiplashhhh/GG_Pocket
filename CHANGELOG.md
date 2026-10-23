@@ -8,7 +8,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 ### Ajouté
 
 - Le topo est au mur : toutes les voies du club, avec leur étiquette, leur secteur, leurs styles, leurs coups de cœur et
-  leurs commentaires. Trie par cotation, date d'ouverture, secteur, cœurs ou commentaires, et combine les filtres
+  leurs commentaires. Les cotations vont de 4a- à 7c+, avec les « - » et les « + » du club. Trie par cotation, date
+  d'ouverture, secteur, cœurs ou commentaires, et combine les filtres
   (secteur, cotation, couleur, style, « pas encore faite par moi »). Un lien partagé garde tes tris et tes filtres.
 - La fiche voie glisse du bas : photo, ouvreur·ses, date d'ouverture, styles et surtout le conseil de l'ouvreur·se.
   Commente (et supprime tes commentaires), coche « Je sais la faire » en mouli ou en tête.

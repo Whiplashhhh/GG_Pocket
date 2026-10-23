@@ -4,6 +4,31 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-23 — Phase 3 (Topo) : cotations avec les « - »
+
+**Branche** : `feature/topo-0.1.1`, PR #19 (label `deploy:dev` posé : chaque push redéploie le dev après approbation).
+
+### Fait
+
+- Willem : le club utilise aussi les « - ». Cotations 4a- → 7c+ (36, « - » < simple < « + ») dans V7 (pas encore sur
+  `main`, donc modifiable ; le dev est réinitialisé à chaque déploiement), seed (chaque cotation au moins une fois),
+  `ClubAdminIT`, données des e2e (une voie en 6c-), texte de la configuration du club, D-002/D-074 révisées, CHANGELOG.
+- Local : lint, format, typecheck, Vitest 169, e2e Desktop Chrome 47 verts ; capture vérifiée (« 6c- » entre 6b et 7a).
+
+### Reste
+
+- CI de la PR, approbation du déploiement dev par Willem, vérification sur le dev ; fusion ; release `0.2.0`.
+
+### Prochaine action exacte
+
+- `gh pr checks 19` ; si vert, Willem approuve le déploiement dev et teste.
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-21 — Phase 3 (Topo) : revue visuelle faite, phase terminée
 
 **Branche** : `feature/topo-0.1.1`, PR #19 « Phase 3 — Topo ». PR #18 à part (`mvnw.cmd`).
