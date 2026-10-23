@@ -285,7 +285,11 @@
     "CLUB_ITEM_INACTIVE": "Cette corde ou cette couleur est désactivée. Choisis-en une active.",
     "INVALID_SETTERS": "Il faut au moins un ouvreur : un membre ouvreur actif, ou un nom libre.",
     "DATE_IN_THE_FUTURE": "Cette date n’est pas encore arrivée. Choisis aujourd’hui ou avant.",
-    "DATE_IN_THE_PAST": "Cette date est déjà passée. Choisis aujourd’hui ou plus tard."
+    "DATE_IN_THE_PAST": "Cette date est déjà passée. Choisis aujourd’hui ou plus tard.",
+    "SESSION_TOO_OLD": "Trop loin dans le passé : une séance se note jusqu’à 7 jours en arrière.",
+    "MONTH_FROZEN": "Ce mois est clos et son podium gravé dans le marbre : ses séances ne bougent plus.",
+    "INVALID_ASCENT": "Une ligne cloche : une voie enchaînée est forcément topée, sans chute.",
+    "CHECK_FROM_ASCENT": "Tu l’as enchaînée dans ce mode pendant une séance : c’est cette séance qu’il faut modifier pour la décocher."
   },
   "gallery": {
     "title": "Galerie des composants",

@@ -102,7 +102,7 @@ public class SessionService {
         draft.check();
         SessionCalendar.checkNewDate(draft.climbedOn(), clock.instant());
         checkRoutes(draft);
-        var session = sessions.save(new ClimbingSession(memberId, clientRef, draft));
+        var session = sessions.save(ClimbingSession.create(memberId, clientRef, draft));
         autoChecks.refresh(memberId, routeModes(session));
         return new Saved(views.of(session, memberId), true);
     }

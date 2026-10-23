@@ -54,10 +54,14 @@ public class Ascent extends TimestampedEntity {
     Ascent(ClimbingSession session, int position, AscentDraft draft) {
         this.session = session;
         this.position = position;
-        update(draft);
+        apply(draft);
     }
 
     void update(AscentDraft draft) {
+        apply(draft);
+    }
+
+    private void apply(AscentDraft draft) {
         this.routeId = draft.routeId();
         this.mode = draft.mode();
         this.topped = draft.topped();

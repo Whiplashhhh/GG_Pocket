@@ -426,7 +426,7 @@ class SessionIT {
                         List.of(
                                 new AscentDraft(
                                         route.id(), ClimbMode.LEAD, true, true, 0, true, null)));
-        return sessions.saveAndFlush(new ClimbingSession(me.id(), UUID.randomUUID(), draft));
+        return sessions.saveAndFlush(ClimbingSession.create(me.id(), UUID.randomUUID(), draft));
     }
 
     private static String ascent(

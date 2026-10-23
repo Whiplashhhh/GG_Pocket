@@ -140,7 +140,8 @@ public class DemoSessionSeeder {
                                 ascents);
                 draft.check();
                 var session =
-                        sessions.save(new ClimbingSession(member.id(), UUID.randomUUID(), draft));
+                        sessions.save(
+                                ClimbingSession.create(member.id(), UUID.randomUUID(), draft));
                 session.ascents().stream().map(Ascent::routeMode).forEach(touched::add);
                 created++;
             }

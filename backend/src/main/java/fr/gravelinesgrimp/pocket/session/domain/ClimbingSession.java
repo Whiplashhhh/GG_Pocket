@@ -54,10 +54,16 @@ public class ClimbingSession extends TimestampedEntity {
         // for JPA
     }
 
-    public ClimbingSession(UUID memberId, UUID clientRef, SessionDraft draft) {
+    private ClimbingSession(UUID memberId, UUID clientRef) {
         this.memberId = memberId;
         this.clientRef = clientRef;
-        apply(draft);
+    }
+
+    /** A new session (its ascents point back to it: built outside the constructor). */
+    public static ClimbingSession create(UUID memberId, UUID clientRef, SessionDraft draft) {
+        var session = new ClimbingSession(memberId, clientRef);
+        session.apply(draft);
+        return session;
     }
 
     /**
