@@ -33,6 +33,7 @@ public record RouteSummaryView(
         List<RouteStyle> styles,
         int favoriteCount,
         int commentCount,
+        int toppedCount,
         boolean favorite,
         List<ClimbMode> checks) {
 

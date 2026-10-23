@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 
 /**
  * Builds route views for the services of the topo, in a fixed number of queries whatever the number
- * of routes: the club layout (4 small tables), the favourite and comment counts grouped by route,
- * and the marks of the reader. The routes come with their styles already fetched.
+ * of routes: the club layout (4 small tables), the favourite, comment and topped-ascent counts
+ * grouped by route, and the marks of the reader. The routes come with their styles already fetched.
  */
 @Component
 public class RouteViews {
@@ -39,18 +39,21 @@ public class RouteViews {
     private final RouteCommentRepository comments;
     private final RouteCheckRepository checks;
     private final MemberRepository members;
+    private final RouteAscentStats ascents;
 
     public RouteViews(
             ClubLayoutReader layouts,
             FavoriteRepository favorites,
             RouteCommentRepository comments,
             RouteCheckRepository checks,
-            MemberRepository members) {
+            MemberRepository members,
+            RouteAscentStats ascents) {
         this.layouts = layouts;
         this.favorites = favorites;
         this.comments = comments;
         this.checks = checks;
         this.members = members;
+        this.ascents = ascents;
     }
 
     /** Summaries in the order of {@code routes}, with the marks of {@code readerId}. */
@@ -63,6 +66,7 @@ public class RouteViews {
         var ids = routes.stream().map(Route::id).collect(Collectors.toSet());
         var favoriteCounts = byRoute(favorites.countPerRoute(ids));
         var commentCounts = byRoute(comments.countVisiblePerRoute(ids));
+        var toppedCounts = ascents.toppedCountPerRoute(ids);
         var myFavorites = new HashSet<>(favorites.findRouteIdsByMemberId(readerId));
         Map<UUID, Set<ClimbMode>> myChecks =
                 checks.findAllByMemberIdAndRouteIdIn(readerId, ids).stream()
@@ -78,6 +82,7 @@ public class RouteViews {
                                         layout,
                                         favoriteCounts.getOrDefault(route.id(), 0),
                                         commentCounts.getOrDefault(route.id(), 0),
+                                        toppedCounts.getOrDefault(route.id(), 0),
                                         myFavorites.contains(route.id()),
                                         myChecks.getOrDefault(route.id(), Set.of())))
                 .toList();
@@ -102,7 +107,9 @@ public class RouteViews {
                 setters,
                 route.setterNote(),
                 route.advice(),
-                route.createdAt());
+                route.createdAt(),
+                ascents.statsOf(route.id()),
+                ascents.ascentsOf(readerId, route.id()));
     }
 
     private static RouteSummaryView summary(
@@ -110,6 +117,7 @@ public class RouteViews {
             ClubLayout layout,
             int favoriteCount,
             int commentCount,
+            int toppedCount,
             boolean favorite,
             Set<ClimbMode> myChecks) {
         // Foreign keys guarantee that grade, cord, sector and colours exist.
@@ -145,6 +153,7 @@ public class RouteViews {
                 route.styles(),
                 favoriteCount,
                 commentCount,
+                toppedCount,
                 favorite,
                 myChecks.stream().sorted().toList());
     }

@@ -9,9 +9,12 @@ import fr.gravelinesgrimp.pocket.club.infra.GradeRepository;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
+import fr.gravelinesgrimp.pocket.topo.domain.CheckSource;
 import fr.gravelinesgrimp.pocket.topo.domain.Route;
 import fr.gravelinesgrimp.pocket.topo.domain.RouteStatus;
 import fr.gravelinesgrimp.pocket.topo.infra.FavoriteRepository;
+import fr.gravelinesgrimp.pocket.topo.infra.RouteCheckRepository;
 import fr.gravelinesgrimp.pocket.topo.infra.RouteCommentRepository;
 import fr.gravelinesgrimp.pocket.topo.infra.RouteRepository;
 
@@ -42,6 +45,8 @@ class DemoSeederIT {
     @Autowired private FavoriteRepository favorites;
     @Autowired private RouteCommentRepository comments;
     @Autowired private GradeRepository grades;
+    @Autowired private ClimbingSessionRepository sessions;
+    @Autowired private RouteCheckRepository checks;
 
     @Test
     void createsOneAccountPerRoleAndADemoCode() {
@@ -97,9 +102,21 @@ class DemoSeederIT {
     }
 
     @Test
+    void theDemoAccountsHaveSessionsAndTheirCleanAscentsAreTicked() {
+        var grimpeur = members.findByNicknameIgnoreCase("grimpeur").orElseThrow();
+        assertThat(sessions.findLatest(grimpeur.id(), 100)).hasSizeGreaterThan(20);
+        var routeIds = routes.findAll().stream().map(Route::id).toList();
+        assertThat(checks.findAllByMemberIdAndRouteIdIn(grimpeur.id(), routeIds))
+                .anySatisfy(check -> assertThat(check.source()).isEqualTo(CheckSource.ASCENT))
+                .anySatisfy(check -> assertThat(check.source()).isEqualTo(CheckSource.MANUAL));
+    }
+
+    @Test
     void runningItAgainChangesNothing() {
+        var before = sessions.count();
         seeder.run(null);
         assertThat(members.count()).isEqualTo(4);
         assertThat(routes.count()).isEqualTo(DemoTopoSeeder.NAMES.size());
+        assertThat(sessions.count()).isEqualTo(before);
     }
 }

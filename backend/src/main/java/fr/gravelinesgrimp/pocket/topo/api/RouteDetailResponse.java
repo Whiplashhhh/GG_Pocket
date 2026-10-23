@@ -17,7 +17,10 @@ public record RouteDetailResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) List<MemberRefResponse> setters,
         @Schema(description = "Setter without an account") String setterNote,
         String advice,
-        @Schema(requiredMode = RequiredMode.REQUIRED) Instant createdAt) {
+        @Schema(requiredMode = RequiredMode.REQUIRED) Instant createdAt,
+        @Schema(requiredMode = RequiredMode.REQUIRED) RouteStatsResponse stats,
+        @Schema(requiredMode = RequiredMode.REQUIRED, description = "Mine, newest first, 20 max")
+                List<MyRouteAscentResponse> myAscents) {
 
     static RouteDetailResponse from(RouteDetailView view) {
         return new RouteDetailResponse(
@@ -27,6 +30,8 @@ public record RouteDetailResponse(
                 view.setters().stream().map(MemberRefResponse::from).toList(),
                 view.setterNote(),
                 view.advice(),
-                view.createdAt());
+                view.createdAt(),
+                RouteStatsResponse.from(view.stats()),
+                view.myAscents().stream().map(MyRouteAscentResponse::from).toList());
     }
 }

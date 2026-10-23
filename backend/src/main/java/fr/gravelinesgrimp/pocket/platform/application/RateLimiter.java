@@ -60,6 +60,13 @@ public class RateLimiter {
     public static final Rule ROUTE_COMMENT_PER_MEMBER =
             new Rule("route-comment-per-member", 20, Duration.ofHours(1));
 
+    /** Creating, changing or deleting sessions: far above a real day at the gym. */
+    public static final Rule SESSION_WRITE_PER_MEMBER =
+            new Rule("session-write-per-member", 60, Duration.ofHours(1));
+
+    public static final Rule SESSION_PHOTO_UPLOAD_PER_MEMBER =
+            new Rule("session-photo-upload-per-member", 20, Duration.ofHours(1));
+
     /** Above this many tracked keys, stale ones are dropped before adding more. */
     private static final int PURGE_THRESHOLD = 10_000;
 

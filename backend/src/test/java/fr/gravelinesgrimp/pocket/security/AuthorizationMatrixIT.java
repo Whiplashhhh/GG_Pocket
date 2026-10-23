@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import fr.gravelinesgrimp.pocket.IntegrationTest;
 import fr.gravelinesgrimp.pocket.MemberFixtures;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
+import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -20,6 +21,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -58,6 +60,15 @@ class AuthorizationMatrixIT {
              "styles": []}
             """
                     .formatted(SOME_ID);
+
+    /** Valid enough to reach the service, which refuses the unknown route. */
+    private static final String SESSION =
+            """
+            {"clientRef": "%1$s", "climbedOn": "%2$s", "visibility": "FRIENDS",
+             "ascents": [{"routeId": "%1$s", "mode": "LEAD", "topped": true, "clean": true,
+             "falls": 0, "firstTry": false}]}
+            """
+                    .formatted(SOME_ID, LocalDate.now(ClubTime.ZONE));
 
     private static final List<Endpoint> ENDPOINTS =
             List.of(
@@ -216,7 +227,25 @@ class AuthorizationMatrixIT {
                             "{\"routeId\": \"" + SOME_ID + "\"}",
                             Role.CLIMBER),
                     new Endpoint(
-                            HttpMethod.DELETE, "/api/v1/me/favorite-route", null, Role.CLIMBER));
+                            HttpMethod.DELETE, "/api/v1/me/favorite-route", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.POST, "/api/v1/sessions", SESSION, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/sessions/" + SOME_ID, null, Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.PUT, "/api/v1/sessions/" + SOME_ID, SESSION, Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.DELETE, "/api/v1/sessions/" + SOME_ID, null, Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.PUT,
+                            "/api/v1/sessions/" + SOME_ID + "/photo",
+                            MULTIPART,
+                            Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.DELETE,
+                            "/api/v1/sessions/" + SOME_ID + "/photo",
+                            null,
+                            Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/sessions", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/climbed-routes", null, Role.CLIMBER));
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;
