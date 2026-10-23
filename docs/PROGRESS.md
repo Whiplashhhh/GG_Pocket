@@ -4,6 +4,36 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-23 — Phase 3 publiée (0.2.0), phase 4 découpée en trois PR
+
+**Branche** : `feature/seances-0.2.0` (depuis `main` = 0.2.0), créée pour démarrer la phase 4.
+
+### Fait
+
+- PR #18 (`mvnw.cmd`) et #19 (Phase 3 — Topo) fusionnées par Willem ; release `0.2.0` publiée et déployée en prod
+  (tag `v0.2.0`, déploiement prod vert). D-074 à D-077 et D-082 validées par Willem.
+- Phase 4 découpée en trois PR successives (voir `docs/ROADMAP.md`) : 4.1 Séances, 4.2 Planning / À faire / Carnet,
+  4.3 Comptes et données personnelles.
+
+### Reste
+
+- Toute la phase 4, en commençant par la PR 4.1.
+- PR #17 (graphe graphify) : en conflit, périmée (instantané 0.1.1) et sa décision porte le numéro D-074, déjà pris.
+  Question posée à Willem : la fermer, ou la refaire sur le code à jour (décision renumérotée). Ne pas la fusionner telle quelle.
+- 24 décisions encore « à valider » dans le récapitulatif de `docs/DECISIONS.md` (surtout côté club).
+
+### Prochaine action exacte
+
+- PR 4.1 sur `feature/seances-0.2.0` : relire la spec (`docs/KICKOFF_PROMPT.md`, sections séances, ascensions,
+  mois figé, hors ligne) et `docs/DESIGN.md` (écran de saisie), puis concevoir le modèle (séance, ascensions, photo ;
+  migration V9) et le contrat API avant le code.
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-23 — Phase 3 (Topo) : cotations avec les « - »
 
 **Branche** : `feature/topo-0.1.1`, PR #19 (label `deploy:dev` posé : chaque push redéploie le dev après approbation).

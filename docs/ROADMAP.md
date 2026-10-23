@@ -93,19 +93,31 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 
 ## Phase 4 — Séances
 
-- [ ] Export JSON de mes données, suppression de compte (libre-service et admin) avec anonymisation « Ancien·ne membre » (D-055)
-- [ ] Colonne « séances » du tableau des membres (D-055)
-- [ ] Fiche voie : statistiques d'ascensions et « mon historique » ; tri du topo par réalisations (D-080)
-- [ ] Suppression de compte : supprimer soi-même le fichier et la ligne de l'avatar (`media_file.owner_id` passe à null) ;
-      créditer « Ancien·ne membre » sur les voies ouvertes (`route_setter` est en `on delete cascade`)
+Découpée en trois PR successives (décidé avec Willem le 2026-10-23), chacune fusionnée et testable sur le dev avant la
+suivante. Branches : `feature/seances-<version>`, `feature/planning-<version>`, `feature/comptes-<version>`, chacune
+créée depuis `main` à jour.
+
+### PR 4.1 — Séances (`feature/seances-0.2.0`)
+
 - [ ] Nouvelle séance (sélecteur rapide, lignes d'ascension, duplication, réordonner)
 - [ ] Brouillon IndexedDB + file d'attente hors ligne (photo comprise)
 - [ ] Photo de séance (compression client, traitement serveur)
 - [ ] Modification / suppression (mois non figé)
 - [ ] « Je sais la faire » automatique (source `ASCENT`)
+- [ ] Fiche voie : statistiques d'ascensions et « mon historique » ; tri du topo par réalisations (D-080)
+
+### PR 4.2 — Planning, À faire, Carnet
+
 - [ ] Planning (calendrier lundi en premier, bilan du mois, série en cours)
 - [ ] À faire (mouli / tête, progression, annulation)
 - [ ] Carnet personnel
+
+### PR 4.3 — Comptes et données personnelles
+
+- [ ] Export JSON de mes données, suppression de compte (libre-service et admin) avec anonymisation « Ancien·ne membre » (D-055)
+- [ ] Suppression de compte : supprimer soi-même le fichier et la ligne de l'avatar (`media_file.owner_id` passe à null) ;
+      créditer « Ancien·ne membre » sur les voies ouvertes (`route_setter` est en `on delete cascade`)
+- [ ] Colonne « séances » du tableau des membres (D-055)
 
 ## Phase 5 — Social
 
