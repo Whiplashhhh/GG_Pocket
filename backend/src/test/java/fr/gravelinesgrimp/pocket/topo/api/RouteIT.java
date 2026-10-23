@@ -69,7 +69,7 @@ class RouteIT {
                         .andExpect(status().isCreated())
                         .andExpect(jsonPath("$.route.name").value(draft.name()))
                         .andExpect(jsonPath("$.route.grade").value("6a"))
-                        .andExpect(jsonPath("$.route.gradeRank").value(13))
+                        .andExpect(jsonPath("$.route.gradeRank").value(20))
                         .andExpect(jsonPath("$.route.cordNumber").value(1))
                         .andExpect(jsonPath("$.route.sectorName").value("Neutre 8 m"))
                         .andExpect(
