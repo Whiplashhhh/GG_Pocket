@@ -12,8 +12,21 @@ interface Capture {
   /** Management screens are also captured at 1280 px. */
   desktop?: boolean
   installInvite?: boolean
+  lastChancePopup?: boolean
   prepare?: (club: FakeClub) => void
-  act?: (page: Page) => Promise<void>
+  act?: (page: Page, club: FakeClub) => Promise<void>
+}
+
+/** Marie's own marks on the topo: favourites (one dismounted since), routes she can climb. */
+const marieOnTheWall = (club: FakeClub) => {
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  if (marie === undefined) return
+  club.topo.favorite(marie, 'Schtroumpfs')
+  club.topo.favorite(marie, 'Bye Bye Morice')
+  club.topo.favorite(marie, 'Réglisse')
+  club.topo.check(marie, 'Bye Bye Morice', 'LEAD')
+  club.topo.check(marie, 'Iron Man', 'TOP_ROPE')
+  marie.favoriteRouteId = club.topo.route('Tonton Talon').id
 }
 
 const someMembers = (club: FakeClub) => {
@@ -34,6 +47,42 @@ const someMembers = (club: FakeClub) => {
     email: 'lea@example.org',
     lastSeenAt: '2026-10-20T07:30:00Z',
   })
+}
+
+/** Openers with an account, Sam credited on Bye Bye Morice; a cord and a colour put away. */
+const settersAndAWornWall = (club: FakeClub) => {
+  const sam = club.addMember({
+    nickname: 'sam',
+    firstName: 'Sam',
+    lastName: 'Ouvre',
+    role: 'SETTER',
+  })
+  club.addMember({
+    nickname: 'tonton.talon',
+    firstName: 'Tonton',
+    lastName: 'Talon',
+    role: 'BOARD',
+  })
+  club.topo.route('Bye Bye Morice').setterIds = [sam.id]
+  const cord = club.topo.config.sectors
+    .flatMap((sector) => sector.cords)
+    .find((candidate) => candidate.number === 7)
+  if (cord) cord.active = false
+  const grey = club.topo.config.holdColors.find((color) => color.label === 'gris')
+  if (grey) grey.active = false
+}
+
+/** Large screens act from the table, phones from the actions sheet of the route. */
+const routeActionOf = async (page: Page, name: string, word: string, label: string) => {
+  if ((page.viewportSize()?.width ?? 0) >= 1024) {
+    await page.getByLabel(label, { exact: true }).click()
+  } else {
+    await page
+      .getByRole('main')
+      .getByRole('button', { name: new RegExp(name) })
+      .click()
+    await page.getByRole('dialog').getByText(word, { exact: true }).click()
+  }
 }
 
 /** Screens captured for visual review (the gallery only exists on the dev server). */
@@ -66,10 +115,76 @@ const CAPTURES: Capture[] = [
   },
   { name: 'premiers-pas-photo', path: '/premiers-pas/photo', as: 'CLIMBER' },
   { name: 'premiers-pas-infos', path: '/premiers-pas/infos', as: 'CLIMBER' },
+  { name: 'premiers-pas-voie', path: '/premiers-pas/voie', as: 'CLIMBER' },
   { name: 'premiers-pas-installer', path: '/premiers-pas/installer', as: 'CLIMBER' },
   { name: 'actu-invitation', path: '/actu', as: 'CLIMBER', installInvite: true },
-  { name: 'profil', path: '/profil', as: 'BOARD' },
-  { name: 'profil-modifier', path: '/profil/modifier', as: 'CLIMBER' },
+  { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
+  { name: 'topo', path: '/topo', as: 'CLIMBER', prepare: marieOnTheWall },
+  { name: 'topo-secteurs', path: '/topo?tri=secteur', as: 'CLIMBER', prepare: marieOnTheWall },
+  {
+    name: 'topo-filtres',
+    path: '/topo',
+    as: 'CLIMBER',
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Filtres' }).click()
+      await page.getByRole('button', { name: 'Grand dévers' }).click()
+      await page.getByRole('button', { name: 'Dévers', exact: true }).click()
+    },
+  },
+  {
+    name: 'topo-fiche',
+    path: '/topo',
+    as: 'CLIMBER',
+    prepare: marieOnTheWall,
+    act: async (page) => {
+      await page.getByRole('link', { name: /Bye Bye Morice/ }).click()
+      await page.getByRole('dialog').getByText('Le conseil de l’ouvreur').waitFor()
+    },
+  },
+  {
+    name: 'topo-fiche-photo',
+    path: '/topo',
+    as: 'CLIMBER',
+    act: async (page) => {
+      await page.getByRole('link', { name: /OH purée/ }).click()
+      await page.getByRole('dialog').getByText('Commentaires (0)').waitFor()
+    },
+  },
+  {
+    name: 'topo-coeur-plein',
+    path: '/topo',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      const marie = club.members.find((member) => member.nickname === 'marie')
+      if (marie === undefined) return
+      club.topo.favorite(marie, 'Réglisse')
+      club.topo.favorite(marie, 'Iron Man')
+    },
+    act: async (page) => {
+      await page.getByRole('link', { name: /Du mou/ }).click()
+      await page.getByRole('button', { name: 'Coup de cœur' }).click()
+      await page.getByRole('dialog', { name: /Ton cœur est plein/ }).waitFor()
+    },
+  },
+  {
+    name: 'topo-archives',
+    path: '/topo/archives',
+    as: 'CLIMBER',
+  },
+  {
+    name: 'topo-fiche-demontee',
+    path: '/topo/archives',
+    as: 'CLIMBER',
+    act: async (page) => {
+      await page.getByRole('link', { name: /Schtroumpfs/ }).click()
+      await page
+        .getByRole('dialog')
+        .getByText(/^Démontée le/)
+        .waitFor()
+    },
+  },
+  { name: 'topo-derniere-chance', path: '/actu', as: 'CLIMBER', lastChancePopup: true },
+  { name: 'profil-modifier', path: '/profil/modifier', as: 'CLIMBER', prepare: marieOnTheWall },
   { name: 'appareils', path: '/profil/appareils', as: 'CLIMBER' },
   { name: 'gestion', path: '/gestion', as: 'ADMIN', desktop: true },
   { name: 'membres', path: '/gestion/membres', as: 'BOARD', desktop: true, prepare: someMembers },
@@ -99,6 +214,125 @@ const CAPTURES: Capture[] = [
     },
   },
   {
+    name: 'gestion-voies',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    prepare: settersAndAWornWall,
+  },
+  {
+    name: 'gestion-voies-archives',
+    path: '/gestion/voies?vue=archives',
+    as: 'SETTER',
+    desktop: true,
+  },
+  {
+    name: 'gestion-voies-actions',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    act: async (page) => {
+      if ((page.viewportSize()?.width ?? 0) < 1024) {
+        await page
+          .getByRole('main')
+          .getByRole('button', { name: /Bye Bye Morice/ })
+          .click()
+        await page.getByRole('dialog', { name: 'Actions pour Bye Bye Morice' }).waitFor()
+      }
+    },
+  },
+  {
+    name: 'gestion-voie-demonter',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    act: async (page) => {
+      await routeActionOf(page, 'Bye Bye Morice', 'Démonter', 'Démonter Bye Bye Morice')
+      await page.getByRole('alertdialog').waitFor()
+    },
+  },
+  {
+    name: 'gestion-voie-derniere-chance',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    act: async (page) => {
+      await routeActionOf(page, 'Réglisse', 'Dernière chance', 'Passer Réglisse en dernière chance')
+      await page.getByRole('dialog', { name: /Dernière chance pour/ }).waitFor()
+    },
+  },
+  {
+    name: 'gestion-voie-nouvelle',
+    path: '/gestion/voies/nouvelle',
+    as: 'SETTER',
+    desktop: true,
+    prepare: settersAndAWornWall,
+    act: async (page) => {
+      await page.getByLabel('Nom de la voie').fill('Avale la corde')
+      await page.getByLabel('Cotation').selectOption({ label: '5c' })
+      await page.getByLabel('Corde', { exact: true }).selectOption({ label: 'Corde 4' })
+      await page
+        .getByRole('group', { name: 'Couleur des prises' })
+        .getByText('vert', { exact: true })
+        .click()
+      await page.getByRole('button', { name: 'Dalle', exact: true }).click()
+    },
+  },
+  {
+    name: 'gestion-voie-erreurs',
+    path: '/gestion/voies/nouvelle',
+    as: 'SETTER',
+    desktop: true,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Enregistrer la voie' }).click()
+      await page.getByText('Choisis une cotation.').waitFor()
+    },
+  },
+  {
+    name: 'gestion-voie-modifier',
+    path: '/gestion/voies',
+    as: 'SETTER',
+    desktop: true,
+    prepare: settersAndAWornWall,
+    act: async (page, club) => {
+      await page.goto(`/gestion/voies/${club.topo.route('Bye Bye Morice').id}/modifier`)
+      await page.getByLabel('Nom de la voie').waitFor()
+    },
+  },
+  {
+    name: 'gestion-derniere-chance',
+    path: '/gestion/derniere-chance',
+    as: 'SETTER',
+    desktop: true,
+  },
+  {
+    name: 'gestion-club',
+    path: '/gestion/club',
+    as: 'ADMIN',
+    desktop: true,
+    prepare: settersAndAWornWall,
+  },
+  {
+    name: 'gestion-club-couleur',
+    path: '/gestion/club',
+    as: 'ADMIN',
+    desktop: true,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Modifier la couleur bleu clair' }).click()
+      await page.getByRole('dialog', { name: 'Couleur bleu clair' }).waitFor()
+    },
+  },
+  {
+    name: 'gestion-club-corde',
+    path: '/gestion/club',
+    as: 'ADMIN',
+    desktop: true,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Modifier la corde 12' }).click()
+      await page.getByRole('dialog', { name: 'Corde 12' }).waitFor()
+    },
+  },
+  {
     name: 'codes',
     path: '/gestion/codes',
     as: 'ADMIN',
@@ -116,18 +350,24 @@ test.use({ meta: { environment: 'dev', branch: 'feature/comptes-0.0.0', commit: 
 
 for (const capture of CAPTURES) {
   test.describe(capture.name, () => {
-    test.use({ signedInAs: capture.as, installInvite: capture.installInvite ?? false })
+    test.use({
+      signedInAs: capture.as,
+      installInvite: capture.installInvite ?? false,
+      lastChancePopup: capture.lastChancePopup ?? false,
+    })
 
     test(`capture ${capture.name}`, async ({ page, club, isMobile }, testInfo) => {
       test.skip(!isMobile && capture.desktop !== true, 'Phone screens are reviewed at 360 px')
       capture.prepare?.(club)
       await page.goto(capture.path)
       await expect(page.locator('h1').first()).toBeVisible()
-      await capture.act?.(page)
+      await capture.act?.(page, club)
       await page.evaluate(() => document.fonts.ready)
       await page.screenshot({
         path: `screenshots/${testInfo.project.name}/${capture.name}.png`,
         fullPage: true,
+        // Finished transitions only: a chip caught mid-fade reads grey on grey.
+        animations: 'disabled',
       })
     })
   })

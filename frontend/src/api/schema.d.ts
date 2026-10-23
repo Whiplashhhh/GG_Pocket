@@ -21,6 +21,125 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/admin/club/cords': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** A new cord (admin) */
+    post: operations['createCord']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/club/cords/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Renumber, move, deactivate or reactivate a cord (admin) */
+    put: operations['updateCord']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/club/hold-colors': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** A new hold colour (admin) */
+    post: operations['createHoldColor']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/club/hold-colors/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Change, deactivate or reactivate a hold colour (admin) */
+    put: operations['updateHoldColor']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/club/sector-order': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Reorder the sectors (admin) */
+    put: operations['reorderSectors']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/club/sectors': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** A new sector (admin) */
+    post: operations['createSector']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/club/sectors/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Rename or describe a sector (admin) */
+    put: operations['updateSector']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/admin/members': {
     parameters: {
       query?: never
@@ -346,6 +465,41 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/favorite-route': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Choose my favourite route */
+    put: operations['setFavoriteRoute']
+    post?: never
+    /** Clear my favourite route */
+    delete: operations['clearFavoriteRoute']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/favorites': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** My favourites, dismounted ones included, newest first */
+    get: operations['listMyFavorites']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/password': {
     parameters: {
       query?: never
@@ -414,6 +568,285 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/route-comments/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Delete my comment, or anyone's (board+) */
+    delete: operations['deleteRouteComment']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Routes on the wall (active and last chance) */
+    get: operations['listRoutes']
+    put?: never
+    /** A new route (setter+) */
+    post: operations['createRoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/archive': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Dismounted routes, most recently dismounted first */
+    get: operations['listDismountedRoutes']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/last-chance': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Routes in last chance, with how many climbers saw it (setter+) */
+    get: operations['listLastChanceRoutes']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/last-chance/acknowledgements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Acknowledge routes in last chance */
+    post: operations['acknowledgeLastChance']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/last-chance/unacknowledged': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Routes in last chance I have not acknowledged yet */
+    get: operations['listUnacknowledgedLastChance']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/setters': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Active setters, by nickname (setter+) */
+    get: operations['listSetters']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** A route, dismounted ones included */
+    get: operations['getRoute']
+    /** Edit a route (setter+) */
+    put: operations['updateRoute']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/{id}/checks/{mode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** I can climb it in this mode */
+    put: operations['checkRoute']
+    post?: never
+    /** Take that back */
+    delete: operations['uncheckRoute']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/{id}/comments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Comments on a route, oldest first */
+    get: operations['listRouteComments']
+    put?: never
+    /** Comment on a route */
+    post: operations['addRouteComment']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/{id}/dismount': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Dismount a route (setter+) */
+    post: operations['dismountRoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/{id}/favorite': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Heart a route (2 active favourites at most) */
+    put: operations['addFavorite']
+    post?: never
+    /** Take my heart back */
+    delete: operations['removeFavorite']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/{id}/last-chance': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Announce a last chance (setter+) */
+    put: operations['announceLastChance']
+    post?: never
+    /** Cancel a last chance (setter+) */
+    delete: operations['cancelLastChance']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/{id}/photo': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Upload the route photo (JPEG, PNG or WebP, 10 MB max, setter+) */
+    put: operations['replaceRoutePhoto']
+    post?: never
+    /** Remove the route photo (setter+) */
+    delete: operations['deleteRoutePhoto']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/routes/{id}/remount': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Undo a dismount (setter+) */
+    post: operations['remountRoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/topo/config': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Sectors, cords, hold colours and grades */
+    get: operations['getTopoConfig']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -428,6 +861,16 @@ export interface components {
         | 'PASSWORD_RESET_LINK_CREATED'
         | 'REGISTRATION_CODE_CREATED'
         | 'REGISTRATION_CODE_UPDATED'
+        | 'ROUTE_DISMOUNTED'
+        | 'ROUTE_REMOUNTED'
+        | 'ROUTE_COMMENT_DELETED'
+        | 'CLUB_SECTOR_CREATED'
+        | 'CLUB_SECTOR_UPDATED'
+        | 'CLUB_SECTORS_REORDERED'
+        | 'CLUB_CORD_CREATED'
+        | 'CLUB_CORD_UPDATED'
+        | 'CLUB_HOLD_COLOR_CREATED'
+        | 'CLUB_HOLD_COLOR_UPDATED'
       /**
        * Format: uuid
        * @description Absent if that member was deleted since
@@ -446,7 +889,14 @@ export interface components {
       /** @description Name at the time of the action */
       targetLabel: string
       /** @enum {string} */
-      targetType: 'MEMBER' | 'REGISTRATION_CODE'
+      targetType:
+        | 'MEMBER'
+        | 'REGISTRATION_CODE'
+        | 'ROUTE'
+        | 'ROUTE_COMMENT'
+        | 'SECTOR'
+        | 'CORD'
+        | 'HOLD_COLOR'
     }
     /** @description Newest first. */
     AuditPage: {
@@ -459,6 +909,22 @@ export interface components {
       authenticated: boolean
       /** @description Present when signed in */
       member?: components['schemas']['CurrentMember']
+    }
+    Cord: {
+      active: boolean
+      /** Format: uuid */
+      id: string
+      /** Format: int32 */
+      number: number
+      /** Format: uuid */
+      sectorId: string
+    }
+    CordSettings: {
+      active: boolean
+      /** Format: int32 */
+      number: number
+      /** Format: uuid */
+      sectorId: string
     }
     /** @description The signed-in member, as shown in the app shell. */
     CurrentMember: {
@@ -487,6 +953,61 @@ export interface components {
       /** Format: date-time */
       signedInAt: string
     }
+    FavoriteRequest: {
+      /**
+       * Format: uuid
+       * @description One of my active favourites to give up for this one
+       */
+      replaceRouteId?: string
+    }
+    FavoriteRouteRequest: {
+      /** Format: uuid */
+      routeId: string
+    }
+    Grade: {
+      /** @example 6a+ */
+      code: string
+      /** Format: uuid */
+      id: string
+      /**
+       * Format: int32
+       * @description 1 for the easiest grade
+       */
+      rank: number
+    }
+    HoldColor: {
+      active: boolean
+      /** @example #F5C518 */
+      hex: string
+      /** Format: uuid */
+      id: string
+      label: string
+      multicolor: boolean
+      /** Format: int32 */
+      position: number
+    }
+    HoldColorSettings: {
+      active: boolean
+      /** @example #F5C518 */
+      hex: string
+      label: string
+      multicolor: boolean
+    }
+    LastChanceAcknowledgement: {
+      routeIds: string[]
+    }
+    LastChanceRoute: {
+      /** Format: int32 */
+      acknowledgedCount: number
+      route: components['schemas']['RouteSummary']
+    }
+    LastChanceSettings: {
+      /**
+       * Format: date
+       * @description Optional, today or later
+       */
+      plannedDismountOn?: string
+    }
     LoginRequest: {
       nickname: string
       password: string
@@ -510,6 +1031,12 @@ export interface components {
       canCreateResetLink: boolean
       canDisable: boolean
       canEnable: boolean
+    }
+    MemberRef: {
+      avatarUrl?: string
+      /** Format: uuid */
+      id: string
+      nickname: string
     }
     /** @description A line of the members table. */
     MemberSummary: {
@@ -561,6 +1088,11 @@ export interface components {
       /** Format: date-time */
       createdAt: string
       email?: string
+      /**
+       * Format: uuid
+       * @description My favourite route, possibly dismounted
+       */
+      favoriteRouteId?: string
       firstName: string
       /** Format: uuid */
       id: string
@@ -668,9 +1200,147 @@ export interface components {
       /** @enum {string} */
       role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
     }
+    RouteComment: {
+      author: components['schemas']['MemberRef']
+      body: string
+      /** Format: date-time */
+      createdAt: string
+      /** @description Whether I may delete it */
+      deletable: boolean
+      /** Format: uuid */
+      id: string
+    }
+    RouteCommentRequest: {
+      body: string
+    }
+    RouteDetail: {
+      advice?: string
+      /** Format: uuid */
+      cordId: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: uuid */
+      gradeId: string
+      route: components['schemas']['RouteSummary']
+      /** @description Setter without an account */
+      setterNote?: string
+      setters: components['schemas']['MemberRef'][]
+    }
+    RouteHold: {
+      hex: string
+      /** Format: uuid */
+      id: string
+      label: string
+      multicolor: boolean
+    }
+    /** @description At least one setter or a setter note. */
+    RouteSettings: {
+      advice?: string
+      /** Format: uuid */
+      cordId: string
+      /** Format: uuid */
+      gradeId: string
+      holdColorIds: string[]
+      name: string
+      /** Format: date */
+      openedOn: string
+      setterIds: string[]
+      setterNote?: string
+      styles: (
+        | 'CONTINUITY'
+        | 'ENDURANCE'
+        | 'PHYSICAL'
+        | 'TECHNICAL'
+        | 'COMPLEX'
+        | 'SLAB'
+        | 'OVERHANG'
+        | 'CRIMPS'
+        | 'JUGS'
+        | 'PINCHES'
+        | 'SLOPERS'
+        | 'DIHEDRAL'
+        | 'ROOF'
+        | 'REACHY'
+      )[]
+    }
+    /** @description A route as listed in the topo, with my own marks. */
+    RouteSummary: {
+      /** @description Modes in which I can climb it */
+      checks: ('TOP_ROPE' | 'LEAD')[]
+      /** Format: int32 */
+      commentCount: number
+      /** Format: int32 */
+      cordNumber: number
+      /** Format: date-time */
+      dismountedAt?: string
+      /** @description Whether it is one of my favourites */
+      favorite: boolean
+      /** Format: int32 */
+      favoriteCount: number
+      grade: string
+      /** Format: int32 */
+      gradeRank: number
+      /** @description One or two hold colours */
+      holds: components['schemas']['RouteHold'][]
+      /** Format: uuid */
+      id: string
+      name: string
+      /** Format: date */
+      openedOn: string
+      photoUrl?: string
+      /** Format: date */
+      plannedDismountOn?: string
+      /** Format: uuid */
+      sectorId: string
+      sectorName: string
+      /** Format: int32 */
+      sectorPosition: number
+      /** @enum {string} */
+      status: 'ACTIVE' | 'LAST_CHANCE' | 'DISMOUNTED'
+      styles: (
+        | 'CONTINUITY'
+        | 'ENDURANCE'
+        | 'PHYSICAL'
+        | 'TECHNICAL'
+        | 'COMPLEX'
+        | 'SLAB'
+        | 'OVERHANG'
+        | 'CRIMPS'
+        | 'JUGS'
+        | 'PINCHES'
+        | 'SLOPERS'
+        | 'DIHEDRAL'
+        | 'ROOF'
+        | 'REACHY'
+      )[]
+    }
+    Sector: {
+      /** @description Sorted by number */
+      cords: components['schemas']['Cord'][]
+      description?: string
+      /** Format: uuid */
+      id: string
+      name: string
+      /** Format: int32 */
+      position: number
+    }
+    SectorOrder: {
+      /** @description Every sector, in the new order */
+      sectorIds: string[]
+    }
+    SectorSettings: {
+      description?: string
+      name: string
+    }
     StatusChange: {
       /** @enum {string} */
       status: 'ACTIVE' | 'DISABLED'
+    }
+    /** @description The club layout: sectors and their cords, hold colours, grades. */
+    TopoConfig: {
+      grades: components['schemas']['Grade'][]
+      holdColors: components['schemas']['HoldColor'][]
+      sectors: components['schemas']['Sector'][]
     }
   }
   responses: never
@@ -700,6 +1370,180 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['AuditPage']
+        }
+      }
+    }
+  }
+  createCord: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CordSettings']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Cord']
+        }
+      }
+    }
+  }
+  updateCord: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CordSettings']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Cord']
+        }
+      }
+    }
+  }
+  createHoldColor: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['HoldColorSettings']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HoldColor']
+        }
+      }
+    }
+  }
+  updateHoldColor: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['HoldColorSettings']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HoldColor']
+        }
+      }
+    }
+  }
+  reorderSectors: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SectorOrder']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TopoConfig']
+        }
+      }
+    }
+  }
+  createSector: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SectorSettings']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Sector']
+        }
+      }
+    }
+  }
+  updateSector: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SectorSettings']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Sector']
         }
       }
     }
@@ -1169,6 +2013,66 @@ export interface operations {
       }
     }
   }
+  setFavoriteRoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FavoriteRouteRequest']
+      }
+    }
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  clearFavoriteRoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  listMyFavorites: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteSummary'][]
+        }
+      }
+    }
+  }
   changeMyPassword: {
     parameters: {
       query?: never
@@ -1253,6 +2157,515 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['Meta']
+        }
+      }
+    }
+  }
+  deleteRouteComment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  listRoutes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteSummary'][]
+        }
+      }
+    }
+  }
+  createRoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RouteSettings']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteDetail']
+        }
+      }
+    }
+  }
+  listDismountedRoutes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteSummary'][]
+        }
+      }
+    }
+  }
+  listLastChanceRoutes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LastChanceRoute'][]
+        }
+      }
+    }
+  }
+  acknowledgeLastChance: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LastChanceAcknowledgement']
+      }
+    }
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  listUnacknowledgedLastChance: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteSummary'][]
+        }
+      }
+    }
+  }
+  listSetters: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MemberRef'][]
+        }
+      }
+    }
+  }
+  getRoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteDetail']
+        }
+      }
+    }
+  }
+  updateRoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RouteSettings']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteDetail']
+        }
+      }
+    }
+  }
+  checkRoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        mode: 'TOP_ROPE' | 'LEAD'
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  uncheckRoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        mode: 'TOP_ROPE' | 'LEAD'
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  listRouteComments: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteComment'][]
+        }
+      }
+    }
+  }
+  addRouteComment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RouteCommentRequest']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteComment']
+        }
+      }
+    }
+  }
+  dismountRoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteDetail']
+        }
+      }
+    }
+  }
+  addFavorite: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FavoriteRequest']
+      }
+    }
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  removeFavorite: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  announceLastChance: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LastChanceSettings']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteDetail']
+        }
+      }
+    }
+  }
+  cancelLastChance: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteDetail']
+        }
+      }
+    }
+  }
+  replaceRoutePhoto: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file: string
+        }
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteDetail']
+        }
+      }
+    }
+  }
+  deleteRoutePhoto: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  remountRoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteDetail']
+        }
+      }
+    }
+  }
+  getTopoConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TopoConfig']
         }
       }
     }

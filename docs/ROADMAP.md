@@ -79,21 +79,25 @@ Légende : `[x]` fait · `[ ]` à faire · `[~]` commencé.
 
 ## Phase 3 — Topo
 
-- [ ] Voie préférée dans l'onboarding et le profil (D-055)
-- [ ] Configuration du club : secteurs, cordes, couleurs de prises, cotations (seed de configuration identique dev/prod)
-- [ ] Gestion des voies (créer, modifier, dupliquer, photo, styles, conseil d'ouvreur)
-- [ ] Liste du topo : tris, filtres combinables, regroupement par secteur
-- [ ] Fiche voie, statistiques, mon historique
-- [ ] Commentaires (ajout, suppression des siens, modération)
-- [ ] Coups de cœur (limite de 2, « Ton cœur est plein »)
-- [ ] « Je sais la faire » manuel (mouli / tête)
-- [ ] Démontage, remontage, archives ; avertissement si coups de cœur
-- [ ] Dernière chance + pop-up « J'accepte leurs destins »
+- [x] Voie préférée dans l'onboarding et le profil (D-055)
+- [x] Configuration du club : secteurs, cordes, couleurs de prises, cotations (seed de configuration identique dev/prod)
+- [x] Gestion des voies (créer, modifier, dupliquer, photo, styles, conseil d'ouvreur)
+- [x] Liste du topo : tris, filtres combinables, regroupement par secteur
+- [x] Fiche voie (statistiques d'ascensions et « mon historique » en phase 4, D-080)
+- [x] Commentaires (ajout, suppression des siens, modération)
+- [x] Coups de cœur (limite de 2, « Ton cœur est plein »)
+- [x] « Je sais la faire » manuel (mouli / tête)
+- [x] Démontage, remontage, archives ; avertissement si coups de cœur
+- [x] Dernière chance + pop-up « J'accepte leurs destins »
+- [x] Captures 360 / 1280 px, clair et sombre, regardées et corrigées (revue UX, D-083)
 
 ## Phase 4 — Séances
 
 - [ ] Export JSON de mes données, suppression de compte (libre-service et admin) avec anonymisation « Ancien·ne membre » (D-055)
 - [ ] Colonne « séances » du tableau des membres (D-055)
+- [ ] Fiche voie : statistiques d'ascensions et « mon historique » ; tri du topo par réalisations (D-080)
+- [ ] Suppression de compte : supprimer soi-même le fichier et la ligne de l'avatar (`media_file.owner_id` passe à null) ;
+      créditer « Ancien·ne membre » sur les voies ouvertes (`route_setter` est en `on delete cascade`)
 - [ ] Nouvelle séance (sélecteur rapide, lignes d'ascension, duplication, réordonner)
 - [ ] Brouillon IndexedDB + file d'attente hors ligne (photo comprise)
 - [ ] Photo de séance (compression client, traitement serveur)

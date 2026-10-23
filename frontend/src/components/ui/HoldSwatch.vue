@@ -19,10 +19,14 @@ const props = withDefaults(
 const MULTICOLOR_QUARTERS = ['#f5c518', '#d7263d', '#1f5fbf', '#2e9e44'] as const
 
 const clipId = `hold-${useId()}`
-// Very light holds (white, light yellow) need a darker outline to stand out on paper.
-const outline = computed(() =>
-  darken(props.color.hex, relativeLuminance(props.color.hex) > 0.6 ? 0.45 : 0.3),
-)
+// Very light holds (white, light yellow) need a darker outline to stand out on paper; very dark
+// ones (black) a mid-grey one, or they vanish on the dark theme's surfaces.
+const DARK_HOLD_OUTLINE = '#8a8275'
+const outline = computed(() => {
+  const luminance = relativeLuminance(props.color.hex)
+  if (luminance < 0.03) return DARK_HOLD_OUTLINE
+  return darken(props.color.hex, luminance > 0.6 ? 0.45 : 0.3)
+})
 const boltRing = computed(() => darken(props.color.hex, 0.5))
 </script>
 

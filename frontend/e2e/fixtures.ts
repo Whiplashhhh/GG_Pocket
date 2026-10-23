@@ -22,14 +22,18 @@ export const test = base.extend<{
   signedInAs: Role | null
   /** The invitation to install pops up by itself; most tests keep it quiet. */
   installInvite: boolean
+  /** The last chance pop-up shows up by itself; most tests keep it quiet. */
+  lastChancePopup: boolean
   club: FakeClub
   me: FakeMember | null
 }>({
   meta: [{}, { option: true }],
   signedInAs: ['CLIMBER', { option: true }],
   installInvite: [false, { option: true }],
-  club: async ({ signedInAs }, use) => {
+  lastChancePopup: [false, { option: true }],
+  club: async ({ signedInAs, lastChancePopup }, use) => {
     const club = new FakeClub()
+    club.topo.quietLastChance = !lastChancePopup
     if (signedInAs !== null) {
       club.signIn(club.addMember({ nickname: 'marie', role: signedInAs }))
     }

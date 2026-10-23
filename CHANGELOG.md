@@ -5,6 +5,25 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- Le topo est au mur : toutes les voies du club, avec leur étiquette, leur secteur, leurs styles, leurs coups de cœur et
+  leurs commentaires. Les cotations vont de 4a- à 7c+, avec les « - » et les « + » du club. Trie par cotation, date
+  d'ouverture, secteur, cœurs ou commentaires, et combine les filtres
+  (secteur, cotation, couleur, style, « pas encore faite par moi »). Un lien partagé garde tes tris et tes filtres.
+- La fiche voie glisse du bas : photo, ouvreur·ses, date d'ouverture, styles et surtout le conseil de l'ouvreur·se.
+  Commente (et supprime tes commentaires), coche « Je sais la faire » en mouli ou en tête.
+- Coups de cœur : deux voies au mur, pas une de plus. Quand ton cœur est plein, l'appli te demande laquelle tu lâches.
+- Dernière chance : quand une voie va être démontée, une fenêtre te prévient à l'ouverture de l'appli. « J'accepte leurs
+  destins » et elle ne revient que pour les prochaines.
+- Les voies démontées partent aux archives, consultables, avec leur date de démontage. Rien ne disparaît de l'historique.
+- Ta voie préférée s'affiche sur ton profil, avec tes coups de cœur : choisis-la pendant tes premiers pas ou plus tard.
+- Pour les ouvreur·ses : créer, modifier et dupliquer une voie (pratique quand on rouvre sur la même corde), avec photo,
+  styles et conseil ; annoncer la dernière chance, démonter (l'appli prévient si des grimpeurs l'ont en coup de cœur) et
+  remonter une voie démontée par erreur. Une vue montre qui a pris connaissance de chaque dernière chance.
+- Pour le Président·e : la configuration du club (secteurs, cordes, couleurs de prises), où l'on renomme, déplace et
+  désactive sans jamais casser l'historique.
+
 ## 0.1.1 — 2026-10-21
 
 ### Modifié

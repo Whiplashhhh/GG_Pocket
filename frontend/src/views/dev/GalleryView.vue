@@ -40,7 +40,7 @@ const PEOPLE = [
 ] as const
 
 const CORD_SAMPLE = '12 · 29 · 7'
-const GRADE_SAMPLE = '4a · 5c+ · 6b · 7c'
+const GRADE_SAMPLE = '4a- · 5c+ · 6b · 7c+'
 
 const mode = ref<'TOP_ROPE' | 'LEAD'>('LEAD')
 const topped = ref<'yes' | 'no'>('yes')

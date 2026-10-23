@@ -85,6 +85,54 @@ class ImageSanitizerTest {
         assertThat(centre.getGreen()).isGreaterThan(centre.getBlue() + 60);
     }
 
+    @Test
+    void fitsAWholePhotoWithoutCroppingIt() throws IOException {
+        var clean = sanitizer.fittedJpeg(image("png", 3200, 1800), 1600);
+
+        assertThat(clean.width()).isEqualTo(1600);
+        assertThat(clean.height()).isEqualTo(900);
+        var decoded = ImageIO.read(new ByteArrayInputStream(clean.jpeg()));
+        assertThat(decoded.getWidth()).isEqualTo(1600);
+        assertThat(decoded.getHeight()).isEqualTo(900);
+        // Not cropped: the left edge is still the orange background.
+        var edge = new Color(decoded.getRGB(4, 450));
+        assertThat(edge.getRed()).isGreaterThan(edge.getGreen() + 100);
+    }
+
+    @Test
+    void fitsPortraitPhotosByTheirHeight() throws IOException {
+        var clean = sanitizer.fittedJpeg(image("jpeg", 1200, 2400), 1600);
+        assertThat(clean.width()).isEqualTo(800);
+        assertThat(clean.height()).isEqualTo(1600);
+    }
+
+    @Test
+    void neverEnlargesASmallRoutePhoto() throws IOException {
+        var clean = sanitizer.fittedJpeg(image("png", 640, 480), 1600);
+        assertThat(clean.width()).isEqualTo(640);
+        assertThat(clean.height()).isEqualTo(480);
+    }
+
+    @Test
+    void routePhotosLoseTheirMetadataToo() throws IOException {
+        var clean = sanitizer.fittedJpeg(withExifBlock(image("jpeg", 640, 480)), 1600);
+        assertThat(contains(clean.jpeg(), "Exif")).isFalse();
+        assertThat(contains(clean.jpeg(), "GPS")).isFalse();
+    }
+
+    @Test
+    void routePhotosFollowTheSameSafetyRules() {
+        var html = "<html></html>".getBytes(StandardCharsets.UTF_8);
+        assertThatThrownBy(() -> sanitizer.fittedJpeg(html, 1600))
+                .isInstanceOfSatisfying(
+                        BusinessException.class,
+                        e -> assertThat(e.code()).isEqualTo(ErrorCode.IMAGE_UNSUPPORTED));
+        assertThatThrownBy(() -> sanitizer.fittedJpeg(pngHeaderOnly(10_000, 10_000), 1600))
+                .isInstanceOfSatisfying(
+                        BusinessException.class,
+                        e -> assertThat(e.code()).isEqualTo(ErrorCode.IMAGE_TOO_LARGE));
+    }
+
     private void assertRefused(byte[] upload, ErrorCode code) {
         assertThatThrownBy(() -> sanitizer.squareJpeg(upload, 512))
                 .isInstanceOfSatisfying(

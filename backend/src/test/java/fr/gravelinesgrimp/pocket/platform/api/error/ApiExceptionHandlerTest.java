@@ -82,6 +82,14 @@ class ApiExceptionHandlerTest {
     }
 
     @Test
+    void concurrentChangeIsAConflictToReload() throws Exception {
+        mockMvc.perform(get("/probe/stale"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("CONCURRENT_CHANGE"))
+                .andExpect(content().string(not(Matchers.containsString("transaction"))));
+    }
+
+    @Test
     void unexpectedErrorNeverLeaksInternalDetails() throws Exception {
         mockMvc.perform(get("/probe/boom"))
                 .andExpect(status().isInternalServerError())

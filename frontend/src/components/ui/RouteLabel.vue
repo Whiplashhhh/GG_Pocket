@@ -19,8 +19,10 @@ const props = withDefaults(
     holds: HoldColor[]
     status?: RouteStatus
     size?: 'sm' | 'md' | 'lg'
+    /** id of the accessible name, for a link or button named by the label (aria-labelledby). */
+    labelId?: string
   }>(),
-  { status: 'ACTIVE', size: 'md' },
+  { status: 'ACTIVE', size: 'md', labelId: undefined },
 )
 
 const { t } = useI18n()
@@ -52,8 +54,7 @@ const SIZES = {
     hold: 18,
     name: 'truncate text-base',
     grade: 'text-lg pl-1.5 pr-2 border-l border-label-edge',
-    stamp: 'text-micro right-10',
-    stampRoom: 'pr-24',
+    stamp: 'text-micro -top-2 right-1',
   },
   md: {
     root: 'h-11',
@@ -61,8 +62,7 @@ const SIZES = {
     hold: 24,
     name: 'truncate text-lg',
     grade: 'text-2xl pr-2.5',
-    stamp: 'text-sm right-14',
-    stampRoom: 'pr-36',
+    stamp: 'text-micro -top-2.5 right-2',
   },
   // Route sheet hero: the name may wrap rather than being cut.
   lg: {
@@ -71,8 +71,7 @@ const SIZES = {
     hold: 32,
     name: 'text-2xl text-pretty py-1',
     grade: 'text-[2.25rem] pr-3.5',
-    stamp: 'text-base right-20',
-    stampRoom: 'pr-40',
+    stamp: 'text-sm -top-3 right-3',
   },
 } as const
 
@@ -85,7 +84,7 @@ const dismounted = computed(() => props.status === 'DISMOUNTED')
     class="relative inline-flex max-w-full items-stretch rounded-paper border border-label-edge bg-label-paper text-label-ink shadow-paper"
     :class="sizing.root"
   >
-    <span class="sr-only">{{ accessibleName }}</span>
+    <span :id="labelId" class="sr-only">{{ accessibleName }}</span>
 
     <span
       v-if="size === 'lg'"
@@ -114,7 +113,7 @@ const dismounted = computed(() => props.status === 'DISMOUNTED')
     </span>
     <span
       class="min-w-0 flex-1 self-center px-2 pt-0.5 font-hand leading-tight font-bold"
-      :class="[sizing.name, { 'text-label-ink/60': dismounted, [sizing.stampRoom]: dismounted }]"
+      :class="[sizing.name, { 'text-label-ink/60': dismounted }]"
       aria-hidden="true"
       >{{ name }}</span
     >
@@ -138,7 +137,7 @@ const dismounted = computed(() => props.status === 'DISMOUNTED')
     >
     <span
       v-if="status === 'DISMOUNTED'"
-      class="pointer-events-none absolute top-1/2 -translate-y-1/2 -rotate-6 rounded-[2px] border-2 border-[#8f1f16] px-1.5 font-extrabold tracking-wide text-[#8f1f16] uppercase"
+      class="pointer-events-none absolute -rotate-3 rounded-[2px] border-2 border-[#8f1f16] bg-label-paper px-1.5 leading-tight font-extrabold tracking-wide text-[#8f1f16] uppercase"
       :class="sizing.stamp"
       aria-hidden="true"
       >{{ t('routeLabel.dismounted') }}</span

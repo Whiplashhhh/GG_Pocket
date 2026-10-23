@@ -1,5 +1,10 @@
 import { nextTick } from 'vue'
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalized,
+  type RouteRecordRaw,
+} from 'vue-router'
 
 import { authStateQuery } from '@/api/auth'
 import { queryClient } from '@/api/queryClient'
@@ -26,6 +31,8 @@ declare module 'vue-router' {
     wide?: boolean
     /** Lowest role allowed (spec §5); the server checks it again on every call. */
     minRole?: Role
+    /** A sheet over its parent screen (route sheet): the screen under it keeps its scroll. */
+    sheet?: boolean
   }
 }
 
@@ -36,6 +43,25 @@ const routes: RouteRecordRaw[] = [
     path: '/topo',
     component: () => import('@/views/TopoView.vue'),
     meta: { titleKey: 'nav.topo' },
+    children: [
+      {
+        path: 'voies/:id',
+        component: () => import('@/views/topo/RouteSheetView.vue'),
+        meta: { titleKey: 'routeSheet.title', sheet: true },
+      },
+    ],
+  },
+  {
+    path: '/topo/archives',
+    component: () => import('@/views/topo/TopoArchiveView.vue'),
+    meta: { titleKey: 'archives.title' },
+    children: [
+      {
+        path: 'voies/:id',
+        component: () => import('@/views/topo/RouteSheetView.vue'),
+        meta: { titleKey: 'routeSheet.title', sheet: true },
+      },
+    ],
   },
   {
     path: '/a-faire',
@@ -112,7 +138,7 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'privacy.title', public: true, layout: 'bare' },
   },
   {
-    path: '/premiers-pas/:step(photo|infos|installer)',
+    path: '/premiers-pas/:step(photo|infos|voie|installer)',
     component: () => import('@/views/onboarding/OnboardingView.vue'),
     meta: { titleKey: 'welcome.title', layout: 'bare' },
   },
@@ -130,8 +156,23 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'voies',
-        component: () => import('@/views/management/RoutesPlaceholderView.vue'),
+        component: () => import('@/views/management/RoutesManagementView.vue'),
         meta: { titleKey: 'management.routes', minRole: 'SETTER', wide: true },
+      },
+      {
+        path: 'voies/nouvelle',
+        component: () => import('@/views/management/RouteFormView.vue'),
+        meta: { titleKey: 'routeForm.createTitle', minRole: 'SETTER', wide: true },
+      },
+      {
+        path: 'voies/:id/modifier',
+        component: () => import('@/views/management/RouteFormView.vue'),
+        meta: { titleKey: 'management.routes', minRole: 'SETTER', wide: true },
+      },
+      {
+        path: 'derniere-chance',
+        component: () => import('@/views/management/LastChanceManagementView.vue'),
+        meta: { titleKey: 'lastChanceAdmin.title', minRole: 'SETTER', wide: true },
       },
       {
         path: 'membres',
@@ -153,6 +194,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/management/RegistrationCodesView.vue'),
         meta: { titleKey: 'codes.title', minRole: 'ADMIN', wide: true },
       },
+      {
+        path: 'club',
+        component: () => import('@/views/management/ClubConfigView.vue'),
+        meta: { titleKey: 'clubConfig.title', minRole: 'ADMIN', wide: true },
+      },
     ],
   },
 
@@ -172,10 +218,21 @@ const routes: RouteRecordRaw[] = [
   },
 ]
 
+/** A sheet opening or closing over the screen it belongs to (the topo and its route sheet). */
+function overSameScreen(to: RouteLocationNormalized, from: RouteLocationNormalized): boolean {
+  return (
+    (to.meta.sheet === true || from.meta.sheet === true) &&
+    to.matched[0] !== undefined &&
+    to.matched[0] === from.matched[0]
+  )
+}
+
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  scrollBehavior: (_to, _from, savedPosition) => savedPosition ?? { top: 0 },
+  // Opening or closing a sheet leaves the screen under it where it was.
+  scrollBehavior: (to, from, savedPosition) =>
+    overSameScreen(to, from) ? false : (savedPosition ?? { top: 0 }),
 })
 
 router.beforeEach(async (to) => {
@@ -198,7 +255,8 @@ router.afterEach((to, from) => {
 
   // After an in-app navigation, move focus to the new content so screen readers announce it.
   // Not on the first load: the browser already starts at the top of the page.
-  if (from.matched.length > 0 && to.path !== from.path) {
+  // A sheet manages its own focus (and gives it back when it closes).
+  if (from.matched.length > 0 && to.path !== from.path && !overSameScreen(to, from)) {
     void nextTick(() => document.getElementById('contenu')?.focus({ preventScroll: true }))
   }
 })

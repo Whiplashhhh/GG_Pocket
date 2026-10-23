@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 import { useCurrentMember } from '@/api/auth'
 import { isAtLeast } from '@/lib/roles'
@@ -10,6 +11,9 @@ import { SECTIONS } from './sections'
 /** Spec §8.1: on large screens, the management space has a side navigation. */
 const { t } = useI18n()
 const member = useCurrentMember()
+const route = useRoute()
+// Sub-pages (a route's form, a member's page) keep their section highlighted.
+const isCurrent = (to: string) => route.path === to || route.path.startsWith(`${to}/`)
 const sections = computed(() =>
   SECTIONS.filter((section) => isAtLeast(member.value?.role, section.minRole)),
 )
@@ -26,6 +30,7 @@ const sections = computed(() =>
         <li v-for="section in sections" :key="section.to">
           <RouterLink
             :to="section.to"
+            :aria-current="isCurrent(section.to) ? 'page' : undefined"
             class="flex min-h-11 items-center gap-3 rounded-control px-3 font-semibold text-ink-muted hover:bg-surface-sunken hover:text-ink aria-[current=page]:bg-ink aria-[current=page]:text-bg"
           >
             <component :is="section.icon" :size="20" aria-hidden="true" />

@@ -6,7 +6,7 @@ de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision r
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
 choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase), environnements et pipeline
-(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072 et suivantes).
+(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072, D-073), topo (D-074 et suivantes, phase 3).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -16,7 +16,7 @@ direction) ou **Willem**.
 | Décision | Question | Qui | Choix appliqué en attendant |
 |---|---|---|---|
 | D-001 | Barre d'onglets à 5 entrées ? | club | Actu, Topo, À faire, Planning, Podium ; profil via l'avatar |
-| D-002 | Cotations avec les « + » ? | club | 4a à 7c avec les « + » (23 niveaux) |
+| D-002 | Cotations avec les « + » ? | club | 4a- à 7c+ avec les « - » et les « + » (36 niveaux, révisé le 2026-10-23) |
 | D-003 | Classement « voies » : ascensions ou voies distinctes ? | club | Ascensions topées, répétitions comprises |
 | D-004 | Séances comptées en jours de grimpe ? | club | Oui : deux séances le même jour = une |
 | D-005 | Seuil du badge « Mois complet » ? | club | 10 jours de grimpe |
@@ -31,7 +31,6 @@ direction) ou **Willem**.
 | D-014 | Âge masqué, accord parental sous 15 ans ? | club | Oui |
 | D-037 | Polices et étiquette de voie : le rendu plaît-il ? | club | Archivo + Kalam, à juger sur l'environnement dev |
 | D-039 | Logo vectoriel / haute définition / fond noir disponible ? | club | Détourage du JPEG fourni |
-| D-041 | Session conservée après installation sur iPhone ? | Willem + testeurs | À vérifier sur appareil réel (environnement dev, phase 2) |
 | D-043 | Nom officiel de l'association et contact RGPD ? | club | « Gravelines Grimp », contact saisi par l'admin dans l'appli |
 | D-044 | Durée de conservation des comptes inactifs ? | club | Suppression après 3 ans sans connexion |
 | D-045 | Ce que la direction voit dans la fiche d'un membre ? | club | Tout sauf la date de naissance |
@@ -54,6 +53,9 @@ direction) ou **Willem**.
 ### D-002 — Cotations avec les « + » de 4a à 7c
 - **Contexte** : le cahier des charges cite des cotations de 4a à 7c sans préciser les « + ».
 - **Choix** : 23 cotations (4a, 4a+, … 7c), stockées avec un rang numérique. Badge « Première cotation » étendu jusqu'à 7c.
+- **Révision (2026-10-23, Willem)** : le club utilise aussi les « - ». La liste devient 4a-, 4a, 4a+, … 7c-, 7c, 7c+
+  (36 cotations, « - » avant la cotation simple, « + » après). Le badge « Première cotation » va jusqu'à 7c+.
+  Faite dans V7, pas encore en prod.
 - **Alternatives** : sans « + » (12 cotations).
 - **Statut** : à valider.
 
@@ -599,4 +601,78 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   garde ses sondes de noms, pour reconnaître le cas chez un autre membre.
 - **Vérifié sur l'iPhone de Willem (dev, 2026-10-21)** : l'avatar ouvre le profil, et « Modifier mon profil » enregistre
   (`PUT /api/v1/me/profile` passe : le filtre ne vise que les fichiers). Le filtre lui-même n'est pas identifié.
+- **Statut** : validée.
+
+### D-074 — Cotations en lecture seule
+- **Contexte** : la spec range les cotations dans la configuration du club (§5), mais l'écran de configuration (§8.11) ne cite
+  que secteurs, cordes et couleurs. Une cotation renommée ou retirée fausserait les tris, les filtres et, plus tard, le badge
+  « Première cotation » et les classements.
+- **Choix** : les 36 cotations (4a- → 7c+, D-002) sont créées par la migration, identiques en dev et en prod, avec un rang
+  numérique ; l'appli les lit mais ne les modifie pas. En ajouter une (8a un jour ?) se fait par une migration.
+- **Statut** : validée (Willem, 2026-10-23).
+
+### D-075 — Coups de cœur : la limite vise les voies non démontées
+- **Choix** : deux coups de cœur au plus sur des voies non démontées (D-010). Le troisième est refusé (`FAVORITES_FULL`), sauf
+  remplacement explicite d'un des deux, fait dans la même transaction. La ligne du membre est verrouillée pendant le contrôle,
+  pour que deux requêtes simultanées ne passent pas à 3. Remonter une voie démontée peut ramener quelqu'un à 3 : c'est toléré
+  (on ne retire pas un cœur sans le dire), et il ne peut plus en ajouter tant qu'il en a 2 ou plus.
+- **Statut** : validée (Willem, 2026-10-23).
+
+### D-076 — Styles de voie
+- **Choix** : liste fixe dans le code (`RouteStyle`) : Conti, Rési, Physique, Technique, Complexe, Dalle, Dévers, Réglettes,
+  Bacs, Pinces, Plats, Dièdre, Toit, Morpho ; cinq au plus par voie, pour que les icônes tiennent dans une ligne du topo.
+  Les libellés sont dans `fr.json`, donc renommables sans toucher aux données.
+- **Statut** : validée (Willem, 2026-10-23).
+
+### D-077 — Ouvreurs d'une voie
+- **Choix** : un ou plusieurs comptes de rôle Responsable et plus (actifs), et/ou un nom libre pour un ouvreur sans compte
+  (invité, ancien membre). Au moins l'un des deux. La date d'ouverture ne peut pas être dans le futur.
+- **Statut** : validée (Willem, 2026-10-23).
+
+### D-078 — Le topo trie et filtre dans le navigateur
+- **Contexte** : une salle porte une soixantaine de voies actives.
+- **Choix** : `GET /api/v1/routes` renvoie toutes les voies actives et en dernière chance avec leurs compteurs (sans requête
+  par voie), et le navigateur trie, filtre et regroupe (`lib/`, testé). Changer de tri est instantané, même avec un réseau de
+  salle. Tri et filtres vivent dans l'URL : un lien partagé ou un retour arrière les retrouve. Les archives sont chargées à
+  part, à la demande.
+- **Alternative** : tri et filtres côté serveur avec pagination, utile au-delà de quelques centaines de voies : pas le cas.
+- **Statut** : validée.
+
+### D-079 — Photo de voie
+- **Choix** : même chaîne de sécurité que la photo de profil (D-054 : type réel, plafonds avant décodage, deux décodages à la
+  fois, ré-encodage JPEG sans métadonnées) mais sans recadrage : la photo est réduite pour tenir dans 1600 px. Le navigateur la
+  réduit avant l'envoi. Servie aux seuls membres connectés.
+- **Statut** : validée.
+
+### D-080 — Statistiques d'ascensions de la fiche voie en phase 4
+- **Contexte** : la fiche voie doit montrer le nombre d'ascensions, de topées, de grimpeurs et la part en tête, ainsi que
+  « mon historique » sur la voie, et le topo doit pouvoir trier par réalisations. Tout cela se calcule sur les ascensions,
+  qui arrivent avec les séances.
+- **Choix** : en phase 3, la fiche n'affiche rien pour ces chiffres (pas de faux zéros) et le tri par réalisations n'est pas
+  proposé. Ils arrivent avec la phase 4 (ligne dans la ROADMAP).
+- **Statut** : validée.
+
+### D-081 — Une voie démontée est en lecture seule
+- **Choix** : sur une voie démontée, on ne modifie rien (fiche, photo, nouveaux commentaires, coups de cœur, « je sais la
+  faire », dernière chance) : refus `ROUTE_DISMOUNTED`. Seul le remontage la rend de nouveau modifiable. Exception : un
+  commentaire peut toujours être supprimé (par son auteur, ou par la direction pour modérer). Un coup de cœur posé avant
+  le démontage reste donc dans l'historique du profil (D-010), sans compter dans la limite de deux.
+- **Statut** : validée.
+
+### D-082 — Pop-up « dernière chance » : « Me le redire plus tard »
+- **Contexte** : la spec prévoit un seul bouton, « J'accepte leurs destins », qui enregistre la prise de connaissance.
+- **Choix** : un second bouton, « Me le redire plus tard », ferme la pop-up sans rien enregistrer : elle revient à la
+  prochaine ouverture de l'appli. La pop-up n'apparaît jamais pendant la saisie d'une séance, ni par-dessus l'invitation à
+  installer l'appli.
+- **Statut** : validée (Willem, 2026-10-23).
+
+### D-083 — Revue visuelle de la phase 3 : table de gestion compacte, tampon au-dessus de l'étiquette
+- **Contexte** : à 1280 px, la table des voies débordait (huit colonnes dans ~860 px) ; le tampon « Démontée » posé sur
+  l'étiquette cachait les noms courts (DESIGN §5 : le nom reste lisible).
+- **Choix** : la table perd la colonne « Cotation » (déjà sur l'étiquette) et la colonne « Ouverture » (reprise sous le
+  statut, en date courte) ; cœurs et commentaires ont une icône pour en-tête. Le tampon « Démontée » se pose au-dessus de
+  l'étiquette, à la manière du ruban « Dernière chance ». Les tris du topo s'appellent « Secteur » et « Ouverture » (le
+  libellé long était coupé à 360 px). Les textes ont une espace insécable avant `? ! : ;` et les dates écrivent « 1er ».
+  On garde deux façons de montrer une sélection dans le formulaire de voie : coche pour les couleurs (choix exclusif),
+  aplat plein pour les styles et les ouvreur·ses (choix multiples).
 - **Statut** : validée.
