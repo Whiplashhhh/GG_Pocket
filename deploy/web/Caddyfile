@@ -54,6 +54,19 @@
 		file_server
 	}
 
+	# Diagnostics (docs/DECISIONS.md D-091): the bytes of a built script under a neutral name. A phone
+	# that refuses /assets/X.js but takes this judges the name; refusing both, it judges the content.
+	@probe {
+		path /sonde/temoin.js
+		expression {query.f}.matches('^[A-Za-z0-9_-]+[.]js$')
+	}
+	handle @probe {
+		root * /srv
+		rewrite * /assets/{query.f}
+		header Cache-Control "no-store"
+		file_server
+	}
+
 	# Everything else (the page, the service worker, the manifest, icons) is revalidated on each
 	# visit, or an installed app would never see a new version.
 	handle {

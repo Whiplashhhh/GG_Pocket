@@ -17,6 +17,33 @@ interface Capture {
   act?: (page: Page, club: FakeClub) => Promise<void>
 }
 
+/** Marie's last sessions: one yesterday with a comment, one last week in top rope only. */
+const marieClimbs = (club: FakeClub) => {
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  if (marie === undefined) return
+  club.climbs.add(
+    marie,
+    1,
+    [
+      { route: 'Bye Bye Morice', mode: 'LEAD', clean: true },
+      { route: 'Réglisse', mode: 'LEAD' },
+      { route: 'Tonton Talon', mode: 'TOP_ROPE', topped: false },
+      { route: 'Bye Bye Morice', mode: 'TOP_ROPE', clean: true },
+      { route: 'Iron Man', mode: 'TOP_ROPE' },
+      { route: 'Sec !', mode: 'TOP_ROPE', clean: true },
+    ],
+    { comment: 'Les avant-bras en béton, le moral au sommet.', feeling: 8 },
+  )
+  club.climbs.add(marie, 6, [{ route: 'P’tite Line' }, { route: 'Sec !', clean: true }], {
+    visibility: 'PRIVATE',
+  })
+}
+
+const addToSession = async (page: Page, search: string, name: string) => {
+  await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill(search)
+  await page.getByRole('button', { name: `Ajouter ${name}` }).click()
+}
+
 /** Marie's own marks on the topo: favourites (one dismounted since), routes she can climb. */
 const marieOnTheWall = (club: FakeClub) => {
   const marie = club.members.find((member) => member.nickname === 'marie')
@@ -119,6 +146,52 @@ const CAPTURES: Capture[] = [
   { name: 'premiers-pas-installer', path: '/premiers-pas/installer', as: 'CLIMBER' },
   { name: 'actu-invitation', path: '/actu', as: 'CLIMBER', installInvite: true },
   { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
+  { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
+  {
+    name: 'seance-saisie',
+    path: '/seance/nouvelle',
+    as: 'CLIMBER',
+    prepare: marieClimbs,
+    act: async (page) => {
+      await addToSession(page, '12', 'Bye Bye Morice')
+      await addToSession(page, 'reglisse', 'Réglisse')
+      const second = page
+        .getByRole('listitem')
+        .filter({ has: page.getByLabel('Actions sur la voie n° 2') })
+      await second
+        .getByRole('radiogroup', { name: 'Mode' })
+        .getByRole('radio', { name: 'Tête' })
+        .click()
+      await second
+        .getByRole('radiogroup', { name: 'Topée' })
+        .getByRole('radio', { name: 'Non' })
+        .click()
+      await second.getByRole('button', { name: 'Une chute de plus' }).click()
+      await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('')
+      await page.getByLabel('Commentaire').fill('Grosse séance de conti.')
+    },
+  },
+  {
+    name: 'seance-detail',
+    path: '/actu',
+    as: 'CLIMBER',
+    prepare: marieClimbs,
+    act: async (page) => {
+      await page.getByRole('link', { name: 'Séance d’hier' }).click()
+      await page.getByRole('heading', { level: 1, name: 'Ma séance' }).waitFor()
+    },
+  },
+  {
+    name: 'seance-en-attente',
+    path: '/seance/nouvelle',
+    as: 'CLIMBER',
+    act: async (page, club) => {
+      await addToSession(page, 'reglisse', 'Réglisse')
+      club.climbs.offline = true
+      await page.getByRole('button', { name: 'Enregistrer la séance' }).click()
+      await page.getByText('1 séance en attente de réseau').waitFor()
+    },
+  },
   { name: 'topo', path: '/topo', as: 'CLIMBER', prepare: marieOnTheWall },
   { name: 'topo-secteurs', path: '/topo?tri=secteur', as: 'CLIMBER', prepare: marieOnTheWall },
   {
@@ -135,10 +208,24 @@ const CAPTURES: Capture[] = [
     name: 'topo-fiche',
     path: '/topo',
     as: 'CLIMBER',
-    prepare: marieOnTheWall,
+    prepare: (club) => {
+      marieOnTheWall(club)
+      marieClimbs(club)
+    },
     act: async (page) => {
       await page.getByRole('link', { name: /Bye Bye Morice/ }).click()
       await page.getByRole('dialog').getByText('Le conseil de l’ouvreur').waitFor()
+    },
+  },
+  {
+    name: 'topo-fiche-compteur',
+    path: '/topo',
+    as: 'CLIMBER',
+    prepare: marieClimbs,
+    act: async (page) => {
+      await page.getByRole('link', { name: /Bye Bye Morice/ }).click()
+      const counter = page.getByRole('dialog').getByRole('heading', { name: 'Au compteur' })
+      await counter.scrollIntoViewIfNeeded()
     },
   },
   {
@@ -358,6 +445,8 @@ for (const capture of CAPTURES) {
 
     test(`capture ${capture.name}`, async ({ page, club, isMobile }, testInfo) => {
       test.skip(!isMobile && capture.desktop !== true, 'Phone screens are reviewed at 360 px')
+      // The phone and the fake server agree on the day (the session sheet reads it).
+      await page.clock.setSystemTime(new Date(club.now))
       capture.prepare?.(club)
       await page.goto(capture.path)
       await expect(page.locator('h1').first()).toBeVisible()

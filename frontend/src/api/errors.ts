@@ -37,6 +37,10 @@ export const SERVER_ERROR_CODES = [
   'INVALID_SETTERS',
   'DATE_IN_THE_FUTURE',
   'DATE_IN_THE_PAST',
+  'SESSION_TOO_OLD',
+  'MONTH_FROZEN',
+  'INVALID_ASCENT',
+  'CHECK_FROM_ASCENT',
 ] as const
 
 export type ServerErrorCode = (typeof SERVER_ERROR_CODES)[number]

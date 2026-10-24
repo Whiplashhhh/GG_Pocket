@@ -112,7 +112,7 @@ export async function prepareAvatar(file: File): Promise<Blob> {
   )
 }
 
-/** A route photo: the whole picture, shrunk to fit in 1600 px, not cropped. */
+/** A route or session photo: the whole picture, shrunk to fit in 1600 px, not cropped. */
 export async function prepareRoutePhoto(file: File): Promise<Blob> {
   const bitmap = await readBitmap(file)
   return redraw(

@@ -38,18 +38,21 @@ public class FavoriteService {
     private final RouteRepository routes;
     private final MemberRepository members;
     private final RouteViews views;
+    private final RouteAscentStats ascents;
 
     public FavoriteService(
             FavoriteRepository favorites,
             RouteCheckRepository checks,
             RouteRepository routes,
             MemberRepository members,
-            RouteViews views) {
+            RouteViews views,
+            RouteAscentStats ascents) {
         this.favorites = favorites;
         this.checks = checks;
         this.routes = routes;
         this.members = members;
         this.views = views;
+        this.ascents = ascents;
     }
 
     /**
@@ -116,11 +119,21 @@ public class FavoriteService {
         }
     }
 
-    /** Idempotent. */
+    /**
+     * Idempotent. A mark backed by a clean ascent in this mode cannot be removed by hand: it would
+     * come back with the next session (change or delete that session instead).
+     *
+     * @throws BusinessException {@code ROUTE_DISMOUNTED}, {@code CHECK_FROM_ASCENT}
+     */
     @PreAuthorize("hasRole('CLIMBER')")
     @Transactional
     public void uncheck(UUID memberId, UUID routeId, ClimbMode mode) {
+        lockMember(memberId);
         loadRoute(routeId).ensureOnTheWall();
+        if (ascents.hasCleanAscent(memberId, routeId, mode)) {
+            throw new BusinessException(
+                    ErrorCode.CHECK_FROM_ASCENT, "Clean ascent of " + routeId + " in " + mode);
+        }
         checks.findByMemberIdAndRouteIdAndMode(memberId, routeId, mode)
                 .ifPresent(check -> checks.delete(check));
     }

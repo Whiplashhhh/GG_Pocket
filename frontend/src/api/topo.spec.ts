@@ -33,6 +33,7 @@ const route = (id: string, overrides: Partial<RouteSummary> = {}): RouteSummary 
   styles: [],
   favoriteCount: 3,
   commentCount: 0,
+  toppedCount: 0,
   favorite: false,
   checks: [],
   ...overrides,

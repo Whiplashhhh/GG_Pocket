@@ -34,6 +34,8 @@ public record RouteSummaryResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) List<RouteStyle> styles,
         @Schema(requiredMode = RequiredMode.REQUIRED) int favoriteCount,
         @Schema(requiredMode = RequiredMode.REQUIRED) int commentCount,
+        @Schema(requiredMode = RequiredMode.REQUIRED, description = "Topped ascents, by everyone")
+                int toppedCount,
         @Schema(
                         requiredMode = RequiredMode.REQUIRED,
                         description = "Whether it is one of my favourites")
@@ -41,7 +43,7 @@ public record RouteSummaryResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED, description = "Modes in which I can climb it")
                 List<ClimbMode> checks) {
 
-    static RouteSummaryResponse from(RouteSummaryView view) {
+    public static RouteSummaryResponse from(RouteSummaryView view) {
         return new RouteSummaryResponse(
                 view.id(),
                 view.name(),
@@ -60,6 +62,7 @@ public record RouteSummaryResponse(
                 view.styles(),
                 view.favoriteCount(),
                 view.commentCount(),
+                view.toppedCount(),
                 view.favorite(),
                 view.checks());
     }

@@ -78,7 +78,7 @@ test.describe('app shell', () => {
     await page.goto('/actu')
     await fab.click()
     await expect(page).toHaveURL(/\/seance\/nouvelle$/)
-    await expect(page.getByRole('heading', { name: 'Voie en cours d’ouverture' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Nouvelle séance' })).toBeVisible()
   })
 
   test('the avatar opens the profile, where the theme can be forced', async ({ page }) => {

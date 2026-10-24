@@ -5,8 +5,10 @@ import { useRoute } from 'vue-router'
 
 import { useAuthState } from '@/api/auth'
 import InstallDialog from '@/components/install/InstallDialog.vue'
+import OutboxBanner from '@/components/session/OutboxBanner.vue'
 import LastChanceDialog from '@/components/topo/LastChanceDialog.vue'
 import { useInstallStore } from '@/stores/install'
+import { useOutboxStore } from '@/stores/outbox'
 
 import AppHeader from './AppHeader.vue'
 import DevBanner from './DevBanner.vue'
@@ -18,6 +20,7 @@ const { t } = useI18n()
 const route = useRoute()
 const { data: auth, isError, refetch } = useAuthState()
 const install = useInstallStore()
+const outbox = useOutboxStore()
 
 const showFab = computed(() => route.meta.fab === true)
 /** The server could not tell who is signed in (offline at start-up): nothing to show but that. */
@@ -34,6 +37,8 @@ watch(
       invitationConsidered = true
       inviting.value = install.shouldInvite
     }
+    // Sessions logged offline leave as soon as someone is signed in.
+    if (authenticated === true) outbox.start()
   },
   { immediate: true },
 )
@@ -59,6 +64,7 @@ const lastChanceEnabled = computed(
     class="mx-auto outline-none"
     :class="[route.meta.wide ? 'max-w-6xl lg:pb-10' : 'max-w-2xl', showFab ? 'pb-40' : 'pb-24']"
   >
+    <OutboxBanner />
     <OfflineState v-if="unreachable" @retry="refetch()" />
     <RouterView v-else />
   </main>

@@ -40,6 +40,7 @@ function route(overrides: Partial<RouteSummary> & Pick<RouteSummary, 'id' | 'nam
     styles: [],
     favoriteCount: 0,
     commentCount: 0,
+    toppedCount: 0,
     favorite: false,
     checks: [],
     ...overrides,
@@ -57,6 +58,7 @@ const morice = route({
   styles: ['CONTINUITY', 'ENDURANCE'],
   favoriteCount: 5,
   commentCount: 1,
+  toppedCount: 12,
   checks: ['LEAD'],
 })
 const puree = route({
@@ -69,6 +71,7 @@ const puree = route({
   openedOn: '2026-10-02',
   favoriteCount: 2,
   commentCount: 4,
+  toppedCount: 3,
 })
 const tonton = route({
   id: 'r3',
@@ -82,6 +85,7 @@ const tonton = route({
   styles: ['PHYSICAL', 'OVERHANG'],
   favoriteCount: 2,
   commentCount: 0,
+  toppedCount: 0,
   checks: ['TOP_ROPE'],
 })
 const reglisse = route({
@@ -94,6 +98,7 @@ const reglisse = route({
   holds: [BLUE],
   openedOn: '2026-10-02',
   styles: ['SLAB'],
+  toppedCount: 7,
 })
 const ALL = [morice, puree, tonton, reglisse]
 const names = (routes: RouteSummary[]) => routes.map((item) => item.name)
@@ -138,6 +143,15 @@ describe('sortRoutes', () => {
       'Bye Bye Morice',
       'Réglisse',
       'OH purée !',
+    ])
+  })
+
+  it('sorts by topped ascents, most done first', () => {
+    expect(names(sortRoutes(ALL, 'topped', 'desc'))).toEqual([
+      'Bye Bye Morice',
+      'Réglisse',
+      'OH purée !',
+      'Tonton Talon',
     ])
   })
 
@@ -262,7 +276,7 @@ describe('topo query', () => {
 
   it('ignores what it does not know', () => {
     const view = parseTopoQuery({
-      tri: 'realisations',
+      tri: 'popularite',
       ordre: 'n-importe',
       min: '-2',
       style: 'YOGA',

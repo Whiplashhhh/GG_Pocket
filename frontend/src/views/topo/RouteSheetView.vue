@@ -23,6 +23,7 @@ import {
   type ClimbMode,
 } from '@/api/topo'
 import FavoriteReplaceDialog from '@/components/topo/FavoriteReplaceDialog.vue'
+import RouteAscents from '@/components/topo/RouteAscents.vue'
 import RouteComments from '@/components/topo/RouteComments.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
@@ -35,7 +36,7 @@ import { formatDate } from '@/lib/format'
 /**
  * The route sheet (spec §8.4, wireframe « Fiche voie »): slides up over the list it was opened
  * from, which keeps its sort and filters. Deep-linkable. Ascent figures and « mon historique »
- * come with sessions (phase 4, D-080): nothing is shown for them until then.
+ * come from the sessions (D-080).
  */
 const { t } = useI18n()
 const route = useRoute()
@@ -371,6 +372,12 @@ const toggleClasses = (pressed: boolean, tone: 'brand' | 'success') => [
                 <FormAlert>{{ t(errorMessageKey(actionError)) }}</FormAlert>
               </div>
             </div>
+
+            <RouteAscents
+              v-if="detail.data.value"
+              :stats="detail.data.value.stats"
+              :mine="detail.data.value.myAscents"
+            />
 
             <RouteComments
               class="mt-8 border-t border-rule pt-6"

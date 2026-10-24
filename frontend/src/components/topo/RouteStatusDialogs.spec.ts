@@ -29,6 +29,7 @@ const morice = (
   styles: [],
   favoriteCount,
   commentCount: 0,
+  toppedCount: 0,
   favorite: false,
   checks: [],
 })
