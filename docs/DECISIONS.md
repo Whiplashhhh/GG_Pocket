@@ -729,3 +729,21 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   fiche voie montre aussi ascensions, topées, grimpeur·ses différent·es et part en tête : des agrégats sans nom, qui
   comptent aussi les séances « juste moi ».
 - **Statut** : à valider (club).
+
+### D-091 — Mises à jour de l'appli installée : chercher plus souvent, dire pourquoi ça bloque
+- **Contexte** : sur l'iPhone de Willem, la PWA du dev affichait encore « GG Pocket 0.1.1 » avec un serveur en 0.2.0, et
+  aucun bandeau « Nouvelle version » ne venait, même après avoir fermé l'appli. Réinstallée en 0.2.0, le Profil ne
+  s'ouvre plus : `/assets/DaqITAgE.js` → `Load failed` (même avec `?sonde`), alors que son nom ne contient pas « profil »
+  (D-073), et « aucun » service worker aux commandes malgré un cache de pré-chargement présent. Lecture : une nouvelle
+  version ne s'installe que si **tous** ses fichiers arrivent ; un seul fichier refusé par le téléphone et l'installation
+  échoue sans un mot, l'ancienne version reste (ou aucune ne prend la main).
+- **Choix** :
+  - l'appli cherche une mise à jour au retour au premier plan et toutes les heures, plus seulement au démarrage complet
+    (`lib/appUpdate.ts`, branché dans `UpdateBanner`) ;
+  - Profil → « Chercher une mise à jour » dit en clair : à jour, nouvelle version prête, ou échec avec la liste des
+    fichiers refusés (à copier) ;
+  - nouvelle sonde : `/sonde/temoin.js?f=<fichier>` (Caddy du conteneur web) sert les mêmes octets sous un nom neutre.
+    Refusé là aussi : le téléphone juge le **contenu** ; accepté : il juge le **nom**. L'écran d'erreur et le bouton la
+    lancent pour chaque script refusé, et listent tous les fichiers de l'appli que le téléphone refuse.
+- **Suite** : selon la réponse de la sonde, renommer autrement ou trouver ce qui, dans le contenu, déclenche le filtre.
+- **Statut** : en cours (diagnostic sur l'iPhone de Willem).

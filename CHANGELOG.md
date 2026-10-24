@@ -16,6 +16,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 - Actu montre tes séances (en attendant tes amis) ; chaque séance a sa page pour la modifier ou la supprimer, tant que
   son mois n'est pas clos.
 - Une voie enchaînée en séance se coche toute seule en « Je sais la faire ».
+- L'appli installée cherche ses mises à jour quand tu reviens dessus, plus seulement au démarrage. Et si elle traîne,
+  Profil → « Chercher une mise à jour » te dit où ça coince.
 - La fiche voie affiche ses chiffres (ascensions, topées, grimpeur·ses, part en tête) et ton historique sur la voie ;
   le topo se trie par réalisations.
 

@@ -2,12 +2,18 @@
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 import { useI18n } from 'vue-i18n'
 
+import { watchForUpdates } from '@/lib/appUpdate'
+
 /**
  * Spec §8.12: a new version waits for the member to accept; never a surprise reload in the middle
  * of a form.
  */
 const { t } = useI18n()
-const { needRefresh, updateServiceWorker } = useRegisterSW()
+const { needRefresh, updateServiceWorker } = useRegisterSW({
+  onRegisteredSW(_url, registration) {
+    if (registration !== undefined) watchForUpdates(registration)
+  },
+})
 </script>
 
 <template>

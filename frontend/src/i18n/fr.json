@@ -331,7 +331,7 @@
     "climbingSince": "Grimpe depuis {year}",
     "clubSince": "Au club depuis {year}",
     "age": "{age} ans",
-    "comingSoon": "Badges et chiffres clés arrivent avec les séances.",
+    "comingSoon": "Badges et chiffres clés arrivent bientôt : tes séances, elles, sont déjà au carnet.",
     "settings": "Réglages",
     "password": "Mot de passe",
     "devices": "Mes appareils",
@@ -1019,5 +1019,17 @@
     "SETTER": "Ouvreur·se",
     "BOARD": "Direction",
     "ADMIN": "Le Président·e"
+  },
+  "appUpdate": {
+    "check": "Chercher une mise à jour",
+    "checking": "On regarde s’il y a du nouveau…",
+    "noRefusedFile": "Aucun fichier refusé : le problème est ailleurs.",
+    "result": {
+      "unsupported": "Ce navigateur ne gère pas les mises à jour d’appli installée : recharge la page pour avoir la dernière version.",
+      "upToDate": "Tu as la dernière version. Rien à faire, grimpe !",
+      "ready": "Nouvelle version prête : touche « Recharger » dans le bandeau en bas.",
+      "failed": "La nouvelle version n’a pas pu s’installer : ton téléphone a refusé des fichiers. Copie le détail et envoie-le à la direction.",
+      "error": "Impossible de chercher une mise à jour pour l’instant. Vérifie ta connexion et réessaie."
+    }
   }
 }
