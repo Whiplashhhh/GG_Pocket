@@ -41,6 +41,8 @@ direction) ou **Willem**.
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
 | D-087 | En attendant les amis, Actu montre mes séances ? | Willem | Oui, « Mes séances » en haut du fil |
 | D-090 | « Réalisations » du topo = ascensions topées ? | club | Oui, par tout le monde, répétitions comprises |
+| D-093 | Série du planning : semaines d'affilée à 2 séances ou plus ? | club | Oui, la semaine en cours ne casse pas la série |
+| D-094 | Le carnet : chiffres, pyramide par cotation, toutes mes voies ? | Willem | Oui, depuis le Profil ; celui des amis en phase 5 |
 
 ---
 
@@ -756,3 +758,42 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   donner est de couper Cyberfiltre (ou de l'autoriser pour le site). Si la prod est touchée, nommer les fichiers par
   un motif plus sage, avec la sonde pour le vérifier.
 - **Statut** : cause trouvée ; contournement côté appli à décider si la prod est touchée.
+
+### D-092 — « À faire » : l'état de chaque voie vient du serveur
+- **Contexte** : la spec (§8.5) veut deux listes (mouli, tête), « sue en tête implique sue en mouli », et la possibilité
+  de décocher ; le front ne recalcule aucune règle (§9).
+- **Choix** : `GET /api/v1/me/todo` renvoie chaque voie au mur avec son état par mode : `TODO`, `CHECKED` (à la main),
+  `FROM_ASCENT` (une ascension enchaînée dans ce mode), `FROM_LEAD` (mouli seulement : sue en tête), et les compteurs.
+  Seule une coche `CHECKED` se décoche depuis l'écran ; les autres disent quoi faire (modifier la séance, décocher en
+  tête). Cocher et annuler passent par les points d'accès de la fiche voie. Filtres secteur et famille de cotation
+  (« les 6a » = 6a-, 6a, 6a+) et tri : présentation seulement, dans l'URL.
+- **Statut** : validée (application de la spec).
+
+### D-093 — Planning : bilan du mois et série en cours
+- **Contexte** : la spec (§8.6) cite « séances, voies topées, cotation max, ressenti moyen » et une série « 3 semaines
+  d'affilée avec 2 séances ou plus », sans définir les cas limites.
+- **Choix** : présences = jours de grimpe (§9.1) ; « Séances » du bilan = séances réellement notées ; voies topées =
+  ascensions topées, répétitions comprises ; cotation max = la plus dure topée ; ressenti moyen = moyenne des ressentis
+  de séance renseignés, à une décimale. Série = semaines ISO consécutives à au moins 2 jours de grimpe, en remontant
+  depuis la semaine en cours ; la semaine en cours compte dès qu'elle a ses 2 jours et ne casse jamais la série avant
+  dimanche. Pas de mois futur ni avant 2000-01 (400). Un jour de la semaine écoulée sans séance propose d'en noter une
+  (`/seance/nouvelle?jour=…`).
+- **Statut** : à valider (club : seuil de 2 séances par semaine).
+
+### D-094 — Le carnet personnel
+- **Contexte** : la roadmap prévoit un « carnet personnel » et le profil un « lien vers mon carnet complet » (§8.8),
+  sans en décrire le contenu.
+- **Choix** : `/carnet` (depuis le Profil) : chiffres (séances, voies différentes, ascensions, topées, topées en tête,
+  enchaînées, cotation max, max en tête), pyramide par cotation (voies différentes topées, comptées dans le mode de
+  leur meilleure ascension) et la liste de toutes les voies grimpées, démontées comprises, avec la meilleure réalisation
+  (enchaînée en tête > topée en tête > enchaînée en mouli > topée en mouli > pas encore topée). Mon carnet seulement en
+  phase 4 ; celui d'un ami arrivera avec les amis (phase 5).
+- **Statut** : à valider (Willem).
+
+### D-095 — Lecture hors ligne du topo, du profil, du planning et de l'À faire
+- **Choix** : le service worker lit `routes`, `routes/{id}`, `topo/config`, `me`, `me/favorites`, `me/todo` et
+  `me/planning` en *network-first* (5 s), garde la dernière réponse 200 dans le cache `gg-offline-reads` (60 entrées,
+  14 jours) et la sert sans réseau (§12). Ces réponses sont celles du membre connecté : le cache est vidé à chaque
+  connexion et déconnexion. Jamais les fichiers (`/media`), l'authentification ni les séances.
+- **Statut** : validée (application de la spec).
+

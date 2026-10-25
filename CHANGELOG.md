@@ -5,6 +5,19 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- À faire : en mouli ou en tête, la liste des voies au mur que tu ne sais pas encore faire, avec ta progression
+  (« 34 / 58 voies en tête. Il en reste 24, courage. »), un filtre secteur et cotation, et le tri par cotation. Coche une
+  voie, elle file ; tu as cinq secondes pour « Annuler ». « Voir celles que je sais faire » pour décocher. Une voie sue en
+  tête l'est aussi en mouli, et une voie enchaînée en séance se coche toute seule.
+- Planning : ton mois à la salle, lundi en premier. Chaque jour grimpé porte sa coche, touche-le pour retrouver ses
+  séances. Dessous, le bilan du mois (séances, voies topées, cotation max, ressenti moyen) et ta série en cours
+  (semaines d'affilée à 2 séances ou plus). Un jour de la semaine passée sans séance ? « Noter une séance ce jour-là ».
+- Mon carnet (depuis le Profil) : tes chiffres, ta pyramide par cotation et toutes les voies que tu as grimpées, avec
+  ta meilleure réalisation sur chacune. Les voies démontées y restent : l'histoire est sacrée.
+- Le topo, ton profil, ton planning et ton À faire se consultent sans réseau (la dernière version vue).
+
 ## 0.3.0 — 2026-10-25
 
 ### Ajouté
