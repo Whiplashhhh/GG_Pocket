@@ -67,11 +67,23 @@ const routes: RouteRecordRaw[] = [
     path: '/a-faire',
     component: () => import('@/views/TodoView.vue'),
     meta: { titleKey: 'nav.todo' },
+    children: [
+      {
+        path: 'voies/:id',
+        component: () => import('@/views/topo/RouteSheetView.vue'),
+        meta: { titleKey: 'routeSheet.title', sheet: true },
+      },
+    ],
   },
   {
     path: '/planning',
     component: () => import('@/views/PlanningView.vue'),
     meta: { titleKey: 'nav.planning', fab: true },
+  },
+  {
+    path: '/carnet',
+    component: () => import('@/views/LogbookView.vue'),
+    meta: { titleKey: 'logbook.title' },
   },
   {
     path: '/podium',

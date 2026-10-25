@@ -879,6 +879,25 @@
         "tags" : [ "Topo" ]
       }
     },
+    "/api/v1/me/logbook" : {
+      "get" : {
+        "operationId" : "getMyLogbook",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Logbook"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "My logbook: totals, grade pyramid and every route I climbed",
+        "tags" : [ "Sessions" ]
+      }
+    },
     "/api/v1/me/password" : {
       "put" : {
         "operationId" : "changeMyPassword",
@@ -899,6 +918,34 @@
         },
         "summary" : "Change my password; closes my other sessions",
         "tags" : [ "Me" ]
+      }
+    },
+    "/api/v1/me/planning" : {
+      "get" : {
+        "operationId" : "getMyPlanning",
+        "parameters" : [ {
+          "description" : "YYYY-MM, this month by default; never a future month",
+          "in" : "query",
+          "name" : "month",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Planning"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "One month of my planning: days climbed, month summary, current streak",
+        "tags" : [ "Sessions" ]
       }
     },
     "/api/v1/me/profile" : {
@@ -964,6 +1011,25 @@
         },
         "summary" : "My sessions, latest day first (cursor pagination)",
         "tags" : [ "Sessions" ]
+      }
+    },
+    "/api/v1/me/todo" : {
+      "get" : {
+        "operationId" : "getMyTodo",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Todo"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Routes on the wall with what I know of them, per mode",
+        "tags" : [ "Topo" ]
       }
     },
     "/api/v1/media/{id}" : {
@@ -2211,6 +2277,129 @@
           }
         }
       },
+      "Logbook" : {
+        "type" : "object",
+        "properties" : {
+          "grades" : {
+            "type" : "array",
+            "description" : "Hardest grade first, only grades with a topped route",
+            "items" : {
+              "$ref" : "#/components/schemas/LogbookGrade"
+            }
+          },
+          "routes" : {
+            "type" : "array",
+            "description" : "Every route I climbed, dismounted ones included; latest first",
+            "items" : {
+              "$ref" : "#/components/schemas/LogbookRoute"
+            }
+          },
+          "totals" : {
+            "$ref" : "#/components/schemas/LogbookTotals"
+          }
+        },
+        "required" : [ "grades", "routes", "totals" ]
+      },
+      "LogbookGrade" : {
+        "type" : "object",
+        "description" : "Distinct routes topped at this grade, by the mode of their best ascent",
+        "properties" : {
+          "grade" : {
+            "type" : "string"
+          },
+          "gradeRank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lead" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "topRope" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "grade", "gradeRank", "lead", "topRope" ]
+      },
+      "LogbookRoute" : {
+        "type" : "object",
+        "properties" : {
+          "ascentCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "best" : {
+            "type" : "string",
+            "enum" : [ "LEAD_CLEAN", "LEAD_TOPPED", "TOP_ROPE_CLEAN", "TOP_ROPE_TOPPED", "TRIED" ]
+          },
+          "firstClimbedOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "lastClimbedOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "route" : {
+            "$ref" : "#/components/schemas/RouteSummary"
+          },
+          "toppedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "ascentCount", "best", "firstClimbedOn", "lastClimbedOn", "route", "toppedCount" ]
+      },
+      "LogbookTotals" : {
+        "type" : "object",
+        "description" : "Ascent counters count repeats; routeCount counts distinct routes; maxGrade and maxLeadGrade: the hardest topped, in any mode and in lead.",
+        "properties" : {
+          "ascentCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "cleanCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "climbingDays" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "leadToppedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "maxGrade" : {
+            "type" : "string"
+          },
+          "maxGradeRank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "maxLeadGrade" : {
+            "type" : "string"
+          },
+          "maxLeadGradeRank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "routeCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "sessionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "toppedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "ascentCount", "cleanCount", "climbingDays", "leadToppedCount", "routeCount", "sessionCount", "toppedCount" ]
+      },
       "LoginRequest" : {
         "type" : "object",
         "properties" : {
@@ -2359,6 +2548,36 @@
           }
         },
         "required" : [ "branch", "commit", "environment", "version" ]
+      },
+      "MonthTotals" : {
+        "type" : "object",
+        "description" : "climbingDays: days with a session (two sessions on a day make one); toppedCount: topped ascents, repeats included; maxGrade: the hardest topped; averageFeeling: of the rated sessions.",
+        "properties" : {
+          "averageFeeling" : {
+            "type" : "number",
+            "example" : 7.5
+          },
+          "climbingDays" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "maxGrade" : {
+            "type" : "string"
+          },
+          "maxGradeRank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "sessionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "toppedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "climbingDays", "sessionCount", "toppedCount" ]
       },
       "MyProfile" : {
         "type" : "object",
@@ -2531,6 +2750,67 @@
           }
         },
         "required" : [ "firstName", "nickname" ]
+      },
+      "Planning" : {
+        "type" : "object",
+        "properties" : {
+          "days" : {
+            "type" : "array",
+            "description" : "Only the days with a session, earliest first",
+            "items" : {
+              "$ref" : "#/components/schemas/PlanningDay"
+            }
+          },
+          "frozen" : {
+            "type" : "boolean",
+            "description" : "Its sessions can no longer change"
+          },
+          "month" : {
+            "type" : "string",
+            "example" : "2026-10"
+          },
+          "streak" : {
+            "$ref" : "#/components/schemas/Streak"
+          },
+          "totals" : {
+            "$ref" : "#/components/schemas/MonthTotals"
+          }
+        },
+        "required" : [ "days", "frozen", "month", "streak", "totals" ]
+      },
+      "PlanningDay" : {
+        "type" : "object",
+        "properties" : {
+          "date" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "sessions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PlanningSession"
+            }
+          }
+        },
+        "required" : [ "date", "sessions" ]
+      },
+      "PlanningSession" : {
+        "type" : "object",
+        "properties" : {
+          "feeling" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Out of 10"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "summary" : {
+            "$ref" : "#/components/schemas/SessionSummary"
+          }
+        },
+        "required" : [ "id", "summary" ]
       },
       "ProfileUpdate" : {
         "type" : "object",
@@ -3203,6 +3483,67 @@
           }
         },
         "required" : [ "status" ]
+      },
+      "Streak" : {
+        "type" : "object",
+        "description" : "ISO weeks in a row with at least minDaysPerWeek climbing days, up to this week (which only counts once it has them).",
+        "properties" : {
+          "currentWeekDays" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "minDaysPerWeek" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "weeks" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "currentWeekDays", "minDaysPerWeek", "weeks" ]
+      },
+      "Todo" : {
+        "type" : "object",
+        "description" : "Every route on the wall, easiest first. A route is on my list in a mode while its state is TODO; known in lead means known in top rope (FROM_LEAD).",
+        "properties" : {
+          "leadKnown" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "routeCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "routes" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TodoRoute"
+            }
+          },
+          "topRopeKnown" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "leadKnown", "routeCount", "routes", "topRopeKnown" ]
+      },
+      "TodoRoute" : {
+        "type" : "object",
+        "properties" : {
+          "lead" : {
+            "type" : "string",
+            "enum" : [ "TODO", "CHECKED", "FROM_ASCENT", "FROM_LEAD" ]
+          },
+          "route" : {
+            "$ref" : "#/components/schemas/RouteSummary"
+          },
+          "topRope" : {
+            "type" : "string",
+            "enum" : [ "TODO", "CHECKED", "FROM_ASCENT", "FROM_LEAD" ]
+          }
+        },
+        "required" : [ "lead", "route", "topRope" ]
       },
       "TopoConfig" : {
         "type" : "object",

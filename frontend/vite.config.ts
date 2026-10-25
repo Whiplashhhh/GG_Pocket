@@ -7,6 +7,8 @@ import vue from '@vitejs/plugin-vue'
 import { defineConfig, type UserConfig } from 'vite'
 import { VitePWA, type VitePWAOptions } from 'vite-plugin-pwa'
 
+import { OFFLINE_READS, OFFLINE_READS_CACHE } from './src/lib/offlineReads.ts'
+
 /** Single source of truth for the version: the repository's VERSION file (docs/DECISIONS.md D-032). */
 const appVersion = readFileSync(new URL('../VERSION', import.meta.url), 'utf8').trim()
 
@@ -44,6 +46,20 @@ const pwaOptions = {
     navigateFallback: '/index.html',
     navigateFallbackDenylist: [/^\/api\//],
     cleanupOutdatedCaches: true,
+    // Spec §12: topo, profile, planning and "à faire" readable offline (src/lib/offlineReads.ts).
+    runtimeCaching: [
+      {
+        urlPattern: OFFLINE_READS,
+        method: 'GET',
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: OFFLINE_READS_CACHE,
+          networkTimeoutSeconds: 5,
+          cacheableResponse: { statuses: [200] },
+          expiration: { maxEntries: 60, maxAgeSeconds: 14 * 24 * 60 * 60 },
+        },
+      },
+    ],
   },
 } satisfies Partial<VitePWAOptions>
 

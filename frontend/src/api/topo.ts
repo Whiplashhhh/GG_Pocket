@@ -23,6 +23,8 @@ export const TOPO_CONFIG_KEY = ['topo', 'config'] as const
 export const ROUTES_KEY = ['topo', 'routes'] as const
 export const ARCHIVE_KEY = ['topo', 'archive'] as const
 export const MY_FAVORITES_KEY = ['me', 'favorites'] as const
+/** "À faire": my standing on every route on the wall; any check or session changes it. */
+export const MY_TODO_KEY = ['me', 'todo'] as const
 export const UNACKNOWLEDGED_LAST_CHANCE_KEY = ['topo', 'last-chance', 'unacknowledged'] as const
 
 const routeKey = (id: string) => [...ROUTES_KEY, id] as const
@@ -121,6 +123,7 @@ function refreshRoutes(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: ROUTES_KEY })
   void queryClient.invalidateQueries({ queryKey: ARCHIVE_KEY })
   void queryClient.invalidateQueries({ queryKey: MY_FAVORITES_KEY })
+  void queryClient.invalidateQueries({ queryKey: MY_TODO_KEY })
 }
 
 export function useAddFavorite() {

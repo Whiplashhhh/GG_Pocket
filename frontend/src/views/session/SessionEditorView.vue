@@ -28,6 +28,7 @@ import TextField from '@/components/ui/TextField.vue'
 import { draftKey, useSessionDraft } from '@/composables/useSessionDraft'
 import { clubToday } from '@/lib/age'
 import { canWait } from '@/lib/outbox'
+import { canLogOn } from '@/lib/planning'
 import {
   addAscent,
   dateBounds,
@@ -85,6 +86,11 @@ async function load() {
   const restored = await draft.restore()
   if (!restored && editing.value && existing.data.value !== undefined) {
     form.value = sessionToForm(existing.data.value)
+  }
+  // From the planning: "Noter une séance ce jour-là" (?jour=YYYY-MM-DD, within the open week).
+  const day = route.query.jour
+  if (!editing.value && typeof day === 'string' && canLogOn(day, today)) {
+    form.value = { ...form.value, climbedOn: day }
   }
   loaded.value = true
 }

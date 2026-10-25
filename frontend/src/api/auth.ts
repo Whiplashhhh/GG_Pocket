@@ -10,6 +10,7 @@ import { computed } from 'vue'
 import { api } from './client'
 import { request, requestNoContent } from './request'
 import type { components } from './schema'
+import { forgetOfflineReads } from '@/lib/offlineReads'
 
 export type AuthState = components['schemas']['AuthState']
 export type CurrentMember = components['schemas']['CurrentMember']
@@ -56,6 +57,7 @@ function useSignedIn() {
  */
 function forgetMemberData(queryClient: QueryClient) {
   queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== AUTH_STATE_KEY[0] })
+  forgetOfflineReads()
 }
 
 export function useLogin() {

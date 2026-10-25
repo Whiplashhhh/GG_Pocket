@@ -517,6 +517,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/logbook': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** My logbook: totals, grade pyramid and every route I climbed */
+    get: operations['getMyLogbook']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/password': {
     parameters: {
       query?: never
@@ -527,6 +544,23 @@ export interface paths {
     get?: never
     /** Change my password; closes my other sessions */
     put: operations['changeMyPassword']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/planning': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** One month of my planning: days climbed, month summary, current streak */
+    get: operations['getMyPlanning']
+    put?: never
     post?: never
     delete?: never
     options?: never
@@ -560,6 +594,23 @@ export interface paths {
     }
     /** My sessions, latest day first (cursor pagination) */
     get: operations['listMySessions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/todo': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Routes on the wall with what I know of them, per mode */
+    get: operations['getMyTodo']
     put?: never
     post?: never
     delete?: never
@@ -1138,6 +1189,59 @@ export interface components {
        */
       plannedDismountOn?: string
     }
+    Logbook: {
+      /** @description Hardest grade first, only grades with a topped route */
+      grades: components['schemas']['LogbookGrade'][]
+      /** @description Every route I climbed, dismounted ones included; latest first */
+      routes: components['schemas']['LogbookRoute'][]
+      totals: components['schemas']['LogbookTotals']
+    }
+    /** @description Distinct routes topped at this grade, by the mode of their best ascent */
+    LogbookGrade: {
+      grade: string
+      /** Format: int32 */
+      gradeRank: number
+      /** Format: int32 */
+      lead: number
+      /** Format: int32 */
+      topRope: number
+    }
+    LogbookRoute: {
+      /** Format: int32 */
+      ascentCount: number
+      /** @enum {string} */
+      best: 'LEAD_CLEAN' | 'LEAD_TOPPED' | 'TOP_ROPE_CLEAN' | 'TOP_ROPE_TOPPED' | 'TRIED'
+      /** Format: date */
+      firstClimbedOn: string
+      /** Format: date */
+      lastClimbedOn: string
+      route: components['schemas']['RouteSummary']
+      /** Format: int32 */
+      toppedCount: number
+    }
+    /** @description Ascent counters count repeats; routeCount counts distinct routes; maxGrade and maxLeadGrade: the hardest topped, in any mode and in lead. */
+    LogbookTotals: {
+      /** Format: int32 */
+      ascentCount: number
+      /** Format: int32 */
+      cleanCount: number
+      /** Format: int32 */
+      climbingDays: number
+      /** Format: int32 */
+      leadToppedCount: number
+      maxGrade?: string
+      /** Format: int32 */
+      maxGradeRank?: number
+      maxLeadGrade?: string
+      /** Format: int32 */
+      maxLeadGradeRank?: number
+      /** Format: int32 */
+      routeCount: number
+      /** Format: int32 */
+      sessionCount: number
+      /** Format: int32 */
+      toppedCount: number
+    }
     LoginRequest: {
       nickname: string
       password: string
@@ -1198,6 +1302,20 @@ export interface components {
       environment: 'local' | 'dev' | 'prod'
       /** @example 1.0.0 */
       version: string
+    }
+    /** @description climbingDays: days with a session (two sessions on a day make one); toppedCount: topped ascents, repeats included; maxGrade: the hardest topped; averageFeeling: of the rated sessions. */
+    MonthTotals: {
+      /** @example 7.5 */
+      averageFeeling?: number
+      /** Format: int32 */
+      climbingDays: number
+      maxGrade?: string
+      /** Format: int32 */
+      maxGradeRank?: number
+      /** Format: int32 */
+      sessionCount: number
+      /** Format: int32 */
+      toppedCount: number
     }
     /** @description Everything the member may see and edit about themselves. */
     MyProfile: {
@@ -1270,6 +1388,31 @@ export interface components {
       firstName: string
       /** @description Their login, as a reminder */
       nickname: string
+    }
+    Planning: {
+      /** @description Only the days with a session, earliest first */
+      days: components['schemas']['PlanningDay'][]
+      /** @description Its sessions can no longer change */
+      frozen: boolean
+      /** @example 2026-10 */
+      month: string
+      streak: components['schemas']['Streak']
+      totals: components['schemas']['MonthTotals']
+    }
+    PlanningDay: {
+      /** Format: date */
+      date: string
+      sessions: components['schemas']['PlanningSession'][]
+    }
+    PlanningSession: {
+      /**
+       * Format: int32
+       * @description Out of 10
+       */
+      feeling?: number
+      /** Format: uuid */
+      id: string
+      summary: components['schemas']['SessionSummary']
     }
     /** @description The whole editable profile, as the member wants it. */
     ProfileUpdate: {
@@ -1561,6 +1704,32 @@ export interface components {
     StatusChange: {
       /** @enum {string} */
       status: 'ACTIVE' | 'DISABLED'
+    }
+    /** @description ISO weeks in a row with at least minDaysPerWeek climbing days, up to this week (which only counts once it has them). */
+    Streak: {
+      /** Format: int32 */
+      currentWeekDays: number
+      /** Format: int32 */
+      minDaysPerWeek: number
+      /** Format: int32 */
+      weeks: number
+    }
+    /** @description Every route on the wall, easiest first. A route is on my list in a mode while its state is TODO; known in lead means known in top rope (FROM_LEAD). */
+    Todo: {
+      /** Format: int32 */
+      leadKnown: number
+      /** Format: int32 */
+      routeCount: number
+      routes: components['schemas']['TodoRoute'][]
+      /** Format: int32 */
+      topRopeKnown: number
+    }
+    TodoRoute: {
+      /** @enum {string} */
+      lead: 'TODO' | 'CHECKED' | 'FROM_ASCENT' | 'FROM_LEAD'
+      route: components['schemas']['RouteSummary']
+      /** @enum {string} */
+      topRope: 'TODO' | 'CHECKED' | 'FROM_ASCENT' | 'FROM_LEAD'
     }
     /** @description The club layout: sectors and their cords, hold colours, grades. */
     TopoConfig: {
@@ -2319,6 +2488,26 @@ export interface operations {
       }
     }
   }
+  getMyLogbook: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Logbook']
+        }
+      }
+    }
+  }
   changeMyPassword: {
     parameters: {
       query?: never
@@ -2338,6 +2527,29 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  getMyPlanning: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM, this month by default; never a future month */
+        month?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Planning']
+        }
       }
     }
   }
@@ -2384,6 +2596,26 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['SessionPage']
+        }
+      }
+    }
+  }
+  getMyTodo: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Todo']
         }
       }
     }
