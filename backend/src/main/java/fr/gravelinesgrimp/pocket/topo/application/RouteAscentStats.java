@@ -5,6 +5,7 @@ import fr.gravelinesgrimp.pocket.topo.domain.ClimbMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -26,4 +27,7 @@ public interface RouteAscentStats {
 
     /** Whether I have a clean ascent of the route in this mode ("je sais la faire" automatic). */
     boolean hasCleanAscent(UUID memberId, UUID routeId, ClimbMode mode);
+
+    /** The modes in which I climbed each route clean; routes without any are left out. */
+    Map<UUID, Set<ClimbMode>> cleanModesOf(UUID memberId, Collection<UUID> routeIds);
 }

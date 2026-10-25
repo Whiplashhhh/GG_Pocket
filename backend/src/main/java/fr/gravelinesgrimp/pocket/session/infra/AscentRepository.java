@@ -2,6 +2,7 @@ package fr.gravelinesgrimp.pocket.session.infra;
 
 import fr.gravelinesgrimp.pocket.session.domain.Ascent;
 import fr.gravelinesgrimp.pocket.session.domain.ClimbedRoute;
+import fr.gravelinesgrimp.pocket.session.domain.MyAscentLine;
 import fr.gravelinesgrimp.pocket.session.domain.MyAscentRow;
 import fr.gravelinesgrimp.pocket.session.domain.RouteAscentTotals;
 import fr.gravelinesgrimp.pocket.session.domain.RouteMode;
@@ -58,4 +59,11 @@ public interface AscentRepository extends JpaRepository<Ascent, UUID> {
                     + " where s.memberId = :memberId group by a.routeId"
                     + " order by max(s.climbedOn) desc")
     List<ClimbedRoute> findClimbedRoutes(UUID memberId);
+
+    /** Every ascent of mine, in no particular order (the logbook). */
+    @Query(
+            "select new fr.gravelinesgrimp.pocket.session.domain.MyAscentLine(s.id, s.climbedOn,"
+                    + " a.routeId, a.mode, a.topped, a.clean)"
+                    + " from Ascent a join a.session s where s.memberId = :memberId")
+    List<MyAscentLine> findAllMine(UUID memberId);
 }
