@@ -5,6 +5,22 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- Nouvelle séance : le gros bouton orange ouvre la feuille de saisie. Tes voies récentes d'abord, sinon tape « 12 » pour
+  la corde 12 (ou un nom, une couleur, une cotation). Pour chaque voie : mouli ou tête, topée, enchaînée, chutes,
+  premier essai (déjà coché si c'est vrai), ressenti. Duplique une ligne pour un deuxième essai, réordonne, retire.
+  Fin de séance : ressenti global, commentaire, photo et « qui la voit ». Une séance se note jusqu'à 7 jours en arrière.
+- Ta saisie est gardée sur le téléphone à chaque geste : ferme la feuille, elle t'attend. Pas de réseau au fond de la
+  salle ? La séance attend et part toute seule au retour du réseau, photo comprise.
+- Actu montre tes séances (en attendant tes amis) ; chaque séance a sa page pour la modifier ou la supprimer, tant que
+  son mois n'est pas clos.
+- Une voie enchaînée en séance se coche toute seule en « Je sais la faire ».
+- L'appli installée cherche ses mises à jour quand tu reviens dessus, plus seulement au démarrage. Et si elle traîne,
+  Profil → « Chercher une mise à jour » te dit où ça coince.
+- La fiche voie affiche ses chiffres (ascensions, topées, grimpeur·ses, part en tête) et ton historique sur la voie ;
+  le topo se trie par réalisations.
+
 ## 0.2.0 — 2026-10-24
 
 ### Ajouté

@@ -14,7 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Stores cleaned files on the media volume, and serves them after checking that the reader may see
@@ -30,25 +34,41 @@ public class MediaService {
 
     private final MediaFileRepository mediaFiles;
     private final MediaStorage storage;
+    private final Map<MediaUsage, PrivateMediaAccess> privateAccess;
 
-    public MediaService(MediaFileRepository mediaFiles, MediaStorage storage) {
+    public MediaService(
+            MediaFileRepository mediaFiles,
+            MediaStorage storage,
+            List<PrivateMediaAccess> privateAccess) {
         this.mediaFiles = mediaFiles;
         this.storage = storage;
+        this.privateAccess =
+                privateAccess.stream()
+                        .collect(Collectors.toMap(PrivateMediaAccess::usage, Function.identity()));
     }
 
     /**
      * Avatars and route photos are visible to every signed-in member (the caller of this method is
-     * one, checked by the security chain). Later usages (session photos) will check friendship
-     * here.
+     * one, checked by the security chain). Other files are visible only when the module that owns
+     * them says so ({@link PrivateMediaAccess}); a usage nobody vouches for is never served. A file
+     * the reader may not see is "not found", like one that does not exist.
      */
     @Transactional(readOnly = true)
-    public MediaContent load(UUID mediaId) {
+    public MediaContent load(UUID readerId, UUID mediaId) {
         var media =
                 mediaFiles
                         .findById(mediaId)
-                        .filter(file -> file.usage().visibleToEveryMember())
+                        .filter(file -> visible(file, readerId))
                         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No media"));
         return new MediaContent(storage.read(media.storageKey()), media.contentType());
+    }
+
+    private boolean visible(MediaFile file, UUID readerId) {
+        if (file.usage().visibleToEveryMember()) {
+            return true;
+        }
+        var access = privateAccess.get(file.usage());
+        return access != null && access.canRead(readerId, file.id());
     }
 
     /**

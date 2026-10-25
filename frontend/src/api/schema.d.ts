@@ -414,6 +414,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/climbed-routes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Routes I climbed, most recently climbed first */
+    get: operations['listMyClimbedRoutes']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/devices': {
     parameters: {
       query?: never
@@ -527,6 +544,23 @@ export interface paths {
     get?: never
     /** Edit my profile */
     put: operations['updateMyProfile']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/sessions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** My sessions, latest day first (cursor pagination) */
+    get: operations['listMySessions']
+    put?: never
     post?: never
     delete?: never
     options?: never
@@ -830,6 +864,60 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/sessions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Log a session (200 with the saved one if its clientRef was already sent) */
+    post: operations['createSession']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/sessions/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** One of my sessions */
+    get: operations['getSession']
+    /** Change one of my sessions (month open) */
+    put: operations['updateSession']
+    post?: never
+    /** Delete one of my sessions (month open) */
+    delete: operations['deleteSession']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/sessions/{id}/photo': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Upload the session photo (JPEG, PNG or WebP, 10 MB max) */
+    put: operations['replaceSessionPhoto']
+    post?: never
+    /** Remove the session photo */
+    delete: operations['deleteSessionPhoto']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/topo/config': {
     parameters: {
       query?: never
@@ -851,6 +939,41 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    Ascent: {
+      clean: boolean
+      /** Format: int32 */
+      falls: number
+      /**
+       * Format: int32
+       * @description Out of 10
+       */
+      feeling?: number
+      firstTry: boolean
+      /** Format: uuid */
+      id: string
+      /** @enum {string} */
+      mode: 'TOP_ROPE' | 'LEAD'
+      route: components['schemas']['RouteSummary']
+      topped: boolean
+    }
+    /** @description A clean ascent is topped, with 0 falls. */
+    AscentRequest: {
+      clean: boolean
+      /** Format: int32 */
+      falls: number
+      /**
+       * Format: int32
+       * @description Out of 10
+       */
+      feeling?: number
+      /** @description First try of my life */
+      firstTry: boolean
+      /** @enum {string} */
+      mode: 'TOP_ROPE' | 'LEAD'
+      /** Format: uuid */
+      routeId: string
+      topped: boolean
+    }
     /** @description Who did what, to whom, when. */
     AuditEntry: {
       /** @enum {string} */
@@ -909,6 +1032,13 @@ export interface components {
       authenticated: boolean
       /** @description Present when signed in */
       member?: components['schemas']['CurrentMember']
+    }
+    /** @description A route I climbed, and the last day I did. */
+    ClimbedRoute: {
+      /** Format: date */
+      lastClimbedOn: string
+      /** Format: uuid */
+      routeId: string
     }
     Cord: {
       active: boolean
@@ -1104,6 +1234,20 @@ export interface components {
       role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
       showAge: boolean
     }
+    /** @description One of my ascents of the route. */
+    MyRouteAscent: {
+      clean: boolean
+      /** Format: date */
+      climbedOn: string
+      /** Format: int32 */
+      falls: number
+      firstTry: boolean
+      /** @enum {string} */
+      mode: 'TOP_ROPE' | 'LEAD'
+      /** Format: uuid */
+      sessionId: string
+      topped: boolean
+    }
     PasswordChange: {
       currentPassword: string
       newPassword: string
@@ -1221,10 +1365,13 @@ export interface components {
       createdAt: string
       /** Format: uuid */
       gradeId: string
+      /** @description Mine, newest first, 20 max */
+      myAscents: components['schemas']['MyRouteAscent'][]
       route: components['schemas']['RouteSummary']
       /** @description Setter without an account */
       setterNote?: string
       setters: components['schemas']['MemberRef'][]
+      stats: components['schemas']['RouteStats']
     }
     RouteHold: {
       hex: string
@@ -1262,6 +1409,20 @@ export interface components {
         | 'ROOF'
         | 'REACHY'
       )[]
+    }
+    /** @description Ascents of the route by everyone. */
+    RouteStats: {
+      /** Format: int32 */
+      ascentCount: number
+      /** Format: int32 */
+      climberCount: number
+      /**
+       * Format: int32
+       * @description Rounded share of ascents in lead; absent without any ascent
+       */
+      leadPercent?: number
+      /** Format: int32 */
+      toppedCount: number
     }
     /** @description A route as listed in the topo, with my own marks. */
     RouteSummary: {
@@ -1313,6 +1474,11 @@ export interface components {
         | 'ROOF'
         | 'REACHY'
       )[]
+      /**
+       * Format: int32
+       * @description Topped ascents, by everyone
+       */
+      toppedCount: number
     }
     Sector: {
       /** @description Sorted by number */
@@ -1331,6 +1497,66 @@ export interface components {
     SectorSettings: {
       description?: string
       name: string
+    }
+    Session: {
+      ascents: components['schemas']['Ascent'][]
+      /** Format: date */
+      climbedOn: string
+      comment?: string
+      /** Format: date-time */
+      createdAt: string
+      /** @description Mine, and its month is not frozen yet */
+      editable: boolean
+      /**
+       * Format: int32
+       * @description Out of 10
+       */
+      feeling?: number
+      /** Format: uuid */
+      id: string
+      photoUrl?: string
+      summary: components['schemas']['SessionSummary']
+      /** @enum {string} */
+      visibility: 'FRIENDS' | 'PRIVATE'
+    }
+    /** @description nextCursor is absent on the last page. */
+    SessionPage: {
+      items: components['schemas']['Session'][]
+      nextCursor?: string
+    }
+    SessionRequest: {
+      /** @description In the order climbed */
+      ascents: components['schemas']['AscentRequest'][]
+      /**
+       * Format: uuid
+       * @description Drawn by the app once per new session: sending it again gives back the session already saved (ignored on update)
+       */
+      clientRef: string
+      /**
+       * Format: date
+       * @description Today or up to 7 days back
+       */
+      climbedOn: string
+      comment?: string
+      /**
+       * Format: int32
+       * @description Out of 10
+       */
+      feeling?: number
+      /** @enum {string} */
+      visibility: 'FRIENDS' | 'PRIVATE'
+    }
+    /** @description maxGrade: the hardest topped grade. */
+    SessionSummary: {
+      /** Format: int32 */
+      ascentCount: number
+      /** Format: int32 */
+      leadCount: number
+      maxGrade?: string
+      /** Format: int32 */
+      maxGradeRank?: number
+      /** Format: int32 */
+      toppedCount: number
     }
     StatusChange: {
       /** @enum {string} */
@@ -1955,6 +2181,26 @@ export interface operations {
       }
     }
   }
+  listMyClimbedRoutes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ClimbedRoute'][]
+        }
+      }
+    }
+  }
   listMyDevices: {
     parameters: {
       query?: never
@@ -2115,6 +2361,29 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['MyProfile']
+        }
+      }
+    }
+  }
+  listMySessions: {
+    parameters: {
+      query?: {
+        cursor?: string
+        size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionPage']
         }
       }
     }
@@ -2647,6 +2916,156 @@ export interface operations {
         content: {
           'application/json': components['schemas']['RouteDetail']
         }
+      }
+    }
+  }
+  createSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SessionRequest']
+      }
+    }
+    responses: {
+      /** @description Already saved with this clientRef */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Session']
+        }
+      }
+      /** @description Saved */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Session']
+        }
+      }
+    }
+  }
+  getSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Session']
+        }
+      }
+    }
+  }
+  updateSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SessionRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Session']
+        }
+      }
+    }
+  }
+  deleteSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  replaceSessionPhoto: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file: string
+        }
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Session']
+        }
+      }
+    }
+  }
+  deleteSessionPhoto: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }

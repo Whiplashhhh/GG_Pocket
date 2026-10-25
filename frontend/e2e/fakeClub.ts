@@ -2,6 +2,7 @@ import type { Page, Route } from '@playwright/test'
 
 import type { components } from '../src/api/schema'
 
+import { FakeSessions } from './fakeSessions'
 import { FakeTopo } from './fakeTopo'
 
 type Schemas = components['schemas']
@@ -95,6 +96,12 @@ export class FakeClub {
     (actor, action, target) => {
       this.record(actor, action, target)
     },
+  )
+  /** Sessions and their ascents (phase 4); the topo reads their figures. */
+  readonly climbs = new FakeSessions(
+    () => this.nextId(),
+    () => this.now,
+    this.topo,
   )
 
   addMember(overrides: Partial<FakeMember> & Pick<FakeMember, 'nickname'>): FakeMember {
@@ -376,6 +383,20 @@ export class FakeClub {
 
     const me = this.current()
     if (me === undefined) return fail(401, 'UNAUTHENTICATED')
+
+    if (this.climbs.offline && path.startsWith('/sessions') && method !== 'GET') {
+      return route.abort('internetdisconnected')
+    }
+    const search = new URL(request.url()).search
+    const climbs = this.climbs.handle(
+      me,
+      method,
+      path + search,
+      method === 'GET' ? undefined : body(),
+    )
+    if (climbs?.kind === 'json') return json(climbs.data, climbs.status)
+    if (climbs?.kind === 'empty') return route.fulfill({ status: 204 })
+    if (climbs?.kind === 'problem') return fail(climbs.status, climbs.code)
 
     const topo = this.topo.handle(me, method, path, method === 'GET' ? undefined : body())
     if (topo?.kind === 'json') return json(topo.data, topo.status)

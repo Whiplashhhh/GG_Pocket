@@ -29,16 +29,129 @@
     "text": "Environnement de dev — branche {branch} {'@'} {commit}"
   },
   "newSession": {
-    "fab": "Nouvelle séance",
-    "placeholderTitle": "Voie en cours d’ouverture",
-    "placeholderBody": "La saisie de séance arrive très vite. En attendant, garde tes avant-bras au chaud.",
-    "back": "Retour à l’actu"
+    "fab": "Nouvelle séance"
+  },
+  "session": {
+    "newTitle": "Nouvelle séance",
+    "editTitle": "Modifier la séance",
+    "detailTitle": "Ma séance",
+    "close": "Fermer (ta saisie reste au chaud)",
+    "date": "Jour de la séance",
+    "dateHint": "Aujourd’hui ou jusqu’à 7 jours en arrière.",
+    "draftRestored": "Brouillon retrouvé : on reprend là où tu t’étais arrêté·e.",
+    "startOver": "Repartir de zéro",
+    "pickerTitle": "Ajouter une voie",
+    "pickerSearch": "Ajouter une voie",
+    "pickerPlaceholder": "Corde, nom, couleur ou cotation",
+    "pickerHint": "Tape « 12 » pour les voies de la corde 12, ou un nom, une couleur, une cotation.",
+    "recent": "Récemment grimpées",
+    "addRoute": "Ajouter {name}",
+    "added": "{name} ajoutée, {n} dans la séance.",
+    "linesTitle": "Voies de la séance",
+    "linesCount": "Aucune voie pour l’instant | 1 voie | {n} voies",
+    "noLine": "Ajoute ta première voie juste au-dessus. Même un échauffement en 4a compte.",
+    "full": "50 voies dans une séance : respect. On s’arrête là.",
+    "unknownRoute": "Voie introuvable",
+    "lineMenu": "Actions sur la voie n° {n}",
+    "duplicate": "Dupliquer (nouvel essai)",
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
+    "remove": "Retirer de la séance",
+    "mode": "Mode",
+    "topRope": "Mouli",
+    "lead": "Tête",
+    "topped": "Topée",
+    "clean": "Enchaînée",
+    "yes": "Oui",
+    "no": "Non",
+    "falls": "Chutes",
+    "fallsLess": "Une chute de moins",
+    "fallsMore": "Une chute de plus",
+    "firstTry": "Premier essai de ma vie sur cette voie",
+    "firstTryShort": "premier essai",
+    "feeling": "Ressenti",
+    "feelingNone": "pas noté",
+    "feelingValue": "{n}/10",
+    "endTitle": "Fin de séance",
+    "globalFeeling": "Ressenti global",
+    "comment": "Commentaire",
+    "commentPlaceholder": "Les avant-bras en béton, le moral au sommet…",
+    "photo": "Photo",
+    "photoHint": "Vue seulement par toi (et par tes amis quand ils arriveront, si tu le choisis plus bas).",
+    "photoAlt": "Photo de la séance",
+    "photoChoose": "Ajouter une photo",
+    "photoChange": "Changer la photo",
+    "photoRemove": "Retirer la photo",
+    "photoRestore": "Garder la photo",
+    "photoWillGo": "La photo partira à l’enregistrement.",
+    "photoPreparing": "On met la photo au format…",
+    "photoRefused": "Ta séance est bien enregistrée, mais la photo n’est pas passée. Modifie la séance pour en remettre une.",
+    "visibility": "Qui la voit",
+    "visibilityFriends": "Mes amis",
+    "visibilityPrivate": "Juste moi",
+    "visibilityFriendsHint": "Tes amis la verront dans leur fil (dès que les amis arrivent dans l’appli).",
+    "visibilityPrivateHint": "Personne d’autre que toi. Elle compte quand même pour le podium.",
+    "save": "Enregistrer la séance",
+    "saving": "Enregistrement…",
+    "savedTitle": "Séance au carnet !",
+    "savedBody": "Bien joué. Va t’étirer, tes avant-bras te diront merci.",
+    "queuedTitle": "En attente de réseau",
+    "queuedBody": "Pas de réseau ici : elle partira toute seule dès qu’il revient.",
+    "problems": {
+      "noAscent": "Ajoute au moins une voie : une séance sans voie, c’est un café au bar.",
+      "dateOutOfRange": "Choisis un jour entre il y a 7 jours et aujourd’hui.",
+      "commentTooLong": "Ton commentaire dépasse 500 caractères : garde le reste pour le vestiaire."
+    },
+    "cardTitle": "Séance {day}",
+    "day": {
+      "today": "d’aujourd’hui",
+      "yesterday": "d’hier",
+      "date": "du {date}"
+    },
+    "summary": {
+      "ascents": "Aucune voie | 1 voie | {n} voies",
+      "topped": "aucune topée | 1 topée | {n} topées",
+      "lead": "aucune en tête | 1 en tête | {n} en tête",
+      "max": "max {grade}",
+      "feeling": "ressenti {n}/10"
+    },
+    "outcome": {
+      "clean": "enchaînée",
+      "topped": "topée | topée, 1 chute | topée, {n} chutes",
+      "notTopped": "pas topée | pas topée, 1 chute | pas topée, {n} chutes"
+    },
+    "moreLines": "et 1 autre voie | et 1 autre voie | et {n} autres voies",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer cette séance ?",
+    "deleteBody": "Ses voies, sa photo et ses chiffres disparaissent pour de bon. Les « je sais la faire » qui en venaient aussi.",
+    "deleteConfirm": "Supprimer la séance",
+    "frozen": "Ce mois est clos et son podium gravé : cette séance ne bouge plus.",
+    "backToActu": "Retour à l’actu",
+    "notFoundTitle": "Séance introuvable",
+    "notFoundBody": "Elle a été supprimée, ou elle n’est pas à toi.",
+    "position": "{n}.",
+    "commentQuote": "« {comment} »"
+  },
+  "outbox": {
+    "waiting": "Aucune séance en attente | 1 séance en attente de réseau : elle partira toute seule. | {n} séances en attente de réseau : elles partiront toutes seules.",
+    "refused": "Ta séance du {date} n’est pas passée.",
+    "photoRefused": "Ta séance du {date} est enregistrée, mais pas sa photo.",
+    "reopen": "La reprendre",
+    "discard": "L’abandonner",
+    "seeSession": "Voir la séance",
+    "ok": "Compris"
   },
   "actu": {
     "title": "Actu",
     "emptyTitle": "Le mur est calme… trop calme.",
-    "emptyBody": "Ajoute des amis ou enregistre ta première séance : ton fil se remplira tout seul.",
-    "clubTagline": "Le fil du club : tes séances et celles de tes amis, au même endroit."
+    "emptyBody": "Enregistre ta première séance avec le bouton « Nouvelle séance » : ton fil se remplira tout seul.",
+    "clubTagline": "Le fil du club : tes séances et celles de tes amis, au même endroit.",
+    "mine": "Mes séances",
+    "more": "Voir les séances d’avant",
+    "loadingMore": "On remonte le carnet…",
+    "end": "C’est tout ! Le reste est encore à grimper.",
+    "loadError": "Impossible de charger tes séances."
   },
   "topo": {
     "title": "Topo",
@@ -55,6 +168,7 @@
       "grade": "Cotation",
       "opened": "Ouverture",
       "sector": "Secteur",
+      "topped": "Réalisations",
       "favorites": "Coups de cœur",
       "comments": "Commentaires"
     },
@@ -76,6 +190,7 @@
     "clearFilters": "Tout effacer",
     "showResults": "Aucune voie à voir | Voir la voie | Voir les {n} voies",
     "row": {
+      "topped": "Jamais topée | Topée 1 fois | Topée {n} fois",
       "favorites": "Aucun coup de cœur | 1 coup de cœur | {n} coups de cœur",
       "comments": "Aucun commentaire | 1 commentaire | {n} commentaires",
       "doneTopRope": "mouli",
@@ -124,7 +239,18 @@
     "heartFullBody": "Deux coups de cœur au maximum sur les voies au mur. Choisis celui que « {name} » remplace.",
     "heartFullRelease": "Lâcher",
     "heartFullKeep": "Je garde les deux",
-    "heartReplaced": "C’est fait : « {name} » a pris la place."
+    "heartReplaced": "C’est fait : « {name} » a pris la place.",
+    "statsTitle": "Au compteur",
+    "noAscent": "Personne ne l’a encore notée dans une séance. À toi l’honneur ?",
+    "stats": {
+      "ascents": "Ascensions",
+      "topped": "Topées",
+      "climbers": "Grimpeur·ses",
+      "lead": "En tête",
+      "percent": "{n} %"
+    },
+    "mineTitle": "Mon historique",
+    "mineEmpty": "Pas encore d’essai à toi sur cette voie."
   },
   "comments": {
     "title": "Commentaires ({count})",
@@ -205,7 +331,7 @@
     "climbingSince": "Grimpe depuis {year}",
     "clubSince": "Au club depuis {year}",
     "age": "{age} ans",
-    "comingSoon": "Badges et chiffres clés arrivent avec les séances.",
+    "comingSoon": "Badges et chiffres clés arrivent bientôt : tes séances, elles, sont déjà au carnet.",
     "settings": "Réglages",
     "password": "Mot de passe",
     "devices": "Mes appareils",
@@ -285,7 +411,11 @@
     "CLUB_ITEM_INACTIVE": "Cette corde ou cette couleur est désactivée. Choisis-en une active.",
     "INVALID_SETTERS": "Il faut au moins un ouvreur : un membre ouvreur actif, ou un nom libre.",
     "DATE_IN_THE_FUTURE": "Cette date n’est pas encore arrivée. Choisis aujourd’hui ou avant.",
-    "DATE_IN_THE_PAST": "Cette date est déjà passée. Choisis aujourd’hui ou plus tard."
+    "DATE_IN_THE_PAST": "Cette date est déjà passée. Choisis aujourd’hui ou plus tard.",
+    "SESSION_TOO_OLD": "Trop loin dans le passé : une séance se note jusqu’à 7 jours en arrière.",
+    "MONTH_FROZEN": "Ce mois est clos et son podium gravé dans le marbre : ses séances ne bougent plus.",
+    "INVALID_ASCENT": "Une ligne cloche : une voie enchaînée est forcément topée, sans chute.",
+    "CHECK_FROM_ASCENT": "Tu l’as enchaînée dans ce mode pendant une séance : c’est cette séance qu’il faut modifier pour la décocher."
   },
   "gallery": {
     "title": "Galerie des composants",
@@ -889,5 +1019,17 @@
     "SETTER": "Ouvreur·se",
     "BOARD": "Direction",
     "ADMIN": "Le Président·e"
+  },
+  "appUpdate": {
+    "check": "Chercher une mise à jour",
+    "checking": "On regarde s’il y a du nouveau…",
+    "noRefusedFile": "Aucun fichier refusé : le problème est ailleurs.",
+    "result": {
+      "unsupported": "Ce navigateur ne gère pas les mises à jour d’appli installée : recharge la page pour avoir la dernière version.",
+      "upToDate": "Tu as la dernière version. Rien à faire, grimpe !",
+      "ready": "Nouvelle version prête : touche « Recharger » dans le bandeau en bas.",
+      "failed": "La nouvelle version n’a pas pu s’installer : ton téléphone a refusé des fichiers. Copie le détail et envoie-le à la direction.",
+      "error": "Impossible de chercher une mise à jour pour l’instant. Vérifie ta connexion et réessaie."
+    }
   }
 }

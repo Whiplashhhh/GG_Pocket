@@ -4,6 +4,74 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-24 — PR 4.1 Séances
+
+**Branche** : `feature/seances-0.2.0` (depuis `main` = 0.2.0).
+
+### Fait
+
+- Backend : V9 (`climbing_session`, `ascent`, `media_file.usage` + `SESSION_PHOTO`), paquet `session` : création
+  idempotente par `clientRef` (D-085), lecture, modification, suppression, photo, mes séances par curseur, mes voies
+  grimpées. Mois figé et fenêtre de 7 jours côté serveur (D-084), voie démontée acceptée si démontée après la séance
+  (D-089), « je sais la faire » automatique + `CHECK_FROM_ASCENT` (D-086), statistiques de la fiche voie et `toppedCount`
+  (via `RouteAscentStats`, D-090), photo de séance réservée au propriétaire (`PrivateMediaAccess`, D-087).
+  Seed : `DemoSessionSeeder` (10 semaines de séances pour grimpeur, direction, ouvreur). CI backend verte (SessionIT 13,
+  matrice 295), contrat régénéré depuis le journal.
+- Front : feuille de saisie (`/seance/nouvelle`, `/seances/:id/modifier`), brouillon IndexedDB, file hors ligne avec
+  photo (bandeau dans l'app), page d'une séance, Actu « Mes séances », fiche voie « Au compteur » + « Mon historique »,
+  tri « Réalisations ». Vitest 192, e2e Desktop Chrome 54 (dont 7 séances), captures 360 px clair/sombre regardées
+  (saisie, Actu, détail, attente, fiche voie).
+- PWA (D-091) : recherche de mise à jour au retour au premier plan et toutes les heures, bouton Profil « Chercher une
+  mise à jour » avec la liste des fichiers refusés, sonde `/sonde/temoin.js` (Caddy). Cause du Profil bloqué sur
+  l'iPhone de Willem : l'extension Safari « Cyberfiltre » (bloqueurs « Phishing1-7 ») ; coupée, tout passe.
+
+### Reste
+
+- CI de la PR, déploiement dev (label `deploy:dev`) et essai par Willem ; fusion ; puis PR 4.2 (Planning, À faire,
+  Carnet) sur une nouvelle branche depuis `main`.
+- D-087 et D-090 à valider ; PR #17 (graphify) toujours en suspens.
+
+### Prochaine action exacte
+
+- `gh pr checks <n°>` sur la PR 4.1 ; si vert, demander à Willem d'approuver le déploiement dev et de tester la saisie
+  sur téléphone (dont le mode avion).
+
+### Points bloquants
+
+- Aucun.
+
+---
+
+## 2026-10-23 — Phase 3 publiée (0.2.0), phase 4 découpée en trois PR
+
+**Branche** : `feature/seances-0.2.0` (depuis `main` = 0.2.0), créée pour démarrer la phase 4.
+
+### Fait
+
+- PR #18 (`mvnw.cmd`) et #19 (Phase 3 — Topo) fusionnées par Willem ; release `0.2.0` publiée et déployée en prod
+  (tag `v0.2.0`, déploiement prod vert). D-074 à D-077 et D-082 validées par Willem.
+- Phase 4 découpée en trois PR successives (voir `docs/ROADMAP.md`) : 4.1 Séances, 4.2 Planning / À faire / Carnet,
+  4.3 Comptes et données personnelles.
+
+### Reste
+
+- Toute la phase 4, en commençant par la PR 4.1.
+- PR #17 (graphe graphify) : en conflit, périmée (instantané 0.1.1) et sa décision porte le numéro D-074, déjà pris.
+  Question posée à Willem : la fermer, ou la refaire sur le code à jour (décision renumérotée). Ne pas la fusionner telle quelle.
+- 24 décisions encore « à valider » dans le récapitulatif de `docs/DECISIONS.md` (surtout côté club).
+
+### Prochaine action exacte
+
+- PR 4.1 sur `feature/seances-0.2.0` : relire la spec (`docs/KICKOFF_PROMPT.md`, sections séances, ascensions,
+  mois figé, hors ligne) et `docs/DESIGN.md` (écran de saisie), puis concevoir le modèle (séance, ascensions, photo ;
+  migration V9) et le contrat API avant le code.
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-23 — Phase 3 (Topo) : cotations avec les « - »
 
 **Branche** : `feature/topo-0.1.1`, PR #19 (label `deploy:dev` posé : chaque push redéploie le dev après approbation).

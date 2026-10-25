@@ -6,7 +6,7 @@ de Willem ou du club). Les entrées ne sont jamais supprimées ; une décision r
 
 Sommaire : choix par défaut du club (D-001 à D-014), versions (D-020), technique (D-030 et suivantes),
 choix de la phase 1 (D-043 et suivantes ; D-048 à D-058 tranchés pendant la phase), environnements et pipeline
-(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072, D-073), topo (D-074 et suivantes, phase 3).
+(D-059 à D-071, phase 2), correctifs de la 0.1.1 (D-072, D-073), topo (D-074 à D-083, phase 3), séances (D-084 et suivantes, phase 4).
 
 ## Récapitulatif : tout ce qui reste à valider
 
@@ -39,6 +39,8 @@ direction) ou **Willem**.
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
+| D-087 | En attendant les amis, Actu montre mes séances ? | Willem | Oui, « Mes séances » en haut du fil |
+| D-090 | « Réalisations » du topo = ascensions topées ? | club | Oui, par tout le monde, répétitions comprises |
 
 ---
 
@@ -676,3 +678,81 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   On garde deux façons de montrer une sélection dans le formulaire de voie : coche pour les couleurs (choix exclusif),
   aplat plein pour les styles et les ouvreur·ses (choix multiples).
 - **Statut** : validée.
+
+### D-084 — Mois figé calculé d'après la date, avant la clôture de la phase 6
+- **Contexte** : la spec fige un mois le 8 du mois suivant à 04:00 (D-009), par une tâche qui écrit les classements
+  (phase 6). Les séances (phase 4) doivent déjà refuser les changements d'un mois figé.
+- **Choix** : `SessionCalendar.isFrozen` calcule la règle sur l'horloge (Europe/Paris) : un mois est figé dès le 8 suivant
+  à 04:00, que la tâche ait tourné ou non. La tâche de la phase 6 figera les classements au même instant, sans changer
+  cette règle. Création : aujourd'hui à 7 jours en arrière (`SESSION_TOO_OLD`), jamais demain (`DATE_IN_THE_FUTURE`),
+  jamais dans un mois figé (`MONTH_FROZEN`). Modification et suppression : mois de la date actuelle non figé ; une
+  nouvelle date suit les règles d'une création (une séance peut donc garder son jour même au-delà de 7 jours).
+- **Statut** : validée (application directe de D-009).
+
+### D-085 — Envoi idempotent des séances (`clientRef`)
+- **Contexte** : la file hors ligne renvoie une séance si la réponse s'est perdue ; il ne faut pas de doublon.
+- **Choix** : l'appli tire un UUID par nouvelle séance (`clientRef`, unique par membre). Un second `POST` avec la même
+  référence renvoie la séance déjà enregistrée (200) sans rien changer. La photo part ensuite (`PUT …/photo`), et repart
+  avec sa séance si elle s'est perdue. Les écritures de séances verrouillent la ligne du membre (une à la fois).
+- **Alternative** : en-tête `Idempotency-Key` générique : plus lourd pour un seul usage.
+- **Statut** : validée.
+
+### D-086 — « Je sais la faire » automatique et décochage
+- **Choix** : une ascension enchaînée coche la voie dans son mode (source `ASCENT`) ; plus d'ascension enchaînée, la
+  coche `ASCENT` part ; une coche manuelle (`MANUAL`) n'est jamais touchée par les séances. Décocher à la main une voie
+  enchaînée dans ce mode est refusé (`CHECK_FROM_ASCENT`, 409) : la coche reviendrait à la séance suivante ; on modifie la
+  séance à la place. « Sue en tête implique sue en mouli » reste une règle d'affichage (À faire, PR 4.2).
+- **Statut** : validée.
+
+### D-087 — Actu montre mes séances en attendant le fil
+- **Contexte** : le fil des amis arrive en phase 5 ; il faut d'ici là retrouver, modifier et supprimer ses séances.
+- **Choix** : Actu liste « Mes séances » (pagination par curseur, carte façon Strava) ; une séance a sa page
+  (`/seances/:id`) avec Modifier et Supprimer. Lecture réservée au propriétaire (404 pour tout autre, direction comprise)
+  tant que les amis n'existent pas ; la photo de séance suit la même règle (`PrivateMediaAccess`).
+- **Statut** : à valider (Willem).
+
+### D-088 — Ressenti en curseur, pas en dix pastilles
+- **Contexte** : la spec laisse le choix « curseur ou 10 pastilles » ; dix cibles de 44 px ne tiennent pas en 360 px.
+- **Choix** : un curseur 0 à 10, où 0 veut dire « pas noté » (le ressenti reste facultatif), pour chaque voie et pour la
+  séance. Une nouvelle ligne est « topée » par défaut, dans le mode de la ligne d'avant.
+- **Statut** : validée.
+
+### D-089 — Voie démontée dans une séance notée après coup
+- **Choix** : une séance peut être notée jusqu'à 7 jours après ; une voie démontée y est acceptée si elle a été démontée
+  le jour de la séance ou après, refusée sinon (`ROUTE_DISMOUNTED`). Le sélecteur rapide ne propose que les voies au mur.
+  Une séance compte 1 à 50 ascensions, 0 à 99 chutes par ascension.
+- **Statut** : validée.
+
+### D-090 — « Réalisations » = ascensions topées
+- **Contexte** : la spec prévoit un tri du topo « nombre de réalisations » sans le définir.
+- **Choix** : le nombre d'ascensions topées par tout le monde, répétitions comprises (comme les compteurs du §9.1). La
+  fiche voie montre aussi ascensions, topées, grimpeur·ses différent·es et part en tête : des agrégats sans nom, qui
+  comptent aussi les séances « juste moi ».
+- **Statut** : à valider (club).
+
+### D-091 — Mises à jour de l'appli installée : chercher plus souvent, dire pourquoi ça bloque
+- **Contexte** : sur l'iPhone de Willem, la PWA du dev affichait encore « GG Pocket 0.1.1 » avec un serveur en 0.2.0, et
+  aucun bandeau « Nouvelle version » ne venait, même après avoir fermé l'appli. Réinstallée en 0.2.0, le Profil ne
+  s'ouvre plus : `/assets/DaqITAgE.js` → `Load failed` (même avec `?sonde`), alors que son nom ne contient pas « profil »
+  (D-073), et « aucun » service worker aux commandes malgré un cache de pré-chargement présent. Lecture : une nouvelle
+  version ne s'installe que si **tous** ses fichiers arrivent ; un seul fichier refusé par le téléphone et l'installation
+  échoue sans un mot, l'ancienne version reste (ou aucune ne prend la main).
+- **Choix** :
+  - l'appli cherche une mise à jour au retour au premier plan et toutes les heures, plus seulement au démarrage complet
+    (`lib/appUpdate.ts`, branché dans `UpdateBanner`) ;
+  - Profil → « Chercher une mise à jour » dit en clair : à jour, nouvelle version prête, ou échec avec la liste des
+    fichiers refusés (à copier) ;
+  - nouvelle sonde : `/sonde/temoin.js?f=<fichier>` (Caddy du conteneur web) sert les mêmes octets sous un nom neutre.
+    Refusé là aussi : le téléphone juge le **contenu** ; accepté : il juge le **nom**. L'écran d'erreur et le bouton la
+    lancent pour chaque script refusé, et listent tous les fichiers de l'appli que le téléphone refuse.
+- **Cause trouvée (2026-10-25)** : l'extension Safari « Cyberfiltre » (sept bloqueurs de contenu « Phishing1 » à
+  « Phishing7 », dans *Réglages → Apps → Safari → Extensions*). Une fois coupée, le Profil s'ouvre et les mises à jour
+  arrivent. Un bloqueur de contenu WebKit ne juge que l'adresse (motifs sur l'URL, le domaine, le type de ressource),
+  jamais le contenu : la règle fautive vise donc l'adresse du fichier, peut-être le domaine de test `*.sslip.io`
+  (souvent listé par les filtres anti-hameçonnage) associé au chemin. Le nom d'un fichier change à chaque version :
+  une version peut passer, la suivante non.
+- **Suite** : savoir si la prod (vrai domaine) est touchée avant de changer quoi que ce soit. Si un membre tombe sur le
+  même écran, l'écran d'erreur et le bouton « Chercher une mise à jour » listent les fichiers refusés ; la réponse à
+  donner est de couper Cyberfiltre (ou de l'autoriser pour le site). Si la prod est touchée, nommer les fichiers par
+  un motif plus sage, avec la sonde pour le vérifier.
+- **Statut** : cause trouvée ; contournement côté appli à décider si la prod est touchée.

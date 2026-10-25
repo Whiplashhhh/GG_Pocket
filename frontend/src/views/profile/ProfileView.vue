@@ -18,6 +18,7 @@ import SegmentedControl from '@/components/ui/SegmentedControl.vue'
 import SettingsLink from '@/components/ui/SettingsLink.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
+import AppUpdateCheck from '@/components/profile/AppUpdateCheck.vue'
 import { errorMessageKey } from '@/api/errors'
 import { formatDate } from '@/lib/format'
 import { isAtLeast } from '@/lib/roles'
@@ -202,6 +203,7 @@ const facts = computed(() => {
     <p v-if="meta && profile && isAtLeast(profile.role, 'BOARD')">
       {{ t('app.serverVersion', { version: meta.version }) }}
     </p>
+    <AppUpdateCheck class="mt-3" />
   </footer>
 
   <ConfirmDialog

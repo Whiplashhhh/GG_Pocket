@@ -749,6 +749,28 @@
         "tags" : [ "Me" ]
       }
     },
+    "/api/v1/me/climbed-routes" : {
+      "get" : {
+        "operationId" : "listMyClimbedRoutes",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClimbedRoute"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Routes I climbed, most recently climbed first",
+        "tags" : [ "Sessions" ]
+      }
+    },
     "/api/v1/me/devices" : {
       "get" : {
         "operationId" : "listMyDevices",
@@ -906,6 +928,42 @@
         },
         "summary" : "Edit my profile",
         "tags" : [ "Me" ]
+      }
+    },
+    "/api/v1/me/sessions" : {
+      "get" : {
+        "operationId" : "listMySessions",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "cursor",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "size",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 10
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SessionPage"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "My sessions, latest day first (cursor pagination)",
+        "tags" : [ "Sessions" ]
       }
     },
     "/api/v1/media/{id}" : {
@@ -1556,6 +1614,191 @@
         "tags" : [ "Topo" ]
       }
     },
+    "/api/v1/sessions" : {
+      "post" : {
+        "operationId" : "createSession",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SessionRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Session"
+                }
+              }
+            },
+            "description" : "Already saved with this clientRef"
+          },
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Session"
+                }
+              }
+            },
+            "description" : "Saved"
+          }
+        },
+        "summary" : "Log a session (200 with the saved one if its clientRef was already sent)",
+        "tags" : [ "Sessions" ]
+      }
+    },
+    "/api/v1/sessions/{id}" : {
+      "delete" : {
+        "operationId" : "deleteSession",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "summary" : "Delete one of my sessions (month open)",
+        "tags" : [ "Sessions" ]
+      },
+      "get" : {
+        "operationId" : "getSession",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Session"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "One of my sessions",
+        "tags" : [ "Sessions" ]
+      },
+      "put" : {
+        "operationId" : "updateSession",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SessionRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Session"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Change one of my sessions (month open)",
+        "tags" : [ "Sessions" ]
+      }
+    },
+    "/api/v1/sessions/{id}/photo" : {
+      "delete" : {
+        "operationId" : "deleteSessionPhoto",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "summary" : "Remove the session photo",
+        "tags" : [ "Sessions" ]
+      },
+      "put" : {
+        "operationId" : "replaceSessionPhoto",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "file" : {
+                    "type" : "string",
+                    "format" : "binary"
+                  }
+                },
+                "required" : [ "file" ]
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Session"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Upload the session photo (JPEG, PNG or WebP, 10 MB max)",
+        "tags" : [ "Sessions" ]
+      }
+    },
     "/api/v1/topo/config" : {
       "get" : {
         "operationId" : "getTopoConfig",
@@ -1578,6 +1821,79 @@
   },
   "components" : {
     "schemas" : {
+      "Ascent" : {
+        "type" : "object",
+        "properties" : {
+          "clean" : {
+            "type" : "boolean"
+          },
+          "falls" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "feeling" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Out of 10"
+          },
+          "firstTry" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "mode" : {
+            "type" : "string",
+            "enum" : [ "TOP_ROPE", "LEAD" ]
+          },
+          "route" : {
+            "$ref" : "#/components/schemas/RouteSummary"
+          },
+          "topped" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "clean", "falls", "firstTry", "id", "mode", "route", "topped" ]
+      },
+      "AscentRequest" : {
+        "type" : "object",
+        "description" : "A clean ascent is topped, with 0 falls.",
+        "properties" : {
+          "clean" : {
+            "type" : "boolean"
+          },
+          "falls" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 99,
+            "minimum" : 0
+          },
+          "feeling" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Out of 10",
+            "maximum" : 10,
+            "minimum" : 1
+          },
+          "firstTry" : {
+            "type" : "boolean",
+            "description" : "First try of my life"
+          },
+          "mode" : {
+            "type" : "string",
+            "enum" : [ "TOP_ROPE", "LEAD" ]
+          },
+          "routeId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "topped" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "clean", "falls", "firstTry", "mode", "routeId", "topped" ]
+      },
       "AuditEntry" : {
         "type" : "object",
         "description" : "Who did what, to whom, when.",
@@ -1654,6 +1970,21 @@
           }
         },
         "required" : [ "authenticated" ]
+      },
+      "ClimbedRoute" : {
+        "type" : "object",
+        "description" : "A route I climbed, and the last day I did.",
+        "properties" : {
+          "lastClimbedOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "routeId" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        },
+        "required" : [ "lastClimbedOn", "routeId" ]
       },
       "Cord" : {
         "type" : "object",
@@ -2098,6 +2429,38 @@
         },
         "required" : [ "appearsInRankings", "createdAt", "firstName", "id", "lastName", "nickname", "parentalConsent", "role", "showAge" ]
       },
+      "MyRouteAscent" : {
+        "type" : "object",
+        "description" : "One of my ascents of the route.",
+        "properties" : {
+          "clean" : {
+            "type" : "boolean"
+          },
+          "climbedOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "falls" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "firstTry" : {
+            "type" : "boolean"
+          },
+          "mode" : {
+            "type" : "string",
+            "enum" : [ "TOP_ROPE", "LEAD" ]
+          },
+          "sessionId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "topped" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "clean", "climbedOn", "falls", "firstTry", "mode", "sessionId", "topped" ]
+      },
       "PasswordChange" : {
         "type" : "object",
         "properties" : {
@@ -2421,6 +2784,13 @@
             "type" : "string",
             "format" : "uuid"
           },
+          "myAscents" : {
+            "type" : "array",
+            "description" : "Mine, newest first, 20 max",
+            "items" : {
+              "$ref" : "#/components/schemas/MyRouteAscent"
+            }
+          },
           "route" : {
             "$ref" : "#/components/schemas/RouteSummary"
           },
@@ -2433,9 +2803,12 @@
             "items" : {
               "$ref" : "#/components/schemas/MemberRef"
             }
+          },
+          "stats" : {
+            "$ref" : "#/components/schemas/RouteStats"
           }
         },
-        "required" : [ "cordId", "createdAt", "gradeId", "route", "setters" ]
+        "required" : [ "cordId", "createdAt", "gradeId", "myAscents", "route", "setters", "stats" ]
       },
       "RouteHold" : {
         "type" : "object",
@@ -2516,6 +2889,30 @@
           }
         },
         "required" : [ "cordId", "gradeId", "holdColorIds", "name", "openedOn", "setterIds", "styles" ]
+      },
+      "RouteStats" : {
+        "type" : "object",
+        "description" : "Ascents of the route by everyone.",
+        "properties" : {
+          "ascentCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "climberCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "leadPercent" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Rounded share of ascents in lead; absent without any ascent"
+          },
+          "toppedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "ascentCount", "climberCount", "toppedCount" ]
       },
       "RouteSummary" : {
         "type" : "object",
@@ -2602,9 +2999,14 @@
               "type" : "string",
               "enum" : [ "CONTINUITY", "ENDURANCE", "PHYSICAL", "TECHNICAL", "COMPLEX", "SLAB", "OVERHANG", "CRIMPS", "JUGS", "PINCHES", "SLOPERS", "DIHEDRAL", "ROOF", "REACHY" ]
             }
+          },
+          "toppedCount" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Topped ascents, by everyone"
           }
         },
-        "required" : [ "checks", "commentCount", "cordNumber", "favorite", "favoriteCount", "grade", "gradeRank", "holds", "id", "name", "openedOn", "sectorId", "sectorName", "sectorPosition", "status", "styles" ]
+        "required" : [ "checks", "commentCount", "cordNumber", "favorite", "favoriteCount", "grade", "gradeRank", "holds", "id", "name", "openedOn", "sectorId", "sectorName", "sectorPosition", "status", "styles", "toppedCount" ]
       },
       "Sector" : {
         "type" : "object",
@@ -2662,6 +3064,135 @@
           }
         },
         "required" : [ "name" ]
+      },
+      "Session" : {
+        "type" : "object",
+        "properties" : {
+          "ascents" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Ascent"
+            }
+          },
+          "climbedOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "comment" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "editable" : {
+            "type" : "boolean",
+            "description" : "Mine, and its month is not frozen yet"
+          },
+          "feeling" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Out of 10"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "photoUrl" : {
+            "type" : "string"
+          },
+          "summary" : {
+            "$ref" : "#/components/schemas/SessionSummary"
+          },
+          "visibility" : {
+            "type" : "string",
+            "enum" : [ "FRIENDS", "PRIVATE" ]
+          }
+        },
+        "required" : [ "ascents", "climbedOn", "createdAt", "editable", "id", "summary", "visibility" ]
+      },
+      "SessionPage" : {
+        "type" : "object",
+        "description" : "nextCursor is absent on the last page.",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Session"
+            }
+          },
+          "nextCursor" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "items" ]
+      },
+      "SessionRequest" : {
+        "type" : "object",
+        "properties" : {
+          "ascents" : {
+            "type" : "array",
+            "description" : "In the order climbed",
+            "items" : {
+              "$ref" : "#/components/schemas/AscentRequest"
+            },
+            "maxItems" : 50,
+            "minItems" : 1
+          },
+          "clientRef" : {
+            "type" : "string",
+            "format" : "uuid",
+            "description" : "Drawn by the app once per new session: sending it again gives back the session already saved (ignored on update)"
+          },
+          "climbedOn" : {
+            "type" : "string",
+            "format" : "date",
+            "description" : "Today or up to 7 days back"
+          },
+          "comment" : {
+            "type" : "string",
+            "maxLength" : 500,
+            "minLength" : 0
+          },
+          "feeling" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Out of 10",
+            "maximum" : 10,
+            "minimum" : 1
+          },
+          "visibility" : {
+            "type" : "string",
+            "enum" : [ "FRIENDS", "PRIVATE" ]
+          }
+        },
+        "required" : [ "ascents", "clientRef", "climbedOn", "visibility" ]
+      },
+      "SessionSummary" : {
+        "type" : "object",
+        "description" : "maxGrade: the hardest topped grade.",
+        "properties" : {
+          "ascentCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "leadCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "maxGrade" : {
+            "type" : "string"
+          },
+          "maxGradeRank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "toppedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "ascentCount", "leadCount", "toppedCount" ]
       },
       "StatusChange" : {
         "type" : "object",

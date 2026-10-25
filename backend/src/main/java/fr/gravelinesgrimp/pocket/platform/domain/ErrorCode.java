@@ -55,7 +55,13 @@ public enum ErrorCode {
     ROUTE_STATUS_CONFLICT(ErrorCategory.CONFLICT),
     INVALID_SETTERS(ErrorCategory.INVALID),
     DATE_IN_THE_FUTURE(ErrorCategory.INVALID),
-    DATE_IN_THE_PAST(ErrorCategory.INVALID);
+    DATE_IN_THE_PAST(ErrorCategory.INVALID),
+
+    // Sessions
+    SESSION_TOO_OLD(ErrorCategory.INVALID),
+    MONTH_FROZEN(ErrorCategory.CONFLICT),
+    INVALID_ASCENT(ErrorCategory.INVALID),
+    CHECK_FROM_ASCENT(ErrorCategory.CONFLICT);
 
     private final ErrorCategory category;
 

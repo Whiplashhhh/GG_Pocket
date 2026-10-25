@@ -78,10 +78,21 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/PodiumView.vue'),
     meta: { titleKey: 'nav.podium' },
   },
+  // The session sheet takes the whole screen: no header nor tab bar while typing.
   {
     path: '/seance/nouvelle',
-    component: () => import('@/views/NewSessionView.vue'),
-    meta: { titleKey: 'newSession.fab' },
+    component: () => import('@/views/session/SessionEditorView.vue'),
+    meta: { titleKey: 'session.newTitle', layout: 'bare' },
+  },
+  {
+    path: '/seances/:id',
+    component: () => import('@/views/session/SessionDetailView.vue'),
+    meta: { titleKey: 'session.detailTitle' },
+  },
+  {
+    path: '/seances/:id/modifier',
+    component: () => import('@/views/session/SessionEditorView.vue'),
+    meta: { titleKey: 'session.editTitle', layout: 'bare' },
   },
 
   // Profile and settings

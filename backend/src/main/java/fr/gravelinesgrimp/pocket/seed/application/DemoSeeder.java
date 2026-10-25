@@ -63,6 +63,7 @@ public class DemoSeeder implements ApplicationRunner {
     private final MemberRepository members;
     private final RegistrationCodeRepository codes;
     private final DemoTopoSeeder topo;
+    private final DemoSessionSeeder sessions;
     private final DemoSeedRegistry registry;
     private final InstanceMarkerRepository markers;
     private final PasswordEncoder passwordEncoder;
@@ -75,6 +76,7 @@ public class DemoSeeder implements ApplicationRunner {
             MemberRepository members,
             RegistrationCodeRepository codes,
             DemoTopoSeeder topo,
+            DemoSessionSeeder sessions,
             DemoSeedRegistry registry,
             InstanceMarkerRepository markers,
             PasswordEncoder passwordEncoder,
@@ -85,6 +87,7 @@ public class DemoSeeder implements ApplicationRunner {
         this.members = members;
         this.codes = codes;
         this.topo = topo;
+        this.sessions = sessions;
         this.registry = registry;
         this.markers = markers;
         this.passwordEncoder = passwordEncoder;
@@ -153,15 +156,16 @@ public class DemoSeeder implements ApplicationRunner {
             members.findByNicknameIgnoreCase(account.nickname())
                     .ifPresent(member -> accounts.put(account.nickname(), member));
         }
-        var routes =
-                accounts.size() == ACCOUNTS.size()
-                        ? topo.seed(accounts, now, ClubTime.today(clock))
-                        : 0;
+        var complete = accounts.size() == ACCOUNTS.size();
+        var today = ClubTime.today(clock);
+        var routes = complete ? topo.seed(accounts, now, today) : 0;
+        var sessionCount = complete ? sessions.seed(accounts, today) : 0;
         log.info(
-                "Demo seed: {} account(s) and {} route(s) created (admin, direction, ouvreur,"
-                        + " grimpeur){}",
+                "Demo seed: {} account(s), {} route(s) and {} session(s) created (admin,"
+                        + " direction, ouvreur, grimpeur){}",
                 created,
                 routes,
+                sessionCount,
                 withCode ? ", registration code DEMO2026" : "");
     }
 }

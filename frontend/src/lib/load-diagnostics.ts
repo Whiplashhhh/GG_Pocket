@@ -1,5 +1,7 @@
 import { isStandalone } from '@/stores/install'
 
+import { fetchProblem, refusedFiles } from './appUpdate'
+
 import type { ScreenLoadFailure } from './stale-chunk'
 
 /**
@@ -17,10 +19,13 @@ export async function collectLoadDiagnostics(failure: ScreenLoadFailure): Promis
   // Absent outside HTTPS and localhost.
   const controller = 'serviceWorker' in navigator ? navigator.serviceWorker.controller : null
   lines.push(`service worker ${controller ? controller.state : 'aucun'}`)
+  lines.push(`inscription ${await registrationState()}`)
   if ('caches' in window) {
     lines.push(`caches ${(await caches.keys()).join(', ') || 'aucun'}`)
   }
   lines.push(...(await probeScripts(scriptUrls())), ...(await probeNames()))
+  const refused = await refusedFiles()
+  lines.push(`fichiers de l'appli ${refused.length === 0 ? 'tous OK' : 'refusés :'}`, ...refused)
   return lines
 }
 
@@ -49,9 +54,11 @@ async function probeScripts(urls: string[]): Promise<string[]> {
       const answer = await probe(url)
       if (answer !== null) {
         // Same file under another address: tells a refused address from a file that breaks in transit.
+        const name = file.replace(/^\/assets\//, '')
         misfits.push(
           `${file} → ${answer}`,
           `  ${file}?sonde → ${(await probe(`${url}?sonde=${String(Date.now())}`)) ?? 'OK'}`,
+          `  même contenu, autre nom → ${(await fetchProblem(`/sonde/temoin.js?f=${name}`)) ?? 'OK'}`,
         )
       }
     }),
@@ -81,6 +88,19 @@ async function probeNames(): Promise<string[]> {
       }
     }),
   )
+}
+
+/** Each version the service worker registration holds: active, waiting, installing. */
+async function registrationState(): Promise<string> {
+  if (!('serviceWorker' in navigator)) return 'impossible'
+  const registration = await navigator.serviceWorker.getRegistration()
+  if (registration === undefined) return 'aucune'
+  const states = [
+    `active ${registration.active?.state ?? 'non'}`,
+    `en attente ${registration.waiting ? 'oui' : 'non'}`,
+    `en installation ${registration.installing?.state ?? 'non'}`,
+  ]
+  return states.join(', ')
 }
 
 /** null when the script comes back fine, else what went wrong. */
