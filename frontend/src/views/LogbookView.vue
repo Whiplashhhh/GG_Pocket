@@ -33,6 +33,7 @@ const figures = computed(() => {
   return [
     { key: 'sessions', value: String(totals.sessionCount) },
     { key: 'routes', value: String(totals.routeCount) },
+    { key: 'ascents', value: String(totals.ascentCount) },
     { key: 'topped', value: String(totals.toppedCount) },
     { key: 'lead', value: String(totals.leadToppedCount) },
     { key: 'clean', value: String(totals.cleanCount) },
@@ -158,9 +159,6 @@ function bestClass(item: LogbookRoute) {
               <span class="text-ink-muted">{{ t('logbook.passages', item.ascentCount) }}</span>
               <span class="text-ink-muted">{{
                 t('logbook.lastTime', { date: formatDate(item.lastClimbedOn) })
-              }}</span>
-              <span v-if="item.route.status === 'DISMOUNTED'" class="text-ink-muted">{{
-                t('logbook.dismounted')
               }}</span>
             </span>
           </RouterLink>

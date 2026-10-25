@@ -62,6 +62,8 @@ export interface AscentSource {
   toppedCount(routeId: string): number
   stats(routeId: string): Schemas['RouteStats']
   mine(memberId: string, routeId: string): Schemas['MyRouteAscent'][]
+  /** A clean ascent of mine on the route in this mode ("je sais la faire" automatic). */
+  hasClean(memberId: string, routeId: string, mode: ClimbMode): boolean
 }
 
 /** What a handler answers: a body (status 200 unless said), or 204, or a Problem Details code. */
@@ -888,7 +890,9 @@ export class FakeTopo {
       if (readOnly) return problem(409, 'ROUTE_DISMOUNTED')
       const key = `${me.id}:${route.id}:${mode}`
       if (method === 'PUT') this.checks.add(key)
-      else this.checks.delete(key)
+      else if (this.ascents?.hasClean(me.id, route.id, mode) === true) {
+        return problem(409, 'CHECK_FROM_ASCENT')
+      } else this.checks.delete(key)
       return empty
     }
     return undefined

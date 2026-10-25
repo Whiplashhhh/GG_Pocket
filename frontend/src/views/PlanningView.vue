@@ -6,7 +6,6 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { errorMessageKey } from '@/api/errors'
 import { useMyPlanning, type PlanningDay } from '@/api/sessions'
-import EmptyState from '@/components/ui/EmptyState.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
@@ -146,7 +145,7 @@ function select(date: string) {
                 cell.date === today && selected !== cell.date
                   ? 'outline-2 outline-offset-[-6px] outline-ink outline-dotted'
                   : '',
-                cell.date > today ? 'text-ink-muted' : '',
+                cell.date > today ? 'opacity-45' : '',
               ]"
               :aria-label="dayLabel(cell.date)"
               :aria-pressed="selected === cell.date"
@@ -193,21 +192,25 @@ function select(date: string) {
         <li v-for="session in selectedDay.sessions" :key="session.id">
           <RouterLink
             :to="`/seances/${session.id}`"
-            class="flex min-h-11 flex-wrap items-center gap-x-2 py-1 font-semibold hover:underline"
-            :aria-label="t('planning.openSession', { date: formatDate(selected) })"
+            class="flex min-h-11 items-center gap-2 py-1 font-semibold hover:underline"
           >
-            <span>{{ t('session.summary.ascents', session.summary.ascentCount) }}</span>
-            <span aria-hidden="true">·</span>
-            <span>{{ t('session.summary.topped', session.summary.toppedCount) }}</span>
-            <template v-if="session.summary.maxGrade">
+            <span class="sr-only">{{
+              t('planning.openSession', { date: formatDate(selected) })
+            }}</span>
+            <span class="flex min-w-0 flex-1 flex-wrap gap-x-2">
+              <span>{{ t('session.summary.ascents', session.summary.ascentCount) }}</span>
               <span aria-hidden="true">·</span>
-              <span>{{ t('session.summary.max', { grade: session.summary.maxGrade }) }}</span>
-            </template>
-            <template v-if="session.feeling !== undefined">
-              <span aria-hidden="true">·</span>
-              <span>{{ t('session.summary.feeling', { n: session.feeling }) }}</span>
-            </template>
-            <ChevronRight :size="18" class="ml-auto shrink-0" aria-hidden="true" />
+              <span>{{ t('session.summary.topped', session.summary.toppedCount) }}</span>
+              <template v-if="session.summary.maxGrade">
+                <span aria-hidden="true">·</span>
+                <span>{{ t('session.summary.max', { grade: session.summary.maxGrade }) }}</span>
+              </template>
+              <template v-if="session.feeling !== undefined">
+                <span aria-hidden="true">·</span>
+                <span>{{ t('session.summary.feeling', { n: session.feeling }) }}</span>
+              </template>
+            </span>
+            <ChevronRight :size="18" class="shrink-0" aria-hidden="true" />
           </RouterLink>
         </li>
       </ul>
@@ -225,13 +228,16 @@ function select(date: string) {
 
     <p v-if="current.frozen" class="px-4 pt-3 text-sm text-ink-muted">{{ t('planning.frozen') }}</p>
 
-    <EmptyState
-      v-if="current.days.length === 0 && !selected"
-      :title="t('planning.monthEmpty')"
-      :body="t('planning.emptyBody')"
-    />
+    <div v-if="current.days.length === 0 && !selected" class="px-4 pt-4">
+      <p class="font-semibold">{{ t('planning.monthEmpty') }}</p>
+      <p class="text-sm text-ink-muted">{{ t('planning.emptyBody') }}</p>
+    </div>
 
-    <section v-if="totals" class="px-4 pt-5" :aria-labelledby="`${titleId}-totals`">
+    <section
+      v-if="totals && current.days.length > 0"
+      class="px-4 pt-5"
+      :aria-labelledby="`${titleId}-totals`"
+    >
       <h2 :id="`${titleId}-totals`" class="text-lg font-title">{{ t('planning.totalsTitle') }}</h2>
       <dl class="mt-2 grid grid-cols-2 border-t border-rule">
         <div class="border-b border-rule py-3 pr-3">
