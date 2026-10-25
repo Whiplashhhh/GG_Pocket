@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 0.3.0 — 2026-10-25
+
 ### Ajouté
 
 - Nouvelle séance : le gros bouton orange ouvre la feuille de saisie. Tes voies récentes d'abord, sinon tape « 12 » pour
