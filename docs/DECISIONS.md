@@ -745,5 +745,14 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - nouvelle sonde : `/sonde/temoin.js?f=<fichier>` (Caddy du conteneur web) sert les mêmes octets sous un nom neutre.
     Refusé là aussi : le téléphone juge le **contenu** ; accepté : il juge le **nom**. L'écran d'erreur et le bouton la
     lancent pour chaque script refusé, et listent tous les fichiers de l'appli que le téléphone refuse.
-- **Suite** : selon la réponse de la sonde, renommer autrement ou trouver ce qui, dans le contenu, déclenche le filtre.
-- **Statut** : en cours (diagnostic sur l'iPhone de Willem).
+- **Cause trouvée (2026-10-25)** : l'extension Safari « Cyberfiltre » (sept bloqueurs de contenu « Phishing1 » à
+  « Phishing7 », dans *Réglages → Apps → Safari → Extensions*). Une fois coupée, le Profil s'ouvre et les mises à jour
+  arrivent. Un bloqueur de contenu WebKit ne juge que l'adresse (motifs sur l'URL, le domaine, le type de ressource),
+  jamais le contenu : la règle fautive vise donc l'adresse du fichier, peut-être le domaine de test `*.sslip.io`
+  (souvent listé par les filtres anti-hameçonnage) associé au chemin. Le nom d'un fichier change à chaque version :
+  une version peut passer, la suivante non.
+- **Suite** : savoir si la prod (vrai domaine) est touchée avant de changer quoi que ce soit. Si un membre tombe sur le
+  même écran, l'écran d'erreur et le bouton « Chercher une mise à jour » listent les fichiers refusés ; la réponse à
+  donner est de couper Cyberfiltre (ou de l'autoriser pour le site). Si la prod est touchée, nommer les fichiers par
+  un motif plus sage, avec la sonde pour le vérifier.
+- **Statut** : cause trouvée ; contournement côté appli à décider si la prod est touchée.

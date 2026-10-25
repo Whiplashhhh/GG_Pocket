@@ -21,6 +21,9 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
   photo (bandeau dans l'app), page d'une séance, Actu « Mes séances », fiche voie « Au compteur » + « Mon historique »,
   tri « Réalisations ». Vitest 192, e2e Desktop Chrome 54 (dont 7 séances), captures 360 px clair/sombre regardées
   (saisie, Actu, détail, attente, fiche voie).
+- PWA (D-091) : recherche de mise à jour au retour au premier plan et toutes les heures, bouton Profil « Chercher une
+  mise à jour » avec la liste des fichiers refusés, sonde `/sonde/temoin.js` (Caddy). Cause du Profil bloqué sur
+  l'iPhone de Willem : l'extension Safari « Cyberfiltre » (bloqueurs « Phishing1-7 ») ; coupée, tout passe.
 
 ### Reste
 
