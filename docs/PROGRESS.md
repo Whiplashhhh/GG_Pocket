@@ -4,6 +4,31 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-26 — PR 4.3 : comptes et données personnelles
+
+**Branche** : `feature/comptes-0.4.0` (PR #25).
+
+### Fait
+
+- Backend : migration V10 « Ancien·ne membre » (D-096) ; `AccountDeletionService` (libre-service derrière le mot de
+  passe, admin seulement côté gestion, dernier admin protégé) qui transmet séances et voies ouvertes, efface avatar et
+  photos de séance (fichiers compris) ; export JSON `GET /api/v1/me/export` ; `sessionCount` dans le tableau des membres
+  et `canDelete` sur la fiche. `countMembers()` ignore l'ancien membre (premier démarrage, seed). `AccountIT` +
+  matrice d'autorisation.
+- Front : page « Mes données et mon compte » (`/profil/compte`), colonne « Séances » triable, suppression depuis la fiche
+  (admin), journal (« X a supprimé son compte »), textes de « Tes données ». Vitest, e2e Desktop Chrome, captures
+  360 px et 1280 px clair/sombre regardées.
+
+### Reste
+
+- CI verte sur le run de la PR (204b91d). Le run « push » du même commit a vu son job e2e dépasser 15 min et
+  être coupé (aucun test en échec) : à relancer si la protection de branche l'exige.
+- D-096 à valider par Willem (audit conservé avec le pseudo, photos listées mais pas incluses dans l'export).
+- Puis Willem fusionne #25 et lance la release (0.5.0). Ensuite : phase 5 (Social).
+- D-093, D-094, D-087, D-090 à valider ; PR #17 en suspens.
+
+---
+
 ## 2026-10-26 — PR 4.2 : retours de Willem sur le dev
 
 **Branche** : `feature/planning-0.3.0` (PR #23).
