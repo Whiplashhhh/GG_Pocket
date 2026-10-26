@@ -38,17 +38,17 @@ public class MyDataExportService {
 
     public record MyDataExport(
             Instant exportedAt,
-            Profile profile,
-            List<Session> sessions,
-            List<RouteTick> routeChecks,
-            List<RouteTick> favorites,
-            List<Comment> routeComments,
-            List<RouteTick> lastChanceAcknowledgements,
-            List<RouteRef> routesSet,
-            List<Device> devices,
-            List<Photo> photos) {}
+            ExportedProfile profile,
+            List<ExportedSession> sessions,
+            List<ExportedTick> routeChecks,
+            List<ExportedTick> favorites,
+            List<ExportedComment> routeComments,
+            List<ExportedTick> lastChanceAcknowledgements,
+            List<ExportedRoute> routesSet,
+            List<ExportedDevice> devices,
+            List<ExportedPhoto> photos) {}
 
-    public record Profile(
+    public record ExportedProfile(
             String nickname,
             String firstName,
             String lastName,
@@ -61,23 +61,23 @@ public class MyDataExportService {
             Integer climbingSinceYear,
             String bio,
             boolean appearsInRankings,
-            RouteRef favoriteRoute,
+            ExportedRoute favoriteRoute,
             Instant privacyAcceptedAt,
             Instant parentalConsentAt,
             Instant registeredAt,
             Instant lastSeenAt) {}
 
-    public record Session(
+    public record ExportedSession(
             LocalDate climbedOn,
             Integer feeling,
             String comment,
             String visibility,
             UUID photoId,
             Instant createdAt,
-            List<Attempt> ascents) {}
+            List<ExportedAscent> ascents) {}
 
-    public record Attempt(
-            RouteRef route,
+    public record ExportedAscent(
+            ExportedRoute route,
             String mode,
             boolean topped,
             boolean clean,
@@ -85,16 +85,17 @@ public class MyDataExportService {
             boolean firstTry,
             Integer feeling) {}
 
-    public record RouteRef(UUID id, String name) {}
+    public record ExportedRoute(UUID id, String name) {}
 
-    public record RouteTick(RouteRef route, String mode, String source, Instant at) {}
+    public record ExportedTick(ExportedRoute route, String mode, String source, Instant at) {}
 
-    public record Comment(RouteRef route, String body, Instant at, Instant deletedAt) {}
+    public record ExportedComment(
+            ExportedRoute route, String body, Instant at, Instant deletedAt) {}
 
-    public record Device(
+    public record ExportedDevice(
             String browser, String platform, Instant signedInAt, Instant lastActiveAt) {}
 
-    public record Photo(UUID id, String usage, int width, int height, Instant at) {}
+    public record ExportedPhoto(UUID id, String usage, int width, int height, Instant at) {}
 
     private final MemberRepository members;
     private final ClimbingSessionRepository sessions;
@@ -154,10 +155,11 @@ public class MyDataExportService {
         Map<UUID, String> names =
                 routes.findAllById(routeIds).stream()
                         .collect(Collectors.toMap(Route::id, Route::name));
-        Function<UUID, RouteRef> route = id -> id == null ? null : new RouteRef(id, names.get(id));
+        Function<UUID, ExportedRoute> route =
+                id -> id == null ? null : new ExportedRoute(id, names.get(id));
 
         var profile =
-                new Profile(
+                new ExportedProfile(
                         member.nickname(),
                         member.firstName(),
                         member.lastName(),
@@ -182,7 +184,7 @@ public class MyDataExportService {
                 myChecks.stream()
                         .map(
                                 check ->
-                                        new RouteTick(
+                                        new ExportedTick(
                                                 route.apply(check.routeId()),
                                                 check.mode().name(),
                                                 check.source().name(),
@@ -194,18 +196,18 @@ public class MyDataExportService {
                 myComments.stream()
                         .map(
                                 comment ->
-                                        new Comment(
+                                        new ExportedComment(
                                                 route.apply(comment.routeId()),
                                                 comment.body(),
                                                 comment.createdAt(),
                                                 comment.deletedAt()))
                         .toList(),
                 myAcks.stream().map(a -> tick(route.apply(a.routeId()), a.createdAt())).toList(),
-                routesSet.stream().map(r -> new RouteRef(r.id(), r.name())).toList(),
+                routesSet.stream().map(r -> new ExportedRoute(r.id(), r.name())).toList(),
                 devices.list(memberId, null).stream()
                         .map(
                                 device ->
-                                        new Device(
+                                        new ExportedDevice(
                                                 device.browser().name(),
                                                 device.platform().name(),
                                                 device.signedInAt(),
@@ -216,7 +218,7 @@ public class MyDataExportService {
                         .stream()
                         .map(
                                 file ->
-                                        new Photo(
+                                        new ExportedPhoto(
                                                 file.id(),
                                                 file.usage().name(),
                                                 file.width(),
@@ -225,12 +227,13 @@ public class MyDataExportService {
                         .toList());
     }
 
-    private static Session session(ClimbingSession session, Function<UUID, RouteRef> route) {
+    private static ExportedSession session(
+            ClimbingSession session, Function<UUID, ExportedRoute> route) {
         var ascents =
                 session.ascents().stream()
                         .map(
                                 ascent ->
-                                        new Attempt(
+                                        new ExportedAscent(
                                                 route.apply(ascent.routeId()),
                                                 ascent.mode().name(),
                                                 ascent.topped(),
@@ -239,7 +242,7 @@ public class MyDataExportService {
                                                 ascent.firstTry(),
                                                 ascent.feeling()))
                         .toList();
-        return new Session(
+        return new ExportedSession(
                 session.climbedOn(),
                 session.feeling(),
                 session.comment(),
@@ -249,7 +252,7 @@ public class MyDataExportService {
                 ascents);
     }
 
-    private static RouteTick tick(RouteRef route, Instant at) {
-        return new RouteTick(route, null, null, at);
+    private static ExportedTick tick(ExportedRoute route, Instant at) {
+        return new ExportedTick(route, null, null, at);
     }
 }

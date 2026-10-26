@@ -50,7 +50,7 @@ class DemoSeederIT {
 
     @Test
     void createsOneAccountPerRoleAndADemoCode() {
-        assertThat(members.findAll())
+        assertThat(members.findAllForDirectory())
                 .extracting(Member::nickname, Member::role)
                 .containsExactlyInAnyOrder(
                         tuple("admin", Role.ADMIN),
