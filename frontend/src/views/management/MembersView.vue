@@ -23,7 +23,11 @@ const COLUMNS: MemberSortKey[] = [
   'status',
   'registeredAt',
   'lastSeenAt',
+  'sessionCount',
 ]
+
+/** Dates and counts: the most recent, or the most, first. */
+const DESCENDING_FIRST = new Set<MemberSortKey>(['registeredAt', 'lastSeenAt', 'sessionCount'])
 
 const { t } = useI18n()
 const members = useMembers()
@@ -42,7 +46,7 @@ function sortBy(key: MemberSortKey) {
   } else {
     sortKey.value = key
     // Dates read best newest first.
-    direction.value = key === 'registeredAt' || key === 'lastSeenAt' ? 'desc' : 'asc'
+    direction.value = DESCENDING_FIRST.has(key) ? 'desc' : 'asc'
   }
 }
 
@@ -123,6 +127,9 @@ function fullName(member: MemberSummary): string {
             <span class="truncate text-sm text-ink-muted">@{{ member.nickname }}</span>
             <span class="flex gap-2">
               <span class="text-sm text-ink-muted">{{ t(`roleNames.${member.role}`) }}</span>
+              <span class="text-sm text-ink-muted">{{
+                t('members.sessions', member.sessionCount)
+              }}</span>
               <span
                 v-if="member.status === 'DISABLED'"
                 class="rounded-control border border-danger px-1.5 text-micro font-semibold text-danger"
@@ -191,6 +198,7 @@ function fullName(member: MemberSummary): string {
           <td class="py-2 pr-3 text-ink-muted">
             {{ member.lastSeenAt ? formatRelative(member.lastSeenAt) : t('members.never') }}
           </td>
+          <td class="py-2 pr-3 tabular-nums">{{ member.sessionCount }}</td>
         </tr>
       </tbody>
     </table>

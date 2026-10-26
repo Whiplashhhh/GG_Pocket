@@ -215,6 +215,14 @@ export class FakeClub {
     }
   }
 
+  /** Account deletion: the member and their sessions go (the real server hands them over). */
+  private remove(member: FakeMember) {
+    this.members.splice(this.members.indexOf(member), 1)
+    for (const [key, session] of this.sessions) {
+      if (session.memberId === member.id) this.sessions.delete(key)
+    }
+  }
+
   private summary(member: FakeMember): Schemas['MemberSummary'] {
     return {
       id: member.id,
@@ -225,6 +233,7 @@ export class FakeClub {
       status: member.status,
       registeredAt: member.registeredAt,
       lastSeenAt: member.lastSeenAt,
+      sessionCount: this.climbs.sessions.filter((session) => session.memberId === member.id).length,
     }
   }
 
@@ -251,6 +260,7 @@ export class FakeClub {
         canDisable: manageable && member.status === 'ACTIVE',
         canEnable: manageable && member.status === 'DISABLED',
         canCreateResetLink: manageable && member.status === 'ACTIVE',
+        canDelete: actor.role === 'ADMIN' && !self,
       },
     }
   }
@@ -422,6 +432,16 @@ export class FakeClub {
       me.password = newPassword
       return route.fulfill({ status: 204 })
     }
+    if (path === '/me/export') {
+      return json({ exportedAt: new Date(this.now).toISOString(), profile: this.profile(me) })
+    }
+    if (path === '/me/deletion') {
+      const { password } = body() as { password: string }
+      if (password !== me.password) return fail(400, 'CURRENT_PASSWORD_WRONG')
+      this.remove(me)
+      this.record(me, 'MEMBER_DELETED', me.nickname)
+      return route.fulfill({ status: 204 })
+    }
     if (path === '/me/devices') {
       const token = this.browserSession
       return json(
@@ -465,6 +485,12 @@ export class FakeClub {
       const action = parts.at(4)
       const member = this.members.find((candidate) => candidate.id === id)
       if (member === undefined) return fail(404, 'NOT_FOUND')
+      if (action === undefined && method === 'DELETE') {
+        if (!this.detail(me, member).permissions.canDelete) return fail(403, 'ACCESS_DENIED')
+        this.remove(member)
+        this.record(me, 'MEMBER_DELETED', member.nickname)
+        return route.fulfill({ status: 204 })
+      }
       if (action === undefined) return json(this.detail(me, member))
       if (action === 'role') {
         const { role } = body() as { role: Role }

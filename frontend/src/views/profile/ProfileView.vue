@@ -3,6 +3,7 @@ import {
   BookOpen,
   ChevronRight,
   Download,
+  FileDown,
   KeyRound,
   ShieldCheck,
   Smartphone,
@@ -193,6 +194,10 @@ const facts = computed(() => {
       <SettingsLink to="/profil/installer">
         <template #icon><Download :size="20" /></template>
         {{ t('profile.install') }}
+      </SettingsLink>
+      <SettingsLink to="/profil/compte">
+        <template #icon><FileDown :size="20" /></template>
+        {{ t('profile.account') }}
       </SettingsLink>
       <SettingsLink to="/tes-donnees">
         <template #icon><ShieldCheck :size="20" /></template>

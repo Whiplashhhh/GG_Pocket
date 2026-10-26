@@ -27,6 +27,10 @@ function value(raw: string | undefined): string {
 }
 
 function sentence(entry: AuditEntry): string {
+  // A member who left on their own: the entry was written in their name, before the account went.
+  if (entry.action === 'MEMBER_DELETED' && entry.actorNickname === entry.targetLabel) {
+    return t('audit.selfDeleted', { target: entry.targetLabel })
+  }
   return t(`audit.actions.${entry.action}`, {
     actor: entry.actorNickname ?? t('audit.formerMember'),
     target: entry.targetLabel,

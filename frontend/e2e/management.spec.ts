@@ -51,6 +51,10 @@ test.describe('the board', () => {
       /\/nouveau-mot-de-passe#jeton-/,
     )
 
+    // Deleting an account for good is the admin's call.
+    await expect(
+      page.getByRole('button', { name: 'Supprimer définitivement le compte' }),
+    ).toHaveCount(0)
     await page.getByRole('button', { name: 'Désactiver le compte' }).click()
     await page
       .getByRole('alertdialog', { name: 'Désactiver le compte de Tonton Talon ?' })
@@ -77,6 +81,25 @@ test.describe('the board', () => {
 
 test.describe('the admin', () => {
   test.use({ signedInAs: 'ADMIN' })
+
+  test('deletes an account for good', async ({ page, club }) => {
+    club.addMember({ nickname: 'tonton.talon', firstName: 'Tonton', lastName: 'Talon' })
+    await page.goto('/gestion/membres')
+    await page.getByRole('link', { name: /Talon/ }).first().click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Tonton Talon' })).toBeVisible()
+    await expect(page.getByText('Séances', { exact: true })).toBeVisible()
+
+    await page.getByRole('button', { name: 'Supprimer définitivement le compte' }).click()
+    await page
+      .getByRole('alertdialog', { name: 'Supprimer pour de bon le compte de Tonton Talon ?' })
+      .getByRole('button', { name: 'Supprimer pour de bon' })
+      .click()
+    await expect(page).toHaveURL(/\/gestion\/membres$/)
+    await expect(page.getByText('1 membre', { exact: true })).toBeVisible()
+
+    await page.goto('/gestion/journal')
+    await expect(page.getByText('marie a supprimé le compte de tonton.talon')).toBeVisible()
+  })
 
   test('creates a registration code for the gym poster', async ({ page }) => {
     await page.goto('/gestion/codes')

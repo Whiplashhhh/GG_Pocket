@@ -168,7 +168,8 @@ export interface paths {
     get: operations['getMember']
     put?: never
     post?: never
-    delete?: never
+    /** Delete an account for good (admin); its sessions stay as "Ancien·ne membre" */
+    delete: operations['deleteMember']
     options?: never
     head?: never
     patch?: never
@@ -431,6 +432,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/deletion': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Delete my account for good, behind my password; my sessions stay as "Ancien·ne membre" for the routes' statistics */
+    post: operations['deleteMyAccount']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/devices': {
     parameters: {
       query?: never
@@ -477,6 +495,23 @@ export interface paths {
     post?: never
     /** Close one of my sessions */
     delete: operations['closeMyDevice']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/export': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Everything the app keeps about me, as a file */
+    get: operations['exportMyData']
+    put?: never
+    post?: never
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -990,6 +1025,9 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    AccountDeletion: {
+      password: string
+    }
     Ascent: {
       clean: boolean
       /** Format: int32 */
@@ -1032,6 +1070,7 @@ export interface components {
         | 'MEMBER_ROLE_CHANGED'
         | 'MEMBER_DISABLED'
         | 'MEMBER_ENABLED'
+        | 'MEMBER_DELETED'
         | 'PASSWORD_RESET_LINK_CREATED'
         | 'REGISTRATION_CODE_CREATED'
         | 'REGISTRATION_CODE_UPDATED'
@@ -1133,6 +1172,95 @@ export interface components {
       platform: 'IPHONE' | 'IPAD' | 'ANDROID' | 'MAC' | 'WINDOWS' | 'LINUX' | 'OTHER'
       /** Format: date-time */
       signedInAt: string
+    }
+    ExportedAscent: {
+      clean?: boolean
+      /** Format: int32 */
+      falls?: number
+      /** Format: int32 */
+      feeling?: number
+      firstTry?: boolean
+      mode?: string
+      route?: components['schemas']['ExportedRoute']
+      topped?: boolean
+    }
+    ExportedComment: {
+      /** Format: date-time */
+      at?: string
+      body?: string
+      /** Format: date-time */
+      deletedAt?: string
+      route?: components['schemas']['ExportedRoute']
+    }
+    ExportedDevice: {
+      browser?: string
+      /** Format: date-time */
+      lastActiveAt?: string
+      platform?: string
+      /** Format: date-time */
+      signedInAt?: string
+    }
+    ExportedPhoto: {
+      /** Format: date-time */
+      at?: string
+      /** Format: int32 */
+      height?: number
+      /** Format: uuid */
+      id?: string
+      usage?: string
+      /** Format: int32 */
+      width?: number
+    }
+    ExportedProfile: {
+      appearsInRankings?: boolean
+      bio?: string
+      /** Format: date */
+      birthDate?: string
+      /** Format: int32 */
+      climbingSinceYear?: number
+      /** Format: int32 */
+      clubArrivalYear?: number
+      email?: string
+      favoriteRoute?: components['schemas']['ExportedRoute']
+      firstName?: string
+      lastName?: string
+      /** Format: date-time */
+      lastSeenAt?: string
+      nickname?: string
+      /** Format: date-time */
+      parentalConsentAt?: string
+      /** Format: date-time */
+      privacyAcceptedAt?: string
+      /** Format: date-time */
+      registeredAt?: string
+      role?: string
+      showAge?: boolean
+      status?: string
+    }
+    ExportedRoute: {
+      /** Format: uuid */
+      id?: string
+      name?: string
+    }
+    ExportedSession: {
+      ascents?: components['schemas']['ExportedAscent'][]
+      /** Format: date */
+      climbedOn?: string
+      comment?: string
+      /** Format: date-time */
+      createdAt?: string
+      /** Format: int32 */
+      feeling?: number
+      /** Format: uuid */
+      photoId?: string
+      visibility?: string
+    }
+    ExportedTick: {
+      /** Format: date-time */
+      at?: string
+      mode?: string
+      route?: components['schemas']['ExportedRoute']
+      source?: string
     }
     FavoriteRequest: {
       /**
@@ -1263,6 +1391,8 @@ export interface components {
     MemberPermissions: {
       assignableRoles: ('CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN')[]
       canCreateResetLink: boolean
+      /** @description Delete the account for good (admin, not oneself) */
+      canDelete: boolean
       canDisable: boolean
       canEnable: boolean
     }
@@ -1289,6 +1419,11 @@ export interface components {
       registeredAt: string
       /** @enum {string} */
       role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      /**
+       * Format: int64
+       * @description Sessions logged, ever
+       */
+      sessionCount: number
       /** @enum {string} */
       status: 'ACTIVE' | 'DISABLED'
     }
@@ -1316,6 +1451,19 @@ export interface components {
       sessionCount: number
       /** Format: int32 */
       toppedCount: number
+    }
+    MyDataExport: {
+      devices?: components['schemas']['ExportedDevice'][]
+      /** Format: date-time */
+      exportedAt?: string
+      favorites?: components['schemas']['ExportedTick'][]
+      lastChanceAcknowledgements?: components['schemas']['ExportedTick'][]
+      photos?: components['schemas']['ExportedPhoto'][]
+      profile?: components['schemas']['ExportedProfile']
+      routeChecks?: components['schemas']['ExportedTick'][]
+      routeComments?: components['schemas']['ExportedComment'][]
+      routesSet?: components['schemas']['ExportedRoute'][]
+      sessions?: components['schemas']['ExportedSession'][]
     }
     /** @description Everything the member may see and edit about themselves. */
     MyProfile: {
@@ -1985,6 +2133,26 @@ export interface operations {
       }
     }
   }
+  deleteMember: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   createPasswordResetLink: {
     parameters: {
       query?: never
@@ -2370,6 +2538,28 @@ export interface operations {
       }
     }
   }
+  deleteMyAccount: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AccountDeletion']
+      }
+    }
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   listMyDevices: {
     parameters: {
       query?: never
@@ -2425,6 +2615,26 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  exportMyData: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MyDataExport']
+        }
       }
     }
   }

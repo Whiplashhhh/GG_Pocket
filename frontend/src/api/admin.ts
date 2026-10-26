@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { api } from './client'
-import { request } from './request'
+import { request, requestNoContent } from './request'
 import type { components } from './schema'
 
 export type MemberSummary = components['schemas']['MemberSummary']
@@ -69,6 +69,20 @@ export function useChangeStatus() {
         }),
       ),
     onSuccess: changed,
+  })
+}
+
+/** For good (admin): the sheet goes, the table and the audit log follow. */
+export function useDeleteMember() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) =>
+      requestNoContent(api.DELETE('/api/v1/admin/members/{id}', { params: { path: { id } } })),
+    onSuccess: (_, id) => {
+      queryClient.removeQueries({ queryKey: [...MEMBERS_KEY, id], exact: true })
+      void queryClient.invalidateQueries({ queryKey: MEMBERS_KEY, exact: true })
+      void queryClient.invalidateQueries({ queryKey: AUDIT_KEY })
+    },
   })
 }
 

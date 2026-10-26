@@ -170,6 +170,36 @@ test.describe('a signed-in member', () => {
     await expect(page.getByText('Ennemie jurée des dévers.')).toBeVisible()
   })
 
+  test('downloads their data, then deletes their account behind their password', async ({
+    page,
+    club,
+  }) => {
+    await page.goto('/profil')
+    await page.getByRole('link', { name: 'Mes données et mon compte' }).click()
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Mes données et mon compte' }),
+    ).toBeVisible()
+
+    const download = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Télécharger mes données' }).click()
+    expect((await download).suggestedFilename()).toMatch(
+      /^gg-pocket-mes-donnees-\d{4}-\d{2}-\d{2}\.json$/,
+    )
+    await expect(page.getByText('C’est dans tes téléchargements.')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Supprimer mon compte' }).click()
+    await expect(page.getByLabel('Ton mot de passe')).toBeFocused()
+    await page.getByLabel('Ton mot de passe').fill('pas le bon')
+    await page.getByRole('button', { name: 'Supprimer définitivement' }).click()
+    await expect(page.getByText('Ce n’est pas ton mot de passe actuel. Réessaie.')).toBeVisible()
+    expect(club.members.some((member) => member.nickname === 'marie')).toBe(true)
+
+    await page.getByLabel('Ton mot de passe').fill('avant-bras en béton')
+    await page.getByRole('button', { name: 'Supprimer définitivement' }).click()
+    await expect(page).toHaveURL(/\/accueil$/)
+    expect(club.members.some((member) => member.nickname === 'marie')).toBe(false)
+  })
+
   test('sees their devices', async ({ page }) => {
     await page.goto('/profil/appareils')
     await expect(page.getByText('Safari sur iPhone')).toBeVisible()

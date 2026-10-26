@@ -2,12 +2,13 @@
 import { useClipboard, useShare } from '@vueuse/core'
 import { computed, ref, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import {
   useChangeRole,
   useChangeStatus,
   useCreateResetLink,
+  useDeleteMember,
   useMember,
   type MemberDetail,
 } from '@/api/admin'
@@ -31,17 +32,20 @@ import ManagementTitle from './ManagementTitle.vue'
  */
 const { t } = useI18n()
 const route = useRoute()
+const router = useRouter()
 const me = useCurrentMember()
 const id = computed(() => String(route.params.id))
 const member = useMember(() => id.value)
 const changeRole = useChangeRole()
 const changeStatus = useChangeStatus()
 const createLink = useCreateResetLink()
+const deleteMember = useDeleteMember()
 const { copy, copied, isSupported: canCopy } = useClipboard({ copiedDuring: 2500 })
 const { share, isSupported: canShare } = useShare()
 
 const selectedRole = ref<Role>('CLIMBER')
 const confirmingDisable = ref(false)
+const confirmingDelete = ref(false)
 const notice = ref<string | null>(null)
 const failure = ref<unknown>(null)
 const resetLink = ref<{ url: string; expiresAt: string } | null>(null)
@@ -111,6 +115,13 @@ function setStatus(status: 'ACTIVE' | 'DISABLED') {
       onError: failed,
     },
   )
+}
+
+function remove() {
+  deleteMember.mutate(id.value, {
+    onSuccess: () => void router.replace('/gestion/membres'),
+    onError: failed,
+  })
 }
 
 function makeResetLink() {
@@ -190,6 +201,10 @@ function makeResetLink() {
               : t('member.neverSeen')
           }}
         </dd>
+      </div>
+      <div>
+        <dt class="text-sm text-ink-muted">{{ t('members.columns.sessionCount') }}</dt>
+        <dd class="tabular-nums">{{ detail.member.sessionCount }}</dd>
       </div>
       <div v-if="detail.clubArrivalYear || detail.climbingSinceYear">
         <dt class="text-sm text-ink-muted">{{ t('profileFields.clubArrivalYear') }}</dt>
@@ -281,7 +296,11 @@ function makeResetLink() {
     </section>
 
     <section
-      v-if="detail.permissions.canDisable || detail.permissions.canEnable"
+      v-if="
+        detail.permissions.canDisable ||
+        detail.permissions.canEnable ||
+        detail.permissions.canDelete
+      "
       class="flex flex-col gap-3 border-t border-rule px-4 py-5 lg:px-0"
       aria-labelledby="account-title"
     >
@@ -303,6 +322,15 @@ function makeResetLink() {
       >
         {{ t('member.enable') }}
       </GgButton>
+      <GgButton
+        v-if="detail.permissions.canDelete"
+        variant="danger"
+        class="self-start"
+        :disabled="deleteMember.isPending.value"
+        @click="confirmingDelete = true"
+      >
+        {{ t('member.delete') }}
+      </GgButton>
     </section>
 
     <ConfirmDialog
@@ -312,6 +340,14 @@ function makeResetLink() {
       :confirm-label="t('member.disable')"
       danger
       @confirm="setStatus('DISABLED')"
+    />
+    <ConfirmDialog
+      v-model:open="confirmingDelete"
+      :title="t('member.deleteConfirmTitle', { name })"
+      :body="t('member.deleteConfirmBody')"
+      :confirm-label="t('member.deleteConfirm')"
+      danger
+      @confirm="remove"
     />
   </div>
 </template>

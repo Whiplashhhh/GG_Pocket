@@ -311,6 +311,14 @@ const CAPTURES: Capture[] = [
   { name: 'topo-derniere-chance', path: '/actu', as: 'CLIMBER', lastChancePopup: true },
   { name: 'profil-modifier', path: '/profil/modifier', as: 'CLIMBER', prepare: marieOnTheWall },
   { name: 'appareils', path: '/profil/appareils', as: 'CLIMBER' },
+  {
+    name: 'compte',
+    path: '/profil/compte',
+    as: 'CLIMBER',
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Supprimer mon compte' }).click()
+    },
+  },
   { name: 'gestion', path: '/gestion', as: 'ADMIN', desktop: true },
   { name: 'membres', path: '/gestion/membres', as: 'BOARD', desktop: true, prepare: someMembers },
   {
@@ -322,6 +330,17 @@ const CAPTURES: Capture[] = [
     act: async (page) => {
       await page.getByRole('link', { name: /Talon/ }).first().click()
       await page.getByRole('button', { name: 'Créer un lien de réinitialisation' }).click()
+    },
+  },
+  {
+    name: 'fiche-membre-admin',
+    path: '/gestion/membres',
+    as: 'ADMIN',
+    desktop: true,
+    prepare: someMembers,
+    act: async (page) => {
+      await page.getByRole('link', { name: /Talon/ }).first().click()
+      await page.getByRole('button', { name: 'Supprimer définitivement le compte' }).click()
     },
   },
   {

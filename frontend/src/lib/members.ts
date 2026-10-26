@@ -2,7 +2,8 @@ import type { MemberSummary } from '@/api/admin'
 
 import { ROLES } from './roles'
 
-export type MemberSortKey = 'name' | 'nickname' | 'role' | 'status' | 'registeredAt' | 'lastSeenAt'
+export type MemberSortKey =
+  'name' | 'nickname' | 'role' | 'status' | 'registeredAt' | 'lastSeenAt' | 'sessionCount'
 export type SortDirection = 'asc' | 'desc'
 
 /** "Élodie" matches "elodie": accents and case are ignored. */
@@ -41,6 +42,8 @@ function compare(a: MemberSummary, b: MemberSummary, key: MemberSortKey): number
     case 'lastSeenAt':
       // Never seen sorts as the oldest.
       return (a.lastSeenAt ?? '').localeCompare(b.lastSeenAt ?? '')
+    case 'sessionCount':
+      return a.sessionCount - b.sessionCount
   }
 }
 
