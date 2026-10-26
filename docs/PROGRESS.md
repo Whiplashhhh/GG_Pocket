@@ -4,6 +4,27 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-26 — PR 4.2 : retours de Willem sur le dev
+
+**Branche** : `feature/planning-0.3.0` (PR #23).
+
+### Fait
+
+- Déployée sur le dev (label `deploy:dev`), essayée par Willem.
+- Nouvelle séance, sélecteur de voies : une voie déjà dans la séance est marquée (« ✓ Dans la séance », fond teinté,
+  « + » en contour pour un passage de plus) et un « − » reprend son dernier passage (`removeLastOf`, testé). e2e des
+  séances complété, captures 360 px clair/sombre regardées.
+
+### Reste
+
+- Willem fusionne #23, puis lance « Prepare release » (`minor` → 0.4.0) et approuve la release prod. Claude ne
+  déclenche jamais la release.
+- Ensuite, dans une nouvelle session : PR 4.3 (Comptes et données personnelles), branche `feature/comptes-0.4.0`
+  depuis `main` à jour.
+- D-093, D-094, D-087, D-090 à valider ; PR #17 en suspens.
+
+---
+
 ## 2026-10-25 — PR 4.2 Planning, À faire, Carnet
 
 **Branche** : `feature/planning-0.3.0` (depuis `main` = 0.3.0, PR 4.1 fusionnée et publiée).
