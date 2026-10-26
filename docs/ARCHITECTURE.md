@@ -35,7 +35,7 @@ Un package par domaine sous `fr.gravelinesgrimp.pocket`, chacun découpé en cou
 | `admin` | Gestion des membres (matrice des rôles), journal d'audit, gestion des codes d'inscription | ✅ |
 | `club` | Configuration du topo : secteurs, cordes, couleurs de prises, cotations (nom et logos en phase 8) | ✅ |
 | `topo` | Voies (ouvreurs, styles, photo, statuts), commentaires, coups de cœur, « je sais la faire », dernière chance, voie préférée | ✅ |
-| `session` | Séances, ascensions, photo de séance, « je sais la faire » automatique, statistiques des voies (via `RouteAscentStats`) | ✅ (planning en PR 4.2) |
+| `session` | Séances, ascensions, photo de séance, « je sais la faire » automatique, statistiques des voies (via `RouteAscentStats`), planning du mois (`PlanningService`), carnet (`LogbookService`) | ✅ |
 | `social` | Amitiés, fil, réactions, commentaires de séance | 🔜 phase 5 |
 | `ranking` | Classements mensuels, clôture | 🔜 phase 6 |
 | `badge` | Moteur de badges | 🔜 phase 7 |

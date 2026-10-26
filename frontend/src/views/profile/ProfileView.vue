@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { Download, KeyRound, ShieldCheck, Smartphone, Wrench } from 'lucide-vue-next'
+import {
+  BookOpen,
+  ChevronRight,
+  Download,
+  KeyRound,
+  ShieldCheck,
+  Smartphone,
+  Wrench,
+} from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -153,7 +161,18 @@ const facts = computed(() => {
         </ul>
       </template>
     </template>
-    <p class="mt-5 px-4 text-sm text-ink-muted">{{ t('profile.comingSoon') }}</p>
+    <RouterLink
+      to="/carnet"
+      class="mx-4 mt-6 flex min-h-14 items-center gap-3 rounded-control border-2 border-ink px-3 py-2 hover:bg-surface-sunken"
+    >
+      <BookOpen :size="24" class="shrink-0 text-brand-ink" aria-hidden="true" />
+      <span class="flex min-w-0 flex-1 flex-col">
+        <span class="font-semibold">{{ t('profile.logbook') }}</span>
+        <span class="text-sm text-ink-muted">{{ t('profile.logbookHint') }}</span>
+      </span>
+      <ChevronRight :size="20" class="shrink-0" aria-hidden="true" />
+    </RouterLink>
+    <p class="mt-4 px-4 text-sm text-ink-muted">{{ t('profile.comingSoon') }}</p>
   </section>
 
   <section class="border-t border-rule" aria-labelledby="reglages">

@@ -10,7 +10,7 @@ import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 import { api } from './client'
 import { request, requestNoContent } from './request'
 import type { components } from './schema'
-import { ROUTES_KEY } from './topo'
+import { MY_TODO_KEY, ROUTES_KEY } from './topo'
 import type { PhotoChange } from './topoAdmin'
 
 export type Session = components['schemas']['Session']
@@ -19,10 +19,18 @@ export type AscentRequest = components['schemas']['AscentRequest']
 export type SessionPage = components['schemas']['SessionPage']
 export type ClimbedRoute = components['schemas']['ClimbedRoute']
 export type SessionVisibility = SessionRequest['visibility']
+export type Planning = components['schemas']['Planning']
+export type PlanningDay = components['schemas']['PlanningDay']
+export type Logbook = components['schemas']['Logbook']
+export type LogbookRoute = components['schemas']['LogbookRoute']
+export type AscentBest = LogbookRoute['best']
 
 export const MY_SESSIONS_KEY = ['me', 'sessions'] as const
 export const CLIMBED_ROUTES_KEY = ['me', 'climbed-routes'] as const
 export const sessionKey = (id: string) => ['sessions', id] as const
+/** One month under it: [...MY_PLANNING_KEY, '2026-10']. */
+export const MY_PLANNING_KEY = ['me', 'planning'] as const
+export const MY_LOGBOOK_KEY = ['me', 'logbook'] as const
 
 const PAGE_SIZE = 10
 
@@ -127,6 +135,9 @@ export function sessionsChanged(queryClient: QueryClient, saved?: Session) {
   void queryClient.invalidateQueries({ queryKey: MY_SESSIONS_KEY })
   void queryClient.invalidateQueries({ queryKey: CLIMBED_ROUTES_KEY })
   void queryClient.invalidateQueries({ queryKey: ROUTES_KEY })
+  void queryClient.invalidateQueries({ queryKey: MY_PLANNING_KEY })
+  void queryClient.invalidateQueries({ queryKey: MY_LOGBOOK_KEY })
+  void queryClient.invalidateQueries({ queryKey: MY_TODO_KEY })
 }
 
 export function useSaveSession() {
@@ -151,5 +162,25 @@ export function useDeleteSession() {
       queryClient.removeQueries({ queryKey: sessionKey(id) })
       sessionsChanged(queryClient)
     },
+  })
+}
+
+/** One month of my planning (spec §8.6); the previous month stays on screen while the next loads. */
+export function useMyPlanning(month: MaybeRefOrGetter<string>) {
+  return useQuery({
+    queryKey: computed(() => [...MY_PLANNING_KEY, toValue(month)] as const),
+    queryFn: ({ signal }) =>
+      request(
+        api.GET('/api/v1/me/planning', { params: { query: { month: toValue(month) } }, signal }),
+      ),
+    placeholderData: (previous) => previous,
+  })
+}
+
+/** My logbook ("carnet"): totals, grade pyramid, every route I climbed. */
+export function useMyLogbook() {
+  return useQuery({
+    queryKey: MY_LOGBOOK_KEY,
+    queryFn: ({ signal }) => request(api.GET('/api/v1/me/logbook', { signal })),
   })
 }

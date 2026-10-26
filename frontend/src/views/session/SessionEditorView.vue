@@ -28,6 +28,7 @@ import TextField from '@/components/ui/TextField.vue'
 import { draftKey, useSessionDraft } from '@/composables/useSessionDraft'
 import { clubToday } from '@/lib/age'
 import { canWait } from '@/lib/outbox'
+import { canLogOn } from '@/lib/planning'
 import {
   addAscent,
   dateBounds,
@@ -38,6 +39,7 @@ import {
   MAX_COMMENT_LENGTH,
   moveAscent,
   removeAscent,
+  removeLastOf,
   sessionToForm,
   toSessionRequest,
   type AscentLine,
@@ -86,6 +88,11 @@ async function load() {
   if (!restored && editing.value && existing.data.value !== undefined) {
     form.value = sessionToForm(existing.data.value)
   }
+  // From the planning: "Noter une séance ce jour-là" (?jour=YYYY-MM-DD, within the open week).
+  const day = route.query.jour
+  if (!editing.value && typeof day === 'string' && canLogOn(day, today)) {
+    form.value = { ...form.value, climbedOn: day }
+  }
   loaded.value = true
 }
 
@@ -122,11 +129,24 @@ const climbedBefore = computed(() => new Set(recentIds.value))
 const full = computed(() => form.value.ascents.length >= MAX_ASCENTS)
 
 const announce = ref('')
+const addedCounts = computed(() => {
+  const counts = new Map<string, number>()
+  for (const line of form.value.ascents)
+    counts.set(line.routeId, (counts.get(line.routeId) ?? 0) + 1)
+  return counts
+})
 function add(routeId: string) {
   form.value.ascents = addAscent(form.value.ascents, routeId, climbedBefore.value)
   const added = routeById.value.get(routeId)
   announce.value = t('session.added', {
     name: added?.name ?? '',
+    n: form.value.ascents.length,
+  })
+}
+function takeBack(routeId: string) {
+  form.value.ascents = removeLastOf(form.value.ascents, routeId)
+  announce.value = t('session.takenBack', {
+    name: routeById.value.get(routeId)?.name ?? '',
     n: form.value.ascents.length,
   })
 }
@@ -257,7 +277,9 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
         v-else
         :routes="routes.data.value ?? []"
         :recent-ids="recentIds"
+        :added-counts="addedCounts"
         :disabled="full"
+        @remove="takeBack"
         @add="add"
       />
       <p class="sr-only" role="status" aria-live="polite">{{ announce }}</p>

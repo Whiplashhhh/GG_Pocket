@@ -56,6 +56,23 @@ const marieOnTheWall = (club: FakeClub) => {
   marie.favoriteRouteId = club.topo.route('Tonton Talon').id
 }
 
+/** A month of Marie at the gym, a route dismounted since in her history, a few marks. */
+const marieSeason = (club: FakeClub) => {
+  marieClimbs(club)
+  marieOnTheWall(club)
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  if (marie === undefined) return
+  club.climbs.add(marie, 2, [{ route: 'Iron Man', mode: 'LEAD' }, { route: 'Du mou !' }], {
+    feeling: 6,
+  })
+  club.climbs.add(marie, 9, [{ route: 'Avant-bras en béton', mode: 'LEAD', clean: true }], {
+    feeling: 9,
+  })
+  club.climbs.add(marie, 13, [{ route: 'Pied-main party' }, { route: 'Réglisse', clean: true }])
+  club.climbs.add(marie, 15, [{ route: 'Sec !', mode: 'LEAD', clean: true }], { feeling: 7 })
+  club.climbs.add(marie, 40, [{ route: 'Schtroumpfs', mode: 'LEAD' }], { frozen: true })
+}
+
 const someMembers = (club: FakeClub) => {
   club.addMember({
     nickname: 'tonton.talon',
@@ -147,6 +164,27 @@ const CAPTURES: Capture[] = [
   { name: 'actu-invitation', path: '/actu', as: 'CLIMBER', installInvite: true },
   { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
+  { name: 'a-faire', path: '/a-faire', as: 'CLIMBER', prepare: marieSeason },
+  {
+    name: 'a-faire-sues',
+    path: '/a-faire',
+    as: 'CLIMBER',
+    prepare: marieSeason,
+    act: async (page) => {
+      await page.getByRole('button', { name: /Voir celles que je sais faire/ }).click()
+    },
+  },
+  {
+    name: 'planning',
+    path: '/planning',
+    as: 'CLIMBER',
+    prepare: marieSeason,
+    act: async (page) => {
+      await page.getByRole('button', { name: '19 octobre 2026, grimpé' }).click()
+    },
+  },
+  { name: 'planning-vide', path: '/planning', as: 'CLIMBER' },
+  { name: 'carnet', path: '/carnet', as: 'CLIMBER', prepare: marieSeason },
   {
     name: 'seance-saisie',
     path: '/seance/nouvelle',

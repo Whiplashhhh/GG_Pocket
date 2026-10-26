@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
+import fr.gravelinesgrimp.pocket.session.domain.RouteMode;
 import fr.gravelinesgrimp.pocket.session.infra.AscentRepository;
 import fr.gravelinesgrimp.pocket.topo.application.MyRouteAscentView;
 import fr.gravelinesgrimp.pocket.topo.application.RouteAscentStats;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -69,5 +71,17 @@ class SessionRouteAscentStats implements RouteAscentStats {
     public boolean hasCleanAscent(UUID memberId, UUID routeId, ClimbMode mode) {
         return ascents.existsBySession_MemberIdAndRouteIdAndModeAndCleanTrue(
                 memberId, routeId, mode);
+    }
+
+    @Override
+    public Map<UUID, Set<ClimbMode>> cleanModesOf(UUID memberId, Collection<UUID> routeIds) {
+        if (routeIds.isEmpty()) {
+            return Map.of();
+        }
+        return ascents.findCleanRouteModes(memberId, routeIds).stream()
+                .collect(
+                        Collectors.groupingBy(
+                                RouteMode::routeId,
+                                Collectors.mapping(RouteMode::mode, Collectors.toSet())));
     }
 }

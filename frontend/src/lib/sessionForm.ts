@@ -147,6 +147,14 @@ export function removeAscent(lines: readonly AscentLine[], index: number): Ascen
   return lines.filter((_, i) => i !== index)
 }
 
+/** Takes back the last line of a route, the one a tap too many just added. */
+export function removeLastOf(lines: readonly AscentLine[], routeId: string): AscentLine[] {
+  for (let index = lines.length - 1; index >= 0; index--) {
+    if (lines[index]?.routeId === routeId) return removeAscent(lines, index)
+  }
+  return [...lines]
+}
+
 export type FormProblem = 'noAscent' | 'dateOutOfRange' | 'commentTooLong'
 
 /** What the form still lacks before it can be sent; empty when ready. */

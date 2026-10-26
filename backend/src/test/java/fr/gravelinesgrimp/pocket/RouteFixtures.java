@@ -56,7 +56,16 @@ public class RouteFixtures {
     }
 
     public Route create(Member setter, RouteStatus status) {
-        var route = new Route(draft(setter), setter.id());
+        return create(setter, status, "6a");
+    }
+
+    /** An active route of this grade (e.g. {@code "6b+"}). */
+    public Route create(Member setter, String grade) {
+        return create(setter, RouteStatus.ACTIVE, grade);
+    }
+
+    private Route create(Member setter, RouteStatus status, String grade) {
+        var route = new Route(draft(setter, grade), setter.id());
         switch (status) {
             case ACTIVE -> {}
             case LAST_CHANCE -> route.announceLastChance(null, ClubTime.today(clock));
@@ -67,9 +76,13 @@ public class RouteFixtures {
 
     /** A valid draft with a unique name. */
     public RouteDraft draft(Member setter) {
+        return draft(setter, "6a");
+    }
+
+    private RouteDraft draft(Member setter, String grade) {
         return new RouteDraft(
                 "Voie de test " + SEQUENCE.incrementAndGet(),
-                gradeId("6a"),
+                gradeId(grade),
                 cordId(1),
                 List.of(holdColorId("Jaune")),
                 ClubTime.today(clock).minusDays(1),

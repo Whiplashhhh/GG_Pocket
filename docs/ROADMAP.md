@@ -106,11 +106,12 @@ créée depuis `main` à jour.
 - [x] « Je sais la faire » automatique (source `ASCENT`)
 - [x] Fiche voie : statistiques d'ascensions et « mon historique » ; tri du topo par réalisations (D-080)
 
-### PR 4.2 — Planning, À faire, Carnet
+### PR 4.2 — Planning, À faire, Carnet (`feature/planning-0.3.0`)
 
-- [ ] Planning (calendrier lundi en premier, bilan du mois, série en cours)
-- [ ] À faire (mouli / tête, progression, annulation)
-- [ ] Carnet personnel
+- [x] Planning (calendrier lundi en premier, bilan du mois, série en cours)
+- [x] À faire (mouli / tête, progression, annulation)
+- [x] Carnet personnel
+- [x] Lecture hors ligne du topo, du profil, du planning et de l'À faire (D-095)
 
 ### PR 4.3 — Comptes et données personnelles
 

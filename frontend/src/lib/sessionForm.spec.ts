@@ -10,6 +10,7 @@ import {
   formProblems,
   moveAscent,
   removeAscent,
+  removeLastOf,
   requestToForm,
   sessionToForm,
   setClean,
@@ -94,6 +95,16 @@ describe('arranging lines', () => {
 
   it('removes a line', () => {
     expect(removeAscent(lines, 1).map((item) => item.key)).toEqual(['a', 'c'])
+  })
+
+  it('takes back the last line of a route only', () => {
+    const tries = [
+      line({ key: 'a', routeId: 'r1' }),
+      line({ key: 'b', routeId: 'r2' }),
+      line({ key: 'c', routeId: 'r1' }),
+    ]
+    expect(removeLastOf(tries, 'r1').map((item) => item.key)).toEqual(['a', 'b'])
+    expect(removeLastOf(tries, 'r3').map((item) => item.key)).toEqual(['a', 'b', 'c'])
   })
 })
 

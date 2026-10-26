@@ -42,4 +42,15 @@ public interface ClimbingSessionRepository extends JpaRepository<ClimbingSession
             nativeQuery = true)
     List<ClimbingSession> findBefore(
             UUID memberId, LocalDate climbedOn, Instant createdAt, UUID id, int limit);
+
+    /** My sessions between two days (both included), with their ascents, oldest first. */
+    @Query(
+            "select s from ClimbingSession s left join fetch s.ascents"
+                    + " where s.memberId = :memberId and s.climbedOn between :from and :to"
+                    + " order by s.climbedOn, s.createdAt")
+    List<ClimbingSession> findAllWithAscentsBetween(UUID memberId, LocalDate from, LocalDate to);
+
+    /** Every day on which I logged a session. */
+    @Query("select distinct s.climbedOn from ClimbingSession s where s.memberId = :memberId")
+    List<LocalDate> findClimbingDays(UUID memberId);
 }

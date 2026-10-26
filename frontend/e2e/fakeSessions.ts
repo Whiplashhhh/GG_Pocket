@@ -109,6 +109,188 @@ export class FakeSessions implements AscentSource {
       }))
   }
 
+  hasClean(memberId: string, routeId: string, mode: AscentRequest['mode']): boolean {
+    return this.allAscents().some(
+      ({ session, ascent }) =>
+        session.memberId === memberId &&
+        ascent.routeId === routeId &&
+        ascent.mode === mode &&
+        ascent.clean,
+    )
+  }
+
+  /** TodoService: every route on the wall, lead known means top rope known. */
+  private todo(me: TopoMember): Schemas['Todo'] {
+    const state = (routeId: string, mode: AscentRequest['mode']): Schemas['TodoRoute']['lead'] => {
+      if (this.hasClean(me.id, routeId, mode)) return 'FROM_ASCENT'
+      return this.topo.checks.has(`${me.id}:${routeId}:${mode}`) ? 'CHECKED' : 'TODO'
+    }
+    const routes = this.topo.routes
+      .filter((route) => route.status !== 'DISMOUNTED')
+      .map((route) => {
+        const lead = state(route.id, 'LEAD')
+        const topRope = lead === 'TODO' ? state(route.id, 'TOP_ROPE') : 'FROM_LEAD'
+        return { route: this.topo.summary(me, route), topRope, lead }
+      })
+      .sort((a, b) => a.route.gradeRank - b.route.gradeRank)
+    return {
+      routeCount: routes.length,
+      topRopeKnown: routes.filter((item) => item.topRope !== 'TODO').length,
+      leadKnown: routes.filter((item) => item.lead !== 'TODO').length,
+      routes,
+    }
+  }
+
+  /** PlanningService, Streak and MonthTotals. */
+  private planning(me: TopoMember, month: string): Schemas['Planning'] {
+    const mine = this.ordered(me.id).reverse()
+    const inMonth = mine.filter((session) => session.climbedOn.startsWith(month))
+    const days = new Map<string, Schemas['PlanningSession'][]>()
+    for (const session of inMonth) {
+      const view = this.view(me, session)
+      days.set(session.climbedOn, [
+        ...(days.get(session.climbedOn) ?? []),
+        {
+          id: view.id,
+          ...(view.feeling === undefined ? {} : { feeling: view.feeling }),
+          summary: view.summary,
+        },
+      ])
+    }
+    const views = inMonth.map((session) => this.view(me, session))
+    const hardest = views
+      .flatMap((view) => view.ascents.filter((ascent) => ascent.topped))
+      .sort((a, b) => b.route.gradeRank - a.route.gradeRank)
+      .at(0)
+    const feelings = inMonth.flatMap((session) =>
+      session.feeling === undefined ? [] : [session.feeling],
+    )
+    const monday = (day: string) => {
+      const date = new Date(`${day}T12:00:00Z`)
+      date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7))
+      return date.toISOString().slice(0, 10)
+    }
+    const perWeek = new Map<string, Set<string>>()
+    for (const session of mine) {
+      const week = monday(session.climbedOn)
+      perWeek.set(week, (perWeek.get(week) ?? new Set()).add(session.climbedOn))
+    }
+    const daysIn = (week: string) => perWeek.get(week)?.size ?? 0
+    const previous = (week: string) => {
+      const date = new Date(`${week}T12:00:00Z`)
+      date.setUTCDate(date.getUTCDate() - 7)
+      return date.toISOString().slice(0, 10)
+    }
+    let week = monday(this.day())
+    const currentWeekDays = daysIn(week)
+    if (currentWeekDays < 2) week = previous(week)
+    let weeks = 0
+    while (daysIn(week) >= 2) {
+      weeks++
+      week = previous(week)
+    }
+    return {
+      month,
+      frozen: inMonth.some((session) => session.frozen),
+      days: [...days.entries()].map(([date, sessions]) => ({ date, sessions })),
+      totals: {
+        climbingDays: days.size,
+        sessionCount: inMonth.length,
+        toppedCount: views.reduce((sum, view) => sum + view.summary.toppedCount, 0),
+        ...(hardest === undefined
+          ? {}
+          : { maxGrade: hardest.route.grade, maxGradeRank: hardest.route.gradeRank }),
+        ...(feelings.length === 0
+          ? {}
+          : {
+              averageFeeling:
+                Math.round((feelings.reduce((a, b) => a + b, 0) / feelings.length) * 10) / 10,
+            }),
+      },
+      streak: { weeks, minDaysPerWeek: 2, currentWeekDays },
+    }
+  }
+
+  /** LogbookService and Logbook. */
+  private logbook(me: TopoMember): Schemas['Logbook'] {
+    const BEST = [
+      'LEAD_CLEAN',
+      'LEAD_TOPPED',
+      'TOP_ROPE_CLEAN',
+      'TOP_ROPE_TOPPED',
+      'TRIED',
+    ] as const
+    type Best = (typeof BEST)[number]
+    const bestOf = (ascent: AscentRequest): Best => {
+      if (!ascent.topped) return 'TRIED'
+      if (ascent.mode === 'LEAD') return ascent.clean ? 'LEAD_CLEAN' : 'LEAD_TOPPED'
+      return ascent.clean ? 'TOP_ROPE_CLEAN' : 'TOP_ROPE_TOPPED'
+    }
+    const mine = this.allAscents().filter(({ session }) => session.memberId === me.id)
+    const byRoute = new Map<string, typeof mine>()
+    for (const item of mine) {
+      byRoute.set(item.ascent.routeId, [...(byRoute.get(item.ascent.routeId) ?? []), item])
+    }
+    const routes = [...byRoute.entries()].map(([routeId, items]) => {
+      const route = this.topo.routes.find((candidate) => candidate.id === routeId)
+      if (route === undefined) throw new Error(`No route ${routeId}`)
+      const days = items.map(({ session }) => session.climbedOn).sort()
+      const best = items
+        .map(({ ascent }) => bestOf(ascent))
+        .sort((a, b) => BEST.indexOf(a) - BEST.indexOf(b))[0]
+      return {
+        route: this.topo.summary(me, route),
+        ascentCount: items.length,
+        toppedCount: items.filter(({ ascent }) => ascent.topped).length,
+        best,
+        firstClimbedOn: days[0],
+        lastClimbedOn: days.at(-1) as string,
+      }
+    })
+    routes.sort(
+      (a, b) =>
+        b.lastClimbedOn.localeCompare(a.lastClimbedOn) || b.route.gradeRank - a.route.gradeRank,
+    )
+    const topped = mine.filter(({ ascent }) => ascent.topped)
+    const gradeOf = (routeId: string) => routes.find((line) => line.route.id === routeId)?.route
+    const hardest = (items: typeof mine) =>
+      items
+        .map(({ ascent }) => gradeOf(ascent.routeId))
+        .sort((a, b) => (b?.gradeRank ?? 0) - (a?.gradeRank ?? 0))
+        .at(0)
+    const max = hardest(topped)
+    const maxLead = hardest(topped.filter(({ ascent }) => ascent.mode === 'LEAD'))
+    const grades = new Map<number, Schemas['LogbookGrade']>()
+    for (const line of routes.filter((line) => line.best !== 'TRIED')) {
+      const entry = grades.get(line.route.gradeRank) ?? {
+        grade: line.route.grade,
+        gradeRank: line.route.gradeRank,
+        topRope: 0,
+        lead: 0,
+      }
+      if (line.best.startsWith('LEAD')) entry.lead++
+      else entry.topRope++
+      grades.set(line.route.gradeRank, entry)
+    }
+    return {
+      totals: {
+        sessionCount: new Set(mine.map(({ session }) => session.id)).size,
+        climbingDays: new Set(mine.map(({ session }) => session.climbedOn)).size,
+        ascentCount: mine.length,
+        toppedCount: topped.length,
+        leadToppedCount: topped.filter(({ ascent }) => ascent.mode === 'LEAD').length,
+        cleanCount: mine.filter(({ ascent }) => ascent.clean).length,
+        routeCount: routes.length,
+        ...(max === undefined ? {} : { maxGrade: max.grade, maxGradeRank: max.gradeRank }),
+        ...(maxLead === undefined
+          ? {}
+          : { maxLeadGrade: maxLead.grade, maxLeadGradeRank: maxLead.gradeRank }),
+      },
+      grades: [...grades.values()].sort((a, b) => b.gradeRank - a.gradeRank),
+      routes,
+    }
+  }
+
   private allAscents() {
     return this.sessions.flatMap((session) =>
       session.ascents.map((ascent) => ({ session, ascent })),
@@ -237,6 +419,15 @@ export class FakeSessions implements AscentSource {
           .sort((a, b) => b[1].localeCompare(a[1]))
           .map(([routeId, lastClimbedOn]) => ({ routeId, lastClimbedOn })),
       )
+    }
+    if (pathname === '/me/todo' && method === 'GET') return json(this.todo(me))
+    if (pathname === '/me/logbook' && method === 'GET') return json(this.logbook(me))
+    if (pathname === '/me/planning' && method === 'GET') {
+      const month = url.searchParams.get('month') ?? this.day().slice(0, 7)
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || month > this.day().slice(0, 7)) {
+        return problem(400, 'VALIDATION_FAILED')
+      }
+      return json(this.planning(me, month))
     }
     if (pathname === '/sessions' && method === 'POST') {
       const sent = body as Schemas['SessionRequest']

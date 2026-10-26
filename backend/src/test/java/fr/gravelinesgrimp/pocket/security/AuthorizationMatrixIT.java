@@ -245,7 +245,10 @@ class AuthorizationMatrixIT {
                             null,
                             Role.CLIMBER),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/sessions", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/climbed-routes", null, Role.CLIMBER));
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/climbed-routes", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/todo", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/planning", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/logbook", null, Role.CLIMBER));
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;

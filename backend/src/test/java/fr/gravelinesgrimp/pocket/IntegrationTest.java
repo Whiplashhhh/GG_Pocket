@@ -18,5 +18,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(properties = "gg.media.root=target/test-media")
 @AutoConfigureMockMvc
-@Import({TestcontainersConfiguration.class, MemberFixtures.class, RouteFixtures.class})
+@Import({
+    TestcontainersConfiguration.class,
+    MemberFixtures.class,
+    RouteFixtures.class,
+    SessionFixtures.class
+})
 public @interface IntegrationTest {}

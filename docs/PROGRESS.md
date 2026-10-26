@@ -4,6 +4,62 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-26 — PR 4.2 : retours de Willem sur le dev
+
+**Branche** : `feature/planning-0.3.0` (PR #23).
+
+### Fait
+
+- Déployée sur le dev (label `deploy:dev`), essayée par Willem.
+- Nouvelle séance, sélecteur de voies : une voie déjà dans la séance est marquée (« ✓ Dans la séance », fond teinté,
+  « + » en contour pour un passage de plus) et un « − » reprend son dernier passage (`removeLastOf`, testé). e2e des
+  séances complété, captures 360 px clair/sombre regardées.
+
+### Reste
+
+- Willem fusionne #23, puis lance « Prepare release » (`minor` → 0.4.0) et approuve la release prod. Claude ne
+  déclenche jamais la release.
+- Ensuite, dans une nouvelle session : PR 4.3 (Comptes et données personnelles), branche `feature/comptes-0.4.0`
+  depuis `main` à jour.
+- D-093, D-094, D-087, D-090 à valider ; PR #17 en suspens.
+
+---
+
+## 2026-10-25 — PR 4.2 Planning, À faire, Carnet
+
+**Branche** : `feature/planning-0.3.0` (depuis `main` = 0.3.0, PR 4.1 fusionnée et publiée).
+
+### Fait
+
+- Backend, sans migration : `GET /me/todo` (topo, `TodoStates` : état par mode `TODO` / `CHECKED` / `FROM_ASCENT` /
+  `FROM_LEAD`, D-092), `GET /me/planning?month=` (session : jours, `MonthTotals`, `Streak`, `PlanningMonth`, D-093),
+  `GET /me/logbook` (session : `Logbook`, `AscentBest`, D-094). Unitaires + `TodoIT`, `PlanningIT`, `LogbookIT`
+  (calculs et isolement entre membres), matrice d'autorisations, `SessionFixtures` pour les IT. CI backend : 440 tests
+  verts au premier passage, contrat régénéré depuis le journal.
+- Front : `/a-faire` (onglets, progression, filtres dans l'URL, cocher + « Annuler » 5 s, celles que je sais faire,
+  fiche voie par-dessus), `/planning` (calendrier lundi en premier, jour → séances, « Noter une séance ce jour-là »,
+  bilan, série), `/carnet` (chiffres, pyramide, toutes mes voies) avec lien depuis le Profil. Lecture hors ligne
+  network-first, cache vidé à la connexion et à la déconnexion (D-095).
+- Vitest 224, e2e Desktop Chrome 62 (dont 8 nouveaux), captures 360 px clair/sombre regardées et corrigées
+  (listes tronquées, chevron, mois vide allégé, « Démontée » en double).
+
+### Reste
+
+- CI de la PR, déploiement dev (label `deploy:dev`) et essai par Willem ; fusion ; puis PR 4.3 (Comptes et données
+  personnelles) sur une nouvelle branche depuis `main`.
+- D-093 (seuil de la série) et D-094 (contenu du carnet) à valider ; D-087, D-090 toujours à valider ; PR #17 en suspens.
+
+### Prochaine action exacte
+
+- `gh pr checks <n°>` sur la PR 4.2 ; si vert, demander à Willem s'il veut le déploiement dev pour tester À faire,
+  Planning et Carnet sur téléphone (dont le mode avion pour la lecture hors ligne).
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-24 — PR 4.1 Séances
 
 **Branche** : `feature/seances-0.2.0` (depuis `main` = 0.2.0).
