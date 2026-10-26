@@ -21,7 +21,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 ### Corrigé
 
 - Nouvelle séance : une voie déjà ajoutée se voit dans la liste (« ✓ Dans la séance », sur fond teinté). Le « + »
-  reste là pour noter un deuxième passage, mais on ne se demande plus ce qu'on a déjà mis.
+  reste là pour noter un deuxième passage, et un « − » juste à côté reprend le dernier ajouté : un doigt qui a glissé
+  se rattrape sans descendre jusqu'à la ligne.
 
 ## 0.3.0 — 2026-10-25
 

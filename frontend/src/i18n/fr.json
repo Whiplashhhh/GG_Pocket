@@ -47,6 +47,8 @@
     "recent": "Récemment grimpées",
     "addRoute": "Ajouter {name}",
     "addRouteAgain": "Ajouter {name} encore une fois (déjà {n} dans la séance)",
+    "removeRoute": "Retirer {name} de la séance | Retirer un passage de {name} (il en restera 1) | Retirer un passage de {name} (il en restera {n})",
+    "takenBack": "{name} retirée, {n} dans la séance.",
     "inSession": "Dans la séance | Dans la séance | Dans la séance, {n} fois",
     "added": "{name} ajoutée, {n} dans la séance.",
     "linesTitle": "Voies de la séance",

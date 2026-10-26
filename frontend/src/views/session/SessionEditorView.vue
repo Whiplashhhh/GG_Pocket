@@ -39,6 +39,7 @@ import {
   MAX_COMMENT_LENGTH,
   moveAscent,
   removeAscent,
+  removeLastOf,
   sessionToForm,
   toSessionRequest,
   type AscentLine,
@@ -139,6 +140,13 @@ function add(routeId: string) {
   const added = routeById.value.get(routeId)
   announce.value = t('session.added', {
     name: added?.name ?? '',
+    n: form.value.ascents.length,
+  })
+}
+function takeBack(routeId: string) {
+  form.value.ascents = removeLastOf(form.value.ascents, routeId)
+  announce.value = t('session.takenBack', {
+    name: routeById.value.get(routeId)?.name ?? '',
     n: form.value.ascents.length,
   })
 }
@@ -271,6 +279,7 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
         :recent-ids="recentIds"
         :added-counts="addedCounts"
         :disabled="full"
+        @remove="takeBack"
         @add="add"
       />
       <p class="sr-only" role="status" aria-live="polite">{{ announce }}</p>

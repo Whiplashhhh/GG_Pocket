@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check, Plus } from 'lucide-vue-next'
+import { Check, Minus, Plus } from 'lucide-vue-next'
 import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -25,7 +25,7 @@ const props = withDefaults(
   }>(),
   { addedCounts: () => new Map(), disabled: false, limit: 8 },
 )
-const emit = defineEmits<{ add: [routeId: string] }>()
+const emit = defineEmits<{ add: [routeId: string]; remove: [routeId: string] }>()
 
 const { t } = useI18n()
 const baseId = useId()
@@ -48,6 +48,10 @@ function addedCount(id: string): number {
 
 function add(id: string) {
   emit('add', id)
+}
+
+function remove(id: string) {
+  emit('remove', id)
 }
 </script>
 
@@ -91,6 +95,21 @@ function add(id: string) {
             {{ t('session.inSession', addedCount(route.id)) }}
           </span>
         </span>
+        <button
+          v-if="addedCount(route.id) > 0"
+          type="button"
+          class="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-rule bg-bg text-ink hover:border-ink"
+          :aria-label="
+            t(
+              'session.removeRoute',
+              { name: route.name, n: addedCount(route.id) - 1 },
+              addedCount(route.id) - 1,
+            )
+          "
+          @click="remove(route.id)"
+        >
+          <Minus :size="24" :stroke-width="3" aria-hidden="true" />
+        </button>
         <button
           type="button"
           class="inline-flex size-12 shrink-0 items-center justify-center rounded-control disabled:cursor-not-allowed disabled:opacity-45"
