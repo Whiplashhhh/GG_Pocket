@@ -5,6 +5,8 @@ public enum AuditAction {
     MEMBER_ROLE_CHANGED,
     MEMBER_DISABLED,
     MEMBER_ENABLED,
+    /** For good, by the member or by the admin (spec §14). */
+    MEMBER_DELETED,
     PASSWORD_RESET_LINK_CREATED,
     REGISTRATION_CODE_CREATED,
     REGISTRATION_CODE_UPDATED,

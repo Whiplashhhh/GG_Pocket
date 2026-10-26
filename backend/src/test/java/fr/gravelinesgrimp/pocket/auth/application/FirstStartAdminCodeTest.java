@@ -32,7 +32,7 @@ class FirstStartAdminCodeTest {
 
     @Test
     void anEmptyClubGetsASingleUseAdminCodeValidOneDay() {
-        when(members.count()).thenReturn(0L);
+        when(members.countMembers()).thenReturn(0L);
         var previous =
                 new RegistrationCode("AAAABBBB", "Premier démarrage", Role.ADMIN, NOW, 1, null);
         when(codes.findAllByGrantedRoleAndActiveTrue(Role.ADMIN)).thenReturn(List.of(previous));
@@ -50,7 +50,7 @@ class FirstStartAdminCodeTest {
 
     @Test
     void aClubWithMembersGetsNothing() {
-        when(members.count()).thenReturn(3L);
+        when(members.countMembers()).thenReturn(3L);
 
         firstStart.run(null);
 

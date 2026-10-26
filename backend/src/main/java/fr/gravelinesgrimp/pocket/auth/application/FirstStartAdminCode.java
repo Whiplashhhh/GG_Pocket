@@ -45,7 +45,7 @@ public class FirstStartAdminCode implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (members.count() > 0) {
+        if (members.countMembers() > 0) {
             return;
         }
         codes.findAllByGrantedRoleAndActiveTrue(Role.ADMIN).forEach(RegistrationCode::deactivate);

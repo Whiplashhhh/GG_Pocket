@@ -22,7 +22,9 @@ public record MemberSummaryResponse(
         String avatarUrl,
         @Schema(requiredMode = RequiredMode.REQUIRED) Instant registeredAt,
         @Schema(description = "Roughly, to the hour; absent if never seen since registration")
-                Instant lastSeenAt) {
+                Instant lastSeenAt,
+        @Schema(requiredMode = RequiredMode.REQUIRED, description = "Sessions logged, ever")
+                long sessionCount) {
 
     static MemberSummaryResponse from(MemberSummaryView view) {
         return new MemberSummaryResponse(
@@ -34,6 +36,7 @@ public record MemberSummaryResponse(
                 view.status(),
                 MediaUrls.of(view.avatarId()),
                 view.createdAt(),
-                view.lastSeenAt());
+                view.lastSeenAt(),
+                view.sessionCount());
     }
 }
