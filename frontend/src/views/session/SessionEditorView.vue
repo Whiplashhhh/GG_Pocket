@@ -128,6 +128,12 @@ const climbedBefore = computed(() => new Set(recentIds.value))
 const full = computed(() => form.value.ascents.length >= MAX_ASCENTS)
 
 const announce = ref('')
+const addedCounts = computed(() => {
+  const counts = new Map<string, number>()
+  for (const line of form.value.ascents)
+    counts.set(line.routeId, (counts.get(line.routeId) ?? 0) + 1)
+  return counts
+})
 function add(routeId: string) {
   form.value.ascents = addAscent(form.value.ascents, routeId, climbedBefore.value)
   const added = routeById.value.get(routeId)
@@ -263,6 +269,7 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
         v-else
         :routes="routes.data.value ?? []"
         :recent-ids="recentIds"
+        :added-counts="addedCounts"
         :disabled="full"
         @add="add"
       />

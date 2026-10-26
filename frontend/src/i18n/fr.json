@@ -46,6 +46,8 @@
     "pickerHint": "Tape « 12 » pour les voies de la corde 12, ou un nom, une couleur, une cotation.",
     "recent": "Récemment grimpées",
     "addRoute": "Ajouter {name}",
+    "addRouteAgain": "Ajouter {name} encore une fois (déjà {n} dans la séance)",
+    "inSession": "Dans la séance | Dans la séance | Dans la séance, {n} fois",
     "added": "{name} ajoutée, {n} dans la séance.",
     "linesTitle": "Voies de la séance",
     "linesCount": "Aucune voie pour l’instant | 1 voie | {n} voies",

@@ -18,6 +18,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   ta meilleure réalisation sur chacune. Les voies démontées y restent : l'histoire est sacrée.
 - Le topo, ton profil, ton planning et ton À faire se consultent sans réseau (la dernière version vue).
 
+### Corrigé
+
+- Nouvelle séance : une voie déjà ajoutée se voit dans la liste (« ✓ Dans la séance », sur fond teinté). Le « + »
+  reste là pour noter un deuxième passage, mais on ne se demande plus ce qu'on a déjà mis.
+
 ## 0.3.0 — 2026-10-25
 
 ### Ajouté

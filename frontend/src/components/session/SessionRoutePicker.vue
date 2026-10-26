@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Plus } from 'lucide-vue-next'
+import { Check, Plus } from 'lucide-vue-next'
 import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -18,10 +18,12 @@ const props = withDefaults(
     routes: readonly RouteSummary[]
     /** Ids of the routes I climbed, most recent first. */
     recentIds: readonly string[]
+    /** How many lines each route already has in the session. */
+    addedCounts?: ReadonlyMap<string, number>
     disabled?: boolean
     limit?: number
   }>(),
-  { disabled: false, limit: 8 },
+  { addedCounts: () => new Map(), disabled: false, limit: 8 },
 )
 const emit = defineEmits<{ add: [routeId: string] }>()
 
@@ -39,6 +41,10 @@ const recent = computed(() =>
 const results = computed(() => searchRoutes(props.routes, search.value))
 const searching = computed(() => search.value.trim() !== '')
 const shown = computed(() => (searching.value ? results.value.slice(0, props.limit) : recent.value))
+
+function addedCount(id: string): number {
+  return props.addedCounts.get(id) ?? 0
+}
 
 function add(id: string) {
   emit('add', id)
@@ -69,15 +75,36 @@ function add(id: string) {
       {{ t('routePicker.noMatch') }}
     </p>
     <ul v-if="shown.length > 0" class="divide-y divide-rule border-y border-rule">
-      <li v-for="route in shown" :key="route.id" class="flex items-center gap-2">
-        <span class="flex min-w-0 flex-1 py-2">
+      <li
+        v-for="route in shown"
+        :key="route.id"
+        class="flex items-center gap-2"
+        :class="{ 'bg-brand/10': addedCount(route.id) > 0 }"
+      >
+        <span class="flex min-w-0 flex-1 flex-col items-start gap-0.5 py-2">
           <RouteSummaryLabel :route="route" :label-id="`${baseId}-${route.id}`" />
+          <span
+            v-if="addedCount(route.id) > 0"
+            class="inline-flex items-center gap-1 text-sm font-semibold text-brand-ink"
+          >
+            <Check :size="16" :stroke-width="3" aria-hidden="true" />
+            {{ t('session.inSession', addedCount(route.id)) }}
+          </span>
         </span>
         <button
           type="button"
-          class="inline-flex size-12 shrink-0 items-center justify-center rounded-control bg-brand text-on-brand disabled:cursor-not-allowed disabled:opacity-45"
+          class="inline-flex size-12 shrink-0 items-center justify-center rounded-control disabled:cursor-not-allowed disabled:opacity-45"
+          :class="
+            addedCount(route.id) > 0
+              ? 'border-2 border-brand bg-bg text-brand-ink'
+              : 'bg-brand text-on-brand'
+          "
           :disabled="disabled"
-          :aria-label="t('session.addRoute', { name: route.name })"
+          :aria-label="
+            addedCount(route.id) > 0
+              ? t('session.addRouteAgain', { name: route.name, n: addedCount(route.id) })
+              : t('session.addRoute', { name: route.name })
+          "
           @click="add(route.id)"
         >
           <Plus :size="24" :stroke-width="3" aria-hidden="true" />

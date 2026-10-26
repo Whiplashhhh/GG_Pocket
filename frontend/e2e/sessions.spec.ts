@@ -40,6 +40,13 @@ test.describe('a new session', () => {
     // Taping a cord number shows its routes.
     await addRoute(page, '12', 'Bye Bye Morice')
     await expect(page.getByRole('heading', { name: '1 voie' })).toBeVisible()
+    // The picker shows it is in the session, and still lets me log another go.
+    await expect(
+      page.getByRole('button', {
+        name: 'Ajouter Bye Bye Morice encore une fois (déjà 1 dans la séance)',
+      }),
+    ).toBeVisible()
+    await expect(page.getByText('Dans la séance', { exact: true })).toBeVisible()
     await expect(line(page, 1).getByLabel('Premier essai de ma vie sur cette voie')).toBeChecked()
     await choose(page, 1, 'Mode', 'Tête')
     await choose(page, 1, 'Enchaînée', 'Oui')
