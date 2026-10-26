@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 0.4.0 — 2026-10-26
+
 ### Ajouté
 
 - À faire : en mouli ou en tête, la liste des voies au mur que tu ne sais pas encore faire, avec ta progression
