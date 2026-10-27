@@ -120,6 +120,19 @@ class SessionController {
         return SessionPageResponse.from(sessions.listMine(me.memberId(), cursor, size));
     }
 
+    @GetMapping("/members/{id}/sessions")
+    @Operation(
+            operationId = "listMemberSessions",
+            summary =
+                    "A friend's sessions shared with friends, latest day first (cursor pagination)")
+    SessionPageResponse listOf(
+            @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
+            @PathVariable UUID id,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size) {
+        return SessionPageResponse.from(sessions.listOf(me.memberId(), id, cursor, size));
+    }
+
     @GetMapping("/me/climbed-routes")
     @Operation(
             operationId = "listMyClimbedRoutes",

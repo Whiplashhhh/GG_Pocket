@@ -32,10 +32,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Sessions of a climber (spec §8.3, §9.3). Until friendships exist (phase 5), only the climber
- * reads their sessions; anyone else gets "not found", like for a session that does not exist. Every
- * change locks the member row: changes of one climber happen one at a time, so the "je sais la
- * faire" bookkeeping and the replay of the offline queue cannot race.
+ * Sessions of a climber (spec §8.3, §9.3). The climber reads and changes them; their friends read
+ * the ones shared with friends ({@link SessionAudience}). Every change locks the member row:
+ * changes of one climber happen one at a time, so the "je sais la faire" bookkeeping and the replay
+ * of the offline queue cannot race.
  */
 @Service
 public class SessionService {
@@ -53,6 +53,7 @@ public class SessionService {
     private final RouteRepository routes;
     private final MemberRepository members;
     private final OwnedSessions owned;
+    private final SessionAudience audience;
     private final AutoRouteChecks autoChecks;
     private final SessionViews views;
     private final MediaService media;
@@ -65,6 +66,7 @@ public class SessionService {
             RouteRepository routes,
             MemberRepository members,
             OwnedSessions owned,
+            SessionAudience audience,
             AutoRouteChecks autoChecks,
             SessionViews views,
             MediaService media,
@@ -75,6 +77,7 @@ public class SessionService {
         this.routes = routes;
         this.members = members;
         this.owned = owned;
+        this.audience = audience;
         this.autoChecks = autoChecks;
         this.views = views;
         this.media = media;
@@ -110,7 +113,12 @@ public class SessionService {
     @PreAuthorize("hasRole('CLIMBER')")
     @Transactional(readOnly = true)
     public SessionView get(UUID readerId, UUID sessionId) {
-        return views.of(owned.load(readerId, sessionId), readerId);
+        var session =
+                sessions.findWithAscentsById(sessionId)
+                        .filter(found -> audience.canRead(readerId, found))
+                        .orElseThrow(
+                                () -> new BusinessException(ErrorCode.NOT_FOUND, "No session"));
+        return views.of(session, readerId);
     }
 
     /**
@@ -178,6 +186,41 @@ public class SessionService {
                             position.id(),
                             limit + 1);
         }
+        return page(found, limit, memberId);
+    }
+
+    /**
+     * The sessions a climber shares with friends, as one of their friends reads them (their
+     * profile, spec §8.8). Mine are all mine.
+     *
+     * @throws BusinessException {@code NOT_FOUND} (not a friend, or not an active member)
+     */
+    @PreAuthorize("hasRole('CLIMBER')")
+    @Transactional(readOnly = true)
+    public SessionPage listOf(UUID readerId, UUID climberId, String cursor, int size) {
+        if (readerId.equals(climberId)) {
+            return listMine(readerId, cursor, size);
+        }
+        audience.checkFriendOf(readerId, climberId);
+        var limit = Math.clamp(size, 1, MAX_PAGE_SIZE);
+        List<ClimbingSession> found;
+        if (cursor == null || cursor.isBlank()) {
+            found = sessions.findLatestShared(climberId, limit + 1);
+        } else {
+            var position = Cursor.decode(cursor);
+            found =
+                    sessions.findSharedBefore(
+                            climberId,
+                            position.climbedOn(),
+                            position.createdAt(),
+                            position.id(),
+                            limit + 1);
+        }
+        return page(found, limit, readerId);
+    }
+
+    /** {@code found} holds one more session than {@code limit} when another page exists. */
+    private SessionPage page(List<ClimbingSession> found, int limit, UUID readerId) {
         var page = found.stream().limit(limit).toList();
         if (page.isEmpty()) {
             return new SessionPage(List.of(), null);
@@ -194,7 +237,7 @@ public class SessionService {
                 found.size() > limit
                         ? Cursor.encode(last.climbedOn(), last.createdAt(), last.id())
                         : null;
-        return new SessionPage(views.of(ordered, memberId), next);
+        return new SessionPage(views.of(ordered, readerId), next);
     }
 
     /**

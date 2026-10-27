@@ -257,7 +257,28 @@ class AuthorizationMatrixIT {
                             HttpMethod.DELETE,
                             "/api/v1/admin/members/" + SOME_ID,
                             null,
-                            Role.ADMIN));
+                            Role.ADMIN),
+                    // Friends (PR 5.1)
+                    new Endpoint(HttpMethod.GET, "/api/v1/members", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/members/" + SOME_ID, null, Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.GET,
+                            "/api/v1/members/" + SOME_ID + "/sessions",
+                            null,
+                            Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.GET,
+                            "/api/v1/members/" + SOME_ID + "/logbook",
+                            null,
+                            Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/friends", null, Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.PUT, "/api/v1/me/friends/" + SOME_ID, null, Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.DELETE,
+                            "/api/v1/me/friends/" + SOME_ID,
+                            null,
+                            Role.CLIMBER));
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;

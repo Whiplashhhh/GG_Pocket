@@ -22,6 +22,7 @@ import java.lang.annotation.Target;
     TestcontainersConfiguration.class,
     MemberFixtures.class,
     RouteFixtures.class,
-    SessionFixtures.class
+    SessionFixtures.class,
+    FriendshipFixtures.class
 })
 public @interface IntegrationTest {}

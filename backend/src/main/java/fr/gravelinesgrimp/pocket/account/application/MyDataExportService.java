@@ -2,12 +2,14 @@ package fr.gravelinesgrimp.pocket.account.application;
 
 import fr.gravelinesgrimp.pocket.auth.application.DeviceService;
 import fr.gravelinesgrimp.pocket.member.domain.MediaUsage;
+import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MediaFileRepository;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
 import fr.gravelinesgrimp.pocket.session.domain.ClimbingSession;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
+import fr.gravelinesgrimp.pocket.social.infra.FriendshipRepository;
 import fr.gravelinesgrimp.pocket.topo.domain.Route;
 import fr.gravelinesgrimp.pocket.topo.infra.FavoriteRepository;
 import fr.gravelinesgrimp.pocket.topo.infra.LastChanceAckRepository;
@@ -46,7 +48,8 @@ public class MyDataExportService {
             List<ExportedTick> lastChanceAcknowledgements,
             List<ExportedRoute> routesSet,
             List<ExportedDevice> devices,
-            List<ExportedPhoto> photos) {}
+            List<ExportedPhoto> photos,
+            List<ExportedFriendship> friendships) {}
 
     public record ExportedProfile(
             String nickname,
@@ -97,6 +100,14 @@ public class MyDataExportService {
 
     public record ExportedPhoto(UUID id, String usage, int width, int height, Instant at) {}
 
+    /** {@code status}: PENDING or ACCEPTED; {@code askedByMe}: who sent the request. */
+    public record ExportedFriendship(
+            String nickname,
+            String status,
+            boolean askedByMe,
+            Instant askedAt,
+            Instant acceptedAt) {}
+
     private final MemberRepository members;
     private final ClimbingSessionRepository sessions;
     private final RouteRepository routes;
@@ -106,6 +117,7 @@ public class MyDataExportService {
     private final LastChanceAckRepository lastChanceAcks;
     private final MediaFileRepository mediaFiles;
     private final DeviceService devices;
+    private final FriendshipRepository friendships;
     private final Clock clock;
 
     public MyDataExportService(
@@ -118,6 +130,7 @@ public class MyDataExportService {
             LastChanceAckRepository lastChanceAcks,
             MediaFileRepository mediaFiles,
             DeviceService devices,
+            FriendshipRepository friendships,
             Clock clock) {
         this.members = members;
         this.sessions = sessions;
@@ -128,6 +141,7 @@ public class MyDataExportService {
         this.lastChanceAcks = lastChanceAcks;
         this.mediaFiles = mediaFiles;
         this.devices = devices;
+        this.friendships = friendships;
         this.clock = clock;
     }
 
@@ -142,6 +156,13 @@ public class MyDataExportService {
         var myComments = comments.findAllByAuthorIdOrderByCreatedAt(memberId);
         var myAcks = lastChanceAcks.findAllByMemberIdOrderByCreatedAt(memberId);
         var routesSet = routes.findAllSetBy(memberId);
+        var myFriendships = friendships.findAllOf(memberId).reversed();
+        Map<UUID, String> nicknames =
+                members
+                        .findAllById(
+                                myFriendships.stream().map(f -> f.otherThan(memberId)).toList())
+                        .stream()
+                        .collect(Collectors.toMap(Member::id, Member::nickname));
 
         var routeIds = new HashSet<UUID>();
         mySessions.forEach(s -> s.ascents().forEach(a -> routeIds.add(a.routeId())));
@@ -224,6 +245,16 @@ public class MyDataExportService {
                                                 file.width(),
                                                 file.height(),
                                                 file.createdAt()))
+                        .toList(),
+                myFriendships.stream()
+                        .map(
+                                friendship ->
+                                        new ExportedFriendship(
+                                                nicknames.get(friendship.otherThan(memberId)),
+                                                friendship.status().name(),
+                                                friendship.requesterId().equals(memberId),
+                                                friendship.createdAt(),
+                                                friendship.acceptedAt()))
                         .toList());
     }
 

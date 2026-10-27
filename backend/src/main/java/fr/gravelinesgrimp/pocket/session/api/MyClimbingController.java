@@ -11,13 +11,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * What my sessions add up to: the planning and the logbook. Mine only for now (phase 5: friends).
- */
+import java.util.UUID;
+
+/** What sessions add up to: my planning, my logbook, and the logbook of a friend. */
 @RestController
 @RequestMapping(path = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Sessions")
@@ -50,5 +51,15 @@ class MyClimbingController {
     LogbookResponse getLogbook(
             @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me) {
         return LogbookResponse.from(logbook.of(me.memberId()));
+    }
+
+    @GetMapping("/members/{id}/logbook")
+    @Operation(
+            operationId = "getMemberLogbook",
+            summary = "A friend's logbook, from the sessions they share with friends")
+    LogbookResponse getMemberLogbook(
+            @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
+            @PathVariable UUID id) {
+        return LogbookResponse.from(logbook.ofFriend(me.memberId(), id));
     }
 }
