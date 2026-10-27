@@ -470,7 +470,8 @@
     "back": "Retour à l’actu"
   },
   "routeLabel": {
-    "accessibleName": "Corde {cord}, {name}, {grade}, couleur {colors}",
+    "accessibleName": "{grade}, {name}, couleur {colors}, corde {cord}",
+    "cord": "corde",
     "colorsJoin": "{first} et {second}",
     "lastChance": "Dernière chance",
     "dismounted": "Démontée",

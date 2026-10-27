@@ -17,7 +17,7 @@ test.describe('the topo', () => {
     await page.goto('/topo')
     await expect(page.getByText('11 voies')).toBeVisible()
     // Grade by default, easiest first.
-    await expect(rows(page).first()).toHaveAccessibleName(/P’tite Line, 4a/)
+    await expect(rows(page).first()).toHaveAccessibleName(/^4a, P’tite Line,/)
 
     await page.getByLabel('Trier par').selectOption({ label: 'Ouverture' })
     await expect(page).toHaveURL(/tri=ouverture/)
@@ -60,7 +60,7 @@ test.describe('the topo', () => {
   test('opens a route sheet from a link, ticks "je sais la faire"', async ({ page, club }) => {
     const morice = club.topo.route('Bye Bye Morice')
     await page.goto(`/topo/voies/${morice.id}`)
-    const routeSheet = sheet(page, /Corde 12, Bye Bye Morice, 6b, couleur jaune et bleu/)
+    const routeSheet = sheet(page, /6b, Bye Bye Morice, couleur jaune et bleu, corde 12/)
     await expect(routeSheet).toBeVisible()
     await expect(routeSheet.getByText('Négatif et ses 2 dièdres · corde 12')).toBeVisible()
     await expect(routeSheet.getByText('Prises : jaune et bleu')).toBeVisible()
@@ -98,7 +98,7 @@ test.describe('the topo', () => {
     await heart.click()
     const full = page.getByRole('dialog', { name: 'Ton cœur est plein. Lequel tu lâches ?' })
     await expect(full).toBeVisible()
-    await full.getByRole('button', { name: /^Lâcher Corde 27, Réglisse/ }).click()
+    await full.getByRole('button', { name: /^Lâcher \S+, Réglisse, .*, corde 27$/ }).click()
     await expect(full).toBeHidden()
     await expect(heart).toHaveAttribute('aria-pressed', 'true')
     await expect(

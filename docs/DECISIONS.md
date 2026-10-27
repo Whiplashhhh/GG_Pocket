@@ -814,3 +814,12 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - Export : un fichier JSON (`GET /api/v1/me/export`) avec le profil, les séances, les coches, les coups de cœur,
     les commentaires, les accusés, les voies ouvertes, les appareils et la liste des photos (pas les images elles-mêmes).
 - **Statut** : à valider (choix par défaut appliqués : audit conservé, photos listées sans être incluses).
+
+### D-097 — La cotation avant la corde sur l'étiquette de voie
+- **Contexte** : demande du club (Willem, 2026-10-27) : la corde était l'info la plus voyante de l'étiquette, alors que
+  les grimpeurs cherchent d'abord la cotation. La spec (§10, élément signature) voulait un « numéro de corde bien lisible ».
+- **Choix** : la cotation prend le bloc encre à gauche (Archivo 800 largeur 75, largeur minimale fixe pour aligner les
+  noms d'une liste) ; la corde passe à droite, plus petite et en encre à 75 %, sous un petit « corde » pour qu'un numéro
+  seul ne passe pas pour une cotation. Le libellé accessible suit l'ordre visuel : « 6b, Bye Bye Morice, couleur jaune
+  et bleu, corde 12 ». Le ruban « Dernière chance » et le tampon « Démontée » se placent à gauche de la corde.
+- **Statut** : validé (demande du club).

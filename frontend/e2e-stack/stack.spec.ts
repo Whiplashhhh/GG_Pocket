@@ -110,7 +110,7 @@ test('a demo climber signs in, browses and signs out without any CSP violation',
   await expect(page.getByRole('heading', { level: 1, name: 'Mes appareils' })).toBeVisible()
   // The real topo: the seeded routes, and the sheet of one of them with its comments.
   await page.goto('/topo')
-  const firstRoute = page.getByRole('link', { name: /^Corde \d+,/ }).first()
+  const firstRoute = page.getByRole('link', { name: /, corde \d+(,|$)/ }).first()
   await expect(firstRoute).toBeVisible()
   const [comments] = await Promise.all([
     page.waitForResponse(/\/api\/v1\/routes\/[0-9a-f-]+\/comments$/),

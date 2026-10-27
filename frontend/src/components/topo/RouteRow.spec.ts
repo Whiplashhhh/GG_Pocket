@@ -39,7 +39,7 @@ describe('RouteRow', () => {
     const wrapper = mountRow(tonton)
     const link = wrapper.get('a')
     const name = wrapper.get(`#${link.attributes('aria-labelledby') ?? ''}`)
-    expect(name.text()).toBe('Corde 15, Tonton Talon, 6a+, couleur orange, dernière chance')
+    expect(name.text()).toBe('6a+, Tonton Talon, couleur orange, corde 15, dernière chance')
     const description = wrapper.get(`#${link.attributes('aria-describedby') ?? ''}`).text()
     expect(description).toContain('Grand dévers')
     expect(description).toContain('Physique Dévers')

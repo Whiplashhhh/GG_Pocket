@@ -4,6 +4,24 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-27 — La cotation avant la corde sur l'étiquette
+
+**Branche** : `feature/cotation-avant-corde-0.5.0`.
+
+### Fait
+
+- Demande du club : `RouteLabel` met la cotation dans le bloc encre à gauche et la corde à droite, plus petite, sous un
+  petit « corde » (D-097). Libellé accessible dans le nouvel ordre ; ruban « Dernière chance » et tampon « Démontée »
+  décalés à gauche de la corde. DESIGN.md §5 et maquettes mises à jour. Vitest, e2e Desktop Chrome, captures 360 px
+  clair/sombre (topo, fiche, fil, archives) et 1280 px (gestion des voies) regardées.
+
+### Reste
+
+- CI de la PR, puis Willem fusionne et décide de la release.
+- D-096, D-093, D-094, D-087, D-090 à valider ; PR #17 en suspens. Ensuite : phase 5 (Social).
+
+---
+
 ## 2026-10-26 — PR 4.3 : comptes et données personnelles
 
 **Branche** : `feature/comptes-0.4.0` (PR #25).
