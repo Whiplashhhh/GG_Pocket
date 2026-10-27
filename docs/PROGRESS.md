@@ -4,6 +4,34 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-27 — Phase 5, PR 5.1 : les amis
+
+**Branche** : `feature/amis-0.5.1` (PR 5.1, voir D-098).
+
+### Fait
+
+- Question de Willem : pas de base graphe (Neo4j) ; amitiés directes, table PostgreSQL (D-098).
+- Backend : domaine `social` (V11 `friendship`, une ligne par paire), `FriendshipService` (demander/accepter,
+  refuser/annuler/retirer, tout depuis mon côté), annuaire et profils publics (`DirectoryService`, membres actifs
+  seulement), `SessionAudience` (séance, photo, liste et carnet d'un ami : amis acceptés, visibilité « amis »,
+  404 sinon). `Session.memberId` exposé. Export et seed (grimpeur : 2 amis + 1 demande). IT : `FriendshipIT`,
+  `DirectoryIT`, `FriendSessionsIT`, matrice d'autorisations, `AccountIT`, `DemoSeederIT`.
+- Front : `/annuaire` (recherche, « Mes amis »), `/membres/:id`, `/membres/:id/carnet` (LogbookView réutilisée),
+  demandes en haut de l'Actu et du profil, pastille sur l'avatar, compteur du club dans l'Actu, séance d'un ami en
+  lecture seule. Vitest (`lib/friendship`), e2e `social.spec.ts` (Desktop Chrome), captures 360 px clair/sombre
+  regardées (débordement d'un pseudo très long corrigé).
+
+### Reste
+
+- PR 5.2 : fil d'actu (amis), réactions, commentaires de séance, modération.
+- D-098, D-096, D-093, D-094, D-087, D-090 à valider ; PR #17 en suspens.
+
+### Prochaine action
+
+- Faire essayer la PR 5.1 sur le dev (label `deploy:dev`) ; après fusion, créer `feature/fil-<version>` depuis `main`.
+
+---
+
 ## 2026-10-27 — La cotation avant la corde sur l'étiquette
 
 **Branche** : `feature/cotation-avant-corde-0.5.0` (PR #30, en prod en 0.5.1).
