@@ -17,6 +17,7 @@ import java.util.UUID;
 @Schema(name = "Session")
 public record SessionResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) UUID id,
+        @Schema(requiredMode = RequiredMode.REQUIRED, description = "The climber") UUID memberId,
         @Schema(requiredMode = RequiredMode.REQUIRED) LocalDate climbedOn,
         @Schema(description = "Out of 10") Integer feeling,
         String comment,
@@ -53,6 +54,7 @@ public record SessionResponse(
         var summary = view.summary();
         return new SessionResponse(
                 view.id(),
+                view.memberId(),
                 view.climbedOn(),
                 view.feeling(),
                 view.comment(),

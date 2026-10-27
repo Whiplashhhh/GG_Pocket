@@ -73,7 +73,7 @@ class DirectoryIT {
         var me = members.create(Role.CLIMBER);
         var other = members.create(Role.CLIMBER);
         other.describe(new MemberDetails(2019, 2012, "Spécialiste des dalles", false, true));
-        memberRepository.saveAndFlush(other);
+        other = memberRepository.saveAndFlush(other);
         var route = routes.create(members.create(Role.SETTER));
         favorites.saveAndFlush(new Favorite(other.id(), route.id()));
 
