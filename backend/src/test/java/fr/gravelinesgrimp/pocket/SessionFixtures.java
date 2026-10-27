@@ -30,8 +30,16 @@ public class SessionFixtures {
 
     public ClimbingSession log(
             Member climber, LocalDate day, Integer feeling, AscentDraft... ascents) {
-        var draft =
-                new SessionDraft(day, feeling, null, SessionVisibility.FRIENDS, List.of(ascents));
+        return log(climber, day, feeling, SessionVisibility.FRIENDS, ascents);
+    }
+
+    public ClimbingSession log(
+            Member climber,
+            LocalDate day,
+            Integer feeling,
+            SessionVisibility visibility,
+            AscentDraft... ascents) {
+        var draft = new SessionDraft(day, feeling, null, visibility, List.of(ascents));
         return sessions.saveAndFlush(
                 ClimbingSession.create(climber.id(), UUID.randomUUID(), draft));
     }

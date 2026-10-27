@@ -10,6 +10,8 @@ import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
+import fr.gravelinesgrimp.pocket.social.domain.FriendshipState;
+import fr.gravelinesgrimp.pocket.social.infra.FriendshipRepository;
 import fr.gravelinesgrimp.pocket.topo.domain.CheckSource;
 import fr.gravelinesgrimp.pocket.topo.domain.Route;
 import fr.gravelinesgrimp.pocket.topo.domain.RouteStatus;
@@ -47,6 +49,7 @@ class DemoSeederIT {
     @Autowired private GradeRepository grades;
     @Autowired private ClimbingSessionRepository sessions;
     @Autowired private RouteCheckRepository checks;
+    @Autowired private FriendshipRepository friendships;
 
     @Test
     void createsOneAccountPerRoleAndADemoCode() {
@@ -112,9 +115,23 @@ class DemoSeederIT {
     }
 
     @Test
+    void theGrimpeurAccountHasTwoFriendsAndARequestToAnswer() {
+        var grimpeur = members.findByNicknameIgnoreCase("grimpeur").orElseThrow();
+        var states =
+                friendships.findAllOf(grimpeur.id()).stream()
+                        .map(friendship -> FriendshipState.of(friendship, grimpeur.id()))
+                        .toList();
+        assertThat(states)
+                .containsExactlyInAnyOrder(
+                        FriendshipState.FRIENDS, FriendshipState.FRIENDS, FriendshipState.INCOMING);
+    }
+
+    @Test
     void runningItAgainChangesNothing() {
         var before = sessions.count();
+        var friendshipsBefore = friendships.count();
         seeder.run(null);
+        assertThat(friendships.count()).isEqualTo(friendshipsBefore);
         assertThat(members.countMembers()).isEqualTo(4);
         assertThat(routes.count()).isEqualTo(DemoTopoSeeder.NAMES.size());
         assertThat(sessions.count()).isEqualTo(before);

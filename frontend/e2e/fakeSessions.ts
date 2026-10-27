@@ -24,13 +24,15 @@ const DAY = 24 * 3600 * 1000
 
 /**
  * Sessions as the backend keeps them (SessionService), close enough for the e2e tests: dates up to
- * 7 days back, idempotent creation by clientRef, my sessions only, clean ascents ticking "je sais
- * la faire".
+ * 7 days back, idempotent creation by clientRef, friends reading the shared ones (SessionAudience),
+ * clean ascents ticking "je sais la faire".
  */
 export class FakeSessions implements AscentSource {
   readonly sessions: FakeSession[] = []
   /** No network for the session writes: the requests fail like in a dead zone of the gym. */
   offline = false
+  /** Accepted friends with an active account (FakeClub knows both). */
+  isFriend: (readerId: string, climberId: string) => boolean = () => false
 
   constructor(
     private readonly nextId: () => string,
@@ -212,7 +214,11 @@ export class FakeSessions implements AscentSource {
   }
 
   /** LogbookService and Logbook. */
-  private logbook(me: TopoMember): Schemas['Logbook'] {
+  private logbook(
+    me: TopoMember,
+    climberId: string = me.id,
+    sharedOnly = false,
+  ): Schemas['Logbook'] {
     const BEST = [
       'LEAD_CLEAN',
       'LEAD_TOPPED',
@@ -226,7 +232,10 @@ export class FakeSessions implements AscentSource {
       if (ascent.mode === 'LEAD') return ascent.clean ? 'LEAD_CLEAN' : 'LEAD_TOPPED'
       return ascent.clean ? 'TOP_ROPE_CLEAN' : 'TOP_ROPE_TOPPED'
     }
-    const mine = this.allAscents().filter(({ session }) => session.memberId === me.id)
+    const mine = this.allAscents().filter(
+      ({ session }) =>
+        session.memberId === climberId && (!sharedOnly || session.visibility === 'FRIENDS'),
+    )
     const byRoute = new Map<string, typeof mine>()
     for (const item of mine) {
       byRoute.set(item.ascent.routeId, [...(byRoute.get(item.ascent.routeId) ?? []), item])
@@ -328,13 +337,14 @@ export class FakeSessions implements AscentSource {
       .at(0)
     return {
       id: session.id,
+      memberId: session.memberId,
       climbedOn: session.climbedOn,
       ...(session.feeling === undefined ? {} : { feeling: session.feeling }),
       ...(session.comment === undefined ? {} : { comment: session.comment }),
       ...(session.photo ? { photoUrl: `/api/v1/media/${session.id}` } : {}),
       visibility: session.visibility,
       createdAt: session.createdAt,
-      editable: !session.frozen,
+      editable: session.memberId === me.id && !session.frozen,
       summary: {
         ascentCount: ascents.length,
         toppedCount: topped.length,
@@ -409,6 +419,22 @@ export class FakeSessions implements AscentSource {
         ...(start + size < all.length ? { nextCursor: String(start + size) } : {}),
       })
     }
+    const friendMatch = /^\/members\/([^/]+)\/(sessions|logbook)$/.exec(pathname)
+    if (friendMatch !== null && method === 'GET') {
+      const [, climberId = '', what] = friendMatch
+      const mine = climberId === me.id
+      if (!mine && !this.isFriend(me.id, climberId)) return problem(404, 'NOT_FOUND')
+      if (what === 'logbook') return json(this.logbook(me, climberId, !mine))
+      const all = this.ordered(climberId).filter(
+        (session) => mine || session.visibility === 'FRIENDS',
+      )
+      const start = Number(url.searchParams.get('cursor') ?? '0')
+      const size = Number(url.searchParams.get('size') ?? '10')
+      return json({
+        items: all.slice(start, start + size).map((session) => this.view(me, session)),
+        ...(start + size < all.length ? { nextCursor: String(start + size) } : {}),
+      })
+    }
     if (pathname === '/me/climbed-routes' && method === 'GET') {
       const last = new Map<string, string>()
       for (const session of this.ordered(me.id).reverse()) {
@@ -457,11 +483,15 @@ export class FakeSessions implements AscentSource {
     const match = /^\/sessions\/([^/]+)(\/photo)?$/.exec(pathname)
     if (match === null) return undefined
     const [, id, photo] = match as (string | undefined)[]
-    const session = this.sessions.find(
-      (candidate) => candidate.id === id && candidate.memberId === me.id,
-    )
-    if (session === undefined) return problem(404, 'NOT_FOUND')
-    if (method === 'GET' && photo === undefined) return json(this.view(me, session))
+    const found = this.sessions.find((candidate) => candidate.id === id)
+    const readable =
+      found !== undefined &&
+      (found.memberId === me.id ||
+        (found.visibility === 'FRIENDS' && this.isFriend(me.id, found.memberId)))
+    if (found === undefined || !readable) return problem(404, 'NOT_FOUND')
+    if (method === 'GET' && photo === undefined) return json(this.view(me, found))
+    if (found.memberId !== me.id) return problem(404, 'NOT_FOUND')
+    const session = found
     if (session.frozen) return problem(409, 'MONTH_FROZEN')
     if (photo !== undefined) {
       session.photo = method === 'PUT'

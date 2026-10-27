@@ -95,6 +95,16 @@ public class FavoriteService {
     @PreAuthorize("hasRole('CLIMBER')")
     @Transactional(readOnly = true)
     public List<RouteSummaryView> listMine(UUID memberId) {
+        return listOf(memberId, memberId);
+    }
+
+    /**
+     * The hearts of a member, as {@code readerId} sees them (their own heart on each route). Hearts
+     * are public among members, like the rest of a profile.
+     */
+    @PreAuthorize("hasRole('CLIMBER')")
+    @Transactional(readOnly = true)
+    public List<RouteSummaryView> listOf(UUID memberId, UUID readerId) {
         var mine = favorites.findAllByMemberIdOrderByCreatedAtDesc(memberId);
         if (mine.isEmpty()) {
             return List.of();
@@ -105,7 +115,7 @@ public class FavoriteService {
                         .stream()
                         .collect(Collectors.toMap(Route::id, Function.identity()));
         var ordered = mine.stream().map(favorite -> byId.get(favorite.routeId())).toList();
-        return views.summaries(ordered, memberId);
+        return views.summaries(ordered, readerId);
     }
 
     /** "Je sais la faire" in this mode. Idempotent. */

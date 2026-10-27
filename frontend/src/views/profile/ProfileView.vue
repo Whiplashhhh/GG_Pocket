@@ -7,6 +7,7 @@ import {
   KeyRound,
   ShieldCheck,
   Smartphone,
+  Users,
   Wrench,
 } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
@@ -18,6 +19,7 @@ import { useMyProfile } from '@/api/me'
 import { useMetaQuery } from '@/api/meta'
 import { useMyFavorites, useRouteDetail } from '@/api/topo'
 import PageTitle from '@/components/layout/PageTitle.vue'
+import FriendRequests from '@/components/social/FriendRequests.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
@@ -72,6 +74,7 @@ const facts = computed(() => {
 
 <template>
   <PageTitle>{{ t('profile.title') }}</PageTitle>
+  <FriendRequests />
 
   <div v-if="isPending" class="flex items-center gap-4 px-4 py-6" aria-hidden="true">
     <SkeletonBlock class="size-24 rounded-full" />
@@ -182,6 +185,10 @@ const facts = computed(() => {
       <SettingsLink v-if="profile && isAtLeast(profile.role, 'SETTER')" to="/gestion">
         <template #icon><Wrench :size="20" /></template>
         {{ t('profile.management') }}
+      </SettingsLink>
+      <SettingsLink to="/annuaire?amis">
+        <template #icon><Users :size="20" /></template>
+        {{ t('profile.friends') }}
       </SettingsLink>
       <SettingsLink to="/profil/mot-de-passe">
         <template #icon><KeyRound :size="20" /></template>

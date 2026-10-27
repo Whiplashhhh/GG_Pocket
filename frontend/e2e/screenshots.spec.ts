@@ -39,6 +39,50 @@ const marieClimbs = (club: FakeClub) => {
   })
 }
 
+/** Marie's friends: Tom and Léa, a request from Jules, one sent to Sam, and strangers. */
+const marieFriends = (club: FakeClub) => {
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  if (marie === undefined) return
+  const tom = club.addMember({
+    nickname: 'tom.bloc',
+    firstName: 'Tom',
+    lastName: 'Bloc',
+    clubArrivalYear: 2018,
+    climbingSinceYear: 2012,
+    bio: 'Toujours fourré dans le grand dévers. Ne prête pas sa magnésie.',
+  })
+  const lea = club.addMember({ nickname: 'lea.dyno', firstName: 'Léa', lastName: 'Dupont' })
+  const jules = club.addMember({
+    nickname: 'jules',
+    firstName: 'Jules',
+    lastName: 'Martin',
+    clubArrivalYear: 2024,
+  })
+  const sam = club.addMember({ nickname: 'sam', firstName: 'Samia', lastName: 'Benali' })
+  club.addMember({
+    nickname: 'bernard.leclercq.du.grand.devers',
+    firstName: 'Bernard-Emmanuel',
+    lastName: 'Leclercq-Vandenberghe',
+    clubArrivalYear: 2003,
+  })
+  club.social.link(tom, marie)
+  club.social.link(marie, lea)
+  club.social.link(jules, marie, false)
+  club.social.link(marie, sam, false)
+  club.topo.favorite(tom, 'Iron Man')
+  club.climbs.add(
+    tom,
+    1,
+    [
+      { route: 'Iron Man', mode: 'LEAD', clean: true },
+      { route: 'Réglisse', mode: 'LEAD' },
+      { route: 'Tonton Talon', mode: 'TOP_ROPE', topped: false },
+    ],
+    { comment: 'Enfin enchaînée, Iron Man.', feeling: 9 },
+  )
+  club.climbs.add(tom, 4, [{ route: 'Sec !', clean: true }])
+}
+
 const addToSession = async (page: Page, search: string, name: string) => {
   await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill(search)
   await page.getByRole('button', { name: `Ajouter ${name}` }).click()
@@ -164,6 +208,42 @@ const CAPTURES: Capture[] = [
   { name: 'actu-invitation', path: '/actu', as: 'CLIMBER', installInvite: true },
   { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
+  {
+    name: 'profil-demandes',
+    path: '/profil',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      marieOnTheWall(club)
+      marieFriends(club)
+      const marie = club.members.find((member) => member.nickname === 'marie')
+      const lea = club.addMember({ nickname: 'zoe', firstName: 'Zoé', lastName: 'Lambert' })
+      if (marie) club.social.link(lea, marie, false)
+    },
+    act: async (page) => {
+      await page.getByRole('button', { name: '2 demandes d’ami' }).click()
+    },
+  },
+  { name: 'annuaire', path: '/annuaire', as: 'CLIMBER', prepare: marieFriends },
+  {
+    name: 'membre-ami',
+    path: '/annuaire',
+    as: 'CLIMBER',
+    prepare: marieFriends,
+    act: async (page) => {
+      await page.getByRole('link', { name: /Tom Bloc/ }).click()
+      await page.getByRole('heading', { level: 2, name: 'Tom Bloc' }).waitFor()
+    },
+  },
+  {
+    name: 'membre-inconnu',
+    path: '/annuaire',
+    as: 'CLIMBER',
+    prepare: marieFriends,
+    act: async (page) => {
+      await page.getByRole('link', { name: /Bernard-Emmanuel/ }).click()
+      await page.getByRole('heading', { level: 2, name: /Bernard-Emmanuel/ }).waitFor()
+    },
+  },
   { name: 'a-faire', path: '/a-faire', as: 'CLIMBER', prepare: marieSeason },
   {
     name: 'a-faire-sues',

@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import { useCurrentMember } from '@/api/auth'
 import { ApiError, errorMessageKey } from '@/api/errors'
 import { useDeleteSession, useSession } from '@/api/sessions'
 import SubPageHeader from '@/components/layout/SubPageHeader.vue'
@@ -14,13 +15,17 @@ import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 
-/** One of my sessions, with what I can still do to it (spec §8.3, §9.3). */
+/**
+ * A session: one of mine, with what I can still do to it (spec §8.3, §9.3), or a friend's to read.
+ */
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
 const id = computed(() => (typeof route.params.id === 'string' ? route.params.id : undefined))
 const session = useSession(id)
+const member = useCurrentMember()
+const isMine = computed(() => session.data.value?.memberId === member.value?.id)
 const remove = useDeleteSession()
 const confirming = ref(false)
 const removeError = ref<string | null>(null)
@@ -44,7 +49,7 @@ function confirmDelete() {
 
 <template>
   <SubPageHeader back="/actu" :back-label="t('session.backToActu')">
-    {{ t('session.detailTitle') }}
+    {{ session.data.value && !isMine ? t('session.friendDetailTitle') : t('session.detailTitle') }}
   </SubPageHeader>
 
   <div v-if="session.isPending.value" class="flex flex-col gap-3 px-4 py-6" aria-hidden="true">
@@ -74,7 +79,7 @@ function confirmDelete() {
         <Trash2 :size="18" aria-hidden="true" />{{ t('session.delete') }}
       </GgButton>
     </div>
-    <p v-else class="px-4 py-4 text-ink-muted">{{ t('session.frozen') }}</p>
+    <p v-else-if="isMine" class="px-4 py-4 text-ink-muted">{{ t('session.frozen') }}</p>
     <FormAlert v-if="removeError" class="mx-4">{{ removeError }}</FormAlert>
   </template>
 

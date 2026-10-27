@@ -823,3 +823,35 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   seul ne passe pas pour une cotation. Le libellé accessible suit l'ordre visuel : « 6b, Bye Bye Morice, couleur jaune
   et bleu, corde 12 ». Le ruban « Dernière chance » et le tampon « Démontée » se placent à gauche de la corde.
 - **Statut** : validé (demande du club).
+
+### D-098 — Phase 5 : amis, annuaire et lecture des séances d'un ami
+- **Contexte** : phase 5 (spec §7, §8.2, §8.8, §14). Willem a demandé (2026-10-27) s'il fallait une base graphe type
+  Neo4j : non, les amitiés sont directes (pas d'amis d'amis), ~200 membres, une table PostgreSQL et un index suffisent ;
+  une deuxième base coûterait sauvegardes, cohérence et tests sans rien apporter.
+- **Choix** :
+  - Deux PR, sur le modèle de la phase 4 : 5.1 « Amis » (annuaire, amitiés, profils, séances d'un ami), 5.2 « Fil
+    d'actu » (fil, réactions, commentaires, modération).
+  - Table `friendship` : une ligne par paire quel que soit le sens (index unique sur `least/greatest`), `PENDING` puis
+    `ACCEPTED`. Refuser, annuler ou retirer supprime la ligne (pas de statut « refusé » : on peut redemander, la
+    limite de 30 demandes par heure suffit contre l'insistance). Demander quelqu'un qui m'a déjà demandé accepte.
+  - Tout passe par mon côté (`PUT/DELETE /me/friends/{memberId}`) : pas d'identifiant d'amitié à deviner.
+  - Annuaire : tous les membres actifs, envoyés d'un bloc (≤ 200) et filtrés côté client comme le tableau des membres ;
+    le compteur du fil (« 87 grimpeurs accrochés ») compte les membres actifs, moi compris. Un membre désactivé ou
+    « Ancien·ne membre » n'a ni ligne ni profil (404) ; un ami désactivé disparaît de mes listes et ses séances se ferment.
+  - Profil public : identité, rôle, bio, années, âge seulement s'il l'a choisi, voie préférée, coups de cœur. Les
+    chiffres clés viendront avec les badges (phase 7).
+  - Séances d'un autre : lisibles par ses amis acceptés si la séance est « amis » ; sinon 404, comme une séance qui
+    n'existe pas (une demande en attente n'ouvre rien, un rôle non plus). Même règle pour la photo et le carnet d'un ami
+    (calculé sur ses séances « amis » seulement). `Session` expose désormais `memberId`.
+- **Statut** : à valider (découpage et choix par défaut : refus silencieux, annuaire sans pagination, chiffres clés plus tard).
+
+### D-099 — Retours du club sur la PR 5.1 : demandes d'amis, accueil, déconnexion
+- **Contexte** : Willem a essayé la PR 5.1 sur le dev (2026-10-27). La spec (§8.2) plaçait les demandes reçues en
+  section en haut du fil ; elles y prenaient trop de place.
+- **Choix** :
+  - Les demandes d'amis quittent le fil. Elles vivent dans le profil, sous un bandeau « N demandes d'ami », replié par
+    défaut (même pour une seule), qui déplie la liste complète. La pastille sur l'avatar reste et mène au profil.
+  - Le bouton de déconnexion devient « Se déconnecter » (« Redescendre » était moins clair) ; la confirmation suit.
+  - L'écran d'accueil propose « Se connecter » (bouton principal) puis « Rejoindre le club » ; le lien de l'écran de
+    connexion devient « Pas encore de compte ? Rejoindre le club ».
+- **Statut** : validé (demande du club).

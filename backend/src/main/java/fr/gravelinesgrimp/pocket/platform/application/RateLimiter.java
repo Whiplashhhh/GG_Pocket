@@ -67,6 +67,10 @@ public class RateLimiter {
     public static final Rule SESSION_PHOTO_UPLOAD_PER_MEMBER =
             new Rule("session-photo-upload-per-member", 20, Duration.ofHours(1));
 
+    /** Asking members to be friends: the whole club in a day, not in an hour. */
+    public static final Rule FRIEND_REQUEST_PER_MEMBER =
+            new Rule("friend-request-per-member", 30, Duration.ofHours(1));
+
     /** Above this many tracked keys, stale ones are dropped before adding more. */
     private static final int PURGE_THRESHOLD = 10_000;
 

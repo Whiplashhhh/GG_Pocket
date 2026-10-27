@@ -8,14 +8,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-/** A session photo is seen by whoever may read the session: its climber only, until phase 5. */
+/** A session photo is seen by whoever may read the session ({@link SessionAudience}). */
 @Component
 class SessionPhotoAccess implements PrivateMediaAccess {
 
     private final ClimbingSessionRepository sessions;
+    private final SessionAudience audience;
 
-    SessionPhotoAccess(ClimbingSessionRepository sessions) {
+    SessionPhotoAccess(ClimbingSessionRepository sessions, SessionAudience audience) {
         this.sessions = sessions;
+        this.audience = audience;
     }
 
     @Override
@@ -26,7 +28,7 @@ class SessionPhotoAccess implements PrivateMediaAccess {
     @Override
     public boolean canRead(UUID readerId, UUID mediaId) {
         return sessions.findByPhotoId(mediaId)
-                .map(session -> session.memberId().equals(readerId))
+                .map(session -> audience.canRead(readerId, session))
                 .orElse(false);
     }
 }

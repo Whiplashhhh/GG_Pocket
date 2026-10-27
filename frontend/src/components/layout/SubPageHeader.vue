@@ -13,6 +13,6 @@ defineProps<{ back: RouteLocationRaw; backLabel: string }>()
     <GgIconButton :to="back" :label="backLabel">
       <ArrowLeft :size="24" aria-hidden="true" />
     </GgIconButton>
-    <h1 class="text-xl font-title"><slot /></h1>
+    <h1 class="min-w-0 text-xl font-title wrap-anywhere"><slot /></h1>
   </div>
 </template>

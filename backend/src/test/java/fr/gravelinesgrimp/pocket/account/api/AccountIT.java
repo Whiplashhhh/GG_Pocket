@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import fr.gravelinesgrimp.pocket.FriendshipFixtures;
 import fr.gravelinesgrimp.pocket.IntegrationTest;
 import fr.gravelinesgrimp.pocket.MemberFixtures;
 import fr.gravelinesgrimp.pocket.RouteFixtures;
@@ -55,6 +56,7 @@ class AccountIT {
     @Autowired private MemberFixtures members;
     @Autowired private RouteFixtures routes;
     @Autowired private SessionFixtures sessions;
+    @Autowired private FriendshipFixtures friendships;
     @Autowired private MemberRepository memberRepository;
     @Autowired private JdbcTemplate jdbc;
 
@@ -63,6 +65,8 @@ class AccountIT {
         var me = members.create(Role.SETTER);
         var route = routes.create(me);
         sessions.log(me, LocalDate.now().minusDays(1), 7, clean(route, ClimbMode.LEAD));
+        var friend = members.create(Role.CLIMBER);
+        friendships.befriend(friend, me);
 
         mockMvc.perform(get("/api/v1/me/export").with(as(me)))
                 .andExpect(status().isOk())
@@ -77,6 +81,9 @@ class AccountIT {
                 .andExpect(jsonPath("$.sessions[0].ascents[0].route.name").value(route.name()))
                 .andExpect(jsonPath("$.sessions[0].ascents[0].clean").value(true))
                 .andExpect(jsonPath("$.routesSet[0].id").value(route.id().toString()))
+                .andExpect(jsonPath("$.friendships[0].nickname").value(friend.nickname()))
+                .andExpect(jsonPath("$.friendships[0].status").value("ACCEPTED"))
+                .andExpect(jsonPath("$.friendships[0].askedByMe").value(false))
                 .andExpect(jsonPath("$.devices").isArray());
     }
 

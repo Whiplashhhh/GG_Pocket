@@ -86,6 +86,21 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'logbook.title' },
   },
   {
+    path: '/annuaire',
+    component: () => import('@/views/social/DirectoryView.vue'),
+    meta: { titleKey: 'directory.title' },
+  },
+  {
+    path: '/membres/:id',
+    component: () => import('@/views/social/MemberProfileView.vue'),
+    meta: { titleKey: 'memberProfile.title' },
+  },
+  {
+    path: '/membres/:id/carnet',
+    component: () => import('@/views/LogbookView.vue'),
+    meta: { titleKey: 'logbook.friend.docTitle' },
+  },
+  {
     path: '/podium',
     component: () => import('@/views/PodiumView.vue'),
     meta: { titleKey: 'nav.podium' },

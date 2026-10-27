@@ -122,11 +122,20 @@ créée depuis `main` à jour.
 
 ## Phase 5 — Social
 
-- [ ] Annuaire (recherche, demandes d'amis)
-- [ ] Amitiés (demande, acceptation, refus, pastille)
-- [ ] Fil d'actu (pagination par curseur, cartes de séance)
+Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant la suivante.
+
+### PR 5.1 — Amis (`feature/amis-0.5.1`)
+
+- [x] Annuaire (recherche, demandes d'amis, filtre « Mes amis »)
+- [x] Amitiés (demande, acceptation, refus, annulation, retrait, pastille ; demandes dans le profil, D-099)
+- [x] Profil public d'un membre ; séances, photos et carnet d'un ami (visibilité « amis » seulement)
+- [x] Seed des amitiés, export des amitiés
+
+### PR 5.2 — Fil d'actu
+
+- [ ] Fil d'actu (mes séances et celles de mes amis, pagination par curseur, carte avec l'auteur)
 - [ ] Réactions (4, une par personne)
-- [ ] Commentaires de séance + modération
+- [ ] Commentaires de séance + modération (Gestion > Modération, journal d'audit)
 
 ## Phase 6 — Podium et statistiques
 
