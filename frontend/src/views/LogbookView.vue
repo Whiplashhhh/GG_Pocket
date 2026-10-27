@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 import { errorMessageKey } from '@/api/errors'
 import { useMyLogbook, type LogbookRoute } from '@/api/sessions'
+import { useMemberLogbook, useMemberProfile } from '@/api/social'
 import SubPageHeader from '@/components/layout/SubPageHeader.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
@@ -13,11 +15,26 @@ import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import { formatDate } from '@/lib/format'
 
 /**
- * My logbook ("carnet", spec §8.8): what my sessions add up to, the grade pyramid, and every route
- * I ever climbed, dismounted ones included (spec §2: history is sacred). Figures come computed.
+ * A logbook ("carnet", spec §8.8): what the sessions add up to, the grade pyramid, and every route
+ * ever climbed, dismounted ones included (spec §2: history is sacred). Figures come computed.
+ * Mine at /carnet; a friend's at /membres/:id/carnet, from the sessions they share with friends.
  */
 const { t } = useI18n()
-const logbook = useMyLogbook()
+const route = useRoute()
+const friendId = typeof route.params.id === 'string' ? route.params.id : undefined
+const logbook = friendId === undefined ? useMyLogbook() : useMemberLogbook(friendId)
+const friend = friendId === undefined ? undefined : useMemberProfile(friendId)
+const friendName = computed(() => friend?.data.value?.member.nickname ?? '')
+const back = friendId === undefined ? '/profil' : `/membres/${friendId}`
+
+/** The words that change when the logbook is someone else's. */
+type Text =
+  'title' | 'intro' | 'totalsTitle' | 'pyramidTitle' | 'routesTitle' | 'emptyTitle' | 'emptyBody'
+function text(key: Text) {
+  return friendId === undefined
+    ? t(`logbook.${key}`)
+    : t(`logbook.friend.${key}`, { name: friendName.value })
+}
 const totalsId = useId()
 const pyramidId = useId()
 const routesId = useId()
@@ -55,8 +72,8 @@ function bestClass(item: LogbookRoute) {
 </script>
 
 <template>
-  <SubPageHeader back="/profil" :back-label="t('common.back')">
-    {{ t('logbook.title') }}
+  <SubPageHeader :back="back" :back-label="t('common.back')">
+    {{ text('title') }}
   </SubPageHeader>
 
   <div v-if="logbook.isPending.value" class="flex flex-col gap-3 px-4 pt-4" aria-hidden="true">
@@ -71,15 +88,15 @@ function bestClass(item: LogbookRoute) {
 
   <EmptyState
     v-else-if="data && data.routes.length === 0"
-    :title="t('logbook.emptyTitle')"
-    :body="t('logbook.emptyBody')"
+    :title="text('emptyTitle')"
+    :body="text('emptyBody')"
   />
 
   <template v-else-if="data">
-    <p class="max-w-prose px-4 pt-2 text-ink-muted">{{ t('logbook.intro') }}</p>
+    <p class="max-w-prose px-4 pt-2 text-ink-muted">{{ text('intro') }}</p>
 
     <section class="px-4 pt-5" :aria-labelledby="totalsId">
-      <h2 :id="totalsId" class="text-lg font-title">{{ t('logbook.totalsTitle') }}</h2>
+      <h2 :id="totalsId" class="text-lg font-title">{{ text('totalsTitle') }}</h2>
       <dl class="mt-2 grid grid-cols-2 border-t border-rule sm:grid-cols-4">
         <div
           v-for="figure in figures"
@@ -95,7 +112,7 @@ function bestClass(item: LogbookRoute) {
     </section>
 
     <section v-if="data.grades.length > 0" class="px-4 pt-6" :aria-labelledby="pyramidId">
-      <h2 :id="pyramidId" class="text-lg font-title">{{ t('logbook.pyramidTitle') }}</h2>
+      <h2 :id="pyramidId" class="text-lg font-title">{{ text('pyramidTitle') }}</h2>
       <p class="text-sm text-ink-muted">{{ t('logbook.pyramidHint') }}</p>
       <p class="mt-2 flex gap-4 text-sm font-semibold" aria-hidden="true">
         <span class="inline-flex items-center gap-1.5">
@@ -140,7 +157,7 @@ function bestClass(item: LogbookRoute) {
 
     <section class="pt-6 pb-10" :aria-labelledby="routesId">
       <h2 :id="routesId" class="flex items-baseline justify-between gap-3 px-4 text-lg font-title">
-        {{ t('logbook.routesTitle') }}
+        {{ text('routesTitle') }}
         <span class="font-sans text-sm font-normal text-ink-muted">{{
           t('logbook.routeCount', data.routes.length)
         }}</span>

@@ -14,7 +14,10 @@ export function normalize(text: string): string {
     .toLocaleLowerCase('fr')
 }
 
-export function filterMembers(members: readonly MemberSummary[], query: string): MemberSummary[] {
+type Named = { firstName: string; lastName: string; nickname: string }
+
+/** Every word typed must be found in the first name, last name or nickname. */
+export function filterMembers<T extends Named>(members: readonly T[], query: string): T[] {
   const words = normalize(query).split(/\s+/).filter(Boolean)
   if (words.length === 0) {
     return [...members]

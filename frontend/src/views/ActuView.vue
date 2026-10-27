@@ -1,22 +1,27 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
+import { ChevronRight, Users } from 'lucide-vue-next'
 import { computed, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { errorMessageKey } from '@/api/errors'
 import { useMySessions } from '@/api/sessions'
+import { useDirectory } from '@/api/social'
 import SessionCard from '@/components/session/SessionCard.vue'
+import FriendRequests from '@/components/social/FriendRequests.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 
 /**
- * The feed (spec §8.2). Until friends arrive (phase 5), it shows my own sessions, latest first,
- * page by page as I scroll.
+ * The feed (spec §8.2): the club header with its climber count (the way to the directory), the
+ * friend requests to answer, then my sessions, latest first, page by page as I scroll. Friends'
+ * sessions join it with the feed (PR 5.2).
  */
 const { t } = useI18n()
 const sessions = useMySessions()
+const directory = useDirectory()
 
 const items = computed(() => sessions.data.value?.pages.flatMap((page) => page.items) ?? [])
 
@@ -32,7 +37,20 @@ useIntersectionObserver(sentinel, ([entry]) => {
   <h1 class="sr-only">{{ t('actu.title') }}</h1>
   <section class="border-b border-rule px-4 py-3">
     <p class="text-ink-muted">{{ t('actu.clubTagline') }}</p>
+    <RouterLink
+      to="/annuaire"
+      class="-mx-1 mt-1 inline-flex min-h-11 items-center gap-2 rounded-control px-1 font-semibold text-brand-ink hover:underline"
+    >
+      <Users :size="20" aria-hidden="true" />
+      <template v-if="directory.data.value">
+        {{ t('actu.clubCount', directory.data.value.climberCount) }}
+        <span class="sr-only">{{ t('actu.clubCountHintSuffix') }}</span>
+      </template>
+      <template v-else>{{ t('actu.clubCountHint') }}</template>
+      <ChevronRight :size="18" aria-hidden="true" />
+    </RouterLink>
   </section>
+  <FriendRequests />
 
   <div v-if="sessions.isPending.value" class="flex flex-col gap-3 px-4 py-4" aria-hidden="true">
     <SkeletonBlock class="h-7 w-48" />

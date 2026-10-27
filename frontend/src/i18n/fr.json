@@ -17,7 +17,8 @@
   "header": {
     "homeLink": "GG Pocket, retour à l’actu",
     "profileLink": "Mon profil",
-    "management": "Espace gestion"
+    "management": "Espace gestion",
+    "profileLinkRequests": "Mon profil, 1 demande d’ami en attente | Mon profil, 1 demande d’ami en attente | Mon profil, {n} demandes d’ami en attente"
   },
   "roles": {
     "CLIMBER": "Grimpeur GG",
@@ -150,12 +151,69 @@
     "title": "Actu",
     "emptyTitle": "Le mur est calme… trop calme.",
     "emptyBody": "Enregistre ta première séance avec le bouton « Nouvelle séance » : ton fil se remplira tout seul.",
-    "clubTagline": "Le fil du club : tes séances et celles de tes amis, au même endroit.",
+    "clubTagline": "Le fil du club : tes séances et celles de tes amis, au même endroit.",
     "mine": "Mes séances",
     "more": "Voir les séances d’avant",
     "loadingMore": "On remonte le carnet…",
     "end": "C’est tout ! Le reste est encore à grimper.",
-    "loadError": "Impossible de charger tes séances."
+    "loadError": "Impossible de charger tes séances.",
+    "clubCount": "Personne n’est encore accroché à l’appli | 1 grimpeur accroché à l’appli | {n} grimpeurs accrochés à l’appli",
+    "clubCountHint": "Voir l’annuaire du club",
+    "clubCountHintSuffix": ", voir l’annuaire du club"
+  },
+  "friends": {
+    "ask": "Demander en ami",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "cancel": "Annuler ma demande",
+    "remove": "Retirer de mes amis",
+    "requested": "En attente",
+    "friends": "Amis",
+    "askLabel": "Demander {name} en ami",
+    "acceptLabel": "Accepter la demande de {name}",
+    "declineLabel": "Refuser la demande de {name}",
+    "cancelLabel": "Annuler ma demande à {name}",
+    "removeLabel": "Retirer {name} de mes amis",
+    "removeTitle": "On se désencorde ?",
+    "removeBody": "{name} ne verra plus tes séances, et toi plus les siennes. Rien ne lui est envoyé ; pour redevenir amis, il faudra redemander.",
+    "requestsTitle": "Demandes d’amis | 1 demande d’ami | {n} demandes d’ami",
+    "requestsIntro": "Ils veulent voir tes séances (et te montrer les leurs).",
+    "asked": "Demandé {date}",
+    "error": "La demande n’est pas passée. {reason}"
+  },
+  "directory": {
+    "title": "Annuaire du club",
+    "intro": "Tous les grimpeurs du club. Demande-les en ami pour voir leurs séances dans ton fil.",
+    "search": "Chercher un grimpeur",
+    "searchHint": "Prénom, nom ou pseudo",
+    "filter": "Afficher",
+    "filterAll": "Tout le club",
+    "filterFriends": "Mes amis ({n})",
+    "count": "Personne | 1 grimpeur | {n} grimpeurs",
+    "clubSince": "Au club depuis {year}",
+    "noMatchTitle": "Personne à ce nom sur le mur.",
+    "noMatchBody": "Vérifie l’orthographe, ou cherche par pseudo.",
+    "noFriendsTitle": "Pas encore d’amis par ici.",
+    "noFriendsBody": "Cherche les grimpeurs que tu croises au club et demande-les en ami.",
+    "aloneTitle": "Tu es seul·e sur le mur pour l’instant.",
+    "aloneBody": "Dès que d’autres membres s’inscrivent, ils apparaîtront ici.",
+    "loadError": "Impossible de charger l’annuaire."
+  },
+  "memberProfile": {
+    "title": "Profil",
+    "back": "Retour",
+    "favorites": "Ses coups de cœur",
+    "favoritesEmpty": "Aucun coup de cœur pour l’instant.",
+    "sessions": "Ses séances",
+    "sessionsEmpty": "Aucune séance partagée pour l’instant. Ça grimpe peut-être en secret.",
+    "sessionsLocked": "Ses séances et son carnet sont réservés à ses amis.",
+    "sessionsRequested": "Dès que ta demande est acceptée, tu verras ses séances et son carnet ici.",
+    "sessionsIncoming": "Accepte sa demande pour voir ses séances et son carnet.",
+    "logbook": "Son carnet",
+    "logbookHint": "Ses séances partagées, sa pyramide, ses voies.",
+    "loadError": "Impossible de charger ce profil.",
+    "notFoundTitle": "Ce grimpeur n’est plus sur le mur.",
+    "notFoundBody": "Son compte a peut-être été désactivé ou supprimé."
   },
   "topo": {
     "title": "Topo",
@@ -425,7 +483,17 @@
     "emptyTitle": "Ton carnet est encore vierge.",
     "emptyBody": "Chaque séance enregistrée vient le noircir. Même un échauffement en 4a compte.",
     "loading": "On ouvre le carnet…",
-    "loadError": "Impossible de charger ton carnet."
+    "loadError": "Impossible de charger ton carnet.",
+    "friend": {
+      "title": "Carnet de {name}",
+      "intro": "Tout ce que {name} a grimpé lors des séances partagées avec ses amis, voies démontées comprises.",
+      "totalsTitle": "Ses chiffres",
+      "pyramidTitle": "Sa pyramide",
+      "routesTitle": "Toutes ses voies",
+      "emptyTitle": "Carnet vierge pour l’instant.",
+      "emptyBody": "Aucune séance partagée avec ses amis : rien à montrer ici.",
+      "docTitle": "Carnet d’un ami"
+    }
   },
   "podium": {
     "title": "Podium",
@@ -455,7 +523,8 @@
     "favoritesEmpty": "Aucun coup de cœur pour l’instant. Touche le cœur d’une voie du topo pour lui déclarer ta flamme (deux au maximum).",
     "pastFavorites": "Anciens coups de cœur, démontés depuis",
     "logbook": "Mon carnet",
-    "logbookHint": "Tes séances, ta pyramide, toutes tes voies."
+    "logbookHint": "Tes séances, ta pyramide, toutes tes voies.",
+    "friends": "Mes amis"
   },
   "theme": {
     "label": "Thème",

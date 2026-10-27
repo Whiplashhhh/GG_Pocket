@@ -3,6 +3,7 @@ import type { Page, Route } from '@playwright/test'
 import type { components } from '../src/api/schema'
 
 import { FakeSessions } from './fakeSessions'
+import { FakeSocial } from './fakeSocial'
 import { FakeTopo } from './fakeTopo'
 
 type Schemas = components['schemas']
@@ -102,6 +103,13 @@ export class FakeClub {
     () => this.nextId(),
     () => this.now,
     this.topo,
+  )
+  /** Friendships, the directory and public profiles (phase 5). */
+  readonly social = new FakeSocial(
+    () => this.now,
+    () => this.members,
+    this.topo,
+    this.climbs,
   )
 
   addMember(overrides: Partial<FakeMember> & Pick<FakeMember, 'nickname'>): FakeMember {
@@ -407,6 +415,11 @@ export class FakeClub {
     if (climbs?.kind === 'json') return json(climbs.data, climbs.status)
     if (climbs?.kind === 'empty') return route.fulfill({ status: 204 })
     if (climbs?.kind === 'problem') return fail(climbs.status, climbs.code)
+
+    const social = this.social.handle(me, method, path)
+    if (social?.kind === 'json') return json(social.data, social.status)
+    if (social?.kind === 'empty') return route.fulfill({ status: 204 })
+    if (social?.kind === 'problem') return fail(social.status, social.code)
 
     const topo = this.topo.handle(me, method, path, method === 'GET' ? undefined : body())
     if (topo?.kind === 'json') return json(topo.data, topo.status)

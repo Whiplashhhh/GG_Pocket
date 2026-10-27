@@ -1038,6 +1038,82 @@
         ]
       }
     },
+    "/api/v1/me/friends": {
+      "get": {
+        "operationId": "getMyFriends",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Friends"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "My friends and pending requests",
+        "tags": [
+          "Social"
+        ]
+      }
+    },
+    "/api/v1/me/friends/{memberId}": {
+      "delete": {
+        "operationId": "unfriend",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "memberId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "Decline their request, cancel mine, or end our friendship",
+        "tags": [
+          "Social"
+        ]
+      },
+      "put": {
+        "operationId": "befriend",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "memberId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FriendshipStateResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Ask a member to be friends, or accept their request",
+        "tags": [
+          "Social"
+        ]
+      }
+    },
     "/api/v1/me/logbook": {
       "get": {
         "operationId": "getMyLogbook",
@@ -1238,6 +1314,141 @@
         "summary": "An uploaded image, after an access check",
         "tags": [
           "Media"
+        ]
+      }
+    },
+    "/api/v1/members": {
+      "get": {
+        "operationId": "getDirectory",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Directory"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Every active member, by name",
+        "tags": [
+          "Social"
+        ]
+      }
+    },
+    "/api/v1/members/{id}": {
+      "get": {
+        "operationId": "getMemberProfile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberProfile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "The public profile of a member",
+        "tags": [
+          "Social"
+        ]
+      }
+    },
+    "/api/v1/members/{id}/logbook": {
+      "get": {
+        "operationId": "getMemberLogbook",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Logbook"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "A friend's logbook, from the sessions they share with friends",
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/api/v1/members/{id}/sessions": {
+      "get": {
+        "operationId": "listMemberSessions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionPage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "A friend's sessions shared with friends, latest day first (cursor pagination)",
+        "tags": [
+          "Sessions"
         ]
       }
     },
@@ -2559,6 +2770,48 @@
           "signedInAt"
         ]
       },
+      "Directory": {
+        "type": "object",
+        "description": "climberCount counts every active member, me included; members leaves me out.",
+        "properties": {
+          "climberCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DirectoryEntry"
+            }
+          }
+        },
+        "required": [
+          "climberCount",
+          "members"
+        ]
+      },
+      "DirectoryEntry": {
+        "type": "object",
+        "properties": {
+          "friendship": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "REQUESTED",
+              "INCOMING",
+              "FRIENDS",
+              "SELF"
+            ]
+          },
+          "member": {
+            "$ref": "#/components/schemas/MemberCard"
+          }
+        },
+        "required": [
+          "friendship",
+          "member"
+        ]
+      },
       "ExportedAscent": {
         "type": "object",
         "properties": {
@@ -2622,6 +2875,28 @@
           "signedInAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "ExportedFriendship": {
+        "type": "object",
+        "properties": {
+          "acceptedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "askedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "askedByMe": {
+            "type": "boolean"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
           }
         }
       },
@@ -2795,6 +3070,70 @@
         },
         "required": [
           "routeId"
+        ]
+      },
+      "Friend": {
+        "type": "object",
+        "description": "since: when asked, or when accepted for a friend.",
+        "properties": {
+          "member": {
+            "$ref": "#/components/schemas/MemberCard"
+          },
+          "since": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "member",
+          "since"
+        ]
+      },
+      "Friends": {
+        "type": "object",
+        "description": "incoming: requests waiting for my answer; outgoing: the ones I sent. Newest first.",
+        "properties": {
+          "friends": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Friend"
+            }
+          },
+          "incoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Friend"
+            }
+          },
+          "outgoing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Friend"
+            }
+          }
+        },
+        "required": [
+          "friends",
+          "incoming",
+          "outgoing"
+        ]
+      },
+      "FriendshipStateResult": {
+        "type": "object",
+        "properties": {
+          "friendship": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "REQUESTED",
+              "INCOMING",
+              "FRIENDS",
+              "SELF"
+            ]
+          }
+        },
+        "required": [
+          "friendship"
         ]
       },
       "Grade": {
@@ -3100,6 +3439,47 @@
           "password"
         ]
       },
+      "MemberCard": {
+        "type": "object",
+        "properties": {
+          "avatarUrl": {
+            "type": "string"
+          },
+          "clubArrivalYear": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "CLIMBER",
+              "SETTER",
+              "BOARD",
+              "ADMIN"
+            ]
+          }
+        },
+        "required": [
+          "firstName",
+          "id",
+          "lastName",
+          "nickname",
+          "role"
+        ]
+      },
       "MemberDetail": {
         "type": "object",
         "description": "The member sheet, with what the caller may do.",
@@ -3167,6 +3547,51 @@
           "canDelete",
           "canDisable",
           "canEnable"
+        ]
+      },
+      "MemberProfile": {
+        "type": "object",
+        "description": "age is absent unless the member chose to show it.",
+        "properties": {
+          "age": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "climbingSinceYear": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "favoriteRouteId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "favorites": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteSummary"
+            }
+          },
+          "friendship": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "REQUESTED",
+              "INCOMING",
+              "FRIENDS",
+              "SELF"
+            ]
+          },
+          "member": {
+            "$ref": "#/components/schemas/MemberCard"
+          }
+        },
+        "required": [
+          "favorites",
+          "friendship",
+          "member"
         ]
       },
       "MemberRef": {
@@ -3333,6 +3758,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ExportedTick"
+            }
+          },
+          "friendships": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExportedFriendship"
             }
           },
           "lastChanceAcknowledgements": {
@@ -4360,6 +4791,11 @@
             "type": "string",
             "format": "uuid"
           },
+          "memberId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The climber"
+          },
           "photoUrl": {
             "type": "string"
           },
@@ -4380,6 +4816,7 @@
           "createdAt",
           "editable",
           "id",
+          "memberId",
           "summary",
           "visibility"
         ]

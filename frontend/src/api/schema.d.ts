@@ -552,6 +552,41 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/friends': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** My friends and pending requests */
+    get: operations['getMyFriends']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/friends/{memberId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Ask a member to be friends, or accept their request */
+    put: operations['befriend']
+    post?: never
+    /** Decline their request, cancel mine, or end our friendship */
+    delete: operations['unfriend']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/logbook': {
     parameters: {
       query?: never
@@ -663,6 +698,74 @@ export interface paths {
     }
     /** An uploaded image, after an access check */
     get: operations['getMedia']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/members': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Every active member, by name */
+    get: operations['getDirectory']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/members/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The public profile of a member */
+    get: operations['getMemberProfile']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/members/{id}/logbook': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** A friend's logbook, from the sessions they share with friends */
+    get: operations['getMemberLogbook']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/members/{id}/sessions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** A friend's sessions shared with friends, latest day first (cursor pagination) */
+    get: operations['listMemberSessions']
     put?: never
     post?: never
     delete?: never
@@ -1173,6 +1276,17 @@ export interface components {
       /** Format: date-time */
       signedInAt: string
     }
+    /** @description climberCount counts every active member, me included; members leaves me out. */
+    Directory: {
+      /** Format: int64 */
+      climberCount: number
+      members: components['schemas']['DirectoryEntry'][]
+    }
+    DirectoryEntry: {
+      /** @enum {string} */
+      friendship: 'NONE' | 'REQUESTED' | 'INCOMING' | 'FRIENDS' | 'SELF'
+      member: components['schemas']['MemberCard']
+    }
     ExportedAscent: {
       clean?: boolean
       /** Format: int32 */
@@ -1199,6 +1313,15 @@ export interface components {
       platform?: string
       /** Format: date-time */
       signedInAt?: string
+    }
+    ExportedFriendship: {
+      /** Format: date-time */
+      acceptedAt?: string
+      /** Format: date-time */
+      askedAt?: string
+      askedByMe?: boolean
+      nickname?: string
+      status?: string
     }
     ExportedPhoto: {
       /** Format: date-time */
@@ -1272,6 +1395,22 @@ export interface components {
     FavoriteRouteRequest: {
       /** Format: uuid */
       routeId: string
+    }
+    /** @description since: when asked, or when accepted for a friend. */
+    Friend: {
+      member: components['schemas']['MemberCard']
+      /** Format: date-time */
+      since: string
+    }
+    /** @description incoming: requests waiting for my answer; outgoing: the ones I sent. Newest first. */
+    Friends: {
+      friends: components['schemas']['Friend'][]
+      incoming: components['schemas']['Friend'][]
+      outgoing: components['schemas']['Friend'][]
+    }
+    FriendshipStateResult: {
+      /** @enum {string} */
+      friendship: 'NONE' | 'REQUESTED' | 'INCOMING' | 'FRIENDS' | 'SELF'
     }
     Grade: {
       /** @example 6a+ */
@@ -1376,6 +1515,18 @@ export interface components {
       /** @description "Rester connecté": 180 days instead of the browser session */
       rememberMe?: boolean
     }
+    MemberCard: {
+      avatarUrl?: string
+      /** Format: int32 */
+      clubArrivalYear?: number
+      firstName: string
+      /** Format: uuid */
+      id: string
+      lastName: string
+      nickname: string
+      /** @enum {string} */
+      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+    }
     /** @description The member sheet, with what the caller may do. */
     MemberDetail: {
       /** Format: int32 */
@@ -1395,6 +1546,20 @@ export interface components {
       canDelete: boolean
       canDisable: boolean
       canEnable: boolean
+    }
+    /** @description age is absent unless the member chose to show it. */
+    MemberProfile: {
+      /** Format: int32 */
+      age?: number
+      bio?: string
+      /** Format: int32 */
+      climbingSinceYear?: number
+      /** Format: uuid */
+      favoriteRouteId?: string
+      favorites: components['schemas']['RouteSummary'][]
+      /** @enum {string} */
+      friendship: 'NONE' | 'REQUESTED' | 'INCOMING' | 'FRIENDS' | 'SELF'
+      member: components['schemas']['MemberCard']
     }
     MemberRef: {
       avatarUrl?: string
@@ -1457,6 +1622,7 @@ export interface components {
       /** Format: date-time */
       exportedAt?: string
       favorites?: components['schemas']['ExportedTick'][]
+      friendships?: components['schemas']['ExportedFriendship'][]
       lastChanceAcknowledgements?: components['schemas']['ExportedTick'][]
       photos?: components['schemas']['ExportedPhoto'][]
       profile?: components['schemas']['ExportedProfile']
@@ -1805,6 +1971,11 @@ export interface components {
       feeling?: number
       /** Format: uuid */
       id: string
+      /**
+       * Format: uuid
+       * @description The climber
+       */
+      memberId: string
       photoUrl?: string
       summary: components['schemas']['SessionSummary']
       /** @enum {string} */
@@ -2698,6 +2869,68 @@ export interface operations {
       }
     }
   }
+  getMyFriends: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Friends']
+        }
+      }
+    }
+  }
+  befriend: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        memberId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['FriendshipStateResult']
+        }
+      }
+    }
+  }
+  unfriend: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        memberId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   getMyLogbook: {
     parameters: {
       query?: never
@@ -2848,6 +3081,95 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+        }
+      }
+    }
+  }
+  getDirectory: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Directory']
+        }
+      }
+    }
+  }
+  getMemberProfile: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MemberProfile']
+        }
+      }
+    }
+  }
+  getMemberLogbook: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Logbook']
+        }
+      }
+    }
+  }
+  listMemberSessions: {
+    parameters: {
+      query?: {
+        cursor?: string
+        size?: number
+      }
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionPage']
         }
       }
     }
