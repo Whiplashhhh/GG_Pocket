@@ -70,7 +70,7 @@ const results = computed(() => {
       :label="t('directory.search')"
       :placeholder="t('directory.searchHint')"
     />
-    <SegmentedControl v-model="shown" :label="t('directory.filter')" :options="options" />
+    <SegmentedControl v-model="shown" :label="t('directory.filter')" :options="options" stretch />
   </div>
 
   <div v-if="directory.isPending.value" class="flex flex-col gap-4 px-4 py-4" aria-hidden="true">
