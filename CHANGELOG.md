@@ -5,6 +5,15 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- L’annuaire du club : touche « 87 grimpeurs accrochés à l’appli » en haut de l’Actu, cherche un prénom, un nom ou un
+  pseudo, et demande les copains de cordée en ami. Les demandes reçues s’affichent en haut du fil et de ton profil,
+  avec une pastille sur ton avatar : accepter, refuser, à toi de voir.
+- Le profil des autres grimpeurs : bio, années de grimpe, voie préférée, coups de cœur. Entre amis, tu vois aussi
+  leurs séances (photos comprises) et leur carnet ; les séances « juste moi » restent à leur propriétaire.
+- « Mes amis » dans ton profil, pour retrouver ta bande (et s’en séparer, sans que personne ne soit prévenu).
+
 ## 0.5.1 — 2026-10-27
 
 ### Modifié
