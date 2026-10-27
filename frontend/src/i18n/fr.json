@@ -177,7 +177,7 @@
     "removeLabel": "Retirer {name} de mes amis",
     "removeTitle": "On se désencorde ?",
     "removeBody": "{name} ne verra plus tes séances, et toi plus les siennes. Rien ne lui est envoyé ; pour redevenir amis, il faudra redemander.",
-    "requestsTitle": "Demandes d’amis | 1 demande d’ami | {n} demandes d’ami",
+    "requestsTitle": "1 demande d’ami | 1 demande d’ami | {n} demandes d’ami",
     "requestsIntro": "Ils veulent voir tes séances (et te montrer les leurs).",
     "asked": "Demandé {date}",
     "error": "La demande n’est pas passée. {reason}"
@@ -515,8 +515,8 @@
     "install": "Installer l’appli",
     "privacy": "Tes données",
     "account": "Mes données et mon compte",
-    "logout": "Redescendre",
-    "logoutConfirmTitle": "Tu redescends ?",
+    "logout": "Se déconnecter",
+    "logoutConfirmTitle": "Tu te déconnectes ?",
     "logoutConfirmBody": "Ta session sera fermée sur cet appareil.",
     "management": "Espace gestion",
     "favoriteRoute": "Voie préférée",
@@ -652,8 +652,8 @@
   "welcome": {
     "title": "GG Pocket",
     "tagline": "Ton carnet de grimpe, le topo du club et tes potes de cordée, dans la poche.",
-    "haveCode": "J’ai un code du club",
-    "haveAccount": "J’ai déjà un compte",
+    "signIn": "Se connecter",
+    "join": "Rejoindre le club",
     "privacyLink": "Tes données : ce qu’on garde et pourquoi"
   },
   "register": {
@@ -696,7 +696,7 @@
     "submit": "Se connecter",
     "forgot": "Mot de passe oublié ?",
     "forgotHelp": "Pas d’e-mail chez nous : demande à la direction du club un lien pour en choisir un nouveau. Il est valable 24 heures.",
-    "noAccount": "Pas encore de compte ? J’ai un code du club",
+    "noAccount": "Pas encore de compte ? Rejoindre le club",
     "sessionEnded": "Tu n’es plus encordé·e : ta session a été fermée. Reconnecte-toi, ton trousseau devrait tout remplir."
   },
   "reset": {

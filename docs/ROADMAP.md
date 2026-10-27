@@ -127,7 +127,7 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 ### PR 5.1 — Amis (`feature/amis-0.5.1`)
 
 - [x] Annuaire (recherche, demandes d'amis, filtre « Mes amis »)
-- [x] Amitiés (demande, acceptation, refus, annulation, retrait, pastille)
+- [x] Amitiés (demande, acceptation, refus, annulation, retrait, pastille ; demandes dans le profil, D-099)
 - [x] Profil public d'un membre ; séances, photos et carnet d'un ami (visibilité « amis » seulement)
 - [x] Seed des amitiés, export des amitiés
 

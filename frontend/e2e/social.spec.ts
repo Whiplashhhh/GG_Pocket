@@ -7,7 +7,7 @@ function signedIn(me: FakeMember | null): FakeMember {
 }
 
 test.describe('friends', () => {
-  test('a request is answered from the feed, and the directory asks someone new', async ({
+  test('a request is answered from my profile, and the directory asks someone new', async ({
     page,
     club,
     me,
@@ -25,14 +25,17 @@ test.describe('friends', () => {
     club.social.link(tom, marie)
 
     await page.goto('/actu')
-    await expect(
-      page.getByRole('link', { name: 'Mon profil, 1 demande d’ami en attente' }),
-    ).toBeVisible()
+    // The feed stays for sessions: the requests wait on my profile, behind the dot on my avatar.
+    await expect(page.getByRole('region', { name: '1 demande d’ami' })).toHaveCount(0)
+    await page.getByRole('link', { name: 'Mon profil, 1 demande d’ami en attente' }).click()
     const requests = page.getByRole('region', { name: '1 demande d’ami' })
+    await expect(requests.getByText('Léa Dupont')).toBeHidden()
+    await requests.getByRole('button', { name: '1 demande d’ami' }).click()
     await expect(requests.getByText('Léa Dupont')).toBeVisible()
     await requests.getByRole('button', { name: 'Accepter la demande de lea.dyno' }).click()
     await expect(requests).toBeHidden()
     await expect(page.getByRole('link', { name: 'Mon profil', exact: true })).toBeVisible()
+    await page.goto('/actu')
 
     await page.getByRole('link', { name: /4 grimpeurs accrochés à l’appli/ }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Annuaire du club' })).toBeVisible()

@@ -8,16 +8,15 @@ import { errorMessageKey } from '@/api/errors'
 import { useMySessions } from '@/api/sessions'
 import { useDirectory } from '@/api/social'
 import SessionCard from '@/components/session/SessionCard.vue'
-import FriendRequests from '@/components/social/FriendRequests.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 
 /**
- * The feed (spec §8.2): the club header with its climber count (the way to the directory), the
- * friend requests to answer, then my sessions, latest first, page by page as I scroll. Friends'
- * sessions join it with the feed (PR 5.2).
+ * The feed (spec §8.2): the club header with its climber count (the way to the directory), then my
+ * sessions, latest first, page by page as I scroll. Friends' sessions join it with the feed (PR
+ * 5.2). Friend requests wait on my profile (D-099).
  */
 const { t } = useI18n()
 const sessions = useMySessions()
@@ -50,7 +49,6 @@ useIntersectionObserver(sentinel, ([entry]) => {
       <ChevronRight :size="18" aria-hidden="true" />
     </RouterLink>
   </section>
-  <FriendRequests />
 
   <div v-if="sessions.isPending.value" class="flex flex-col gap-3 px-4 py-4" aria-hidden="true">
     <SkeletonBlock class="h-7 w-48" />

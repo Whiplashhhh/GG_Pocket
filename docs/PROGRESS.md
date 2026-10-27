@@ -20,6 +20,8 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
   demandes en haut de l'Actu et du profil, pastille sur l'avatar, compteur du club dans l'Actu, séance d'un ami en
   lecture seule. Vitest (`lib/friendship`), e2e `social.spec.ts` (Desktop Chrome), captures 360 px clair/sombre
   regardées (débordement d'un pseudo très long corrigé).
+- Déployée sur le dev. Retours de Willem appliqués (D-099) : demandes d'amis retirées du fil, bandeau repliable dans
+  le profil ; « Se déconnecter » ; accueil « Se connecter » / « Rejoindre le club ».
 
 ### Reste
 

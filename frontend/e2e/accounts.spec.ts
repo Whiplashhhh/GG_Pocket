@@ -7,8 +7,8 @@ test.describe('a visitor', () => {
     await page.goto('/')
     await expect(page).toHaveURL(/\/accueil$/)
     await expect(page.getByRole('heading', { level: 1, name: 'GG Pocket' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'J’ai un code du club' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'J’ai déjà un compte' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Se connecter' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Rejoindre le club' })).toBeVisible()
     await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toHaveCount(0)
   })
 
@@ -16,7 +16,7 @@ test.describe('a visitor', () => {
     club.addMember({ nickname: 'Tonton.Talon', password: 'un mot de passe solide' })
     await page.goto('/profil/appareils')
     await expect(page).toHaveURL(/\/accueil\?retour=/)
-    await page.getByRole('link', { name: 'J’ai déjà un compte' }).click()
+    await page.getByRole('link', { name: 'Se connecter' }).click()
     await page.getByLabel('Pseudo').fill('tonton.talon')
     await page.getByLabel('Mot de passe', { exact: true }).fill('un mot de passe solide')
     await page.getByRole('button', { name: 'Se connecter' }).click()
@@ -82,7 +82,7 @@ test.describe('joining the club', () => {
     await page.clock.setSystemTime(new Date(club.now))
 
     await page.goto('/')
-    await page.getByRole('link', { name: 'J’ai un code du club' }).click()
+    await page.getByRole('link', { name: 'Rejoindre le club' }).click()
     await page.getByLabel('Code du club').fill('k7xm p2qa')
     await page.getByRole('button', { name: 'Vérifier le code' }).click()
 
@@ -141,9 +141,9 @@ test.describe('joining the club', () => {
 test.describe('a signed-in member', () => {
   test('signs out from the profile', async ({ page }) => {
     await page.goto('/profil')
-    await page.getByRole('button', { name: 'Redescendre' }).click()
-    const confirm = page.getByRole('alertdialog', { name: 'Tu redescends ?' })
-    await confirm.getByRole('button', { name: 'Redescendre' }).click()
+    await page.getByRole('button', { name: 'Se déconnecter' }).click()
+    const confirm = page.getByRole('alertdialog', { name: 'Tu te déconnectes ?' })
+    await confirm.getByRole('button', { name: 'Se déconnecter' }).click()
     await expect(page).toHaveURL(/\/accueil$/)
   })
 

@@ -209,12 +209,18 @@ const CAPTURES: Capture[] = [
   { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
   {
-    name: 'actu-demandes',
-    path: '/actu',
+    name: 'profil-demandes',
+    path: '/profil',
     as: 'CLIMBER',
     prepare: (club) => {
-      marieClimbs(club)
+      marieOnTheWall(club)
       marieFriends(club)
+      const marie = club.members.find((member) => member.nickname === 'marie')
+      const lea = club.addMember({ nickname: 'zoe', firstName: 'Zoé', lastName: 'Lambert' })
+      if (marie) club.social.link(lea, marie, false)
+    },
+    act: async (page) => {
+      await page.getByRole('button', { name: '2 demandes d’ami' }).click()
     },
   },
   { name: 'annuaire', path: '/annuaire', as: 'CLIMBER', prepare: marieFriends },
