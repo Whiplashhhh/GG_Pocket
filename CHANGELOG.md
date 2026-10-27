@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 0.5.0 — 2026-10-27
+
 ### Ajouté
 
 - Mes données et mon compte, dans ton profil : télécharge en un fichier tout ce que l’appli garde sur toi (profil,
