@@ -254,6 +254,7 @@ export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   // Opening or closing a sheet leaves the screen under it where it was.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- its replacement only exists in vue-router/experimental
   scrollBehavior: (to, from, savedPosition) =>
     overSameScreen(to, from) ? false : (savedPosition ?? { top: 0 }),
 })

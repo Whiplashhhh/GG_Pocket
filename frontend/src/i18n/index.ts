@@ -11,6 +11,7 @@ declare module 'vue-i18n' {
 }
 
 export const i18n = createI18n<[MessageSchema], 'fr', false>({
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- required until vue-i18n 12, which drops legacy mode
   legacy: false,
   locale: 'fr',
   fallbackLocale: 'fr',
