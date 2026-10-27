@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 0.6.0 — 2026-10-28
+
 ### Ajouté
 
 - L’annuaire du club : touche « 87 grimpeurs accrochés à l’appli » en haut de l’Actu, cherche un prénom, un nom ou un
