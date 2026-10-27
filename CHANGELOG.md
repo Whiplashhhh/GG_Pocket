@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 0.5.1 — 2026-10-27
+
 ### Modifié
 
 - L’étiquette des voies met enfin la cotation en gros, dans le bloc noir à gauche : c’est ce qu’on cherche en premier
