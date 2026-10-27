@@ -6,7 +6,7 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ## 2026-10-27 — La cotation avant la corde sur l'étiquette
 
-**Branche** : `feature/cotation-avant-corde-0.5.0`.
+**Branche** : `feature/cotation-avant-corde-0.5.0` (PR #30, en prod en 0.5.1).
 
 ### Fait
 
@@ -15,10 +15,17 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
   décalés à gauche de la corde. DESIGN.md §5 et maquettes mises à jour. Vitest, e2e Desktop Chrome, captures 360 px
   clair/sombre (topo, fiche, fil, archives) et 1280 px (gestion des voies) regardées.
 
+- Déployée sur le dev (label `deploy:dev`), essayée et validée par le club. Un test de `e2e-stack/` cherchait encore
+  « Corde 12, … » (job « Docker stack » rouge au premier run) : corrigé avant la fusion.
+- PR #30 fusionnée, **release 0.5.1 en prod** (PR #31).
+
 ### Reste
 
-- CI de la PR, puis Willem fusionne et décide de la release.
-- D-096, D-093, D-094, D-087, D-090 à valider ; PR #17 en suspens. Ensuite : phase 5 (Social).
+- D-096, D-093, D-094, D-087, D-090 à valider ; PR #17 en suspens.
+
+### Prochaine action
+
+- Phase 5 (Social) : relire `docs/ROADMAP.md`, créer `feature/<slug>-0.5.1` depuis `main`.
 
 ---
 
