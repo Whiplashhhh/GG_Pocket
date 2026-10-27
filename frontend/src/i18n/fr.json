@@ -136,7 +136,8 @@
     "notFoundTitle": "Séance introuvable",
     "notFoundBody": "Elle a été supprimée, ou elle n’est pas à toi.",
     "position": "{n}.",
-    "commentQuote": "« {comment} »"
+    "commentQuote": "« {comment} »",
+    "friendDetailTitle": "Séance d’un ami"
   },
   "outbox": {
     "waiting": "Aucune séance en attente | 1 séance en attente de réseau : elle partira toute seule. | {n} séances en attente de réseau : elles partiront toutes seules.",
@@ -719,7 +720,7 @@
     "whyTitle": "Pourquoi",
     "whyBody": "Seulement pour faire fonctionner l’appli du club : te connecter, tenir ton carnet, afficher le topo, les classements et le fil entre amis. Rien n’est vendu, rien ne sert à de la publicité.",
     "whoSeesTitle": "Qui voit quoi",
-    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut. Tes séances seront visibles de tes amis seulement, ou de toi seul·e. La direction voit ta fiche de membre, sans ta date de naissance. Personne en dehors de l’appli ne voit quoi que ce soit.",
+    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut. Tes séances, leurs photos et ton carnet sont visibles de tes amis seulement, ou de toi seul·e. La direction voit ta fiche de membre, sans ta date de naissance. Personne en dehors de l’appli ne voit quoi que ce soit.",
     "minorsTitle": "Moins de 15 ans",
     "minorsBody": "Avant 15 ans, un parent ou responsable légal doit être d’accord. Le profil d’un ou une jeune n’est jamais visible en dehors des membres du club.",
     "howLongTitle": "Combien de temps",

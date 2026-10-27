@@ -49,7 +49,7 @@ function confirmDelete() {
 
 <template>
   <SubPageHeader back="/actu" :back-label="t('session.backToActu')">
-    {{ t('session.detailTitle') }}
+    {{ session.data.value && !isMine ? t('session.friendDetailTitle') : t('session.detailTitle') }}
   </SubPageHeader>
 
   <div v-if="session.isPending.value" class="flex flex-col gap-3 px-4 py-6" aria-hidden="true">

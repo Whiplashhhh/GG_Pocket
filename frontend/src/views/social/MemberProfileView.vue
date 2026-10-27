@@ -117,10 +117,10 @@ useIntersectionObserver(sentinel, ([entry]) => {
           :size="96"
         />
         <div class="flex min-w-0 flex-col items-start gap-1">
-          <h2 id="son-identite" class="text-xl font-title break-words">
+          <h2 id="son-identite" class="max-w-full text-xl font-title wrap-anywhere">
             {{ data.member.firstName }} {{ data.member.lastName }}
           </h2>
-          <p class="text-ink-muted">@{{ data.member.nickname }}</p>
+          <p class="max-w-full wrap-anywhere text-ink-muted">@{{ data.member.nickname }}</p>
           <RoleBadge :role="data.member.role" />
         </div>
       </div>
