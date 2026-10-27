@@ -124,6 +124,11 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'password.title' },
   },
   {
+    path: '/profil/compte',
+    component: () => import('@/views/profile/AccountView.vue'),
+    meta: { titleKey: 'account.title' },
+  },
+  {
     path: '/profil/appareils',
     component: () => import('@/views/profile/DevicesView.vue'),
     meta: { titleKey: 'devices.title' },

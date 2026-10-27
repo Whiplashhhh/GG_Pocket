@@ -797,3 +797,20 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   connexion et déconnexion. Jamais les fichiers (`/media`), l'authentification ni les séances.
 - **Statut** : validée (application de la spec).
 
+
+### D-096 — Suppression de compte et « Ancien·ne membre »
+- **Choix** :
+  - Un seul membre anonyme « Ancien·ne membre », créé par la migration V10 (UUID fixe `…a5c1`), désactivé, au pseudo
+    impossible à saisir et au mot de passe inconnu. Il n'apparaît ni dans le tableau des membres, ni dans les
+    classements (`appears_in_rankings = false`), et ne compte pas comme un membre (premier démarrage, garde-fou du seed).
+  - Ce qui lui est transmis : les séances et leurs passages (pour les statistiques des voies), sans commentaire ni photo,
+    en visibilité « juste moi » ; le crédit d'ouvreur·se des voies ouvertes. Les classements figés suivront en phase 6.
+  - Ce qui est effacé : la ligne du membre, son avatar et ses photos de séance (fichiers compris), ses coups de cœur,
+    ses « je sais la faire » (même ceux venus d'une séance), ses commentaires de voies, ses accusés « dernière chance »,
+    ses liens de réinitialisation et toutes ses sessions. Les photos de voies restent au club.
+  - Libre-service derrière le mot de passe (compté comme un échec de connexion s'il est faux) ; côté gestion,
+    l'admin seulement, jamais sur son propre compte. Le dernier admin actif ne peut pas partir.
+  - Le journal d'audit garde une ligne `MEMBER_DELETED` avec le pseudo (intérêt légitime, durée du journal : 3 ans).
+  - Export : un fichier JSON (`GET /api/v1/me/export`) avec le profil, les séances, les coches, les coups de cœur,
+    les commentaires, les accusés, les voies ouvertes, les appareils et la liste des photos (pas les images elles-mêmes).
+- **Statut** : à valider (choix par défaut appliqués : audit conservé, photos listées sans être incluses).

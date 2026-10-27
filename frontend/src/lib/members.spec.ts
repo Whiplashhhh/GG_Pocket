@@ -17,13 +17,22 @@ const member = (
   role: 'CLIMBER',
   status: 'ACTIVE',
   registeredAt: '2026-01-01T10:00:00Z',
+  sessionCount: 0,
   ...overrides,
 })
 
 const MEMBERS = [
-  member('1', 'Élodie', 'Zébulon', { role: 'ADMIN', lastSeenAt: '2026-10-19T10:00:00Z' }),
+  member('1', 'Élodie', 'Zébulon', {
+    role: 'ADMIN',
+    lastSeenAt: '2026-10-19T10:00:00Z',
+    sessionCount: 12,
+  }),
   member('2', 'Marc', 'Abel', { status: 'DISABLED', nickname: 'tonton.talon' }),
-  member('3', 'Léa', 'Dupont', { role: 'SETTER', lastSeenAt: '2026-10-20T10:00:00Z' }),
+  member('3', 'Léa', 'Dupont', {
+    role: 'SETTER',
+    lastSeenAt: '2026-10-20T10:00:00Z',
+    sessionCount: 40,
+  }),
 ]
 
 describe('filterMembers', () => {
@@ -51,5 +60,11 @@ describe('sortMembers', () => {
       'CLIMBER',
     ])
     expect(sortMembers(MEMBERS, 'lastSeenAt', 'desc').map((m) => m.id)).toEqual(['3', '1', '2'])
+  })
+
+  it('sorts by sessions logged, the most first, ties by name', () => {
+    expect(sortMembers(MEMBERS, 'sessionCount', 'desc').map((m) => m.id)).toEqual(['3', '1', '2'])
+    const tied = [...MEMBERS, member('4', 'Anne', 'Aaron')]
+    expect(sortMembers(tied, 'sessionCount', 'asc').map((m) => m.id)).toEqual(['4', '2', '1', '3'])
   })
 })

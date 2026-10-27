@@ -83,6 +83,13 @@ export function useRemoveAvatar() {
   })
 }
 
+/** Everything the app keeps about me, as a JSON file to save (spec §14). */
+export function useExportMyData() {
+  return useMutation({
+    mutationFn: () => request(api.GET('/api/v1/me/export', { parseAs: 'blob' })),
+  })
+}
+
 export function useChangePassword() {
   const queryClient = useQueryClient()
   return useMutation({

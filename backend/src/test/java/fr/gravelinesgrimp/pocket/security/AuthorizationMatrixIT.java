@@ -248,7 +248,16 @@ class AuthorizationMatrixIT {
                     new Endpoint(HttpMethod.GET, "/api/v1/me/climbed-routes", null, Role.CLIMBER),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/todo", null, Role.CLIMBER),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/planning", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/logbook", null, Role.CLIMBER));
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/logbook", null, Role.CLIMBER),
+                    // Accounts and personal data (PR 4.3)
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/export", null, Role.CLIMBER),
+                    // An empty body: refused before the service, the account stays.
+                    new Endpoint(HttpMethod.POST, "/api/v1/me/deletion", "{}", Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.DELETE,
+                            "/api/v1/admin/members/" + SOME_ID,
+                            null,
+                            Role.ADMIN));
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;

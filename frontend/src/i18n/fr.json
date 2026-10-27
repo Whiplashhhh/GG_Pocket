@@ -445,6 +445,7 @@
     "devices": "Mes appareils",
     "install": "Installer l’appli",
     "privacy": "Tes données",
+    "account": "Mes données et mon compte",
     "logout": "Redescendre",
     "logoutConfirmTitle": "Tu redescends ?",
     "logoutConfirmBody": "Ta session sera fermée sur cet appareil.",
@@ -644,7 +645,7 @@
     "whoTitle": "Qui s’en occupe",
     "whoBody": "Le club Gravelines Grimp, association qui fait tourner l’appli. Pour toute question ou demande sur tes données, adresse-toi à la direction du club.",
     "whatTitle": "Ce qu’on garde",
-    "whatBody": "Ton prénom, ton nom, ton pseudo et ton mot de passe (enregistré chiffré : personne ne peut le lire, pas même le club). Si tu les donnes : ton e-mail, ta date de naissance, ta photo et les infos de ton profil. Bientôt : tes séances, tes voies et tes badges.",
+    "whatBody": "Ton prénom, ton nom, ton pseudo et ton mot de passe (enregistré chiffré : personne ne peut le lire, pas même le club). Si tu les donnes : ton e-mail, ta date de naissance, ta photo et les infos de ton profil. Tes séances (voies, essais, ressentis, commentaires, photos), tes voies cochées, tes coups de cœur et tes commentaires sur les voies. Bientôt : tes badges.",
     "whyTitle": "Pourquoi",
     "whyBody": "Seulement pour faire fonctionner l’appli du club : te connecter, tenir ton carnet, afficher le topo, les classements et le fil entre amis. Rien n’est vendu, rien ne sert à de la publicité.",
     "whoSeesTitle": "Qui voit quoi",
@@ -656,8 +657,25 @@
     "cookiesTitle": "Cookies",
     "cookiesBody": "Un cookie garde ta session ouverte et un autre protège tes envois contre les sites malveillants. C’est tout : pas de pub, pas de pisteur, pas de mesure d’audience.",
     "rightsTitle": "Tes droits",
-    "rightsBody": "Tu peux voir et corriger ton profil quand tu veux, depuis l’appli. L’export de toutes tes données et la suppression de ton compte en libre-service arrivent bientôt ; d’ici là, la direction s’en charge sur simple demande. Tu peux aussi saisir la CNIL.",
-    "back": "Retour"
+    "rightsBody": "Tu peux voir et corriger ton profil quand tu veux, depuis l’appli. Dans ton profil, « Mes données et mon compte » te permet de télécharger tout ce qu’on garde sur toi (un fichier JSON) et de supprimer ton compte toi-même. Tes infos, tes photos et tes commentaires disparaissent ; tes séances restent pour les statistiques des voies, mais au nom d’« Ancien·ne membre », sans commentaire ni photo, et plus personne ne les voit. Tu peux aussi saisir la CNIL.",
+    "back": "Retour",
+    "toAccount": "Mes données et mon compte"
+  },
+  "account": {
+    "title": "Mes données et mon compte",
+    "exportTitle": "Télécharger mes données",
+    "exportBody": "Tout ce que GG Pocket garde sur toi, dans un seul fichier JSON : ton profil, tes séances et leurs voies, tes voies cochées, tes coups de cœur, tes commentaires, tes appareils connectés et la liste de tes photos. De quoi tout relire, ou tout emporter ailleurs.",
+    "export": "Télécharger mes données",
+    "exporting": "Préparation du fichier…",
+    "exportDone": "C’est dans tes téléchargements.",
+    "deleteTitle": "Supprimer mon compte",
+    "deleteGone": "Ce qui part : ton profil, ta photo, les photos et les commentaires de tes séances, tes voies cochées, tes coups de cœur et tes commentaires sur les voies. Toutes tes sessions sont fermées.",
+    "deleteKept": "Ce qui reste : tes séances et tes passages, pour ne pas fausser les statistiques des voies, et ton nom d’ouvreur·se sur les voies que tu as ouvertes. Tout ça passe au nom d’« Ancien·ne membre », et tes séances ne sont plus visibles de personne.",
+    "deleteFinal": "C’est définitif : on ne pourra rien te rendre. Télécharge tes données avant si tu veux les garder.",
+    "delete": "Supprimer mon compte",
+    "password": "Ton mot de passe",
+    "passwordHint": "Pour vérifier que c’est bien toi qui pars, et pas un copain qui a trouvé ton téléphone.",
+    "deleteConfirm": "Supprimer définitivement"
   },
   "onboarding": {
     "step": "Étape {current} sur {total}",
@@ -779,7 +797,8 @@
       "role": "Rôle",
       "status": "Statut",
       "registeredAt": "Inscription",
-      "lastSeenAt": "Dernière activité"
+      "lastSeenAt": "Dernière activité",
+      "sessionCount": "Séances"
     },
     "columns": {
       "name": "Nom",
@@ -787,8 +806,10 @@
       "role": "Rôle",
       "status": "Statut",
       "registeredAt": "Inscription",
-      "lastSeenAt": "Dernière activité"
+      "lastSeenAt": "Dernière activité",
+      "sessionCount": "Séances"
     },
+    "sessions": "Aucune séance | 1 séance | {n} séances",
     "status": {
       "ACTIVE": "Actif",
       "DISABLED": "Désactivé"
@@ -829,7 +850,11 @@
     "resetWarning": "Ce lien ouvre le compte : envoie-le à la bonne personne, et à elle seule.",
     "resetLinkLabel": "Lien de réinitialisation",
     "shareTitle": "GG Pocket : nouveau mot de passe",
-    "roleCurrent": "Actuellement : {role}"
+    "roleCurrent": "Actuellement : {role}",
+    "delete": "Supprimer définitivement le compte",
+    "deleteConfirm": "Supprimer pour de bon",
+    "deleteConfirmTitle": "Supprimer pour de bon le compte de {name} ?",
+    "deleteConfirmBody": "Son profil, ses photos et ses commentaires sont effacés, ses sessions fermées. Ses séances restent pour les statistiques des voies, au nom d’« Ancien·ne membre ». Impossible de revenir en arrière : pour une pause, désactive plutôt le compte."
   },
   "audit": {
     "title": "Journal d’audit",
@@ -837,10 +862,12 @@
     "empty": "Rien à signaler pour l’instant. Le calme avant la prochaine ouverture.",
     "loadMore": "Voir plus ancien",
     "formerMember": "Un ancien membre",
+    "selfDeleted": "{target} a supprimé son compte",
     "actions": {
       "MEMBER_ROLE_CHANGED": "{actor} a fait passer {target} de {before} à {after}",
       "MEMBER_DISABLED": "{actor} a désactivé le compte de {target}",
       "MEMBER_ENABLED": "{actor} a réactivé le compte de {target}",
+      "MEMBER_DELETED": "{actor} a supprimé le compte de {target}",
       "PASSWORD_RESET_LINK_CREATED": "{actor} a créé un lien de réinitialisation pour {target}",
       "REGISTRATION_CODE_CREATED": "{actor} a créé le code d’inscription « {target} »",
       "REGISTRATION_CODE_UPDATED": "{actor} a modifié le code d’inscription « {target} »",

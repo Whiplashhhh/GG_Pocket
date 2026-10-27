@@ -115,10 +115,10 @@ créée depuis `main` à jour.
 
 ### PR 4.3 — Comptes et données personnelles
 
-- [ ] Export JSON de mes données, suppression de compte (libre-service et admin) avec anonymisation « Ancien·ne membre » (D-055)
-- [ ] Suppression de compte : supprimer soi-même le fichier et la ligne de l'avatar (`media_file.owner_id` passe à null) ;
+- [x] Export JSON de mes données, suppression de compte (libre-service et admin) avec anonymisation « Ancien·ne membre » (D-055)
+- [x] Suppression de compte : supprimer soi-même le fichier et la ligne de l'avatar (`media_file.owner_id` passe à null) ;
       créditer « Ancien·ne membre » sur les voies ouvertes (`route_setter` est en `on delete cascade`)
-- [ ] Colonne « séances » du tableau des membres (D-055)
+- [x] Colonne « séances » du tableau des membres (D-055)
 
 ## Phase 5 — Social
 

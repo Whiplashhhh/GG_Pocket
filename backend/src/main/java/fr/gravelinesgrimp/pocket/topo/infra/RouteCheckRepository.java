@@ -17,4 +17,7 @@ public interface RouteCheckRepository extends JpaRepository<RouteCheck, UUID> {
 
     /** Callers never pass an empty collection. */
     List<RouteCheck> findAllByMemberIdAndRouteIdIn(UUID memberId, Collection<UUID> routeIds);
+
+    /** My data export. */
+    List<RouteCheck> findAllByMemberIdOrderByCreatedAt(UUID memberId);
 }

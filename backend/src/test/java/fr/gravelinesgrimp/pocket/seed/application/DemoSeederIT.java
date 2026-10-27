@@ -50,7 +50,7 @@ class DemoSeederIT {
 
     @Test
     void createsOneAccountPerRoleAndADemoCode() {
-        assertThat(members.findAll())
+        assertThat(members.findAllForDirectory())
                 .extracting(Member::nickname, Member::role)
                 .containsExactlyInAnyOrder(
                         tuple("admin", Role.ADMIN),
@@ -115,7 +115,7 @@ class DemoSeederIT {
     void runningItAgainChangesNothing() {
         var before = sessions.count();
         seeder.run(null);
-        assertThat(members.count()).isEqualTo(4);
+        assertThat(members.countMembers()).isEqualTo(4);
         assertThat(routes.count()).isEqualTo(DemoTopoSeeder.NAMES.size());
         assertThat(sessions.count()).isEqualTo(before);
     }

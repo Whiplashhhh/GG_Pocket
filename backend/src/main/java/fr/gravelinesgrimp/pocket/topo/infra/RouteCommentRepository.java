@@ -24,4 +24,7 @@ public interface RouteCommentRepository extends JpaRepository<RouteComment, UUID
                     + " from RouteComment c where c.routeId in :routeIds and c.deletedAt is null"
                     + " group by c.routeId")
     List<RouteCount> countVisiblePerRoute(Collection<UUID> routeIds);
+
+    /** My data export: deleted ones included, they are still kept. */
+    List<RouteComment> findAllByAuthorIdOrderByCreatedAt(UUID authorId);
 }

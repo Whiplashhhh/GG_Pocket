@@ -7,6 +7,7 @@ import jakarta.persistence.LockModeType;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
@@ -47,4 +48,22 @@ public interface RouteRepository extends JpaRepository<Route, UUID> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select r from Route r where r.id = :id")
     Optional<Route> lockById(UUID id);
+
+    /**
+     * Account deletion (spec §14): "Ancien·ne membre" is credited on the routes the member set,
+     * before the member's own rows go with the account ({@code on delete cascade}).
+     */
+    @Modifying
+    @Query(
+            value =
+                    "insert into route_setter (route_id, member_id)"
+                            + " select route_id, :heirId from route_setter where member_id = :memberId"
+                            + " on conflict do nothing",
+            nativeQuery = true)
+    int creditSetter(UUID memberId, UUID heirId);
+
+    /** The routes I set (my data export). */
+    @Query(
+            "select r from Route r join r.setterIds setter where setter = :memberId order by r.openedOn")
+    List<Route> findAllSetBy(UUID memberId);
 }

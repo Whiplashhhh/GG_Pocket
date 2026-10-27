@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.member.infra;
 
+import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.MemberAccess;
 import fr.gravelinesgrimp.pocket.member.domain.MemberStatus;
@@ -54,8 +55,23 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     @Query("select m from Member m where m.role = :role and m.status = :status")
     List<Member> lockAllByRoleAndStatus(Role role, MemberStatus status);
 
-    @Query("select m from Member m order by lower(m.lastName), lower(m.firstName)")
-    List<Member> findAllForDirectory();
+    /** The real members: "Ancien·ne membre" does not count, an empty club still has it. */
+    default long countMembers() {
+        return countExcept(FormerMember.ID);
+    }
+
+    @Query("select count(m) from Member m where m.id <> :excludedId")
+    long countExcept(UUID excludedId);
+
+    /** Every member but "Ancien·ne membre", by last name then first name. */
+    default List<Member> findAllForDirectory() {
+        return findAllExceptOrderByName(FormerMember.ID);
+    }
+
+    @Query(
+            "select m from Member m where m.id <> :excludedId"
+                    + " order by lower(m.lastName), lower(m.firstName)")
+    List<Member> findAllExceptOrderByName(UUID excludedId);
 
     /**
      * Locks one member until the end of the transaction: serializes what must stay consistent for

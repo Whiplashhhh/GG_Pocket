@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.auth.api;
 
+import fr.gravelinesgrimp.pocket.account.application.AccountDeletionService;
 import fr.gravelinesgrimp.pocket.auth.application.DeviceService;
 import fr.gravelinesgrimp.pocket.auth.application.PasswordChangeService;
 import fr.gravelinesgrimp.pocket.member.domain.MemberPrincipal;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/** The member's password and open sessions ("Mes appareils"). */
+/** The member's password, open sessions ("Mes appareils") and the account itself. */
 @RestController
 @RequestMapping("/api/v1/me")
 @Tag(name = "Me")
@@ -34,10 +36,36 @@ class MySecurityController {
 
     private final PasswordChangeService passwordChange;
     private final DeviceService devices;
+    private final AccountDeletionService accountDeletion;
+    private final SessionEstablisher sessions;
 
-    MySecurityController(PasswordChangeService passwordChange, DeviceService devices) {
+    MySecurityController(
+            PasswordChangeService passwordChange,
+            DeviceService devices,
+            AccountDeletionService accountDeletion,
+            SessionEstablisher sessions) {
         this.passwordChange = passwordChange;
         this.devices = devices;
+        this.accountDeletion = accountDeletion;
+        this.sessions = sessions;
+    }
+
+    @PostMapping("/deletion")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            operationId = "deleteMyAccount",
+            summary =
+                    "Delete my account for good, behind my password; my sessions stay as"
+                            + " \"Ancien·ne membre\" for the routes' statistics")
+    void deleteAccount(
+            @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
+            @Valid @RequestBody AccountDeletionRequest body,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        accountDeletion.deleteOwnAccount(me.memberId(), body.password(), ClientAddress.of(request));
+        sessions.signOut(request);
+        // Like a sign-out: the phone keeps nothing of the member, cached photos included.
+        response.setHeader("Clear-Site-Data", "\"cache\"");
     }
 
     @PutMapping("/password")

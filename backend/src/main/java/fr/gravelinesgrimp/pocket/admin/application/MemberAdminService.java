@@ -6,6 +6,7 @@ import fr.gravelinesgrimp.pocket.auth.application.DeviceService;
 import fr.gravelinesgrimp.pocket.auth.application.PasswordResetService;
 import fr.gravelinesgrimp.pocket.auth.application.PasswordResetService.ResetLink;
 import fr.gravelinesgrimp.pocket.member.domain.Age;
+import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.MemberGovernance;
 import fr.gravelinesgrimp.pocket.member.domain.MemberStatus;
@@ -14,6 +15,8 @@ import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
+import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
+import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository.SessionCount;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -22,8 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Member management by the board and the admin (spec §5 and §8.11). Every method is reserved to the
@@ -41,14 +46,16 @@ public class MemberAdminService {
             MemberStatus status,
             UUID avatarId,
             Instant createdAt,
-            Instant lastSeenAt) {}
+            Instant lastSeenAt,
+            long sessionCount) {}
 
     /** What the actor may do to this member, so the screen only offers allowed actions. */
     public record Permissions(
             Set<Role> assignableRoles,
             boolean canDisable,
             boolean canEnable,
-            boolean canCreateResetLink) {}
+            boolean canCreateResetLink,
+            boolean canDelete) {}
 
     /**
      * The member sheet (DECISIONS D-045): no birth date, only whether a parental consent covers a
@@ -63,6 +70,7 @@ public class MemberAdminService {
             Permissions permissions) {}
 
     private final MemberRepository members;
+    private final ClimbingSessionRepository sessions;
     private final DeviceService devices;
     private final PasswordResetService passwordResets;
     private final AuditLog auditLog;
@@ -70,11 +78,13 @@ public class MemberAdminService {
 
     public MemberAdminService(
             MemberRepository members,
+            ClimbingSessionRepository sessions,
             DeviceService devices,
             PasswordResetService passwordResets,
             AuditLog auditLog,
             Clock clock) {
         this.members = members;
+        this.sessions = sessions;
         this.devices = devices;
         this.passwordResets = passwordResets;
         this.auditLog = auditLog;
@@ -84,7 +94,14 @@ public class MemberAdminService {
     @PreAuthorize("hasRole('BOARD')")
     @Transactional(readOnly = true)
     public List<MemberSummaryView> list() {
-        return members.findAllForDirectory().stream().map(MemberAdminService::summary).toList();
+        Map<UUID, Long> sessionCounts =
+                sessions.countByMember().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        SessionCount::getMemberId, SessionCount::getSessions));
+        return members.findAllForDirectory().stream()
+                .map(member -> summary(member, sessionCounts.getOrDefault(member.id(), 0L)))
+                .toList();
     }
 
     @PreAuthorize("hasRole('BOARD')")
@@ -185,9 +202,10 @@ public class MemberAdminService {
                         MemberGovernance.assignableRoles(actor.role(), self, member.role()),
                         manageable && member.isActive(),
                         manageable && !member.isActive(),
-                        manageable && member.isActive());
+                        manageable && member.isActive(),
+                        actor.role() == Role.ADMIN && !self);
         return new MemberDetailView(
-                summary(member),
+                summary(member, sessions.countByMemberId(member.id())),
                 member.email(),
                 Age.needsParentalConsent(member.birthDate(), ClubTime.today(clock))
                         && member.hasParentalConsent(),
@@ -196,7 +214,7 @@ public class MemberAdminService {
                 permissions);
     }
 
-    private static MemberSummaryView summary(Member member) {
+    private static MemberSummaryView summary(Member member, long sessionCount) {
         return new MemberSummaryView(
                 member.id(),
                 member.nickname(),
@@ -206,7 +224,8 @@ public class MemberAdminService {
                 member.status(),
                 member.avatarId(),
                 member.createdAt(),
-                member.lastSeenAt());
+                member.lastSeenAt(),
+                sessionCount);
     }
 
     private void checkManageable(Member actor, Member member) {
@@ -234,8 +253,10 @@ public class MemberAdminService {
         }
     }
 
+    /** "Ancien·ne membre" is out of reach: as if it did not exist. */
     private Member load(UUID memberId) {
         return members.findById(memberId)
+                .filter(member -> !FormerMember.is(member.id()))
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No member"));
     }
 

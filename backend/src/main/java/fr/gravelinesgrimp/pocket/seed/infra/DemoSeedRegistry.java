@@ -1,5 +1,7 @@
 package fr.gravelinesgrimp.pocket.seed.infra;
 
+import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -20,9 +22,10 @@ public class DemoSeedRegistry {
     public long countMembersNotFromTheSeed() {
         Long count =
                 jdbc.queryForObject(
-                        "select count(*) from member m where not exists"
+                        "select count(*) from member m where m.id <> ? and not exists"
                                 + " (select 1 from demo_seed_entry d where d.member_id = m.id)",
-                        Long.class);
+                        Long.class,
+                        FormerMember.ID);
         return count == null ? 0 : count;
     }
 

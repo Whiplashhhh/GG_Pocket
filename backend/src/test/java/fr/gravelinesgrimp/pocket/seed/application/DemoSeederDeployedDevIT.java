@@ -37,7 +37,7 @@ class DemoSeederDeployedDevIT {
 
     @Test
     void createsTheAccountsWithTheirPasswordButNoRegistrationCode() {
-        assertThat(members.count()).isEqualTo(4);
+        assertThat(members.countMembers()).isEqualTo(4);
         assertThat(members.findByNicknameIgnoreCase("grimpeur"))
                 .get()
                 .satisfies(

@@ -29,4 +29,7 @@ public interface LastChanceAckRepository extends JpaRepository<LastChanceAck, UU
     @Modifying
     @Query("delete from LastChanceAck a where a.routeId = :routeId")
     void deleteByRoute(UUID routeId);
+
+    /** My data export. */
+    List<LastChanceAck> findAllByMemberIdOrderByCreatedAt(UUID memberId);
 }

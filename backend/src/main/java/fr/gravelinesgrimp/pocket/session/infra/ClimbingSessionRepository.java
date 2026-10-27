@@ -3,6 +3,7 @@ package fr.gravelinesgrimp.pocket.session.infra;
 import fr.gravelinesgrimp.pocket.session.domain.ClimbingSession;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
@@ -53,4 +54,37 @@ public interface ClimbingSessionRepository extends JpaRepository<ClimbingSession
     /** Every day on which I logged a session. */
     @Query("select distinct s.climbedOn from ClimbingSession s where s.memberId = :memberId")
     List<LocalDate> findClimbingDays(UUID memberId);
+
+    /** How many sessions each member logged (the members table, spec §8.11). */
+    interface SessionCount {
+        UUID getMemberId();
+
+        long getSessions();
+    }
+
+    long countByMemberId(UUID memberId);
+
+    @Query(
+            "select s.memberId as memberId, count(s) as sessions from ClimbingSession s"
+                    + " group by s.memberId")
+    List<SessionCount> countByMember();
+
+    /** Everything I logged, with the ascents, oldest first (my data export). */
+    @Query(
+            "select distinct s from ClimbingSession s left join fetch s.ascents"
+                    + " where s.memberId = :memberId order by s.climbedOn, s.createdAt")
+    List<ClimbingSession> findAllWithAscentsOf(UUID memberId);
+
+    /**
+     * Account deletion (spec §14): the sessions and their ascents go to "Ancien·ne membre" so the
+     * routes' statistics stay true, without what was personal (comment, photo) and seen by nobody.
+     */
+    @Modifying
+    @Query(
+            value =
+                    "update climbing_session set member_id = :heirId, comment = null,"
+                            + " photo_id = null, visibility = 'PRIVATE', updated_at = :now,"
+                            + " version = version + 1 where member_id = :memberId",
+            nativeQuery = true)
+    int handOver(UUID memberId, UUID heirId, Instant now);
 }

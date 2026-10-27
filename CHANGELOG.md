@@ -5,6 +5,19 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- Mes données et mon compte, dans ton profil : télécharge en un fichier tout ce que l’appli garde sur toi (profil,
+  séances, voies cochées, coups de cœur, commentaires, appareils). Et si tu raccroches les chaussons pour de bon, tu
+  peux supprimer ton compte toi-même, mot de passe à l’appui. Ton profil, tes photos et tes commentaires
+  disparaissent ; tes séances restent pour les stats des voies, au nom d’« Ancien·ne membre », et plus personne ne les voit.
+- Gestion : le tableau des membres compte les séances de chacun (et se trie avec), et le Président·e peut supprimer
+  définitivement un compte depuis la fiche membre.
+
+### Modifié
+
+- La page « Tes données » explique comment exporter tes données et supprimer ton compte, sans passer par la direction.
+
 ## 0.4.0 — 2026-10-26
 
 ### Ajouté

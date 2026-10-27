@@ -86,6 +86,23 @@ export function useLogout() {
   })
 }
 
+/**
+ * Deleting my account for good (spec §14), behind my password. The server has closed every
+ * session: like a sign-out on purpose, the app forgets me and goes back to the welcome.
+ */
+export function useDeleteMyAccount() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (password: string) =>
+      requestNoContent(api.POST('/api/v1/me/deletion', { body: { password } })),
+    onSuccess: () => {
+      signOut.intentional = true
+      forgetMemberData(queryClient)
+      queryClient.setQueryData(AUTH_STATE_KEY, SIGNED_OUT)
+    },
+  })
+}
+
 export function useCheckRegistrationCode() {
   return useMutation({
     mutationFn: (code: string) =>

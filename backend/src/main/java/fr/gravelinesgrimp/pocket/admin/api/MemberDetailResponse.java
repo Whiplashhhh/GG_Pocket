@@ -25,7 +25,11 @@ public record MemberDetailResponse(
             @Schema(requiredMode = RequiredMode.REQUIRED) List<Role> assignableRoles,
             @Schema(requiredMode = RequiredMode.REQUIRED) boolean canDisable,
             @Schema(requiredMode = RequiredMode.REQUIRED) boolean canEnable,
-            @Schema(requiredMode = RequiredMode.REQUIRED) boolean canCreateResetLink) {}
+            @Schema(requiredMode = RequiredMode.REQUIRED) boolean canCreateResetLink,
+            @Schema(
+                            requiredMode = RequiredMode.REQUIRED,
+                            description = "Delete the account for good (admin, not oneself)")
+                    boolean canDelete) {}
 
     static MemberDetailResponse from(MemberDetailView view) {
         var permissions = view.permissions();
@@ -39,6 +43,7 @@ public record MemberDetailResponse(
                         permissions.assignableRoles().stream().sorted().toList(),
                         permissions.canDisable(),
                         permissions.canEnable(),
-                        permissions.canCreateResetLink()));
+                        permissions.canCreateResetLink(),
+                        permissions.canDelete()));
     }
 }
