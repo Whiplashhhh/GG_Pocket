@@ -67,7 +67,7 @@ test.describe('a setter', () => {
     await page.getByLabel('Le conseil de l’ouvreur').fill('Les pieds, toujours les pieds.')
     // The label is drawn as it will be taped at the foot of the route.
     await expect(page.getByRole('region', { name: 'Aperçu de l’étiquette' })).toContainText(
-      'Corde 4, Avale la corde, 5c, couleur vert et jaune',
+      '5c, Avale la corde, couleur vert et jaune, corde 4',
     )
 
     // No opener yet: said before anything is sent.
@@ -95,7 +95,7 @@ test.describe('a setter', () => {
     await expect(page.getByText('« Avale la corde ! » est à jour.')).toBeVisible()
 
     await page.goto('/topo')
-    await page.getByRole('link', { name: /Avale la corde !, 6a/ }).click()
+    await page.getByRole('link', { name: /^6a, Avale la corde !,/ }).click()
     await expect(page.getByRole('dialog', { name: /Avale la corde !/ })).toContainText(
       'Les pieds, toujours les pieds.',
     )

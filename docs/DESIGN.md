@@ -157,10 +157,10 @@ Chiffres : `font-variant-numeric: tabular-nums` partout où des nombres s'aligne
 ├────────────────────────────────────┤
 │ [🔍 corde, nom, couleur, cotation ]│
 │ Récemment grimpées                 │
-│ [12 ●● Bye Bye Morice  6b]   ＋    │
-│ [ 3 ●  Iron Man       6a+]   ＋    │
+│ [6b  ●● Bye Bye Morice  12]   ＋    │
+│ [6a+ ●  Iron Man        3]   ＋    │
 ├────────────────────────────────────┤
-│ 1. [12 ●● Bye Bye Morice  6b]  ⋮   │  ⋮ = dupliquer, monter, descendre, supprimer
+│ 1. [6b  ●● Bye Bye Morice  12]  ⋮   │  ⋮ = dupliquer, monter, descendre, supprimer
 │ ┌ Mouli ┬ Tête ┐  Topée [oui|non]  │  boutons segmentés 48 px
 │ Enchaînée [oui|non]  Chutes [− 0 +]│
 │ Premier essai ✓   Ressenti ○○○○○○○ │
@@ -179,10 +179,10 @@ Chiffres : `font-variant-numeric: tabular-nums` partout où des nombres s'aligne
 │ Topo           58 voies            │
 │ [Cotation ▾] [↑↓] [Filtres (2)]    │  barre de tri et filtres collante
 ├────────────────────────────────────┤
-│ ▢ [12 ●● Bye Bye Morice   6b]      │  vignette photo + étiquette md
+│ ▢ [6b  ●● Bye Bye Morice   12]      │  vignette photo + étiquette md
 │   Négatif · Conti Rési · ♥5 ✓tête  │
 ├────────────────────────────────────┤
-│ ▢ [15 ●  Tonton Talon    6a+] ⚑    │  ⚑ dernière chance
+│ ▢ [6a+ ●  Tonton Talon     15] ⚑    │  ⚑ dernière chance
 │   Grand dévers · ♥2 · 8 réal.      │
 ├────────────────────────────────────┤
 │ Voies démontées (archives)        ›│
@@ -196,7 +196,7 @@ Chiffres : `font-variant-numeric: tabular-nums` partout où des nombres s'aligne
 │ ───                              ✕ │
 │ [ photo de la voie, 4:3          ] │
 │  ┌───────────────────────────────┐ │
-│  │12 ●● Bye Bye Morice        6b │ │  étiquette lg, légèrement inclinée, scotch en haut
+│  │6b ●● Bye Bye Morice        12 │ │  étiquette lg, légèrement inclinée, scotch en haut
 │  └───────────────────────────────┘ │
 │ Négatif et ses 2 dièdres · corde 12│
 │ Ouverte le 16 mai par Sam          │
@@ -219,23 +219,26 @@ Chiffres : `font-variant-numeric: tabular-nums` partout où des nombres s'aligne
 ```
    ▓▓ (scotch, taille lg)
  ┌─────┬──────┬────────────────────────┬──────┐
- │ 12  │ ●●   │ Bye Bye Morice         │  6b  │
+ │ 6b  │ ●●   │ Bye Bye Morice         │corde │
+ │     │      │                        │  12  │
  └─────┴──────┴────────────────────────┴──────┘
-  corde  prises  nom (Kalam, au feutre)  cotation
+ cotation prises nom (Kalam, au feutre)  corde
 ```
 
-- **Corde** : bloc encre, numéro en Archivo 850 largeur 62, comme les numéros peints au mur.
+- **Cotation** : bloc encre, Archivo 800 largeur 75, minuscules (« 6a+ »), chiffres tabulaires. C'est l'info qu'on cherche
+  en premier (D-097) ; largeur minimale fixe pour que les noms s'alignent dans une liste.
 - **Prises** : une ou deux petites prises dessinées (forme organique, trou de boulon, reflet), dans la couleur de prise. Le blanc a un contour,
   le multicolore est un motif à quartiers.
 - **Nom** : Kalam 700, tronqué avec ellipse si besoin (nom complet dans le libellé accessible).
-- **Cotation** : Archivo 800 largeur 75, minuscules (« 6a+ »), chiffres tabulaires.
+- **Corde** : à droite, en retrait (encre à 75 %), numéro en Archivo 850 largeur 62 comme les numéros peints au mur,
+  sous un petit « corde » pour ne pas le confondre avec une cotation.
 - **Support** : papier (`--gg-label-paper`), rayon 2 px, ombre papier fine. En taille `lg` (fiche voie) : inclinaison de −0,8°, un bout de scotch,
   et le nom passe à la ligne au lieu d'être tronqué. Pas de scotch dans les listes : répété sur chaque ligne, il devenait du bruit.
-- **Statuts** : dernière chance = ruban orange « Dernière chance » qui déborde en haut à droite ; démontée = étiquette délavée, prises en gris
-  et tampon « Démontée » placé à droite pour laisser le nom lisible.
+- **Statuts** : dernière chance = ruban orange « Dernière chance » qui déborde en haut, juste à gauche de la corde ; démontée = étiquette
+  délavée, prises en gris et tampon « Démontée » au même endroit, pour laisser le nom et la corde lisibles.
 - **Tailles** : `sm` (32 px de haut, prises 18 px, fil et listes compactes), `md` (44 px, prises 24 px, topo, À faire, saisie), `lg` (64 px
   minimum, prises 32 px, fiche voie).
-- **Accessibilité** : un seul libellé lisible, par exemple « Corde 12, Bye Bye Morice, 6b, couleur jaune et bleu, dernière chance »
+- **Accessibilité** : un seul libellé lisible, par exemple « 6b, Bye Bye Morice, couleur jaune et bleu, corde 12, dernière chance »
   (« couleur » + libellé singulier de la configuration : évite les accords que l’admin devrait saisir).
 
 ## 6. Composants de base

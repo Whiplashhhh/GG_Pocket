@@ -8,7 +8,7 @@ const yellow = { label: 'jaune', hex: '#f5c518' }
 const blue = { label: 'bleu', hex: '#1f5fbf' }
 
 describe('RouteLabel', () => {
-  it('shows cord, name and grade', () => {
+  it('shows grade, name and cord', () => {
     const wrapper = mountWithApp(RouteLabel, {
       props: { cord: 12, name: 'Bye Bye Morice', grade: '6b', holds: [yellow] },
     })
@@ -22,7 +22,7 @@ describe('RouteLabel', () => {
       props: { cord: 12, name: 'Bye Bye Morice', grade: '6b', holds: [yellow, blue] },
     })
     expect(wrapper.get('.sr-only').text()).toBe(
-      'Corde 12, Bye Bye Morice, 6b, couleur jaune et bleu',
+      '6b, Bye Bye Morice, couleur jaune et bleu, corde 12',
     )
   })
 
