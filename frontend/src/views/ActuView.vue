@@ -5,7 +5,7 @@ import { computed, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { errorMessageKey } from '@/api/errors'
-import { useMySessions } from '@/api/sessions'
+import { useFeed } from '@/api/feed'
 import { useDirectory } from '@/api/social'
 import SessionCard from '@/components/session/SessionCard.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
@@ -15,11 +15,11 @@ import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 
 /**
  * The feed (spec §8.2): the club header with its climber count (the way to the directory), then my
- * sessions, latest first, page by page as I scroll. Friends' sessions join it with the feed (PR
- * 5.2). Friend requests wait on my profile (D-099).
+ * sessions and the ones my friends share, latest first, page by page as I scroll. Friend requests
+ * wait on my profile (D-099).
  */
 const { t } = useI18n()
-const sessions = useMySessions()
+const sessions = useFeed()
 const directory = useDirectory()
 
 const items = computed(() => sessions.data.value?.pages.flatMap((page) => page.items) ?? [])
@@ -63,14 +63,17 @@ useIntersectionObserver(sentinel, ([entry]) => {
     v-else-if="items.length === 0"
     :title="t('actu.emptyTitle')"
     :body="t('actu.emptyBody')"
-  />
+  >
+    <GgButton variant="secondary" to="/annuaire">{{ t('actu.findFriends') }}</GgButton>
+  </EmptyState>
   <template v-else>
-    <h2 class="px-4 pt-4 text-lg font-title">{{ t('actu.mine') }}</h2>
+    <h2 class="sr-only">{{ t('actu.feed') }}</h2>
     <SessionCard
       v-for="session in items"
       :key="session.id"
       :session="session"
       linked
+      show-author
       :max-lines="5"
       :heading-level="3"
     />

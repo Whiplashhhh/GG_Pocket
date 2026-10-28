@@ -1,4 +1,12 @@
-import { ClipboardList, Hourglass, Route, Settings2, Ticket, Users } from 'lucide-vue-next'
+import {
+  ClipboardList,
+  Hourglass,
+  MessageSquareWarning,
+  Route,
+  Settings2,
+  Ticket,
+  Users,
+} from 'lucide-vue-next'
 import type { Component } from 'vue'
 
 import type { Role } from '@/lib/route'
@@ -10,6 +18,7 @@ export interface ManagementSection {
     | 'management.routes'
     | 'management.lastChance'
     | 'management.members'
+    | 'management.moderation'
     | 'management.audit'
     | 'management.codes'
     | 'management.club'
@@ -28,6 +37,12 @@ export const SECTIONS: readonly ManagementSection[] = [
     minRole: 'SETTER',
   },
   { to: '/gestion/membres', labelKey: 'management.members', icon: Users, minRole: 'BOARD' },
+  {
+    to: '/gestion/moderation',
+    labelKey: 'management.moderation',
+    icon: MessageSquareWarning,
+    minRole: 'BOARD',
+  },
   { to: '/gestion/journal', labelKey: 'management.audit', icon: ClipboardList, minRole: 'BOARD' },
   { to: '/gestion/codes', labelKey: 'management.codes', icon: Ticket, minRole: 'ADMIN' },
   { to: '/gestion/club', labelKey: 'management.club', icon: Settings2, minRole: 'ADMIN' },

@@ -151,16 +151,34 @@
   "actu": {
     "title": "Actu",
     "emptyTitle": "Le mur est calme… trop calme.",
-    "emptyBody": "Enregistre ta première séance avec le bouton « Nouvelle séance » : ton fil se remplira tout seul.",
+    "emptyBody": "Ajoute des amis ou enregistre ta première séance avec le bouton « Nouvelle séance » : ton fil se remplira tout seul.",
     "clubTagline": "Le fil du club : tes séances et celles de tes amis, au même endroit.",
-    "mine": "Mes séances",
     "more": "Voir les séances d’avant",
     "loadingMore": "On remonte le carnet…",
     "end": "C’est tout ! Le reste est encore à grimper.",
-    "loadError": "Impossible de charger tes séances.",
+    "loadError": "Impossible de charger le fil.",
     "clubCount": "Personne n’est encore accroché à l’appli | 1 grimpeur accroché à l’appli | {n} grimpeurs accrochés à l’appli",
     "clubCountHint": "Voir l’annuaire du club",
-    "clubCountHintSuffix": ", voir l’annuaire du club"
+    "clubCountHintSuffix": ", voir l’annuaire du club",
+    "feed": "Le fil",
+    "findFriends": "Trouver des copains de cordée"
+  },
+  "feed": {
+    "authorProfile": "Profil de {nickname}",
+    "titleSuffix": ", {title}",
+    "comments": "Commenter | 1 commentaire | {n} commentaires"
+  },
+  "reactions": {
+    "groupLabel": "Réagir à la séance",
+    "give": "{name} : {count}",
+    "received": "{name} : {count}",
+    "failed": "Ta réaction n’est pas passée, réessaie.",
+    "names": {
+      "FIRE": "Ça chauffe",
+      "STRONG": "Costaud",
+      "CLAP": "Bravo",
+      "GORILLA": "Mode gorille"
+    }
   },
   "friends": {
     "ask": "Demander en ami",
@@ -328,7 +346,12 @@
     "delete": "Supprimer",
     "deleted": "Commentaire supprimé.",
     "required": "Écris quelque chose avant de publier.",
-    "loadError": "Les commentaires ne se chargent pas."
+    "loadError": "Les commentaires ne se chargent pas.",
+    "session": {
+      "empty": "Pas encore de commentaire. Un bravo, une question sur la méthode, un « tu m’avais dit séance tranquille » ?",
+      "placeholder": "Un bravo, une question, une vanne gentille…",
+      "deleteConfirmBody": "Il disparaîtra de la séance pour tout le monde."
+    }
   },
   "lastChance": {
     "title": "Dernière chance !",
@@ -716,11 +739,11 @@
     "whoTitle": "Qui s’en occupe",
     "whoBody": "Le club Gravelines Grimp, association qui fait tourner l’appli. Pour toute question ou demande sur tes données, adresse-toi à la direction du club.",
     "whatTitle": "Ce qu’on garde",
-    "whatBody": "Ton prénom, ton nom, ton pseudo et ton mot de passe (enregistré chiffré : personne ne peut le lire, pas même le club). Si tu les donnes : ton e-mail, ta date de naissance, ta photo et les infos de ton profil. Tes séances (voies, essais, ressentis, commentaires, photos), tes voies cochées, tes coups de cœur et tes commentaires sur les voies. Bientôt : tes badges.",
+    "whatBody": "Ton prénom, ton nom, ton pseudo et ton mot de passe (enregistré chiffré : personne ne peut le lire, pas même le club). Si tu les donnes : ton e-mail, ta date de naissance, ta photo et les infos de ton profil. Tes séances (voies, essais, ressentis, commentaires, photos), tes voies cochées, tes coups de cœur, tes commentaires sur les voies et sur les séances, tes réactions et la liste de tes amis. Bientôt : tes badges.",
     "whyTitle": "Pourquoi",
     "whyBody": "Seulement pour faire fonctionner l’appli du club : te connecter, tenir ton carnet, afficher le topo, les classements et le fil entre amis. Rien n’est vendu, rien ne sert à de la publicité.",
     "whoSeesTitle": "Qui voit quoi",
-    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut. Tes séances, leurs photos et ton carnet sont visibles de tes amis seulement, ou de toi seul·e. La direction voit ta fiche de membre, sans ta date de naissance. Personne en dehors de l’appli ne voit quoi que ce soit.",
+    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut. Tes séances, leurs photos et ton carnet sont visibles de tes amis seulement, ou de toi seul·e. Tes réactions et tes commentaires sur une séance se voient par ceux qui voient la séance ; pour la modération, la direction lit les derniers commentaires du club, sans voir les séances. La direction voit ta fiche de membre, sans ta date de naissance. Personne en dehors de l’appli ne voit quoi que ce soit.",
     "minorsTitle": "Moins de 15 ans",
     "minorsBody": "Avant 15 ans, un parent ou responsable légal doit être d’accord. Le profil d’un ou une jeune n’est jamais visible en dehors des membres du club.",
     "howLongTitle": "Combien de temps",
@@ -735,12 +758,12 @@
   "account": {
     "title": "Mes données et mon compte",
     "exportTitle": "Télécharger mes données",
-    "exportBody": "Tout ce que GG Pocket garde sur toi, dans un seul fichier JSON : ton profil, tes séances et leurs voies, tes voies cochées, tes coups de cœur, tes commentaires, tes appareils connectés et la liste de tes photos. De quoi tout relire, ou tout emporter ailleurs.",
+    "exportBody": "Tout ce que GG Pocket garde sur toi, dans un seul fichier JSON : ton profil, tes séances et leurs voies, tes voies cochées, tes coups de cœur, tes commentaires et tes réactions, tes amis, tes appareils connectés et la liste de tes photos. De quoi tout relire, ou tout emporter ailleurs.",
     "export": "Télécharger mes données",
     "exporting": "Préparation du fichier…",
     "exportDone": "C’est dans tes téléchargements.",
     "deleteTitle": "Supprimer mon compte",
-    "deleteGone": "Ce qui part : ton profil, ta photo, les photos et les commentaires de tes séances, tes voies cochées, tes coups de cœur et tes commentaires sur les voies. Toutes tes sessions sont fermées.",
+    "deleteGone": "Ce qui part : ton profil, ta photo, les photos et les commentaires de tes séances, tes voies cochées, tes coups de cœur, tes amis, tes réactions, tes commentaires sur les voies et les séances, et ce que les autres ont écrit sous tes séances. Toutes tes sessions sont fermées.",
     "deleteKept": "Ce qui reste : tes séances et tes passages, pour ne pas fausser les statistiques des voies, et ton nom d’ouvreur·se sur les voies que tu as ouvertes. Tout ça passe au nom d’« Ancien·ne membre », et tes séances ne sont plus visibles de personne.",
     "deleteFinal": "C’est définitif : on ne pourra rien te rendre. Télécharge tes données avant si tu veux les garder.",
     "delete": "Supprimer mon compte",
@@ -848,6 +871,7 @@
     "title": "Espace gestion",
     "navLabel": "Sections de la gestion",
     "members": "Membres",
+    "moderation": "Modération",
     "audit": "Journal",
     "codes": "Codes d’inscription",
     "routes": "Voies",
@@ -855,6 +879,20 @@
     "soon": "bientôt",
     "lastChance": "Dernière chance",
     "club": "Club"
+  },
+  "moderation": {
+    "title": "Modération",
+    "intro": "Les derniers commentaires du club, sur les voies et sur les séances. Supprimer un commentaire le retire pour tout le monde et laisse une trace au journal.",
+    "onRoute": "Sur la voie « {route} »",
+    "onSession": "Sur la séance de {climber} du {day}",
+    "delete": "Supprimer",
+    "deleteNamed": "Supprimer le commentaire de {nickname}",
+    "confirmTitle": "Supprimer ce commentaire ?",
+    "confirmBody": "Il disparaîtra pour tout le monde. Le journal gardera qui l’a supprimé, et son texte.",
+    "deleted": "Commentaire de {nickname} supprimé.",
+    "emptyTitle": "Rien à signaler.",
+    "emptyBody": "Pas un commentaire à l’horizon. Le vestiaire est sage, profitez-en.",
+    "loadMore": "Voir les commentaires d’avant"
   },
   "members": {
     "title": "Membres",
@@ -945,6 +983,7 @@
       "ROUTE_DISMOUNTED": "{actor} a démonté la voie « {target} »",
       "ROUTE_REMOUNTED": "{actor} a remonté la voie « {target} »",
       "ROUTE_COMMENT_DELETED": "{actor} a supprimé un commentaire sur « {target} »",
+      "SESSION_COMMENT_DELETED": "{actor} a supprimé un commentaire sur la séance « {target} »",
       "CLUB_SECTOR_CREATED": "{actor} a créé le secteur « {target} »",
       "CLUB_SECTOR_UPDATED": "{actor} a modifié le secteur « {target} »",
       "CLUB_CORD_CREATED": "{actor} a créé la corde {target}",
@@ -957,7 +996,8 @@
       "MEMBER": "Membre",
       "REGISTRATION_CODE": "Code d’inscription",
       "ROUTE": "Voie",
-      "ROUTE_COMMENT": "Commentaire",
+      "ROUTE_COMMENT": "Commentaire de voie",
+      "SESSION_COMMENT": "Commentaire de séance",
       "SECTOR": "Secteur",
       "CORD": "Corde",
       "HOLD_COLOR": "Couleur de prises"

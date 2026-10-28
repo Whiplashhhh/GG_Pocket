@@ -28,6 +28,14 @@ export class FakeSocial {
     climbs: FakeSessions,
   ) {
     climbs.isFriend = (a, b) => this.state(a, b) === 'FRIENDS' && this.active(b) !== undefined
+    climbs.memberRef = (id) => {
+      const member = this.members().find((candidate) => candidate.id === id)
+      return {
+        id,
+        nickname: member?.nickname ?? 'Ancien·ne membre',
+        ...(member?.avatarUrl === undefined ? {} : { avatarUrl: member.avatarUrl }),
+      }
+    }
   }
 
   /** A request from `requester`, accepted already when `accepted`. */

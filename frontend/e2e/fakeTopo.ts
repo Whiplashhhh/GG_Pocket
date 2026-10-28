@@ -739,6 +739,24 @@ export class FakeTopo {
     return undefined
   }
 
+  /** The visible comments on routes, newest first (the moderation list). */
+  latestComments(): Schemas['ModeratedComment'][] {
+    return this.comments
+      .filter((comment) => !comment.deleted)
+      .map((comment) => {
+        const route = this.routes.find((candidate) => candidate.id === comment.routeId)
+        return {
+          id: comment.id,
+          kind: 'ROUTE' as const,
+          author: comment.author,
+          body: comment.body,
+          createdAt: comment.createdAt,
+          route: { id: comment.routeId, name: route?.name ?? '' },
+        }
+      })
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  }
+
   private comment(me: TopoMember, comment: FakeComment): Schemas['RouteComment'] {
     return {
       id: comment.id,

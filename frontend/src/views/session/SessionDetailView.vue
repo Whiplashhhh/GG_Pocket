@@ -9,6 +9,7 @@ import { ApiError, errorMessageKey } from '@/api/errors'
 import { useDeleteSession, useSession } from '@/api/sessions'
 import SubPageHeader from '@/components/layout/SubPageHeader.vue'
 import SessionCard from '@/components/session/SessionCard.vue'
+import CommentThread from '@/components/social/CommentThread.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
@@ -70,7 +71,7 @@ function confirmDelete() {
   </div>
   <template v-else-if="session.data.value">
     <FormAlert v-if="photoRefused" class="mx-4 mt-4">{{ t('session.photoRefused') }}</FormAlert>
-    <SessionCard :session="session.data.value" />
+    <SessionCard :session="session.data.value" :show-author="!isMine" />
     <div v-if="session.data.value.editable" class="flex flex-wrap gap-2 px-4 py-4">
       <GgButton variant="secondary" :to="`/seances/${session.data.value.id}/modifier`">
         <Pencil :size="18" aria-hidden="true" />{{ t('session.edit') }}
@@ -81,6 +82,13 @@ function confirmDelete() {
     </div>
     <p v-else-if="isMine" class="px-4 py-4 text-ink-muted">{{ t('session.frozen') }}</p>
     <FormAlert v-if="removeError" class="mx-4">{{ removeError }}</FormAlert>
+    <CommentThread
+      :key="session.data.value.id"
+      class="border-t border-rule pt-6 pb-6"
+      :target="{ kind: 'session', id: session.data.value.id }"
+      :read-only="false"
+      :count="session.data.value.commentCount"
+    />
   </template>
 
   <ConfirmDialog

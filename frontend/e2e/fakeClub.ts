@@ -492,6 +492,13 @@ export class FakeClub {
     if (path.startsWith('/admin/')) {
       if (ROLES.indexOf(me.role) < ROLES.indexOf('BOARD')) return fail(403, 'ACCESS_DENIED')
       if (path === '/admin/audit') return json({ entries: this.audit })
+      if (path === '/admin/moderation/comments') {
+        return json({
+          comments: [...this.topo.latestComments(), ...this.climbs.latestComments()].sort((a, b) =>
+            b.createdAt.localeCompare(a.createdAt),
+          ),
+        })
+      }
       if (path === '/admin/members') return json(this.members.map((member) => this.summary(member)))
       const parts = path.split('/')
       const id = parts[3]
