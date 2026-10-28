@@ -26,6 +26,12 @@ public class FriendshipFixtures {
         return friendships.saveAndFlush(friendship);
     }
 
+    /** Unfriending, declining or cancelling: the row goes. */
+    public void end(Friendship friendship) {
+        friendships.delete(friendship);
+        friendships.flush();
+    }
+
     public Friendship ask(Member requester, Member addressee) {
         return friendships.saveAndFlush(Friendship.request(requester.id(), addressee.id()));
     }

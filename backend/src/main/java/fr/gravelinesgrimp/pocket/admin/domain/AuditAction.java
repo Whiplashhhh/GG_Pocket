@@ -14,6 +14,8 @@ public enum AuditAction {
     ROUTE_REMOUNTED,
     /** By someone else than the author (moderation). */
     ROUTE_COMMENT_DELETED,
+    /** By someone else than the author (moderation). */
+    SESSION_COMMENT_DELETED,
     CLUB_SECTOR_CREATED,
     CLUB_SECTOR_UPDATED,
     CLUB_SECTORS_REORDERED,

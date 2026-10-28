@@ -10,6 +10,8 @@ import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
+import fr.gravelinesgrimp.pocket.session.infra.SessionCommentRepository;
+import fr.gravelinesgrimp.pocket.session.infra.SessionReactionRepository;
 import fr.gravelinesgrimp.pocket.social.domain.FriendshipState;
 import fr.gravelinesgrimp.pocket.social.infra.FriendshipRepository;
 import fr.gravelinesgrimp.pocket.topo.domain.CheckSource;
@@ -50,6 +52,8 @@ class DemoSeederIT {
     @Autowired private ClimbingSessionRepository sessions;
     @Autowired private RouteCheckRepository checks;
     @Autowired private FriendshipRepository friendships;
+    @Autowired private SessionReactionRepository reactions;
+    @Autowired private SessionCommentRepository sessionComments;
 
     @Test
     void createsOneAccountPerRoleAndADemoCode() {
@@ -127,11 +131,30 @@ class DemoSeederIT {
     }
 
     @Test
+    void theFriendsReactToAndCommentOnEachOthersSessions() {
+        assertThat(reactions.count()).isPositive();
+        assertThat(sessionComments.count()).isPositive();
+        var grimpeur = members.findByNicknameIgnoreCase("grimpeur").orElseThrow();
+        // Never on one's own session.
+        assertThat(reactions.findAllByMemberIdOrderByCreatedAt(grimpeur.id()))
+                .allSatisfy(
+                        reaction ->
+                                assertThat(sessions.findById(reaction.sessionId()))
+                                        .get()
+                                        .extracting(session -> session.memberId())
+                                        .isNotEqualTo(grimpeur.id()));
+    }
+
+    @Test
     void runningItAgainChangesNothing() {
         var before = sessions.count();
         var friendshipsBefore = friendships.count();
+        var reactionsBefore = reactions.count();
+        var commentsBefore = sessionComments.count();
         seeder.run(null);
         assertThat(friendships.count()).isEqualTo(friendshipsBefore);
+        assertThat(reactions.count()).isEqualTo(reactionsBefore);
+        assertThat(sessionComments.count()).isEqualTo(commentsBefore);
         assertThat(members.countMembers()).isEqualTo(4);
         assertThat(routes.count()).isEqualTo(DemoTopoSeeder.NAMES.size());
         assertThat(sessions.count()).isEqualTo(before);

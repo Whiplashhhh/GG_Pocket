@@ -18,6 +18,8 @@ import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
+import fr.gravelinesgrimp.pocket.session.infra.SessionCommentRepository;
+import fr.gravelinesgrimp.pocket.session.infra.SessionReactionRepository;
 import fr.gravelinesgrimp.pocket.topo.infra.RouteRepository;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,8 +34,9 @@ import java.util.UUID;
 /**
  * Deleting an account for good (spec §14, DECISIONS D-096), by its owner or by the admin. What is
  * personal goes: the member row and, through {@code on delete cascade}, the hearts, the "je sais la
- * faire", the route comments, the reset links; the avatar and the session photos are deleted here
- * (files included). What feeds the routes' statistics stays, handed over to "Ancien·ne membre": the
+ * faire", the comments and reactions, the friendships, the reset links; the avatar and the session
+ * photos are deleted here (files included), and so are the reactions and comments of the others on
+ * my sessions. What feeds the routes' statistics stays, handed over to "Ancien·ne membre": the
  * sessions and their ascents (stripped of comment and photo, seen by nobody) and the routes set.
  */
 @Service
@@ -46,6 +49,8 @@ public class AccountDeletionService {
     private final MediaFileRepository mediaFiles;
     private final MediaService media;
     private final ClimbingSessionRepository sessions;
+    private final SessionReactionRepository sessionReactions;
+    private final SessionCommentRepository sessionComments;
     private final RouteRepository routes;
     private final MemberSessionStore devices;
     private final AuditLog auditLog;
@@ -58,6 +63,8 @@ public class AccountDeletionService {
             MediaFileRepository mediaFiles,
             MediaService media,
             ClimbingSessionRepository sessions,
+            SessionReactionRepository sessionReactions,
+            SessionCommentRepository sessionComments,
             RouteRepository routes,
             MemberSessionStore devices,
             AuditLog auditLog,
@@ -68,6 +75,8 @@ public class AccountDeletionService {
         this.mediaFiles = mediaFiles;
         this.media = media;
         this.sessions = sessions;
+        this.sessionReactions = sessionReactions;
+        this.sessionComments = sessionComments;
         this.routes = routes;
         this.devices = devices;
         this.auditLog = auditLog;
@@ -118,6 +127,9 @@ public class AccountDeletionService {
                 null,
                 null);
         var now = clock.instant();
+        // Before the hand-over, while the sessions are still mine.
+        sessionReactions.deleteAllOnSessionsOf(member.id());
+        sessionComments.deleteAllOnSessionsOf(member.id());
         sessions.handOver(member.id(), FormerMember.ID, now);
         routes.creditSetter(member.id(), FormerMember.ID);
         member.changeAvatar(null);

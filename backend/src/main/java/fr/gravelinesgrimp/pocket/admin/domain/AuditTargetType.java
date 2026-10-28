@@ -5,6 +5,7 @@ public enum AuditTargetType {
     REGISTRATION_CODE,
     ROUTE,
     ROUTE_COMMENT,
+    SESSION_COMMENT,
     SECTOR,
     CORD,
     HOLD_COLOR

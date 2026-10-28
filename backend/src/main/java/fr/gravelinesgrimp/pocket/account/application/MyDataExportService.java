@@ -9,6 +9,8 @@ import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
 import fr.gravelinesgrimp.pocket.session.domain.ClimbingSession;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
+import fr.gravelinesgrimp.pocket.session.infra.SessionCommentRepository;
+import fr.gravelinesgrimp.pocket.session.infra.SessionReactionRepository;
 import fr.gravelinesgrimp.pocket.social.infra.FriendshipRepository;
 import fr.gravelinesgrimp.pocket.topo.domain.Route;
 import fr.gravelinesgrimp.pocket.topo.infra.FavoriteRepository;
@@ -49,7 +51,9 @@ public class MyDataExportService {
             List<ExportedRoute> routesSet,
             List<ExportedDevice> devices,
             List<ExportedPhoto> photos,
-            List<ExportedFriendship> friendships) {}
+            List<ExportedFriendship> friendships,
+            List<ExportedSessionComment> sessionComments,
+            List<ExportedSessionReaction> sessionReactions) {}
 
     public record ExportedProfile(
             String nickname,
@@ -108,6 +112,14 @@ public class MyDataExportService {
             Instant askedAt,
             Instant acceptedAt) {}
 
+    /** Whose session, which day ({@code climber} is me on my own sessions). */
+    public record ExportedSessionRef(String climber, LocalDate climbedOn) {}
+
+    public record ExportedSessionComment(
+            ExportedSessionRef session, String body, Instant at, Instant deletedAt) {}
+
+    public record ExportedSessionReaction(ExportedSessionRef session, String kind, Instant at) {}
+
     private final MemberRepository members;
     private final ClimbingSessionRepository sessions;
     private final RouteRepository routes;
@@ -118,6 +130,8 @@ public class MyDataExportService {
     private final MediaFileRepository mediaFiles;
     private final DeviceService devices;
     private final FriendshipRepository friendships;
+    private final SessionCommentRepository sessionComments;
+    private final SessionReactionRepository sessionReactions;
     private final Clock clock;
 
     public MyDataExportService(
@@ -131,6 +145,8 @@ public class MyDataExportService {
             MediaFileRepository mediaFiles,
             DeviceService devices,
             FriendshipRepository friendships,
+            SessionCommentRepository sessionComments,
+            SessionReactionRepository sessionReactions,
             Clock clock) {
         this.members = members;
         this.sessions = sessions;
@@ -142,6 +158,8 @@ public class MyDataExportService {
         this.mediaFiles = mediaFiles;
         this.devices = devices;
         this.friendships = friendships;
+        this.sessionComments = sessionComments;
+        this.sessionReactions = sessionReactions;
         this.clock = clock;
     }
 
@@ -157,12 +175,26 @@ public class MyDataExportService {
         var myAcks = lastChanceAcks.findAllByMemberIdOrderByCreatedAt(memberId);
         var routesSet = routes.findAllSetBy(memberId);
         var myFriendships = friendships.findAllOf(memberId).reversed();
+        var mySessionComments = sessionComments.findAllByAuthorIdOrderByCreatedAt(memberId);
+        var myReactions = sessionReactions.findAllByMemberIdOrderByCreatedAt(memberId);
+        var sessionIds = new HashSet<UUID>();
+        mySessionComments.forEach(c -> sessionIds.add(c.sessionId()));
+        myReactions.forEach(r -> sessionIds.add(r.sessionId()));
+        Map<UUID, ClimbingSession> reactedOn =
+                sessions.findAllById(sessionIds).stream()
+                        .collect(Collectors.toMap(ClimbingSession::id, Function.identity()));
+        var memberIds = new HashSet<UUID>();
+        myFriendships.forEach(f -> memberIds.add(f.otherThan(memberId)));
+        reactedOn.values().forEach(session -> memberIds.add(session.memberId()));
         Map<UUID, String> nicknames =
-                members
-                        .findAllById(
-                                myFriendships.stream().map(f -> f.otherThan(memberId)).toList())
-                        .stream()
+                members.findAllById(memberIds).stream()
                         .collect(Collectors.toMap(Member::id, Member::nickname));
+        Function<UUID, ExportedSessionRef> sessionRef =
+                id -> {
+                    var session = reactedOn.get(id);
+                    return new ExportedSessionRef(
+                            nicknames.get(session.memberId()), session.climbedOn());
+                };
 
         var routeIds = new HashSet<UUID>();
         mySessions.forEach(s -> s.ascents().forEach(a -> routeIds.add(a.routeId())));
@@ -255,6 +287,23 @@ public class MyDataExportService {
                                                 friendship.requesterId().equals(memberId),
                                                 friendship.createdAt(),
                                                 friendship.acceptedAt()))
+                        .toList(),
+                mySessionComments.stream()
+                        .map(
+                                comment ->
+                                        new ExportedSessionComment(
+                                                sessionRef.apply(comment.sessionId()),
+                                                comment.body(),
+                                                comment.createdAt(),
+                                                comment.deletedAt()))
+                        .toList(),
+                myReactions.stream()
+                        .map(
+                                reaction ->
+                                        new ExportedSessionReaction(
+                                                sessionRef.apply(reaction.sessionId()),
+                                                reaction.kind().name(),
+                                                reaction.updatedAt()))
                         .toList());
     }
 

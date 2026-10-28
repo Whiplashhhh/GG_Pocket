@@ -275,10 +275,35 @@ class AuthorizationMatrixIT {
                     new Endpoint(
                             HttpMethod.PUT, "/api/v1/me/friends/" + SOME_ID, null, Role.CLIMBER),
                     new Endpoint(
+                            HttpMethod.DELETE, "/api/v1/me/friends/" + SOME_ID, null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/feed", null, Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.PUT,
+                            "/api/v1/sessions/" + SOME_ID + "/reaction",
+                            "{\"kind\": \"FIRE\"}",
+                            Role.CLIMBER),
+                    new Endpoint(
                             HttpMethod.DELETE,
-                            "/api/v1/me/friends/" + SOME_ID,
+                            "/api/v1/sessions/" + SOME_ID + "/reaction",
                             null,
-                            Role.CLIMBER));
+                            Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.GET,
+                            "/api/v1/sessions/" + SOME_ID + "/comments",
+                            null,
+                            Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.POST,
+                            "/api/v1/sessions/" + SOME_ID + "/comments",
+                            "{\"body\": \"Allez !\"}",
+                            Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.DELETE,
+                            "/api/v1/session-comments/" + SOME_ID,
+                            null,
+                            Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.GET, "/api/v1/admin/moderation/comments", null, Role.BOARD));
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;
