@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,6 +26,7 @@ import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.session.domain.ClimbingSession;
 import fr.gravelinesgrimp.pocket.topo.domain.ClimbMode;
 
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -67,6 +70,9 @@ class AccountIT {
         sessions.log(me, LocalDate.now().minusDays(1), 7, clean(route, ClimbMode.LEAD));
         var friend = members.create(Role.CLIMBER);
         friendships.befriend(friend, me);
+        var theirs =
+                sessions.log(friend, LocalDate.now().minusDays(1), 6, clean(route, ClimbMode.LEAD));
+        say(me, theirs, "Bien joué");
 
         mockMvc.perform(get("/api/v1/me/export").with(as(me)))
                 .andExpect(status().isOk())
@@ -84,6 +90,10 @@ class AccountIT {
                 .andExpect(jsonPath("$.friendships[0].nickname").value(friend.nickname()))
                 .andExpect(jsonPath("$.friendships[0].status").value("ACCEPTED"))
                 .andExpect(jsonPath("$.friendships[0].askedByMe").value(false))
+                .andExpect(jsonPath("$.sessionComments[0].body").value("Bien joué"))
+                .andExpect(
+                        jsonPath("$.sessionComments[0].session.climber").value(friend.nickname()))
+                .andExpect(jsonPath("$.sessionReactions[0].kind").value("FIRE"))
                 .andExpect(jsonPath("$.devices").isArray());
     }
 
@@ -164,6 +174,67 @@ class AccountIT {
                                 UUID.class,
                                 route.id()))
                 .containsExactly(FormerMember.ID);
+    }
+
+    @Test
+    void deletingMyAccountTakesWhatTheOthersSaidOnMySessions() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var friend = members.create(Role.CLIMBER);
+        friendships.befriend(me, friend);
+        var mine =
+                sessions.log(
+                        me,
+                        LocalDate.now().minusDays(1),
+                        8,
+                        clean(routes.create(members.create(Role.SETTER)), ClimbMode.LEAD));
+        var theirs =
+                sessions.log(
+                        friend,
+                        LocalDate.now().minusDays(1),
+                        6,
+                        clean(routes.create(members.create(Role.SETTER)), ClimbMode.LEAD));
+        say(friend, mine, "Bravo");
+        say(me, theirs, "Merci");
+        var cookie = MemberFixtures.signIn(mockMvc, me, true);
+
+        mockMvc.perform(
+                        post("/api/v1/me/deletion")
+                                .cookie(cookie)
+                                .with(xsrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"password\": \"%s\"}"
+                                                .formatted(MemberFixtures.PASSWORD)))
+                .andExpect(status().isNoContent());
+
+        for (var table : List.of("session_reaction", "session_comment")) {
+            assertThat(
+                            jdbc.queryForObject(
+                                    "select count(*) from " + table + " where session_id in (?, ?)",
+                                    Integer.class,
+                                    mine.id(),
+                                    theirs.id()))
+                    .as(table)
+                    .isZero();
+        }
+    }
+
+    /** A reaction and a comment from {@code member} on {@code session}. */
+    private void say(Member member, ClimbingSession session, String comment) throws Exception {
+        mockMvc.perform(
+                        put("/api/v1/sessions/" + session.id() + "/reaction")
+                                .with(as(member))
+                                .with(xsrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"kind\": \"FIRE\"}"))
+                .andExpect(status().isOk());
+        mockMvc.perform(
+                        post("/api/v1/sessions/" + session.id() + "/comments")
+                                .with(as(member))
+                                .with(xsrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"body\": \"" + comment + "\"}"))
+                .andExpect(status().isCreated());
     }
 
     @Test

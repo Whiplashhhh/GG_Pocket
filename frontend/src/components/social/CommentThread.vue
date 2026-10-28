@@ -4,6 +4,7 @@ import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { errorMessageKey } from '@/api/errors'
+import { useAddSessionComment, useDeleteSessionComment, useSessionComments } from '@/api/feed'
 import { useAddComment, useDeleteComment, useRouteComments, type RouteComment } from '@/api/topo'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
@@ -14,33 +15,65 @@ import UserAvatar from '@/components/ui/UserAvatar.vue'
 import { formatDateTime, formatRelative } from '@/lib/format'
 
 /**
- * Comments of the route sheet: oldest first, mine (or anyone's for the board, as the server says
- * with `deletable`) can be deleted. A dismounted route takes no new comment, but its comments can
- * still be deleted (D-081).
+ * Comments of a route sheet or of a session: oldest first, mine (or anyone's for the board, as the
+ * server says with `deletable`) can be deleted. A dismounted route takes no new comment, but its
+ * comments can still be deleted (D-081). The target never changes for a given thread.
  */
-const props = defineProps<{ routeId: string; readOnly: boolean; count: number }>()
+const props = defineProps<{
+  target: { kind: 'route' | 'session'; id: string }
+  readOnly: boolean
+  count: number
+}>()
+
+/** A comment on a route or on a session: the same shape. */
+type ThreadComment = RouteComment
 
 const MAX_LENGTH = 500
 
 const { t } = useI18n()
-const comments = useRouteComments(() => props.routeId)
-const add = useAddComment(() => props.routeId)
-const remove = useDeleteComment(() => props.routeId)
+const targetId = () => props.target.id
+const { comments, add, remove } =
+  props.target.kind === 'route'
+    ? {
+        comments: useRouteComments(targetId),
+        add: useAddComment(targetId),
+        remove: useDeleteComment(targetId),
+      }
+    : {
+        comments: useSessionComments(targetId),
+        add: useAddSessionComment(targetId),
+        remove: useDeleteSessionComment(targetId),
+      }
 
 const headingId = useId()
 const fieldId = useId()
 const body = ref('')
 const invalid = ref(false)
 const sendError = ref<unknown>(null)
-const deleting = ref<RouteComment | null>(null)
+const deleting = ref<ThreadComment | null>(null)
 const notice = ref('')
 
 const confirmOpen = ref(false)
 
+/** What differs between a route sheet and a session. */
+const texts = computed(() =>
+  props.target.kind === 'session'
+    ? {
+        empty: t('comments.session.empty'),
+        placeholder: t('comments.session.placeholder'),
+        deleteConfirmBody: t('comments.session.deleteConfirmBody'),
+      }
+    : {
+        empty: t('comments.empty'),
+        placeholder: t('comments.placeholder'),
+        deleteConfirmBody: t('comments.deleteConfirmBody'),
+      },
+)
+
 const shownCount = computed(() => comments.data.value?.length ?? props.count)
 
 /** Kept after the confirmation closes: the dialog may close before it says "confirm". */
-function askDelete(comment: RouteComment) {
+function askDelete(comment: ThreadComment) {
   deleting.value = comment
   confirmOpen.value = true
 }
@@ -96,7 +129,7 @@ function confirmDelete() {
       <GgButton variant="secondary" @click="comments.refetch()">{{ t('common.retry') }}</GgButton>
     </div>
     <p v-else-if="comments.data.value?.length === 0" class="px-4 py-3 text-ink-muted">
-      {{ t('comments.empty') }}
+      {{ texts.empty }}
     </p>
     <ul v-else class="mt-2 divide-y divide-rule border-y border-rule">
       <li
@@ -151,7 +184,7 @@ function confirmDelete() {
         v-model="body"
         rows="3"
         :maxlength="MAX_LENGTH"
-        :placeholder="t('comments.placeholder')"
+        :placeholder="texts.placeholder"
         :aria-invalid="invalid ? true : undefined"
         :aria-describedby="`${fieldId}-counter${invalid ? ` ${fieldId}-error` : ''}`"
         class="w-full rounded-control border-2 border-rule bg-surface px-3 py-2 text-base text-ink placeholder:text-ink-muted focus:border-ink focus:outline-none aria-invalid:border-danger"
@@ -172,7 +205,7 @@ function confirmDelete() {
     <ConfirmDialog
       v-model:open="confirmOpen"
       :title="t('comments.deleteConfirmTitle')"
-      :body="t('comments.deleteConfirmBody')"
+      :body="texts.deleteConfirmBody"
       :confirm-label="t('comments.delete')"
       danger
       @confirm="confirmDelete"

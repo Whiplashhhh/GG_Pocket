@@ -22,9 +22,9 @@ import {
   useToggleCheck,
   type ClimbMode,
 } from '@/api/topo'
+import CommentThread from '@/components/social/CommentThread.vue'
 import FavoriteReplaceDialog from '@/components/topo/FavoriteReplaceDialog.vue'
 import RouteAscents from '@/components/topo/RouteAscents.vue'
-import RouteComments from '@/components/topo/RouteComments.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
@@ -379,9 +379,10 @@ const toggleClasses = (pressed: boolean, tone: 'brand' | 'success') => [
               :mine="detail.data.value.myAscents"
             />
 
-            <RouteComments
+            <CommentThread
+              :key="summary.id"
               class="mt-8 border-t border-rule pt-6"
-              :route-id="summary.id"
+              :target="{ kind: 'route', id: summary.id }"
               :read-only="dismounted"
               :count="summary.commentCount"
             />

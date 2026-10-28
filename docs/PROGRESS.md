@@ -4,6 +4,34 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-28 — Phase 5, PR 5.2 : le fil d'actu
+
+**Branche** : `feature/fil-0.6.0` (PR 5.2, voir D-100).
+
+### Fait
+
+- Backend : V12 (`session_reaction`, `session_comment`), `SessionReactionService` (upsert, pas sur sa propre séance),
+  `SessionCommentService` (auteur ou direction, audit `SESSION_COMMENT_DELETED`), `SessionService.feed`
+  (`GET /feed`), `ModerationService` (`GET /admin/moderation/comments`, voies + séances fusionnées par curseur).
+  Toute séance porte `author`, `reactions`, `commentCount`. Suppression de compte (réactions/commentaires des autres
+  sur mes séances), export, seed (`DemoFeedSeeder`). IT : `SessionReactionIT`, `SessionCommentIT`, `FeedIT`,
+  `ModerationIT`, `AccountIT`, `DemoSeederIT`, matrice d'autorisations. CI backend verte.
+- Front : Actu sur le fil (`api/feed.ts`), carte avec auteur, réactions (optimistes, `lib/reactions.ts` + Vitest),
+  nombre de commentaires ; commentaires sur la fiche séance (`CommentThread`, partagé avec les voies) ;
+  Gestion > Modération. Textes « Tes données ». e2e Desktop Chrome (70 verts), captures 360 clair/sombre et 1280
+  (modération) regardées.
+
+### Reste
+
+- CI complète sur le dernier commit, essai sur le dev (label `deploy:dev`) si Willem le demande, fusion.
+- D-100, D-098, D-096, D-093, D-094, D-087, D-090 à valider ; PR #17 en suspens.
+
+### Prochaine action
+
+- Après fusion de la PR 5.2 : phase 6 (Podium), branche `feature/<slug>-<version>` depuis `main`.
+
+---
+
 ## 2026-10-27 — Phase 5, PR 5.1 : les amis
 
 **Branche** : `feature/amis-0.5.1` (PR 5.1, voir D-098).

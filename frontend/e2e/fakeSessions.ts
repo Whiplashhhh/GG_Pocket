@@ -4,6 +4,17 @@ import type { AscentSource, FakeTopo, TopoAnswer, TopoMember } from './fakeTopo'
 
 type Schemas = components['schemas']
 type AscentRequest = Schemas['AscentRequest']
+type ReactionKind = Schemas['ReactionCount']['kind']
+
+const REACTION_KINDS: ReactionKind[] = ['FIRE', 'STRONG', 'CLAP', 'GORILLA']
+
+interface FakeSessionComment {
+  id: string
+  authorId: string
+  body: string
+  createdAt: string
+  deleted: boolean
+}
 
 interface FakeSession {
   id: string
@@ -18,6 +29,9 @@ interface FakeSession {
   /** A month already frozen (spec §9.2): read-only. */
   frozen: boolean
   ascents: (AscentRequest & { id: string })[]
+  /** Member id → their reaction. */
+  reactions: Map<string, ReactionKind>
+  comments: FakeSessionComment[]
 }
 
 const DAY = 24 * 3600 * 1000
@@ -33,6 +47,8 @@ export class FakeSessions implements AscentSource {
   offline = false
   /** Accepted friends with an active account (FakeClub knows both). */
   isFriend: (readerId: string, climberId: string) => boolean = () => false
+  /** Nickname and photo of a member (FakeSocial knows them). */
+  memberRef: (id: string) => Schemas['MemberRef'] = (id) => ({ id, nickname: id })
 
   constructor(
     private readonly nextId: () => string,
@@ -64,6 +80,8 @@ export class FakeSessions implements AscentSource {
       photo: false,
       createdAt: new Date(this.clock() - daysBack * DAY).toISOString(),
       frozen: false,
+      reactions: new Map(),
+      comments: [],
       ...extra,
       ascents: ascents.map((ascent) => ({
         id: this.nextId(),
@@ -300,6 +318,69 @@ export class FakeSessions implements AscentSource {
     }
   }
 
+  /** A reaction given before the test. */
+  react(member: TopoMember, session: FakeSession, kind: ReactionKind): void {
+    session.reactions.set(member.id, kind)
+  }
+
+  /** A comment written before the test, `minutesAgo` minutes ago. */
+  comment(member: TopoMember, session: FakeSession, body: string, minutesAgo = 5): void {
+    session.comments.push({
+      id: this.nextId(),
+      authorId: member.id,
+      body,
+      createdAt: new Date(this.clock() - minutesAgo * 60_000).toISOString(),
+      deleted: false,
+    })
+  }
+
+  /** The visible comments on sessions, newest first (the moderation list). */
+  latestComments(): Schemas['ModeratedComment'][] {
+    return this.sessions
+      .flatMap((session) =>
+        session.comments
+          .filter((comment) => !comment.deleted)
+          .map((comment) => ({
+            id: comment.id,
+            kind: 'SESSION' as const,
+            author: this.memberRef(comment.authorId),
+            body: comment.body,
+            createdAt: comment.createdAt,
+            climber: this.memberRef(session.memberId),
+            climbedOn: session.climbedOn,
+          })),
+      )
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  }
+
+  private readable(me: TopoMember, session: FakeSession): boolean {
+    return (
+      session.memberId === me.id ||
+      (session.visibility === 'FRIENDS' && this.isFriend(me.id, session.memberId))
+    )
+  }
+
+  private reactions(me: TopoMember, session: FakeSession): Schemas['SessionReactions'] {
+    const mine = session.reactions.get(me.id)
+    return {
+      counts: REACTION_KINDS.map((kind) => ({
+        kind,
+        count: [...session.reactions.values()].filter((given) => given === kind).length,
+      })),
+      ...(mine === undefined ? {} : { mine }),
+    }
+  }
+
+  private commentView(me: TopoMember, comment: FakeSessionComment): Schemas['SessionComment'] {
+    return {
+      id: comment.id,
+      author: this.memberRef(comment.authorId),
+      body: comment.body,
+      createdAt: comment.createdAt,
+      deletable: comment.authorId === me.id || me.role === 'BOARD' || me.role === 'ADMIN',
+    }
+  }
+
   private allAscents() {
     return this.sessions.flatMap((session) =>
       session.ascents.map((ascent) => ({ session, ascent })),
@@ -338,6 +419,7 @@ export class FakeSessions implements AscentSource {
     return {
       id: session.id,
       memberId: session.memberId,
+      author: this.memberRef(session.memberId),
       climbedOn: session.climbedOn,
       ...(session.feeling === undefined ? {} : { feeling: session.feeling }),
       ...(session.comment === undefined ? {} : { comment: session.comment }),
@@ -363,6 +445,8 @@ export class FakeSessions implements AscentSource {
         firstTry: ascent.firstTry,
         ...(ascent.feeling === undefined ? {} : { feeling: ascent.feeling }),
       })),
+      reactions: this.reactions(me, session),
+      commentCount: session.comments.filter((comment) => !comment.deleted).length,
     }
   }
 
@@ -409,6 +493,36 @@ export class FakeSessions implements AscentSource {
     const url = new URL(path, 'http://fake')
     const pathname = url.pathname
 
+    if (pathname === '/feed' && method === 'GET') {
+      const all = this.sessions
+        .filter(
+          (session) =>
+            session.memberId === me.id ||
+            (session.visibility === 'FRIENDS' && this.isFriend(me.id, session.memberId)),
+        )
+        .sort(
+          (a, b) =>
+            b.climbedOn.localeCompare(a.climbedOn) || b.createdAt.localeCompare(a.createdAt),
+        )
+      const start = Number(url.searchParams.get('cursor') ?? '0')
+      const size = Number(url.searchParams.get('size') ?? '10')
+      return json({
+        items: all.slice(start, start + size).map((session) => this.view(me, session)),
+        ...(start + size < all.length ? { nextCursor: String(start + size) } : {}),
+      })
+    }
+    const deleteComment = /^\/session-comments\/([^/]+)$/.exec(pathname)
+    if (deleteComment !== null && method === 'DELETE') {
+      const session = this.sessions.find((candidate) =>
+        candidate.comments.some((comment) => comment.id === deleteComment[1] && !comment.deleted),
+      )
+      const comment = session?.comments.find((candidate) => candidate.id === deleteComment[1])
+      if (comment === undefined || !this.commentView(me, comment).deletable) {
+        return problem(404, 'NOT_FOUND')
+      }
+      comment.deleted = true
+      return empty
+    }
     if (pathname === '/me/sessions' && method === 'GET') {
       const all = this.ordered(me.id)
       const start = Number(url.searchParams.get('cursor') ?? '0')
@@ -473,6 +587,8 @@ export class FakeSessions implements AscentSource {
         createdAt: new Date(this.clock()).toISOString(),
         frozen: false,
         ascents: [],
+        reactions: new Map(),
+        comments: [],
       }
       this.apply(session, sent)
       this.sessions.push(session)
@@ -480,15 +596,41 @@ export class FakeSessions implements AscentSource {
       return json(this.view(me, session), 201)
     }
 
-    const match = /^\/sessions\/([^/]+)(\/photo)?$/.exec(pathname)
+    const match = /^\/sessions\/([^/]+)(\/photo|\/reaction|\/comments)?$/.exec(pathname)
     if (match === null) return undefined
-    const [, id, photo] = match as (string | undefined)[]
+    const [, id, part] = match as (string | undefined)[]
     const found = this.sessions.find((candidate) => candidate.id === id)
-    const readable =
-      found !== undefined &&
-      (found.memberId === me.id ||
-        (found.visibility === 'FRIENDS' && this.isFriend(me.id, found.memberId)))
-    if (found === undefined || !readable) return problem(404, 'NOT_FOUND')
+    if (found === undefined || !this.readable(me, found)) return problem(404, 'NOT_FOUND')
+    if (part === '/reaction') {
+      if (method === 'PUT') {
+        if (found.memberId === me.id) return problem(400, 'VALIDATION_FAILED')
+        found.reactions.set(me.id, (body as Schemas['SessionReactionRequest']).kind)
+      } else {
+        found.reactions.delete(me.id)
+      }
+      return json(this.reactions(me, found))
+    }
+    if (part === '/comments') {
+      if (method === 'GET') {
+        return json(
+          found.comments
+            .filter((comment) => !comment.deleted)
+            .map((comment) => this.commentView(me, comment)),
+        )
+      }
+      const text = (body as Schemas['SessionCommentRequest']).body.trim()
+      if (text === '' || text.length > 500) return problem(400, 'VALIDATION_FAILED')
+      const comment: FakeSessionComment = {
+        id: this.nextId(),
+        authorId: me.id,
+        body: text,
+        createdAt: new Date(this.clock()).toISOString(),
+        deleted: false,
+      }
+      found.comments.push(comment)
+      return json(this.commentView(me, comment), 201)
+    }
+    const photo = part
     if (method === 'GET' && photo === undefined) return json(this.view(me, found))
     if (found.memberId !== me.id) return problem(404, 'NOT_FOUND')
     const session = found

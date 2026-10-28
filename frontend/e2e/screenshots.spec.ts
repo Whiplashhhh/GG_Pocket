@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import type { FakeClub } from './fakeClub'
+import type { FakeClub, FakeMember } from './fakeClub'
 import { expect, test } from './fixtures'
 
 type Role = 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
@@ -81,6 +81,32 @@ const marieFriends = (club: FakeClub) => {
     { comment: 'Enfin enchaînée, Iron Man.', feeling: 9 },
   )
   club.climbs.add(tom, 4, [{ route: 'Sec !', clean: true }])
+}
+
+/** Marie's friends at it: their sessions in her feed, reactions and comments both ways. */
+const feedAlive = (club: FakeClub) => {
+  marieClimbs(club)
+  marieFriends(club)
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  const tom = club.members.find((member) => member.nickname === 'tom.bloc')
+  const lea = club.members.find((member) => member.nickname === 'lea.dyno')
+  if (marie === undefined || tom === undefined || lea === undefined) return
+  const latest = (member: FakeMember) =>
+    club.climbs.sessions
+      .filter((session) => session.memberId === member.id && session.visibility === 'FRIENDS')
+      .sort((a, b) => b.climbedOn.localeCompare(a.climbedOn))
+      .at(0)
+  const hers = latest(marie)
+  const his = latest(tom)
+  if (hers === undefined || his === undefined) return
+  club.climbs.react(tom, hers, 'FIRE')
+  club.climbs.react(lea, hers, 'GORILLA')
+  club.climbs.comment(tom, hers, 'Les avant-bras en béton ? Les miens sont en guimauve.', 90)
+  club.climbs.react(lea, his, 'CLAP')
+  club.climbs.react(marie, his, 'STRONG')
+  club.climbs.comment(lea, his, 'Enfin ! Tu me montres la méthode du crux jeudi ?', 120)
+  club.climbs.comment(tom, his, 'Jeudi 19 h, ramène de la magnésie.', 60)
+  club.climbs.add(lea, 0, [{ route: 'Réglisse', mode: 'LEAD', clean: true }], { feeling: 7 })
 }
 
 const addToSession = async (page: Page, search: string, name: string) => {
@@ -208,6 +234,24 @@ const CAPTURES: Capture[] = [
   { name: 'actu-invitation', path: '/actu', as: 'CLIMBER', installInvite: true },
   { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
+  { name: 'actu-fil', path: '/actu', as: 'CLIMBER', prepare: feedAlive },
+  {
+    name: 'seance-ami',
+    path: '/actu',
+    as: 'CLIMBER',
+    prepare: feedAlive,
+    act: async (page) => {
+      await page.getByRole('link', { name: 'Séance d’hier de tom.bloc' }).click()
+      await page.getByRole('heading', { name: 'Commentaires (2)' }).waitFor()
+    },
+  },
+  {
+    name: 'moderation',
+    path: '/gestion/moderation',
+    as: 'BOARD',
+    desktop: true,
+    prepare: feedAlive,
+  },
   {
     name: 'profil-demandes',
     path: '/profil',
@@ -295,7 +339,7 @@ const CAPTURES: Capture[] = [
     as: 'CLIMBER',
     prepare: marieClimbs,
     act: async (page) => {
-      await page.getByRole('link', { name: 'Séance d’hier' }).click()
+      await page.getByRole('link', { name: /Séance d’hier/ }).click()
       await page.getByRole('heading', { level: 1, name: 'Ma séance' }).waitFor()
     },
   },

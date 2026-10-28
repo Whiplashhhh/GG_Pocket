@@ -14,7 +14,7 @@ public record MemberRefResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) String nickname,
         String avatarUrl) {
 
-    static MemberRefResponse from(MemberRefView view) {
+    public static MemberRefResponse from(MemberRefView view) {
         return new MemberRefResponse(view.id(), view.nickname(), MediaUrls.of(view.avatarId()));
     }
 }

@@ -1,6 +1,7 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
 import fr.gravelinesgrimp.pocket.member.application.MediaService;
+import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
@@ -14,6 +15,7 @@ import fr.gravelinesgrimp.pocket.session.domain.SessionCalendar;
 import fr.gravelinesgrimp.pocket.session.domain.SessionDraft;
 import fr.gravelinesgrimp.pocket.session.infra.AscentRepository;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
+import fr.gravelinesgrimp.pocket.social.application.Friendships;
 import fr.gravelinesgrimp.pocket.topo.infra.RouteRepository;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
@@ -54,6 +57,7 @@ public class SessionService {
     private final MemberRepository members;
     private final OwnedSessions owned;
     private final SessionAudience audience;
+    private final Friendships friendships;
     private final AutoRouteChecks autoChecks;
     private final SessionViews views;
     private final MediaService media;
@@ -67,6 +71,7 @@ public class SessionService {
             MemberRepository members,
             OwnedSessions owned,
             SessionAudience audience,
+            Friendships friendships,
             AutoRouteChecks autoChecks,
             SessionViews views,
             MediaService media,
@@ -78,6 +83,7 @@ public class SessionService {
         this.members = members;
         this.owned = owned;
         this.audience = audience;
+        this.friendships = friendships;
         this.autoChecks = autoChecks;
         this.views = views;
         this.media = media;
@@ -211,6 +217,37 @@ public class SessionService {
             found =
                     sessions.findSharedBefore(
                             climberId,
+                            position.climbedOn(),
+                            position.createdAt(),
+                            position.id(),
+                            limit + 1);
+        }
+        return page(found, limit, readerId);
+    }
+
+    /**
+     * The feed (spec §8.2): my sessions and the ones my friends share with friends, latest day
+     * first. A friend whose account is disabled drops out, like everywhere else.
+     */
+    @PreAuthorize("hasRole('CLIMBER')")
+    @Transactional(readOnly = true)
+    public SessionPage feed(UUID readerId, String cursor, int size) {
+        var limit = Math.clamp(size, 1, MAX_PAGE_SIZE);
+        var climberIds = new ArrayList<UUID>();
+        climberIds.add(readerId);
+        members.findAllById(friendships.friendIdsOf(readerId)).stream()
+                .filter(Member::isActive)
+                .map(Member::id)
+                .forEach(climberIds::add);
+        List<ClimbingSession> found;
+        if (cursor == null || cursor.isBlank()) {
+            found = sessions.findLatestInFeed(readerId, climberIds, limit + 1);
+        } else {
+            var position = Cursor.decode(cursor);
+            found =
+                    sessions.findInFeedBefore(
+                            readerId,
+                            climberIds,
                             position.climbedOn(),
                             position.createdAt(),
                             position.id(),

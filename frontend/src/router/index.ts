@@ -228,6 +228,11 @@ const routes: RouteRecordRaw[] = [
         meta: { titleKey: 'members.title', minRole: 'BOARD', wide: true },
       },
       {
+        path: 'moderation',
+        component: () => import('@/views/management/ModerationView.vue'),
+        meta: { titleKey: 'moderation.title', minRole: 'BOARD', wide: true },
+      },
+      {
         path: 'journal',
         component: () => import('@/views/management/AuditView.vue'),
         meta: { titleKey: 'audit.title', minRole: 'BOARD', wide: true },

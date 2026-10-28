@@ -71,6 +71,14 @@ public class RateLimiter {
     public static final Rule FRIEND_REQUEST_PER_MEMBER =
             new Rule("friend-request-per-member", 30, Duration.ofHours(1));
 
+    /** Comments on sessions: a lively chat after a session, not a flood. */
+    public static final Rule SESSION_COMMENT_PER_MEMBER =
+            new Rule("session-comment-per-member", 40, Duration.ofHours(1));
+
+    /** Reacting to sessions (changing one's mind included): a whole feed, several times. */
+    public static final Rule SESSION_REACTION_PER_MEMBER =
+            new Rule("session-reaction-per-member", 300, Duration.ofHours(1));
+
     /** Above this many tracked keys, stale ones are dropped before adding more. */
     private static final int PURGE_THRESHOLD = 10_000;
 

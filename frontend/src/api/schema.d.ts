@@ -226,6 +226,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/admin/moderation/comments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The latest comments on routes and sessions, newest first (board+) */
+    get: operations['listModeratedComments']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/admin/registration-codes': {
     parameters: {
       query?: never
@@ -372,6 +389,23 @@ export interface paths {
     }
     /** Whether this browser is signed in (public). Also sets the CSRF cookie. */
     get: operations['getAuthState']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/feed': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** My sessions and the ones my friends share, latest day first (cursor pagination) */
+    get: operations['getFeed']
     put?: never
     post?: never
     delete?: never
@@ -1053,6 +1087,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/session-comments/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Delete my comment, or anyone's (board+) */
+    delete: operations['deleteSessionComment']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/sessions': {
     parameters: {
       query?: never
@@ -1089,6 +1140,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/sessions/{id}/comments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Comments on a session, oldest first */
+    get: operations['listSessionComments']
+    put?: never
+    /** Comment on a session */
+    post: operations['addSessionComment']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/sessions/{id}/photo': {
     parameters: {
       query?: never
@@ -1102,6 +1171,24 @@ export interface paths {
     post?: never
     /** Remove the session photo */
     delete: operations['deleteSessionPhoto']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/sessions/{id}/reaction': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Give or change my reaction to someone else's session */
+    put: operations['reactToSession']
+    post?: never
+    /** Take back my reaction */
+    delete: operations['takeBackSessionReaction']
     options?: never
     head?: never
     patch?: never
@@ -1180,6 +1267,7 @@ export interface components {
         | 'ROUTE_DISMOUNTED'
         | 'ROUTE_REMOUNTED'
         | 'ROUTE_COMMENT_DELETED'
+        | 'SESSION_COMMENT_DELETED'
         | 'CLUB_SECTOR_CREATED'
         | 'CLUB_SECTOR_UPDATED'
         | 'CLUB_SECTORS_REORDERED'
@@ -1210,6 +1298,7 @@ export interface components {
         | 'REGISTRATION_CODE'
         | 'ROUTE'
         | 'ROUTE_COMMENT'
+        | 'SESSION_COMMENT'
         | 'SECTOR'
         | 'CORD'
         | 'HOLD_COLOR'
@@ -1377,6 +1466,25 @@ export interface components {
       /** Format: uuid */
       photoId?: string
       visibility?: string
+    }
+    ExportedSessionComment: {
+      /** Format: date-time */
+      at?: string
+      body?: string
+      /** Format: date-time */
+      deletedAt?: string
+      session?: components['schemas']['ExportedSessionRef']
+    }
+    ExportedSessionReaction: {
+      /** Format: date-time */
+      at?: string
+      kind?: string
+      session?: components['schemas']['ExportedSessionRef']
+    }
+    ExportedSessionRef: {
+      /** Format: date */
+      climbedOn?: string
+      climber?: string
     }
     ExportedTick: {
       /** Format: date-time */
@@ -1603,6 +1711,32 @@ export interface components {
       /** @example 1.0.0 */
       version: string
     }
+    /** @description route for a comment on a route; climber and climbedOn for a comment on a session. */
+    ModeratedComment: {
+      author: components['schemas']['MemberRef']
+      body: string
+      /** Format: date */
+      climbedOn?: string
+      climber?: components['schemas']['MemberRef']
+      /** Format: date-time */
+      createdAt: string
+      /** Format: uuid */
+      id: string
+      /** @enum {string} */
+      kind: 'ROUTE' | 'SESSION'
+      route?: components['schemas']['ModeratedRoute']
+    }
+    ModeratedRoute: {
+      /** Format: uuid */
+      id: string
+      name: string
+    }
+    /** @description Newest first. */
+    ModerationPage: {
+      comments: components['schemas']['ModeratedComment'][]
+      /** @description Pass it as ?cursor= for the next page; absent on the last page */
+      nextCursor?: string
+    }
     /** @description climbingDays: days with a session (two sessions on a day make one); toppedCount: topped ascents, repeats included; maxGrade: the hardest topped; averageFeeling: of the rated sessions. */
     MonthTotals: {
       /** @example 7.5 */
@@ -1629,6 +1763,8 @@ export interface components {
       routeChecks?: components['schemas']['ExportedTick'][]
       routeComments?: components['schemas']['ExportedComment'][]
       routesSet?: components['schemas']['ExportedRoute'][]
+      sessionComments?: components['schemas']['ExportedSessionComment'][]
+      sessionReactions?: components['schemas']['ExportedSessionReaction'][]
       sessions?: components['schemas']['ExportedSession'][]
     }
     /** @description Everything the member may see and edit about themselves. */
@@ -1746,6 +1882,12 @@ export interface components {
       /** @description Declares that a parent agreed; required once under 15 */
       parentalConsent?: boolean
       showAge?: boolean
+    }
+    ReactionCount: {
+      /** Format: int32 */
+      count: number
+      /** @enum {string} */
+      kind: 'FIRE' | 'STRONG' | 'CLAP' | 'GORILLA'
     }
     /** @description The one-page registration form (spec §6). */
     RegisterRequest: {
@@ -1957,9 +2099,16 @@ export interface components {
     }
     Session: {
       ascents: components['schemas']['Ascent'][]
+      /** @description The climber */
+      author: components['schemas']['MemberRef']
       /** Format: date */
       climbedOn: string
       comment?: string
+      /**
+       * Format: int64
+       * @description Deleted ones left out
+       */
+      commentCount: number
       /** Format: date-time */
       createdAt: string
       /** @description Mine, and its month is not frozen yet */
@@ -1977,14 +2126,38 @@ export interface components {
        */
       memberId: string
       photoUrl?: string
+      reactions: components['schemas']['SessionReactions']
       summary: components['schemas']['SessionSummary']
       /** @enum {string} */
       visibility: 'FRIENDS' | 'PRIVATE'
+    }
+    SessionComment: {
+      author: components['schemas']['MemberRef']
+      body: string
+      /** Format: date-time */
+      createdAt: string
+      /** @description Whether I may delete it */
+      deletable: boolean
+      /** Format: uuid */
+      id: string
+    }
+    SessionCommentRequest: {
+      body: string
     }
     /** @description nextCursor is absent on the last page. */
     SessionPage: {
       items: components['schemas']['Session'][]
       nextCursor?: string
+    }
+    SessionReactionRequest: {
+      /** @enum {string} */
+      kind: 'FIRE' | 'STRONG' | 'CLAP' | 'GORILLA'
+    }
+    /** @description One count per reaction, always all four in a fixed order; mine is absent if I gave none. */
+    SessionReactions: {
+      counts: components['schemas']['ReactionCount'][]
+      /** @enum {string} */
+      mine?: 'FIRE' | 'STRONG' | 'CLAP' | 'GORILLA'
     }
     SessionRequest: {
       /** @description In the order climbed */
@@ -2398,6 +2571,29 @@ export interface operations {
       }
     }
   }
+  listModeratedComments: {
+    parameters: {
+      query?: {
+        cursor?: string
+        size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ModerationPage']
+        }
+      }
+    }
+  }
   listRegistrationCodes: {
     parameters: {
       query?: never
@@ -2620,6 +2816,29 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['AuthState']
+        }
+      }
+    }
+  }
+  getFeed: {
+    parameters: {
+      query?: {
+        cursor?: string
+        size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionPage']
         }
       }
     }
@@ -3683,6 +3902,26 @@ export interface operations {
       }
     }
   }
+  deleteSessionComment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   createSession: {
     parameters: {
       query?: never
@@ -3784,6 +4023,54 @@ export interface operations {
       }
     }
   }
+  listSessionComments: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionComment'][]
+        }
+      }
+    }
+  }
+  addSessionComment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SessionCommentRequest']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionComment']
+        }
+      }
+    }
+  }
   replaceSessionPhoto: {
     parameters: {
       query?: never
@@ -3830,6 +4117,54 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  reactToSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SessionReactionRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionReactions']
+        }
+      }
+    }
+  }
+  takeBackSessionReaction: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionReactions']
+        }
       }
     }
   }

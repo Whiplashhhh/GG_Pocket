@@ -64,6 +64,34 @@ public interface ClimbingSessionRepository extends JpaRepository<ClimbingSession
     List<ClimbingSession> findSharedBefore(
             UUID memberId, LocalDate climbedOn, Instant createdAt, UUID id, int limit);
 
+    /**
+     * The feed (spec §8.2): my sessions and the ones my friends share with friends, in the order of
+     * {@link #findLatest}. {@code friendIds} is never empty: callers add mine.
+     */
+    @Query(
+            value =
+                    "select * from climbing_session where (member_id = :memberId"
+                            + " or (visibility = 'FRIENDS' and member_id in (:friendIds)))"
+                            + " order by climbed_on desc, created_at desc, id desc limit :limit",
+            nativeQuery = true)
+    List<ClimbingSession> findLatestInFeed(UUID memberId, Collection<UUID> friendIds, int limit);
+
+    /** The page after a cursor, in the same order as {@link #findLatestInFeed}. */
+    @Query(
+            value =
+                    "select * from climbing_session where (member_id = :memberId"
+                            + " or (visibility = 'FRIENDS' and member_id in (:friendIds)))"
+                            + " and (climbed_on, created_at, id) < (:climbedOn, :createdAt, :id)"
+                            + " order by climbed_on desc, created_at desc, id desc limit :limit",
+            nativeQuery = true)
+    List<ClimbingSession> findInFeedBefore(
+            UUID memberId,
+            Collection<UUID> friendIds,
+            LocalDate climbedOn,
+            Instant createdAt,
+            UUID id,
+            int limit);
+
     /** My sessions between two days (both included), with their ascents, oldest first. */
     @Query(
             "select s from ClimbingSession s left join fetch s.ascents"

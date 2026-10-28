@@ -497,6 +497,47 @@
         ]
       }
     },
+    "/api/v1/admin/moderation/comments": {
+      "get": {
+        "operationId": "listModeratedComments",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModerationPage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "The latest comments on routes and sessions, newest first (board+)",
+        "tags": [
+          "Moderation"
+        ]
+      }
+    },
     "/api/v1/admin/registration-codes": {
       "get": {
         "operationId": "listRegistrationCodes",
@@ -772,6 +813,47 @@
         "summary": "Whether this browser is signed in (public). Also sets the CSRF cookie.",
         "tags": [
           "Auth"
+        ]
+      }
+    },
+    "/api/v1/feed": {
+      "get": {
+        "operationId": "getFeed",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionPage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "My sessions and the ones my friends share, latest day first (cursor pagination)",
+        "tags": [
+          "Feed"
         ]
       }
     },
@@ -2157,6 +2239,31 @@
         ]
       }
     },
+    "/api/v1/session-comments/{id}": {
+      "delete": {
+        "operationId": "deleteSessionComment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "Delete my comment, or anyone's (board+)",
+        "tags": [
+          "Feed"
+        ]
+      }
+    },
     "/api/v1/sessions": {
       "post": {
         "operationId": "createSession",
@@ -2293,6 +2400,81 @@
         ]
       }
     },
+    "/api/v1/sessions/{id}/comments": {
+      "get": {
+        "operationId": "listSessionComments",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionComment"
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Comments on a session, oldest first",
+        "tags": [
+          "Feed"
+        ]
+      },
+      "post": {
+        "operationId": "addSessionComment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCommentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionComment"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "summary": "Comment on a session",
+        "tags": [
+          "Feed"
+        ]
+      }
+    },
     "/api/v1/sessions/{id}/photo": {
       "delete": {
         "operationId": "deleteSessionPhoto",
@@ -2363,6 +2545,78 @@
         "summary": "Upload the session photo (JPEG, PNG or WebP, 10 MB max)",
         "tags": [
           "Sessions"
+        ]
+      }
+    },
+    "/api/v1/sessions/{id}/reaction": {
+      "delete": {
+        "operationId": "takeBackSessionReaction",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionReactions"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Take back my reaction",
+        "tags": [
+          "Feed"
+        ]
+      },
+      "put": {
+        "operationId": "reactToSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionReactionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionReactions"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Give or change my reaction to someone else's session",
+        "tags": [
+          "Feed"
         ]
       }
     },
@@ -2514,6 +2768,7 @@
               "ROUTE_DISMOUNTED",
               "ROUTE_REMOUNTED",
               "ROUTE_COMMENT_DELETED",
+              "SESSION_COMMENT_DELETED",
               "CLUB_SECTOR_CREATED",
               "CLUB_SECTOR_UPDATED",
               "CLUB_SECTORS_REORDERED",
@@ -2561,6 +2816,7 @@
               "REGISTRATION_CODE",
               "ROUTE",
               "ROUTE_COMMENT",
+              "SESSION_COMMENT",
               "SECTOR",
               "CORD",
               "HOLD_COLOR"
@@ -3028,6 +3284,52 @@
             "format": "uuid"
           },
           "visibility": {
+            "type": "string"
+          }
+        }
+      },
+      "ExportedSessionComment": {
+        "type": "object",
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "body": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "session": {
+            "$ref": "#/components/schemas/ExportedSessionRef"
+          }
+        }
+      },
+      "ExportedSessionReaction": {
+        "type": "object",
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "session": {
+            "$ref": "#/components/schemas/ExportedSessionRef"
+          }
+        }
+      },
+      "ExportedSessionRef": {
+        "type": "object",
+        "properties": {
+          "climbedOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "climber": {
             "type": "string"
           }
         }
@@ -3707,6 +4009,85 @@
           "version"
         ]
       },
+      "ModeratedComment": {
+        "type": "object",
+        "description": "route for a comment on a route; climber and climbedOn for a comment on a session.",
+        "properties": {
+          "author": {
+            "$ref": "#/components/schemas/MemberRef"
+          },
+          "body": {
+            "type": "string"
+          },
+          "climbedOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "climber": {
+            "$ref": "#/components/schemas/MemberRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "ROUTE",
+              "SESSION"
+            ]
+          },
+          "route": {
+            "$ref": "#/components/schemas/ModeratedRoute"
+          }
+        },
+        "required": [
+          "author",
+          "body",
+          "createdAt",
+          "id",
+          "kind"
+        ]
+      },
+      "ModeratedRoute": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ModerationPage": {
+        "type": "object",
+        "description": "Newest first.",
+        "properties": {
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModeratedComment"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "description": "Pass it as ?cursor= for the next page; absent on the last page"
+          }
+        },
+        "required": [
+          "comments"
+        ]
+      },
       "MonthTotals": {
         "type": "object",
         "description": "climbingDays: days with a session (two sessions on a day make one); toppedCount: topped ascents, repeats included; maxGrade: the hardest topped; averageFeeling: of the rated sessions.",
@@ -3797,6 +4178,18 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ExportedRoute"
+            }
+          },
+          "sessionComments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExportedSessionComment"
+            }
+          },
+          "sessionReactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExportedSessionReaction"
             }
           },
           "sessions": {
@@ -4152,6 +4545,28 @@
           "firstName",
           "lastName",
           "nickname"
+        ]
+      },
+      "ReactionCount": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "FIRE",
+              "STRONG",
+              "CLAP",
+              "GORILLA"
+            ]
+          }
+        },
+        "required": [
+          "count",
+          "kind"
         ]
       },
       "RegisterRequest": {
@@ -4767,12 +5182,21 @@
               "$ref": "#/components/schemas/Ascent"
             }
           },
+          "author": {
+            "$ref": "#/components/schemas/MemberRef",
+            "description": "The climber"
+          },
           "climbedOn": {
             "type": "string",
             "format": "date"
           },
           "comment": {
             "type": "string"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Deleted ones left out"
           },
           "createdAt": {
             "type": "string",
@@ -4799,6 +5223,9 @@
           "photoUrl": {
             "type": "string"
           },
+          "reactions": {
+            "$ref": "#/components/schemas/SessionReactions"
+          },
           "summary": {
             "$ref": "#/components/schemas/SessionSummary"
           },
@@ -4812,13 +5239,59 @@
         },
         "required": [
           "ascents",
+          "author",
           "climbedOn",
+          "commentCount",
           "createdAt",
           "editable",
           "id",
           "memberId",
+          "reactions",
           "summary",
           "visibility"
+        ]
+      },
+      "SessionComment": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "$ref": "#/components/schemas/MemberRef"
+          },
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletable": {
+            "type": "boolean",
+            "description": "Whether I may delete it"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "author",
+          "body",
+          "createdAt",
+          "deletable",
+          "id"
+        ]
+      },
+      "SessionCommentRequest": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1
+          }
+        },
+        "required": [
+          "body"
         ]
       },
       "SessionPage": {
@@ -4837,6 +5310,47 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "SessionReactionRequest": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "FIRE",
+              "STRONG",
+              "CLAP",
+              "GORILLA"
+            ]
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "SessionReactions": {
+        "type": "object",
+        "description": "One count per reaction, always all four in a fixed order; mine is absent if I gave none.",
+        "properties": {
+          "counts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReactionCount"
+            }
+          },
+          "mine": {
+            "type": "string",
+            "enum": [
+              "FIRE",
+              "STRONG",
+              "CLAP",
+              "GORILLA"
+            ]
+          }
+        },
+        "required": [
+          "counts"
         ]
       },
       "SessionRequest": {

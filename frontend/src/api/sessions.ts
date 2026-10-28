@@ -26,6 +26,8 @@ export type LogbookRoute = components['schemas']['LogbookRoute']
 export type AscentBest = LogbookRoute['best']
 
 export const MY_SESSIONS_KEY = ['me', 'sessions'] as const
+/** The feed (api/feed.ts): here because a saved session changes it. */
+export const FEED_KEY = ['feed'] as const
 export const CLIMBED_ROUTES_KEY = ['me', 'climbed-routes'] as const
 export const sessionKey = (id: string) => ['sessions', id] as const
 /** One month under it: [...MY_PLANNING_KEY, '2026-10']. */
@@ -133,6 +135,7 @@ export async function sendSession(input: {
 export function sessionsChanged(queryClient: QueryClient, saved?: Session) {
   if (saved !== undefined) queryClient.setQueryData(sessionKey(saved.id), saved)
   void queryClient.invalidateQueries({ queryKey: MY_SESSIONS_KEY })
+  void queryClient.invalidateQueries({ queryKey: FEED_KEY })
   void queryClient.invalidateQueries({ queryKey: CLIMBED_ROUTES_KEY })
   void queryClient.invalidateQueries({ queryKey: ROUTES_KEY })
   void queryClient.invalidateQueries({ queryKey: MY_PLANNING_KEY })

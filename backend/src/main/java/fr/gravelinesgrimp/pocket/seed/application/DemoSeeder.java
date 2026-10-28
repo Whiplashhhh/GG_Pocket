@@ -32,9 +32,10 @@ import java.util.List;
 
 /**
  * Demo accounts for the local machine and the dev environment (spec §17): one per role, plus a
- * registration code, the demo topo (DemoTopoSeeder), sessions (DemoSessionSeeder) and friendships
- * (DemoSocialSeeder). Idempotent: accounts already there are left alone, the rest is seeded only
- * once. The rest of the demo data is added phase after phase.
+ * registration code, the demo topo (DemoTopoSeeder), sessions (DemoSessionSeeder), friendships
+ * (DemoSocialSeeder), reactions and comments (DemoFeedSeeder). Idempotent: accounts already there
+ * are left alone, the rest is seeded only once. The rest of the demo data is added phase after
+ * phase.
  *
  * <p>Runs before the first-start admin code, which then sees members and stays quiet.
  */
@@ -65,6 +66,7 @@ public class DemoSeeder implements ApplicationRunner {
     private final DemoTopoSeeder topo;
     private final DemoSessionSeeder sessions;
     private final DemoSocialSeeder social;
+    private final DemoFeedSeeder feed;
     private final DemoSeedRegistry registry;
     private final InstanceMarkerRepository markers;
     private final PasswordEncoder passwordEncoder;
@@ -79,6 +81,7 @@ public class DemoSeeder implements ApplicationRunner {
             DemoTopoSeeder topo,
             DemoSessionSeeder sessions,
             DemoSocialSeeder social,
+            DemoFeedSeeder feed,
             DemoSeedRegistry registry,
             InstanceMarkerRepository markers,
             PasswordEncoder passwordEncoder,
@@ -91,6 +94,7 @@ public class DemoSeeder implements ApplicationRunner {
         this.topo = topo;
         this.sessions = sessions;
         this.social = social;
+        this.feed = feed;
         this.registry = registry;
         this.markers = markers;
         this.passwordEncoder = passwordEncoder;
@@ -164,13 +168,16 @@ public class DemoSeeder implements ApplicationRunner {
         var routes = complete ? topo.seed(accounts, now, today) : 0;
         var sessionCount = complete ? sessions.seed(accounts, today) : 0;
         var friendshipCount = complete ? social.seed(accounts, now) : 0;
+        var feedCount = complete ? feed.seed(accounts) : 0;
         log.info(
-                "Demo seed: {} account(s), {} route(s), {} session(s) and {} friendship(s) created"
-                        + " (admin, direction, ouvreur, grimpeur){}",
+                "Demo seed: {} account(s), {} route(s), {} session(s), {} friendship(s) and {}"
+                        + " reaction(s) or comment(s) created (admin, direction, ouvreur,"
+                        + " grimpeur){}",
                 created,
                 routes,
                 sessionCount,
                 friendshipCount,
+                feedCount,
                 withCode ? ", registration code DEMO2026" : "");
     }
 }

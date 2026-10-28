@@ -3,6 +3,7 @@ package fr.gravelinesgrimp.pocket.session.api;
 import fr.gravelinesgrimp.pocket.member.api.MediaUrls;
 import fr.gravelinesgrimp.pocket.session.application.SessionView;
 import fr.gravelinesgrimp.pocket.session.domain.SessionVisibility;
+import fr.gravelinesgrimp.pocket.topo.api.MemberRefResponse;
 import fr.gravelinesgrimp.pocket.topo.api.RouteSummaryResponse;
 import fr.gravelinesgrimp.pocket.topo.domain.ClimbMode;
 
@@ -18,6 +19,8 @@ import java.util.UUID;
 public record SessionResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) UUID id,
         @Schema(requiredMode = RequiredMode.REQUIRED, description = "The climber") UUID memberId,
+        @Schema(requiredMode = RequiredMode.REQUIRED, description = "The climber")
+                MemberRefResponse author,
         @Schema(requiredMode = RequiredMode.REQUIRED) LocalDate climbedOn,
         @Schema(description = "Out of 10") Integer feeling,
         String comment,
@@ -29,7 +32,10 @@ public record SessionResponse(
                         description = "Mine, and its month is not frozen yet")
                 boolean editable,
         @Schema(requiredMode = RequiredMode.REQUIRED) Summary summary,
-        @Schema(requiredMode = RequiredMode.REQUIRED) List<AscentItem> ascents) {
+        @Schema(requiredMode = RequiredMode.REQUIRED) List<AscentItem> ascents,
+        @Schema(requiredMode = RequiredMode.REQUIRED) SessionReactionsResponse reactions,
+        @Schema(requiredMode = RequiredMode.REQUIRED, description = "Deleted ones left out")
+                long commentCount) {
 
     @Schema(name = "SessionSummary", description = "maxGrade: the hardest topped grade.")
     public record Summary(
@@ -55,6 +61,7 @@ public record SessionResponse(
         return new SessionResponse(
                 view.id(),
                 view.memberId(),
+                MemberRefResponse.from(view.author()),
                 view.climbedOn(),
                 view.feeling(),
                 view.comment(),
@@ -80,6 +87,8 @@ public record SessionResponse(
                                                 ascent.falls(),
                                                 ascent.firstTry(),
                                                 ascent.feeling()))
-                        .toList());
+                        .toList(),
+                SessionReactionsResponse.from(view.reactions()),
+                view.commentCount());
     }
 }

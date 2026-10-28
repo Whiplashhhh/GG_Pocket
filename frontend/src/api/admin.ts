@@ -1,13 +1,16 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { api } from './client'
+import { FEED_KEY } from './sessions'
 import { request, requestNoContent } from './request'
 import type { components } from './schema'
+import { ROUTES_KEY } from './topo'
 
 export type MemberSummary = components['schemas']['MemberSummary']
 export type MemberDetail = components['schemas']['MemberDetail']
 export type MemberStatus = MemberSummary['status']
 export type AuditEntry = components['schemas']['AuditEntry']
+export type ModeratedComment = components['schemas']['ModeratedComment']
 export type RegistrationCode = components['schemas']['RegistrationCode']
 export type RegistrationCodeSettings = components['schemas']['RegistrationCodeSettings']
 type Role = MemberSummary['role']
@@ -15,6 +18,7 @@ type Role = MemberSummary['role']
 const MEMBERS_KEY = ['admin', 'members'] as const
 /** The audit log: refreshed after every audited action (roles, codes, dismounts, club config). */
 export const AUDIT_KEY = ['admin', 'audit'] as const
+export const MODERATION_KEY = ['admin', 'moderation'] as const
 const CODES_KEY = ['admin', 'registration-codes'] as const
 
 export const AUDIT_PAGE_SIZE = 50
@@ -144,6 +148,47 @@ export function useUpdateRegistrationCode() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: CODES_KEY })
       void queryClient.invalidateQueries({ queryKey: AUDIT_KEY })
+    },
+  })
+}
+
+const MODERATION_PAGE_SIZE = 30
+
+/** Spec §8.11: the latest comments on routes and sessions, newest first (board and admin). */
+export function useModeratedComments() {
+  return useInfiniteQuery({
+    queryKey: MODERATION_KEY,
+    queryFn: ({ pageParam, signal }) =>
+      request(
+        api.GET('/api/v1/admin/moderation/comments', {
+          params: { query: { cursor: pageParam, size: MODERATION_PAGE_SIZE } },
+          signal,
+        }),
+      ),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.nextCursor,
+  })
+}
+
+/** Deletes a comment of either kind; the server writes the audit log. */
+export function useModerateComment() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (comment: ModeratedComment) => {
+      const params = { params: { path: { id: comment.id } } }
+      return requestNoContent(
+        comment.kind === 'ROUTE'
+          ? api.DELETE('/api/v1/route-comments/{id}', params)
+          : api.DELETE('/api/v1/session-comments/{id}', params),
+      )
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: MODERATION_KEY })
+      void queryClient.invalidateQueries({ queryKey: AUDIT_KEY })
+      // Wherever the comment showed: route sheets and their counts, sessions and theirs.
+      void queryClient.invalidateQueries({ queryKey: ROUTES_KEY })
+      void queryClient.invalidateQueries({ queryKey: ['sessions'] })
+      void queryClient.invalidateQueries({ queryKey: FEED_KEY })
     },
   })
 }

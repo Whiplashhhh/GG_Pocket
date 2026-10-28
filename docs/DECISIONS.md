@@ -855,3 +855,32 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - L'écran d'accueil propose « Se connecter » (bouton principal) puis « Rejoindre le club » ; le lien de l'écran de
     connexion devient « Pas encore de compte ? Rejoindre le club ».
 - **Statut** : validé (demande du club).
+
+### D-100 — Phase 5.2 : fil d'actu, réactions, commentaires de séance, modération
+- **Contexte** : PR 5.2 (spec §7, §8.2, §8.11, §5, §14). La spec fixe le jeu de 4 réactions et « auteur ou modération
+  peuvent supprimer » ; le reste est à trancher.
+- **Choix** :
+  - Tout vit dans le module `session` (tables `session_reaction`, `session_comment`, V12) : la lecture d'une séance y
+    est déjà décidée (`SessionAudience`), et le module `social` ne dépend pas de `session`.
+  - Réagir ou commenter demande de pouvoir lire la séance (amis acceptés et actifs, séance « amis ») ; sinon 404, comme
+    une séance qui n'existe pas. **Pas de réaction sur sa propre séance** (comme les kudos de Strava) ; commenter la
+    sienne, oui (pour répondre).
+  - Une réaction par personne et par séance (index unique, écriture par `insert … on conflict`) ; changer = remplacer,
+    retoucher la même = la reprendre (côté appli). L'appli bouge les compteurs tout de suite, puis prend ceux du serveur.
+  - Toute séance renvoyée par l'API porte désormais `author`, `reactions` (les 4 compteurs dans l'ordre fixe, et la
+    mienne) et `commentCount` : la même carte sert au fil, au profil d'un ami et à la fiche séance.
+  - Fil : mes séances + les séances « amis » de mes amis acceptés dont le compte est actif, triées comme le carnet
+    (jour, puis enregistrement), curseur opaque. Les identifiants d'amis (≤ 200) sont passés à la requête.
+  - Commentaires : 500 caractères, 40 par heure ; supprimer = masquer (comme les commentaires de voie). L'auteur supprime
+    les siens même s'il ne voit plus la séance (ses mots restent les siens) ; le grimpeur de la séance ne supprime pas
+    ceux des autres (la spec dit « auteur ou modération ») ; en dessous de la direction, le commentaire d'un autre
+    répond 404.
+  - Modération : `GET /admin/moderation/comments` (direction et admin) fusionne commentaires de voie et de séance,
+    plus récents d'abord, par pages. Pour une séance, la direction voit qui, quel jour et le texte, **pas la séance**
+    (elle reste aux amis). Une suppression par un tiers va au journal (`SESSION_COMMENT_DELETED`).
+  - Suppression de compte : en plus de ses propres réactions et commentaires (cascade), ceux des autres sur ses
+    séances partent, puisque plus personne ne voit ces séances. L'export contient mes réactions et mes commentaires
+    de séance.
+  - Badges dans la carte (« a débloqué… ») : avec la phase 7.
+- **Statut** : à valider (pas de réaction sur sa propre séance ; le grimpeur ne modère pas sous sa séance ; la direction
+  lit les commentaires de séance pour modérer).
