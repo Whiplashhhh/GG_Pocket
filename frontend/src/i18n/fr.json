@@ -165,7 +165,7 @@
   },
   "feed": {
     "authorProfile": "Profil de {nickname}",
-    "titleSuffix": ", {title}",
+    "cardTitle": "{title} de {nickname}",
     "comments": "Commenter | 1 commentaire | {n} commentaires"
   },
   "reactions": {
@@ -883,6 +883,7 @@
   "moderation": {
     "title": "Modération",
     "intro": "Les derniers commentaires du club, sur les voies et sur les séances. Supprimer un commentaire le retire pour tout le monde et laisse une trace au journal.",
+    "listLabel": "Derniers commentaires",
     "onRoute": "Sur la voie « {route} »",
     "onSession": "Sur la séance de {climber} du {day}",
     "delete": "Supprimer",

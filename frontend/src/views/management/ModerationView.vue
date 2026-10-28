@@ -91,7 +91,7 @@ function confirmDelete() {
   />
 
   <template v-else>
-    <ol class="border-t border-rule">
+    <ol class="border-t border-rule" :aria-label="t('moderation.listLabel')">
       <li
         v-for="comment in comments"
         :key="comment.id"

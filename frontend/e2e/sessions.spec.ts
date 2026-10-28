@@ -87,7 +87,7 @@ test.describe('a new session', () => {
     await expect(page.getByText('Séance au carnet !')).toBeVisible()
     await expect(page).toHaveURL(/\/actu$/)
 
-    const card = page.getByRole('article', { name: 'Séance d’aujourd’hui' })
+    const card = page.getByRole('article', { name: /Séance d’aujourd’hui/ })
     await expect(card.getByText('3 voies')).toBeVisible()
     await expect(card.getByText('2 topées')).toBeVisible()
     await expect(card.getByText('3 en tête')).toBeVisible()
@@ -141,7 +141,7 @@ test.describe('a new session', () => {
     club.climbs.offline = false
     await page.evaluate(() => window.dispatchEvent(new Event('online')))
     await expect(page.getByText('1 séance en attente de réseau')).toBeHidden()
-    await expect(page.getByRole('article', { name: 'Séance d’aujourd’hui' })).toBeVisible()
+    await expect(page.getByRole('article', { name: /Séance d’aujourd’hui/ })).toBeVisible()
     expect(club.climbs.sessions).toHaveLength(1)
   })
 
@@ -158,7 +158,7 @@ test.describe('my sessions', () => {
     await sameDay(page, club)
     club.climbs.add(signedIn(me), 1, [{ route: 'Réglisse' }], { comment: 'Petite séance.' })
     await page.goto('/actu')
-    await page.getByRole('link', { name: 'Séance d’hier' }).click()
+    await page.getByRole('link', { name: /Séance d’hier/ }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Ma séance' })).toBeVisible()
 
     await page.getByRole('link', { name: 'Modifier' }).click()

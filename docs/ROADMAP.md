@@ -131,11 +131,12 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [x] Profil public d'un membre ; séances, photos et carnet d'un ami (visibilité « amis » seulement)
 - [x] Seed des amitiés, export des amitiés
 
-### PR 5.2 — Fil d'actu
+### PR 5.2 — Fil d'actu (`feature/fil-0.6.0`)
 
-- [ ] Fil d'actu (mes séances et celles de mes amis, pagination par curseur, carte avec l'auteur)
-- [ ] Réactions (4, une par personne)
-- [ ] Commentaires de séance + modération (Gestion > Modération, journal d'audit)
+- [x] Fil d'actu (mes séances et celles de mes amis, pagination par curseur, carte avec l'auteur)
+- [x] Réactions (4, une par personne)
+- [x] Commentaires de séance + modération (Gestion > Modération, journal d'audit)
+- [x] Seed des réactions et commentaires, export, suppression de compte (D-100)
 
 ## Phase 6 — Podium et statistiques
 

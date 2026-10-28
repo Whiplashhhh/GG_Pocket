@@ -32,11 +32,11 @@ Un package par domaine sous `fr.gravelinesgrimp.pocket`, chacun découpé en cou
 | `platform` | Transverse technique : erreurs (Problem Details), sécurité, horloge, `/api/v1/meta`, marqueur d'environnement | ✅ |
 | `auth` | Connexion, sessions et appareils, inscription, codes d'inscription, code de premier démarrage, réinitialisation, limitation de débit, politique de mot de passe, configuration de Spring Security | ✅ |
 | `member` | Membre (`Member`, table `member`), rôles, profil, photos (`MediaFile`, nettoyage des images, volume de fichiers) | ✅ (annuaire en phase 5) |
-| `admin` | Gestion des membres (matrice des rôles), journal d'audit, gestion des codes d'inscription | ✅ |
+| `admin` | Gestion des membres (matrice des rôles), journal d'audit, gestion des codes d'inscription, liste de modération des commentaires (`ModerationService`) | ✅ |
 | `club` | Configuration du topo : secteurs, cordes, couleurs de prises, cotations (nom et logos en phase 8) | ✅ |
 | `topo` | Voies (ouvreurs, styles, photo, statuts), commentaires, coups de cœur, « je sais la faire », dernière chance, voie préférée | ✅ |
-| `session` | Séances, ascensions, photo de séance, « je sais la faire » automatique, statistiques des voies (via `RouteAscentStats`), planning du mois (`PlanningService`), carnet (`LogbookService`) | ✅ |
-| `social` | Amitiés, fil, réactions, commentaires de séance | 🔜 phase 5 |
+| `session` | Séances, ascensions, photo de séance, « je sais la faire » automatique, statistiques des voies (via `RouteAscentStats`), planning du mois (`PlanningService`), carnet (`LogbookService`), fil d'actu (`SessionService.feed`), réactions et commentaires de séance (D-100) | ✅ |
+| `social` | Amitiés (`Friendships` pour les autres modules), annuaire, profils publics | ✅ |
 | `ranking` | Classements mensuels, clôture | 🔜 phase 6 |
 | `badge` | Moteur de badges | 🔜 phase 7 |
 

@@ -75,9 +75,12 @@ const summary = computed(() => props.session.summary)
             v-if="linked"
             :to="`/seances/${session.id}`"
             class="after:absolute after:inset-0 hover:underline"
-            >{{ author.nickname
-            }}<span class="sr-only">{{
-              t('feed.titleSuffix', { title: t('session.cardTitle', { day }) })
+            ><span aria-hidden="true">{{ author.nickname }}</span
+            ><span class="sr-only">{{
+              t('feed.cardTitle', {
+                title: t('session.cardTitle', { day }),
+                nickname: author.nickname,
+              })
             }}</span></RouterLink
           >
           <template v-else>{{ author.nickname }}</template>

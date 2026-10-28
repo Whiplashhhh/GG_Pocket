@@ -5,6 +5,21 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- Le fil d’actu s’anime : tes séances et celles de tes amis (celles qu’ils partagent), les plus récentes d’abord,
+  avec la tête et le pseudo de qui a grimpé.
+- Les réactions : 🔥 💪 👏 🦍 sous chaque séance d’un ami. Une seule par personne, tu peux changer d’avis (ou la
+  reprendre) d’un tap. Sous tes séances, tu vois ce que les copains t’ont laissé.
+- Les commentaires de séance : un bravo, une question sur la méthode, une vanne gentille. Tu supprimes les tiens
+  quand tu veux.
+- Pour la direction : Gestion > Modération, les derniers commentaires du club (voies et séances) en un seul endroit,
+  à supprimer s’il le faut. Chaque suppression laisse une trace au journal.
+
+### Modifié
+
+- « Tes données » et l’export de tes données parlent maintenant de tes amis, de tes réactions et de tes commentaires.
+
 ## 0.6.0 — 2026-10-28
 
 ### Ajouté

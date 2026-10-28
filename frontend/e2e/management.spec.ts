@@ -12,6 +12,35 @@ test.describe('a climber', () => {
 test.describe('the board', () => {
   test.use({ signedInAs: 'BOARD' })
 
+  test('deletes a comment from the moderation list', async ({ page, club, isMobile }) => {
+    const tom = club.addMember({ nickname: 'tom', firstName: 'Tom', lastName: 'Bloc' })
+    const lea = club.addMember({ nickname: 'lea', firstName: 'Léa', lastName: 'Dupont' })
+    const session = club.climbs.add(tom, 1, [{ route: 'Réglisse' }])
+    club.climbs.comment(lea, session, 'Bravo, enfin !', 30)
+    club.climbs.comment(lea, session, 'Message pas très sympa.', 5)
+
+    await page.goto('/gestion')
+    if (isMobile) {
+      await page.getByRole('link', { name: 'Modération' }).click()
+    } else {
+      await page
+        .getByRole('navigation', { name: 'Sections de la gestion' })
+        .getByRole('link', { name: 'Modération' })
+        .click()
+    }
+    await expect(page.getByRole('heading', { level: 1, name: 'Modération' })).toBeVisible()
+    const items = page.getByRole('list', { name: 'Derniers commentaires' }).getByRole('listitem')
+    await expect(items.first()).toContainText('Message pas très sympa.')
+    await expect(items.first()).toContainText('Sur la séance de tom du')
+
+    await items.first().getByRole('button', { name: 'Supprimer le commentaire de lea' }).click()
+    const dialog = page.getByRole('alertdialog', { name: 'Supprimer ce commentaire ?' })
+    await dialog.getByRole('button', { name: 'Supprimer' }).click()
+    await expect(page.getByRole('status')).toHaveText('Commentaire de lea supprimé.')
+    await expect(page.getByText('Message pas très sympa.')).toBeHidden()
+    await expect(page.getByText('Bravo, enfin !')).toBeVisible()
+  })
+
   test('finds a member, makes them a setter, creates a reset link, disables them', async ({
     page,
     club,

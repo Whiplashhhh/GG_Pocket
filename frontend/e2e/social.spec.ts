@@ -117,3 +117,67 @@ test.describe('friends', () => {
     await expect(page.getByRole('button', { name: 'Supprimer' })).toBeHidden()
   })
 })
+
+test.describe('the feed', () => {
+  test('mixes my sessions with my friends’ shared ones; I react and comment', async ({
+    page,
+    club,
+    me,
+  }) => {
+    const marie = signedIn(me)
+    const tom = club.addMember({ nickname: 'tom', firstName: 'Tom', lastName: 'Bloc' })
+    const jules = club.addMember({ nickname: 'jules', firstName: 'Jules', lastName: 'Martin' })
+    club.social.link(tom, marie)
+    const mine = club.climbs.add(marie, 0, [{ route: 'Réglisse' }])
+    const toms = club.climbs.add(tom, 1, [{ route: 'Bye Bye Morice', mode: 'LEAD', clean: true }], {
+      comment: 'Le dévers a cédé.',
+    })
+    club.climbs.add(tom, 2, [{ route: 'Bye Bye Morice' }], { visibility: 'PRIVATE' })
+    club.climbs.add(jules, 1, [{ route: 'Bye Bye Morice' }])
+    club.climbs.react(tom, mine, 'GORILLA')
+
+    await page.clock.setSystemTime(new Date(club.now))
+    await page.goto('/actu')
+    await expect(page.getByRole('article')).toHaveCount(2)
+    const myCard = page.getByRole('article', { name: 'Séance d’aujourd’hui de marie' })
+    const tomsCard = page.getByRole('article', { name: 'Séance d’hier de tom' })
+    await expect(tomsCard.getByText('« Le dévers a cédé. »')).toBeVisible()
+    // On my own session, what the others gave, nothing to tap.
+    await expect(myCard.getByText('Mode gorille : 1')).toHaveCount(1)
+    await expect(myCard.getByRole('button')).toHaveCount(0)
+
+    await tomsCard.getByRole('button', { name: 'Ça chauffe : 0' }).click()
+    await expect(tomsCard.getByRole('button', { name: 'Ça chauffe : 1' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await tomsCard.getByRole('button', { name: 'Costaud : 0' }).click()
+    await expect(tomsCard.getByRole('button', { name: 'Costaud : 1' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(tomsCard.getByRole('button', { name: 'Ça chauffe : 0' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+    expect(toms.reactions.get(marie.id)).toBe('STRONG')
+
+    await tomsCard.getByRole('link', { name: 'Commenter' }).click()
+    await expect(page.getByRole('heading', { level: 2, name: 'tom' })).toBeVisible()
+    await expect(page.getByText('Pas encore de commentaire.', { exact: false })).toBeVisible()
+    await page.getByLabel('Ton commentaire').fill('Propre ! Tu me montres jeudi ?')
+    await page.getByRole('button', { name: 'Publier' }).click()
+    await expect(page.getByText('Propre ! Tu me montres jeudi ?')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Commentaires (1)' })).toBeVisible()
+
+    await page.goto('/actu')
+    await expect(tomsCard.getByRole('link', { name: '1 commentaire' })).toBeVisible()
+  })
+
+  test('says what to do when it is empty', async ({ page }) => {
+    await page.goto('/actu')
+    await expect(page.getByRole('heading', { name: 'Le mur est calme… trop calme.' })).toBeVisible()
+    await page.getByRole('link', { name: 'Trouver des copains de cordée' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Annuaire du club' })).toBeVisible()
+  })
+})
