@@ -25,10 +25,14 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -80,15 +84,22 @@ public class SessionViews {
             return List.of();
         }
         var sessionIds = sessions.stream().map(ClimbingSession::id).toList();
-        Map<UUID, MemberRefView> authors =
-                members
-                        .findAllById(
-                                sessions.stream()
-                                        .map(ClimbingSession::memberId)
-                                        .distinct()
-                                        .toList())
-                        .stream()
-                        .collect(Collectors.toMap(Member::id, MemberRefView::of));
+        var authorIds =
+                sessions.stream().map(ClimbingSession::memberId).collect(Collectors.toSet());
+        var belayerIds =
+                sessions.stream()
+                        .flatMap(session -> session.ascents().stream())
+                        .map(Ascent::belayerId)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+        var people = new HashSet<>(authorIds);
+        people.addAll(belayerIds);
+        Map<UUID, Member> found =
+                members.findAllById(people).stream()
+                        .collect(Collectors.toMap(Member::id, Function.identity()));
+        Map<UUID, MemberRefView> authors = refs(found, authorIds, member -> true);
+        // A disabled belayer drops out of sight, like everywhere else.
+        Map<UUID, MemberRefView> belayers = refs(found, belayerIds, Member::isActive);
         var reactionsBySession = reactionsOf(sessionIds, readerId);
         Map<UUID, Long> commentCounts =
                 comments.countVisiblePerSession(sessionIds).stream()
@@ -117,11 +128,20 @@ public class SessionViews {
                                         summaries,
                                         // The foreign key guarantees that the climber exists.
                                         authors.get(session.memberId()),
+                                        belayers,
                                         reactionsBySession.getOrDefault(session.id(), noReaction),
                                         commentCounts.getOrDefault(session.id(), 0L),
                                         readerId,
                                         now))
                 .toList();
+    }
+
+    private static Map<UUID, MemberRefView> refs(
+            Map<UUID, Member> found, Set<UUID> ids, Predicate<Member> shown) {
+        return ids.stream()
+                .map(found::get)
+                .filter(member -> member != null && shown.test(member))
+                .collect(Collectors.toMap(Member::id, MemberRefView::of));
     }
 
     private Map<UUID, SessionView.ReactionsView> reactionsOf(List<UUID> sessionIds, UUID readerId) {
@@ -149,6 +169,7 @@ public class SessionViews {
             ClimbingSession session,
             Map<UUID, RouteSummaryView> summaries,
             MemberRefView author,
+            Map<UUID, MemberRefView> belayers,
             SessionView.ReactionsView reactions,
             long commentCount,
             UUID readerId,
@@ -166,7 +187,10 @@ public class SessionViews {
                                                 ascent.clean(),
                                                 ascent.falls(),
                                                 ascent.firstTry(),
-                                                ascent.feeling()))
+                                                ascent.feeling(),
+                                                ascent.belayerId() == null
+                                                        ? null
+                                                        : belayers.get(ascent.belayerId())))
                         .toList();
         return new SessionView(
                 session.id(),

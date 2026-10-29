@@ -92,6 +92,29 @@ public interface ClimbingSessionRepository extends JpaRepository<ClimbingSession
             UUID id,
             int limit);
 
+    /**
+     * The sessions where I held the rope on at least one route, whoever climbed and whatever they
+     * share, in the order of {@link #findLatest} (index {@code ascent_belayer_idx}).
+     */
+    @Query(
+            value =
+                    "select * from climbing_session s where exists (select 1 from ascent a"
+                            + " where a.session_id = s.id and a.belayer_id = :belayerId)"
+                            + " order by climbed_on desc, created_at desc, id desc limit :limit",
+            nativeQuery = true)
+    List<ClimbingSession> findLatestBelayedBy(UUID belayerId, int limit);
+
+    /** The page after a cursor, in the same order as {@link #findLatestBelayedBy}. */
+    @Query(
+            value =
+                    "select * from climbing_session s where exists (select 1 from ascent a"
+                            + " where a.session_id = s.id and a.belayer_id = :belayerId)"
+                            + " and (climbed_on, created_at, id) < (:climbedOn, :createdAt, :id)"
+                            + " order by climbed_on desc, created_at desc, id desc limit :limit",
+            nativeQuery = true)
+    List<ClimbingSession> findBelayedByBefore(
+            UUID belayerId, LocalDate climbedOn, Instant createdAt, UUID id, int limit);
+
     /** My sessions between two days (both included), with their ascents, oldest first. */
     @Query(
             "select s from ClimbingSession s left join fetch s.ascents"

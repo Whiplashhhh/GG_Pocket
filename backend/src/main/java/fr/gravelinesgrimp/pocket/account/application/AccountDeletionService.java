@@ -17,6 +17,7 @@ import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
+import fr.gravelinesgrimp.pocket.session.infra.AscentRepository;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
 import fr.gravelinesgrimp.pocket.session.infra.SessionCommentRepository;
 import fr.gravelinesgrimp.pocket.session.infra.SessionReactionRepository;
@@ -49,6 +50,7 @@ public class AccountDeletionService {
     private final MediaFileRepository mediaFiles;
     private final MediaService media;
     private final ClimbingSessionRepository sessions;
+    private final AscentRepository ascents;
     private final SessionReactionRepository sessionReactions;
     private final SessionCommentRepository sessionComments;
     private final RouteRepository routes;
@@ -63,6 +65,7 @@ public class AccountDeletionService {
             MediaFileRepository mediaFiles,
             MediaService media,
             ClimbingSessionRepository sessions,
+            AscentRepository ascents,
             SessionReactionRepository sessionReactions,
             SessionCommentRepository sessionComments,
             RouteRepository routes,
@@ -75,6 +78,7 @@ public class AccountDeletionService {
         this.mediaFiles = mediaFiles;
         this.media = media;
         this.sessions = sessions;
+        this.ascents = ascents;
         this.sessionReactions = sessionReactions;
         this.sessionComments = sessionComments;
         this.routes = routes;
@@ -130,6 +134,7 @@ public class AccountDeletionService {
         // Before the hand-over, while the sessions are still mine.
         sessionReactions.deleteAllOnSessionsOf(member.id());
         sessionComments.deleteAllOnSessionsOf(member.id());
+        ascents.clearBelayersOnSessionsOf(member.id(), now);
         sessions.handOver(member.id(), FormerMember.ID, now);
         routes.creditSetter(member.id(), FormerMember.ID);
         member.changeAvatar(null);

@@ -54,7 +54,9 @@ public record SessionResponse(
             @Schema(requiredMode = RequiredMode.REQUIRED) boolean clean,
             @Schema(requiredMode = RequiredMode.REQUIRED) int falls,
             @Schema(requiredMode = RequiredMode.REQUIRED) boolean firstTry,
-            @Schema(description = "Out of 10") Integer feeling) {}
+            @Schema(description = "Out of 10") Integer feeling,
+            @Schema(description = "Who held the rope; absent when nobody was named")
+                    MemberRefResponse belayer) {}
 
     static SessionResponse from(SessionView view) {
         var summary = view.summary();
@@ -86,7 +88,10 @@ public record SessionResponse(
                                                 ascent.clean(),
                                                 ascent.falls(),
                                                 ascent.firstTry(),
-                                                ascent.feeling()))
+                                                ascent.feeling(),
+                                                ascent.belayer() == null
+                                                        ? null
+                                                        : MemberRefResponse.from(ascent.belayer())))
                         .toList(),
                 SessionReactionsResponse.from(view.reactions()),
                 view.commentCount());

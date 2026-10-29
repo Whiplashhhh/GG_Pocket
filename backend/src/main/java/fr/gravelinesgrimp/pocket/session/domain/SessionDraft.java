@@ -5,6 +5,7 @@ import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -46,5 +47,13 @@ public record SessionDraft(
 
     public Set<UUID> routeIds() {
         return ascents.stream().map(AscentDraft::routeId).collect(Collectors.toSet());
+    }
+
+    /** Whoever held the rope on at least one route. */
+    public Set<UUID> belayerIds() {
+        return ascents.stream()
+                .map(AscentDraft::belayerId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 }

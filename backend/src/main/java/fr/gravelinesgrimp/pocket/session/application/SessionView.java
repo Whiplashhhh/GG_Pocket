@@ -49,7 +49,8 @@ public record SessionView(
             boolean clean,
             int falls,
             boolean firstTry,
-            Integer feeling) {}
+            Integer feeling,
+            MemberRefView belayer) {}
 
     /** One count per reaction, in the order of {@link ReactionKind}; {@code mine} may be null. */
     public record ReactionsView(List<ReactionCountView> counts, ReactionKind mine) {

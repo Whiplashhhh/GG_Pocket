@@ -1,6 +1,7 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
 import fr.gravelinesgrimp.pocket.member.application.MediaService;
+import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
@@ -97,7 +98,7 @@ public class SessionService {
      *
      * @throws BusinessException {@code VALIDATION_FAILED}, {@code INVALID_ASCENT}, {@code
      *     DATE_IN_THE_FUTURE}, {@code SESSION_TOO_OLD}, {@code MONTH_FROZEN}, {@code NOT_FOUND}
-     *     (route), {@code ROUTE_DISMOUNTED}
+     *     (route), {@code ROUTE_DISMOUNTED}, {@code VALIDATION_FAILED} (belayer)
      */
     @PreAuthorize("hasRole('CLIMBER')")
     @Transactional
@@ -111,6 +112,7 @@ public class SessionService {
         draft.check();
         SessionCalendar.checkNewDate(draft.climbedOn(), clock.instant());
         checkRoutes(draft);
+        checkBelayers(memberId, draft);
         var session = sessions.save(ClimbingSession.create(memberId, clientRef, draft));
         autoChecks.refresh(memberId, routeModes(session));
         return new Saved(views.of(session, memberId), true);
@@ -145,6 +147,7 @@ public class SessionService {
             SessionCalendar.checkNewDate(draft.climbedOn(), now);
         }
         checkRoutes(draft);
+        checkBelayers(memberId, draft);
         var touched = new HashSet<>(routeModes(session));
         session.update(draft);
         touched.addAll(routeModes(session));
@@ -303,6 +306,27 @@ public class SessionService {
                 throw new BusinessException(
                         ErrorCode.ROUTE_DISMOUNTED, "Route " + route.id() + " was off");
             }
+        }
+    }
+
+    /**
+     * Any active member of the club may have held the rope, friend or not, but not the climber
+     * themself (D-101).
+     */
+    private void checkBelayers(UUID memberId, SessionDraft draft) {
+        var ids = draft.belayerIds();
+        if (ids.isEmpty()) {
+            return;
+        }
+        if (ids.contains(memberId)) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Nobody belays themself");
+        }
+        var active =
+                members.findAllById(ids).stream()
+                        .filter(member -> member.isActive() && !FormerMember.is(member.id()))
+                        .count();
+        if (active != ids.size()) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "No such belayer");
         }
     }
 
