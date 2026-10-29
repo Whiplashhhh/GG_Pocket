@@ -15,6 +15,16 @@ RUN pnpm build \
          echo 'dist/index.html has an inline script: the CSP (script-src self) would block it.' >&2; exit 1; \
        fi
 
+# Caddy rebuilt from source with the latest Go 1.27: the stock 2.11.7 binary is built with Go
+# 1.26.8, whose standard library has a critical CVE (Trivy). Same Caddy version, no plugin.
+# When the official image ships a fixed build, going back to its binary is enough.
+FROM golang:1.27-alpine AS caddy
+ENV CADDY_VERSION=v2.11.7 XCADDY_VERSION=v0.4.7 CGO_ENABLED=0
+RUN apk add --no-cache git \
+    && go install github.com/caddyserver/xcaddy/cmd/xcaddy@${XCADDY_VERSION} \
+    && xcaddy build ${CADDY_VERSION} --output /caddy \
+    && /caddy version
+
 FROM caddy:2.11-alpine
 ARG GIT_COMMIT=unknown
 ARG VERSION=unknown
@@ -23,10 +33,11 @@ LABEL org.opencontainers.image.title="gg-pocket-web" \
       org.opencontainers.image.source="https://github.com/Whiplashhhh/GG_Pocket" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${GIT_COMMIT}"
-# The stock binary carries the file capability cap_net_bind_service, which the kernel refuses to
-# run without any capability (cap_drop: ALL in compose). Port 8080 needs none: a plain copy drops it.
-RUN cp /usr/bin/caddy /usr/bin/caddy.plain \
-    && mv /usr/bin/caddy.plain /usr/bin/caddy \
+# The rebuilt binary replaces the stock one. Unlike it, it carries no file capability
+# (cap_net_bind_service), which the kernel would refuse to run without any capability (cap_drop: ALL
+# in compose); port 8080 needs none. The Alpine packages get their security fixes too.
+COPY --from=caddy /caddy /usr/bin/caddy
+RUN apk upgrade --no-cache \
     && addgroup -S -g 10001 gg \
     && adduser -S -u 10001 -G gg -H -h /srv gg \
     && chown -R gg:gg /config /data

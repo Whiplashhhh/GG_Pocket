@@ -906,3 +906,13 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Statut** : à valider (le retrait du nom sans blocage ; la liste « Mes assurages » visible même pour une séance privée,
   réduite à qui et quand).
 
+
+### D-102 — Caddy de l'image web recompilé avec un Go corrigé
+- **Contexte** : depuis le 2026-10-29, Trivy bloque l'image web : le binaire de `caddy:2.11-alpine` (2.11.7, la
+  dernière) est compilé avec Go 1.26.8, dont la bibliothèque standard a une faille critique corrigée. Aucune image
+  officielle corrigée n'existe encore.
+- **Choix** : `frontend/Dockerfile` recompile Caddy 2.11.7 (même version, sans plugin) avec `xcaddy` sur
+  `golang:1.27-alpine`, remplace le binaire de l'image officielle et applique `apk upgrade`. On revient au binaire
+  officiel dès qu'il est corrigé. Le proxy d'entrée (`deploy/edge`, image officielle, non scanné par la CI) a la même
+  faille : à mettre à jour sur le serveur quand l'image officielle sera corrigée.
+- **Statut** : à valider.
