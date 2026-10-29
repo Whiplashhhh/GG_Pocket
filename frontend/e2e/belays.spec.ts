@@ -60,7 +60,7 @@ test.describe('the belayer', () => {
     await line(page, 3)
       .getByRole('button', { name: /^À l’assurage sur la voie n° 3/ })
       .click()
-    await picker.getByRole('button', { name: 'Personne de précisé' }).click()
+    await picker.getByRole('button', { name: 'Pas précisé' }).click()
 
     await page.getByRole('button', { name: 'Enregistrer la séance' }).click()
     await expect(page).toHaveURL(/\/actu$/)

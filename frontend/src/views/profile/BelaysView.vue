@@ -20,13 +20,14 @@ import { sessionDay } from '@/lib/sessionView'
 const { t } = useI18n()
 const belays = useMyBelays()
 const withdraw = useWithdrawBelay()
+/** Kept once the sheet closes: it may close before saying "confirm". */
 const confirming = ref<Belay | null>(null)
-const open = computed({
-  get: () => confirming.value !== null,
-  set: (value: boolean) => {
-    if (!value) confirming.value = null
-  },
-})
+const open = ref(false)
+
+function ask(belay: Belay) {
+  confirming.value = belay
+  open.value = true
+}
 
 const items = computed(() => belays.data.value?.pages.flatMap((page) => page.items) ?? [])
 
@@ -99,7 +100,7 @@ function confirmWithdraw() {
           class="ml-auto"
           :disabled="withdraw.isPending.value"
           :aria-label="t('belays.withdrawNamed', { title: title(belay) })"
-          @click="confirming = belay"
+          @click="ask(belay)"
         >
           {{ t('belays.withdraw') }}
         </GgButton>
