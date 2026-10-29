@@ -144,6 +144,11 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'account.title' },
   },
   {
+    path: '/profil/assurages',
+    component: () => import('@/views/profile/BelaysView.vue'),
+    meta: { titleKey: 'belays.title' },
+  },
+  {
     path: '/profil/appareils',
     component: () => import('@/views/profile/DevicesView.vue'),
     meta: { titleKey: 'devices.title' },

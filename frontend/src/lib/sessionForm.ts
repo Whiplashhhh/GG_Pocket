@@ -25,6 +25,8 @@ export interface AscentLine {
   falls: number
   firstTry: boolean
   feeling: number | null
+  /** Who held the rope (a club member), if I say so. */
+  belayerId: string | null
 }
 
 export interface SessionForm {
@@ -69,7 +71,20 @@ export function sessionToForm(session: Session): SessionForm {
       falls: ascent.falls,
       firstTry: ascent.firstTry,
       feeling: ascent.feeling ?? null,
+      belayerId: ascent.belayer?.id ?? null,
     })),
+  }
+}
+
+/** A draft kept on the phone, maybe from before belayers (D-101): its lines get none. */
+export function restoredForm(
+  form: Omit<SessionForm, 'ascents'> & {
+    ascents: (Omit<AscentLine, 'belayerId'> & Partial<AscentLine>)[]
+  },
+): SessionForm {
+  return {
+    ...form,
+    ascents: form.ascents.map((line) => ({ ...line, belayerId: line.belayerId ?? null })),
   }
 }
 
@@ -81,7 +96,8 @@ export function dateBounds(today: string = clubToday()): { min: string; max: str
 }
 
 /**
- * A new line for a route, topped in the mode of the line before (top rope for the first one).
+ * A new line for a route, topped in the mode and with the belayer of the line before (top rope and
+ * nobody for the first one): one usually climbs a whole evening with the same partner.
  * "Premier essai" is ticked when I never logged this route before, nor higher in this session.
  */
 export function addAscent(
@@ -90,6 +106,7 @@ export function addAscent(
   climbedBefore: ReadonlySet<string>,
   mode: ClimbMode = lines.at(-1)?.mode ?? 'TOP_ROPE',
 ): AscentLine[] {
+  const belayerId = lines.at(-1)?.belayerId ?? null
   if (lines.length >= MAX_ASCENTS) return [...lines]
   const firstTry = !climbedBefore.has(routeId) && !lines.some((line) => line.routeId === routeId)
   return [
@@ -103,6 +120,7 @@ export function addAscent(
       falls: 0,
       firstTry,
       feeling: null,
+      belayerId,
     },
   ]
 }
@@ -185,6 +203,7 @@ export function toSessionRequest(form: SessionForm): SessionRequest {
       falls: line.clean ? 0 : line.falls,
       firstTry: line.firstTry,
       ...(line.feeling === null ? {} : { feeling: line.feeling }),
+      ...(line.belayerId === null ? {} : { belayerId: line.belayerId }),
     })),
   }
 }
@@ -206,6 +225,7 @@ export function requestToForm(body: SessionRequest): SessionForm {
       falls: ascent.falls,
       firstTry: ascent.firstTry,
       feeling: ascent.feeling ?? null,
+      belayerId: ascent.belayerId ?? null,
     })),
   }
 }

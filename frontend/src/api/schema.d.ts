@@ -449,6 +449,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/belays': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The sessions where I held the rope, latest day first (cursor pagination) */
+    get: operations['listMyBelays']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/climbed-routes': {
     parameters: {
       query?: never
@@ -1140,6 +1157,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/sessions/{id}/belayer': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Take my name back from the routes I belayed in a session */
+    delete: operations['withdrawFromBelay']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/sessions/{id}/comments': {
     parameters: {
       query?: never
@@ -1219,6 +1253,8 @@ export interface components {
       password: string
     }
     Ascent: {
+      /** @description Who held the rope; absent when nobody was named */
+      belayer?: components['schemas']['MemberRef']
       clean: boolean
       /** Format: int32 */
       falls: number
@@ -1237,6 +1273,11 @@ export interface components {
     }
     /** @description A clean ascent is topped, with 0 falls. */
     AscentRequest: {
+      /**
+       * Format: uuid
+       * @description Who held the rope: an active club member, not me
+       */
+      belayerId?: string
       clean: boolean
       /** Format: int32 */
       falls: number
@@ -1315,6 +1356,22 @@ export interface components {
       /** @description Present when signed in */
       member?: components['schemas']['CurrentMember']
     }
+    /** @description A session where I held the rope; readable says whether I may open it. */
+    Belay: {
+      /** Format: date */
+      climbedOn: string
+      climber: components['schemas']['MemberRef']
+      readable: boolean
+      /** Format: int32 */
+      routeCount: number
+      /** Format: uuid */
+      sessionId: string
+    }
+    /** @description nextCursor is absent on the last page. */
+    BelayPage: {
+      items: components['schemas']['Belay'][]
+      nextCursor?: string
+    }
     /** @description A route I climbed, and the last day I did. */
     ClimbedRoute: {
       /** Format: date */
@@ -1377,6 +1434,7 @@ export interface components {
       member: components['schemas']['MemberCard']
     }
     ExportedAscent: {
+      belayer?: string
       clean?: boolean
       /** Format: int32 */
       falls?: number
@@ -1386,6 +1444,11 @@ export interface components {
       mode?: string
       route?: components['schemas']['ExportedRoute']
       topped?: boolean
+    }
+    ExportedBelay: {
+      /** Format: int32 */
+      routeCount?: number
+      session?: components['schemas']['ExportedSessionRef']
     }
     ExportedComment: {
       /** Format: date-time */
@@ -1752,6 +1815,7 @@ export interface components {
       toppedCount: number
     }
     MyDataExport: {
+      belays?: components['schemas']['ExportedBelay'][]
       devices?: components['schemas']['ExportedDevice'][]
       /** Format: date-time */
       exportedAt?: string
@@ -2908,6 +2972,29 @@ export interface operations {
       }
     }
   }
+  listMyBelays: {
+    parameters: {
+      query?: {
+        cursor?: string
+        size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BelayPage']
+        }
+      }
+    }
+  }
   listMyClimbedRoutes: {
     parameters: {
       query?: never
@@ -4004,6 +4091,26 @@ export interface operations {
     }
   }
   deleteSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  withdrawFromBelay: {
     parameters: {
       query?: never
       header?: never

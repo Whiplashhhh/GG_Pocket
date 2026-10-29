@@ -2,7 +2,7 @@ import { watchDebounced } from '@vueuse/core'
 import { ref, toRaw, type Ref } from 'vue'
 
 import { localStore } from '@/lib/localStore'
-import type { SessionForm } from '@/lib/sessionForm'
+import { restoredForm, type SessionForm } from '@/lib/sessionForm'
 
 /** What the phone keeps of a session being typed (spec §8.3). */
 export interface SessionDraft {
@@ -38,7 +38,7 @@ export function useSessionDraft(
   async function restore(): Promise<boolean> {
     const draft = await store.get(key)
     if (draft !== undefined) {
-      form.value = draft.form
+      form.value = restoredForm(draft.form)
       photo.value = draft.photo
       removePhoto.value = draft.removePhoto === true
       restored.value = true

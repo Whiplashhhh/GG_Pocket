@@ -929,6 +929,47 @@
         ]
       }
     },
+    "/api/v1/me/belays": {
+      "get": {
+        "operationId": "listMyBelays",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BelayPage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "The sessions where I held the rope, latest day first (cursor pagination)",
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
     "/api/v1/me/climbed-routes": {
       "get": {
         "operationId": "listMyClimbedRoutes",
@@ -2400,6 +2441,31 @@
         ]
       }
     },
+    "/api/v1/sessions/{id}/belayer": {
+      "delete": {
+        "operationId": "withdrawFromBelay",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "Take my name back from the routes I belayed in a session",
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
     "/api/v1/sessions/{id}/comments": {
       "get": {
         "operationId": "listSessionComments",
@@ -2660,6 +2726,10 @@
       "Ascent": {
         "type": "object",
         "properties": {
+          "belayer": {
+            "$ref": "#/components/schemas/MemberRef",
+            "description": "Who held the rope; absent when nobody was named"
+          },
           "clean": {
             "type": "boolean"
           },
@@ -2707,6 +2777,11 @@
         "type": "object",
         "description": "A clean ascent is topped, with 0 falls.",
         "properties": {
+          "belayerId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Who held the rope: an active club member, not me"
+          },
           "clean": {
             "type": "boolean"
           },
@@ -2864,6 +2939,55 @@
         },
         "required": [
           "authenticated"
+        ]
+      },
+      "Belay": {
+        "type": "object",
+        "description": "A session where I held the rope; readable says whether I may open it.",
+        "properties": {
+          "climbedOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "climber": {
+            "$ref": "#/components/schemas/MemberRef"
+          },
+          "readable": {
+            "type": "boolean"
+          },
+          "routeCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "climbedOn",
+          "climber",
+          "readable",
+          "routeCount",
+          "sessionId"
+        ]
+      },
+      "BelayPage": {
+        "type": "object",
+        "description": "nextCursor is absent on the last page.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Belay"
+            }
+          },
+          "nextCursor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "ClimbedRoute": {
@@ -3071,6 +3195,9 @@
       "ExportedAscent": {
         "type": "object",
         "properties": {
+          "belayer": {
+            "type": "string"
+          },
           "clean": {
             "type": "boolean"
           },
@@ -3093,6 +3220,18 @@
           },
           "topped": {
             "type": "boolean"
+          }
+        }
+      },
+      "ExportedBelay": {
+        "type": "object",
+        "properties": {
+          "routeCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "session": {
+            "$ref": "#/components/schemas/ExportedSessionRef"
           }
         }
       },
@@ -4125,6 +4264,12 @@
       "MyDataExport": {
         "type": "object",
         "properties": {
+          "belays": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExportedBelay"
+            }
+          },
           "devices": {
             "type": "array",
             "items": {

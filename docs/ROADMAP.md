@@ -138,6 +138,12 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [x] Commentaires de séance + modération (Gestion > Modération, journal d'audit)
 - [x] Seed des réactions et commentaires, export, suppression de compte (D-100)
 
+### PR 5.3 — L'assureur (`feature/assureur-0.7.0`, demande de Willem, D-101)
+
+- [x] Un assureur par voie (membre du club, amis en tête), affiché sur la séance
+- [x] Profil > Mes assurages : retirer son nom
+- [x] Seed, export, suppression de compte
+
 ## Phase 6 — Podium et statistiques
 
 - [ ] Classements en direct (séances, voies), ex-aequo

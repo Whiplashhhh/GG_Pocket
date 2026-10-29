@@ -12,9 +12,11 @@ import {
   useSession,
   type SessionVisibility,
 } from '@/api/sessions'
+import { useDirectory, type MemberCard } from '@/api/social'
 import { useRoutes, type RouteSummary } from '@/api/topo'
 import type { PhotoChange } from '@/api/topoAdmin'
 import AscentLineEditor from '@/components/session/AscentLineEditor.vue'
+import BelayerPicker from '@/components/session/BelayerPicker.vue'
 import FeelingSlider from '@/components/session/FeelingSlider.vue'
 import SessionPhotoField from '@/components/session/SessionPhotoField.vue'
 import SessionRoutePicker from '@/components/session/SessionRoutePicker.vue'
@@ -124,6 +126,30 @@ const routeById = computed(() => {
   for (const item of routes.data.value ?? []) map.set(item.id, item)
   return map
 })
+/** The club, plus the belayers of the session being changed. */
+const directory = useDirectory()
+const belayerById = computed(() => {
+  const map = new Map<string, { nickname: string; avatarUrl?: string }>()
+  for (const ascent of existing.data.value?.ascents ?? []) {
+    if (ascent.belayer) map.set(ascent.belayer.id, ascent.belayer)
+  }
+  for (const entry of directory.data.value?.members ?? []) map.set(entry.member.id, entry.member)
+  return map
+})
+const pickingBelayer = ref(false)
+const belayerLine = ref(0)
+
+function chooseBelayer(index: number) {
+  belayerLine.value = index
+  pickingBelayer.value = true
+}
+
+function pickBelayer(member: MemberCard | null) {
+  const line = form.value.ascents[belayerLine.value]
+  if (line === undefined) return
+  update(belayerLine.value, { ...line, belayerId: member?.id ?? null })
+}
+
 const recentIds = computed(() => (climbed.data.value ?? []).map((item) => item.routeId))
 const climbedBefore = computed(() => new Set(recentIds.value))
 const full = computed(() => form.value.ascents.length >= MAX_ASCENTS)
@@ -300,13 +326,20 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
             :position="index + 1"
             :count="form.ascents.length"
             :can-duplicate="!full"
+            :belayer="line.belayerId === null ? undefined : belayerById.get(line.belayerId)"
             @update="update(index, $event)"
+            @choose-belayer="chooseBelayer(index)"
             @duplicate="duplicate(index)"
             @move="move(index, $event)"
             @remove="remove(index)"
           />
         </ol>
         <p v-if="full" class="px-4 py-3 text-sm text-ink-muted">{{ t('session.full') }}</p>
+        <BelayerPicker
+          v-model:open="pickingBelayer"
+          :selected-id="form.ascents[belayerLine]?.belayerId ?? null"
+          @pick="pickBelayer"
+        />
       </section>
 
       <section

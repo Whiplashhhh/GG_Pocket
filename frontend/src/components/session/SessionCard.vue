@@ -8,6 +8,8 @@ import type { Session } from '@/api/sessions'
 import SessionReactions from '@/components/session/SessionReactions.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
+import { sessionBelayers } from '@/lib/belayers'
+import { formatList } from '@/lib/format'
 import { ascentOutcome, sessionDay } from '@/lib/sessionView'
 
 /**
@@ -48,6 +50,9 @@ const lines = computed(() =>
 )
 const hidden = computed(() => props.session.ascents.length - lines.value.length)
 const summary = computed(() => props.session.summary)
+const belayers = computed(() =>
+  formatList(sessionBelayers(props.session).map((belayer) => belayer.nickname)),
+)
 </script>
 
 <template>
@@ -130,6 +135,9 @@ const summary = computed(() => props.session.summary)
         t('session.summary.feeling', { n: session.feeling })
       }}</span>
     </p>
+    <p v-if="belayers !== ''" class="-mt-2 text-ink-muted">
+      {{ t('session.belayedBy', { names: belayers }) }}
+    </p>
 
     <img
       v-if="session.photoUrl"
@@ -152,6 +160,9 @@ const summary = computed(() => props.session.summary)
             )
           }}
           <template v-if="ascent.firstTry"> · {{ t('session.firstTryShort') }}</template>
+          <template v-if="!linked && ascent.belayer">
+            · {{ t('session.belayerShort', { name: ascent.belayer.nickname }) }}</template
+          >
         </span>
       </li>
     </ul>

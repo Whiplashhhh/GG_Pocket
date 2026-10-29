@@ -884,3 +884,25 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - Badges dans la carte (« a débloqué… ») : avec la phase 7.
 - **Statut** : à valider (pas de réaction sur sa propre séance ; le grimpeur ne modère pas sous sa séance ; la direction
   lit les commentaires de séance pour modérer).
+
+### D-101 — PR 5.3 : l'assureur, voie par voie
+- **Contexte** : demande de Willem (2026-10-29), hors spec : choisir son assureur en saisissant une séance. Willem a
+  tranché : facultatif, **un assureur par voie**, choisi dans **tout le club, amis en tête**, **membres seulement**
+  (pas de texte libre : pas de nom stocké pour quelqu'un qui n'a rien accepté).
+- **Choix** :
+  - `ascent.belayer_id` (V13, `on delete set null`), facultatif. Le serveur refuse (400 `VALIDATION_FAILED`) le grimpeur
+    lui-même et tout membre inconnu, désactivé ou « Ancien·ne membre ».
+  - Saisie : une nouvelle voie reprend l'assureur de la voie d'avant (souvent le même binôme toute la soirée), dupliquer
+    le garde ; le sélecteur montre mes amis, puis le reste de l'annuaire, avec une recherche.
+  - Affichage : « À l'assurage : jules et tom » sur la carte, et voie par voie sur la fiche. Un assureur désactivé
+    n'apparaît plus (comme partout).
+  - **Être nommé ne donne aucun droit sur la séance** : une séance privée reste privée. L'assureur voit, dans Profil >
+    Mes assurages, qui grimpait, quel jour et combien de voies il a assurées ; il n'ouvre la séance que s'il la voit
+    déjà (ami, séance « amis »). Il peut **retirer son nom** (`DELETE /sessions/{id}/belayer`), même un mois figé : ça
+    ne change rien aux chiffres du grimpeur. Le grimpeur peut le renommer ensuite (pas de liste noire, à revoir si abus).
+  - Suppression de compte : un assureur supprimé disparaît des voies (FK) ; les séances cédées à « Ancien·ne membre »
+    perdent leurs assureurs. Export : l'assureur de mes voies (pseudo) et mes assurages (grimpeur, jour, nombre de voies).
+  - Idée pour la phase 6, non engagée : un classement « assureur du mois ».
+- **Statut** : à valider (le retrait du nom sans blocage ; la liste « Mes assurages » visible même pour une séance privée,
+  réduite à qui et quand).
+
