@@ -10,11 +10,27 @@ import {
 
 /**
  * A sheet that slides up from the bottom on phones and sits in the middle on larger screens.
- * Focus is trapped inside while it is open and comes back where it was afterwards.
+ * Focus is trapped inside while it is open and comes back where it was afterwards. It lands on the
+ * first field, or on the first element matching one of `initialFocus` (in that order): a list to
+ * pick from should not open the phone keyboard over itself.
  */
-defineProps<{ title: string; description?: string }>()
+const props = defineProps<{ title: string; description?: string; initialFocus?: string[] }>()
 
 const open = defineModel<boolean>('open', { required: true })
+
+function focusOnOpen(event: Event) {
+  if (props.initialFocus === undefined) return
+  const content = event.target
+  if (!(content instanceof HTMLElement)) return
+  for (const selector of props.initialFocus) {
+    const target = content.querySelector<HTMLElement>(selector)
+    if (target !== null) {
+      event.preventDefault()
+      target.focus()
+      return
+    }
+  }
+}
 </script>
 
 <template>
@@ -24,6 +40,7 @@ const open = defineModel<boolean>('open', { required: true })
       <DialogContent
         class="fixed inset-x-0 bottom-0 z-50 max-h-[90dvh] overflow-y-auto rounded-t-sheet bg-surface px-4 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-sheet sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-[28rem] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-sheet sm:pb-5"
         v-bind="description ? {} : { 'aria-describedby': undefined }"
+        @open-auto-focus="focusOnOpen"
       >
         <DialogTitle class="text-xl font-title text-balance">{{ title }}</DialogTitle>
         <DialogDescription v-if="description" class="mt-2 text-ink-muted">

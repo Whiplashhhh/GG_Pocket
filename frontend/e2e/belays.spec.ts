@@ -34,6 +34,8 @@ test.describe('the belayer', () => {
       .getByRole('button', { name: 'À l’assurage sur la voie n° 1 : Pas précisé. Changer' })
       .click()
     const picker = page.getByRole('dialog', { name: 'Qui t’assurait ?' })
+    // No keyboard over the list: the current choice has the focus, not the search box.
+    await expect(picker.getByRole('button', { name: 'Pas précisé' })).toBeFocused()
     await expect(
       picker.getByRole('region', { name: 'Tes amis' }).getByRole('button', { name: /Tom Bloc/ }),
     ).toBeVisible()

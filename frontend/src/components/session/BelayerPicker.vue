@@ -52,6 +52,7 @@ const row =
     v-model:open="open"
     :title="t('belayerPicker.title')"
     :description="t('belayerPicker.description')"
+    :initial-focus="['[aria-pressed=\'true\']', '[data-nobody]']"
   >
     <div class="flex flex-col gap-3">
       <TextField
@@ -70,6 +71,7 @@ const row =
         type="button"
         :class="row"
         :aria-pressed="props.selectedId === null"
+        data-nobody
         @click="pick(null)"
       >
         <span
