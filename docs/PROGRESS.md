@@ -4,6 +4,32 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-29 — PR 5.3 : l'assureur (demande de Willem)
+
+**Branche** : `feature/assureur-0.7.0` (D-101).
+
+### Fait
+
+- Backend : V13 (`ascent.belayer_id`), assureur facultatif par voie (membre actif, pas soi-même, sinon 400),
+  affiché sur toute séance ; `GET /me/belays` et `DELETE /sessions/{id}/belayer` (`BelayService`) ; suppression de
+  compte, export, seed. IT : `BelayIT`, `DemoSeederIT`, matrice d'autorisations. CI backend verte.
+- Front : choix de l'assureur par voie (`BelayerPicker`, amis en tête, hérité de la voie d'avant), « À l'assurage »
+  sur la carte et la fiche, Profil > Mes assurages (`BelaysView`). Vitest (`belayers`, `sessionForm`), e2e
+  `belays.spec.ts` (72 verts en Desktop Chrome), captures 360 clair/sombre regardées.
+
+### Reste
+
+- CI complète de la PR, essai sur le dev si Willem le demande, fusion. D-101 à valider.
+- Le job « Docker stack » échoue (sur `main` aussi depuis la 0.7.0) : Trivy trouve une faille critique corrigée dans la
+  bibliothèque Go de l'image `caddy:2.11-alpine`. Hors de cette PR : monter l'image Caddy dès qu'une version corrigée
+  existe (PR `chore/`).
+
+### Prochaine action
+
+Attendre Willem (essai dev, fusion), puis phase 6 (podium), ou la PR `chore/` pour l'image Caddy s'il le demande.
+
+---
+
 ## 2026-10-28 — Phase 5, PR 5.2 : le fil d'actu
 
 **Branche** : `feature/fil-0.6.0` (PR 5.2, voir D-100).
