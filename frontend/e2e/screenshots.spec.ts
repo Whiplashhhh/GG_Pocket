@@ -137,6 +137,30 @@ const marieOnTheWall = (club: FakeClub) => {
 
 /** A month of Marie at the gym, a route dismounted since in her history, a few marks. */
 /** The club's October: a tie at the top, a long list, Marie far enough down for her bar. */
+/** A month of the club on the wall: popular routes, ignored ones, falls and clean ascents. */
+const clubAttendance = (club: FakeClub) => {
+  const climbers = ['lea.dyno', 'Tom', 'jules', 'nina', 'paulo', 'zoe'].map((nickname) =>
+    club.addMember({ nickname }),
+  )
+  const plan: [string, number, number][] = [
+    ['Bye Bye Morice', 14, 9],
+    ['Iron Man', 9, 8],
+    ['Réglisse', 7, 3],
+    ['OH purée !', 6, 2],
+    ['Pied-main party', 4, 4],
+    ['Avant-bras en béton', 3, 0],
+    ['Sec !', 2, 2],
+  ]
+  for (const [route, ascents, topped] of plan) {
+    for (let index = 0; index < ascents; index++) {
+      const climber = climbers[index % climbers.length]
+      club.climbs.add(climber, 1 + (index % 15), [
+        { route, topped: index < topped, clean: index < topped && index % 3 === 0 },
+      ])
+    }
+  }
+}
+
 const clubPodium = (club: FakeClub) => {
   const marie = club.members.find((member) => member.nickname === 'marie')
   if (marie === undefined) return
@@ -641,6 +665,20 @@ const CAPTURES: Capture[] = [
     path: '/gestion/derniere-chance',
     as: 'SETTER',
     desktop: true,
+  },
+  {
+    name: 'gestion-frequentation',
+    path: '/gestion/frequentation',
+    as: 'SETTER',
+    desktop: true,
+    prepare: clubAttendance,
+  },
+  {
+    name: 'gestion-bilan-du-topo',
+    path: '/gestion/bilan-du-topo',
+    as: 'SETTER',
+    desktop: true,
+    prepare: clubAttendance,
   },
   {
     name: 'gestion-club',

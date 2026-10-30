@@ -16,6 +16,12 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   d’« Ancien·ne membre ».
 - Pas envie d’y apparaître ? Décoche « Apparaître dans les classements du podium » dans ton profil : tu grimpes
   incognito.
+- Pour les ouvreurs et le bureau, deux nouveaux écrans dans l’espace gestion :
+  - **Fréquentation** : mois par mois, combien d’ascensions sur chaque voie, combien de grimpeurs, combien de
+    topées et d’enchaînées. Trie comme tu veux et exporte le tout en CSV pour ton tableur.
+  - **Bilan du topo** : le mur d’un coup d’œil. Les cotations qui manquent, les secteurs bien garnis, les cordes
+    libres, les voies qui cartonnent, celles qui prennent la poussière, les plus anciennes (de quoi savoir quoi
+    démonter) et les coups de cœur.
 
 ### Modifié
 

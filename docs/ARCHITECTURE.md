@@ -37,7 +37,8 @@ Un package par domaine sous `fr.gravelinesgrimp.pocket`, chacun découpé en cou
 | `topo` | Voies (ouvreurs, styles, photo, statuts), commentaires, coups de cœur, « je sais la faire », dernière chance, voie préférée | ✅ |
 | `session` | Séances, ascensions, photo de séance, « je sais la faire » automatique, statistiques des voies (via `RouteAscentStats`), planning du mois (`PlanningService`), carnet (`LogbookService`), fil d'actu (`SessionService.feed`), réactions et commentaires de séance (D-100) | ✅ |
 | `social` | Amitiés (`Friendships` pour les autres modules), annuaire, profils publics | ✅ |
-| `ranking` | Classements mensuels, clôture | 🔜 phase 6 |
+| `ranking` | Classements mensuels (podium), clôture mensuelle, mois figés (D-103) | ✅ |
+| `stats` | Statistiques de gestion : fréquentation d'un mois par voie, voies au mur et leurs ascensions depuis l'ouverture (D-104) ; lit les séances et réutilise les vues de voie de `topo` | ✅ |
 | `badge` | Moteur de badges | 🔜 phase 7 |
 
 ```mermaid
@@ -67,7 +68,7 @@ servlet, controllers dans `api`, repositories dans `infra`, **aucune entité JPA
   ni mot de passe par défaut.
 - **Dépendances entre domaines** : `member` ne dépend de personne ; `auth` dépend de `member` ; `admin` de `auth` et `member` ;
   `club` de `member` et `admin` (journal d'audit) ; `topo` de `club`, `member` et `admin`. `member` ne porte que l'identifiant
-  de la voie préférée (`member.favorite_route_id`), sans association : c'est `topo` qui la choisit et la vérifie.
+  de la voie préférée (`member.favorite_route_id`), sans association : c'est `topo` qui la choisit et la vérifie. `ranking` et `stats` lisent `session` et `topo`, personne ne dépend d'eux.
 - **Temps** : horodatages en UTC (`timestamptz`, `Instant`) ; règles calendaires en `Europe/Paris` (semaines ISO, mois).
   « Maintenant » vient toujours du bean `Clock`, pour que les tests fixent l'heure.
 - **Configuration** : préfixe `gg` (`GgProperties`), alimenté par variables d'environnement (`GG_ENVIRONMENT`, …).

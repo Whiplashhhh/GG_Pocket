@@ -123,6 +123,39 @@ export class FakeSessions implements AscentSource {
     }
   }
 
+  /** Ascents counted for the management space: every attempt, every visibility. */
+  private attendance(
+    on: { session: FakeSession; ascent: FakeSession['ascents'][number] }[],
+  ): Schemas['Attendance'] {
+    const topped = on.filter(({ ascent }) => ascent.topped).length
+    return {
+      ascentCount: on.length,
+      toppedCount: topped,
+      cleanCount: on.filter(({ ascent }) => ascent.clean).length,
+      climberCount: new Set(on.map(({ session }) => session.memberId)).size,
+      ...(on.length === 0 ? {} : { successPercent: Math.round((100 * topped) / on.length) }),
+    }
+  }
+
+  /** Spec §8.10: the routes on the wall during the month and those climbed in it. */
+  private monthAttendance(me: TopoMember, month: string): Schemas['MonthAttendance'] {
+    const inMonth = this.allAscents().filter(({ session }) => session.climbedOn.startsWith(month))
+    const routes = this.topo.routes.filter(
+      (route) =>
+        inMonth.some(({ ascent }) => ascent.routeId === route.id) ||
+        (route.openedOn.slice(0, 7) <= month &&
+          (route.dismountedAt === undefined || route.dismountedAt.slice(0, 7) >= month)),
+    )
+    return {
+      month,
+      total: this.attendance(inMonth),
+      routes: routes.map((route) => ({
+        route: this.topo.summary(me, route),
+        attendance: this.attendance(inMonth.filter(({ ascent }) => ascent.routeId === route.id)),
+      })),
+    }
+  }
+
   mine(memberId: string, routeId: string): Schemas['MyRouteAscent'][] {
     return this.ordered(memberId)
       .flatMap((session) => [...session.ascents].reverse().map((ascent) => ({ session, ascent })))
@@ -630,6 +663,27 @@ export class FakeSessions implements AscentSource {
     }
     if (pathname === '/me/todo' && method === 'GET') return json(this.todo(me))
     if (pathname === '/me/logbook' && method === 'GET') return json(this.logbook(me))
+    if (pathname.startsWith('/stats/') && me.role === 'CLIMBER') {
+      return problem(403, 'ACCESS_DENIED')
+    }
+    if (pathname === '/stats/attendance' && method === 'GET') {
+      const month = url.searchParams.get('month') ?? this.day().slice(0, 7)
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || month > this.day().slice(0, 7)) {
+        return problem(400, 'VALIDATION_FAILED')
+      }
+      return json(this.monthAttendance(me, month))
+    }
+    if (pathname === '/stats/routes' && method === 'GET') {
+      const all = this.allAscents()
+      return json(
+        this.topo.routes
+          .filter((route) => route.status !== 'DISMOUNTED')
+          .map((route) => ({
+            route: this.topo.summary(me, route),
+            attendance: this.attendance(all.filter(({ ascent }) => ascent.routeId === route.id)),
+          })),
+      )
+    }
     if (pathname === '/rankings' && method === 'GET') {
       const month = url.searchParams.get('month') ?? this.day().slice(0, 7)
       if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || month > this.day().slice(0, 7)) {

@@ -2742,6 +2742,62 @@
         ]
       }
     },
+    "/api/v1/stats/attendance": {
+      "get": {
+        "operationId": "getMonthAttendance",
+        "parameters": [
+          {
+            "description": "YYYY-MM, this month by default; never a future month",
+            "in": "query",
+            "name": "month",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthAttendance"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "The ascents of a month, route by route (setter+)",
+        "tags": [
+          "Stats"
+        ]
+      }
+    },
+    "/api/v1/stats/routes": {
+      "get": {
+        "operationId": "listRouteAttendance",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RouteAttendance"
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "The routes on the wall, with their ascents since they opened (setter+)",
+        "tags": [
+          "Stats"
+        ]
+      }
+    },
     "/api/v1/topo/config": {
       "get": {
         "operationId": "getTopoConfig",
@@ -2880,6 +2936,40 @@
           "mode",
           "routeId",
           "topped"
+        ]
+      },
+      "Attendance": {
+        "type": "object",
+        "description": "Ascents over a period, topped or not.",
+        "properties": {
+          "ascentCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cleanCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "climberCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Distinct climbers"
+          },
+          "successPercent": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Rounded share of topped ascents; absent without any ascent"
+          },
+          "toppedCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "ascentCount",
+          "cleanCount",
+          "climberCount",
+          "toppedCount"
         ]
       },
       "AuditEntry": {
@@ -4302,6 +4392,31 @@
           "comments"
         ]
       },
+      "MonthAttendance": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-10"
+          },
+          "routes": {
+            "type": "array",
+            "description": "Routes on the wall during the month, climbed or not, and those climbed in it; most climbed first",
+            "items": {
+              "$ref": "#/components/schemas/RouteAttendance"
+            }
+          },
+          "total": {
+            "$ref": "#/components/schemas/Attendance",
+            "description": "Every route together: a climber of several routes counts once"
+          }
+        },
+        "required": [
+          "month",
+          "routes",
+          "total"
+        ]
+      },
       "MonthTotals": {
         "type": "object",
         "description": "climbingDays: days with a session (two sessions on a day make one); toppedCount: topped ascents, repeats included; maxGrade: the hardest topped; averageFeeling: of the rated sessions.",
@@ -5069,6 +5184,22 @@
         },
         "required": [
           "role"
+        ]
+      },
+      "RouteAttendance": {
+        "type": "object",
+        "description": "A route and its ascents over a period.",
+        "properties": {
+          "attendance": {
+            "$ref": "#/components/schemas/Attendance"
+          },
+          "route": {
+            "$ref": "#/components/schemas/RouteSummary"
+          }
+        },
+        "required": [
+          "attendance",
+          "route"
         ]
       },
       "RouteComment": {

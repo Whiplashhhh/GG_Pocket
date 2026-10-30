@@ -223,6 +223,16 @@ const routes: RouteRecordRaw[] = [
         meta: { titleKey: 'lastChanceAdmin.title', minRole: 'SETTER', wide: true },
       },
       {
+        path: 'frequentation',
+        component: () => import('@/views/management/AttendanceView.vue'),
+        meta: { titleKey: 'attendance.title', minRole: 'SETTER', wide: true },
+      },
+      {
+        path: 'bilan-du-topo',
+        component: () => import('@/views/management/TopoReviewView.vue'),
+        meta: { titleKey: 'topoReview.title', minRole: 'SETTER', wide: true },
+      },
+      {
         path: 'membres',
         component: () => import('@/views/management/MembersView.vue'),
         meta: { titleKey: 'members.title', minRole: 'BOARD', wide: true },
