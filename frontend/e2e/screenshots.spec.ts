@@ -107,6 +107,15 @@ const feedAlive = (club: FakeClub) => {
   club.climbs.comment(lea, his, 'Enfin ! Tu me montres la méthode du crux jeudi ?', 120)
   club.climbs.comment(tom, his, 'Jeudi 19 h, ramène de la magnésie.', 60)
   club.climbs.add(lea, 0, [{ route: 'Réglisse', mode: 'LEAD', clean: true }], { feeling: 7 })
+  // Who held the rope: marie for tom, tom then léa for marie (D-101).
+  for (const ascent of his.ascents) ascent.belayerId = marie.id
+  hers.ascents.forEach((ascent, index) => {
+    ascent.belayerId = index === 0 ? tom.id : lea.id
+  })
+  const sam = club.members.find((member) => member.nickname === 'sam')
+  if (sam !== undefined) {
+    club.climbs.add(sam, 4, [{ route: 'Bye Bye Morice', belayerId: marie.id }])
+  }
 }
 
 const addToSession = async (page: Page, search: string, name: string) => {
@@ -246,6 +255,12 @@ const CAPTURES: Capture[] = [
     },
   },
   {
+    name: 'mes-assurages',
+    path: '/profil/assurages',
+    as: 'CLIMBER',
+    prepare: feedAlive,
+  },
+  {
     name: 'moderation',
     path: '/gestion/moderation',
     as: 'BOARD',
@@ -331,6 +346,20 @@ const CAPTURES: Capture[] = [
       await second.getByRole('button', { name: 'Une chute de plus' }).click()
       await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('')
       await page.getByLabel('Commentaire').fill('Grosse séance de conti.')
+    },
+  },
+  {
+    name: 'seance-assureur',
+    path: '/seance/nouvelle',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      marieClimbs(club)
+      marieFriends(club)
+    },
+    act: async (page) => {
+      await addToSession(page, '12', 'Bye Bye Morice')
+      await page.getByRole('button', { name: /^À l’assurage sur la voie n° 1/ }).click()
+      await page.getByRole('dialog', { name: 'Qui t’assurait ?' }).waitFor()
     },
   },
   {

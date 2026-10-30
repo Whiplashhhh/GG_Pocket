@@ -52,6 +52,11 @@ public class SessionFixtures {
         return new AscentDraft(route.id(), mode, true, true, 0, false, null);
     }
 
+    /** Topped clean, with {@code belayer} on the rope. */
+    public static AscentDraft belayed(Route route, ClimbMode mode, Member belayer) {
+        return new AscentDraft(route.id(), mode, true, true, 0, false, null, belayer.id());
+    }
+
     public static AscentDraft tried(Route route, ClimbMode mode) {
         return new AscentDraft(route.id(), mode, false, false, 2, false, null);
     }

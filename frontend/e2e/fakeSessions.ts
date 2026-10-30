@@ -68,7 +68,13 @@ export class FakeSessions implements AscentSource {
   add(
     member: TopoMember,
     daysBack: number,
-    ascents: { route: string; mode?: AscentRequest['mode']; topped?: boolean; clean?: boolean }[],
+    ascents: {
+      route: string
+      mode?: AscentRequest['mode']
+      topped?: boolean
+      clean?: boolean
+      belayerId?: string
+    }[],
     extra: Partial<Pick<FakeSession, 'comment' | 'feeling' | 'frozen' | 'visibility'>> = {},
   ): FakeSession {
     const session: FakeSession = {
@@ -91,6 +97,7 @@ export class FakeSessions implements AscentSource {
         clean: ascent.clean ?? false,
         falls: ascent.clean === true || ascent.topped === false ? 0 : 1,
         firstTry: false,
+        ...(ascent.belayerId === undefined ? {} : { belayerId: ascent.belayerId }),
       })),
     }
     this.sessions.push(session)
@@ -444,6 +451,7 @@ export class FakeSessions implements AscentSource {
         falls: ascent.falls,
         firstTry: ascent.firstTry,
         ...(ascent.feeling === undefined ? {} : { feeling: ascent.feeling }),
+        ...(ascent.belayerId === undefined ? {} : { belayer: this.memberRef(ascent.belayerId) }),
       })),
       reactions: this.reactions(me, session),
       commentCount: session.comments.filter((comment) => !comment.deleted).length,
@@ -594,6 +602,37 @@ export class FakeSessions implements AscentSource {
       this.sessions.push(session)
       this.refreshChecks(me.id)
       return json(this.view(me, session), 201)
+    }
+
+    if (pathname === '/me/belays' && method === 'GET') {
+      const all = this.sessions
+        .filter((session) => session.ascents.some((ascent) => ascent.belayerId === me.id))
+        .sort(
+          (a, b) =>
+            b.climbedOn.localeCompare(a.climbedOn) || b.createdAt.localeCompare(a.createdAt),
+        )
+      const start = Number(url.searchParams.get('cursor') ?? '0')
+      const size = Number(url.searchParams.get('size') ?? '20')
+      return json({
+        items: all.slice(start, start + size).map((session) => ({
+          sessionId: session.id,
+          climber: this.memberRef(session.memberId),
+          climbedOn: session.climbedOn,
+          routeCount: session.ascents.filter((ascent) => ascent.belayerId === me.id).length,
+          readable: this.readable(me, session),
+        })),
+        ...(start + size < all.length ? { nextCursor: String(start + size) } : {}),
+      })
+    }
+    // Named or not is all that counts: the belayer may not read the session (D-101).
+    const belay = /^\/sessions\/([^/]+)\/belayer$/.exec(pathname)
+    if (belay !== null && method === 'DELETE') {
+      const named = this.sessions
+        .find((candidate) => candidate.id === belay[1])
+        ?.ascents.filter((ascent) => ascent.belayerId === me.id)
+      if (named === undefined || named.length === 0) return problem(404, 'NOT_FOUND')
+      for (const ascent of named) delete ascent.belayerId
+      return empty
     }
 
     const match = /^\/sessions\/([^/]+)(\/photo|\/reaction|\/comments)?$/.exec(pathname)

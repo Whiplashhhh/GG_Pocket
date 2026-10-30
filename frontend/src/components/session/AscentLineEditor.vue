@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowDown, ArrowUp, Copy, EllipsisVertical, Trash2 } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, ChevronRight, Copy, EllipsisVertical, Trash2 } from 'lucide-vue-next'
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -14,6 +14,7 @@ import type { ClimbMode, RouteSummary } from '@/api/topo'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import CheckboxField from '@/components/ui/CheckboxField.vue'
 import SegmentedControl from '@/components/ui/SegmentedControl.vue'
+import UserAvatar from '@/components/ui/UserAvatar.vue'
 import { setClean, setFalls, setTopped, type AscentLine } from '@/lib/sessionForm'
 
 import FallsStepper from './FallsStepper.vue'
@@ -21,7 +22,7 @@ import FeelingSlider from './FeelingSlider.vue'
 
 /**
  * One ascent of the session sheet (docs/DESIGN.md, « Nouvelle séance »): mode, topped, clean,
- * falls, first try, feeling. Big targets: hands are full of chalk.
+ * falls, first try, feeling, belayer. Big targets: hands are full of chalk.
  */
 const props = defineProps<{
   line: AscentLine
@@ -30,9 +31,12 @@ const props = defineProps<{
   position: number
   count: number
   canDuplicate: boolean
+  /** Who line.belayerId is; undefined when nobody is named (or no longer in the club). */
+  belayer: { nickname: string; avatarUrl?: string } | undefined
 }>()
 const emit = defineEmits<{
   update: [line: AscentLine]
+  chooseBelayer: []
   duplicate: []
   move: [delta: -1 | 1]
   remove: []
@@ -184,6 +188,33 @@ const menuItem =
       </div>
       <div class="col-span-2 sm:col-span-1">
         <FeelingSlider v-model="feeling" :label="t('session.feeling')" />
+      </div>
+      <div class="col-span-2 flex flex-col gap-1">
+        <span class="font-semibold" aria-hidden="true">{{ t('session.belayer') }}</span>
+        <button
+          type="button"
+          class="flex min-h-12 items-center gap-3 rounded-control border-2 border-rule bg-surface px-3 py-1.5 text-left hover:border-ink"
+          :aria-label="
+            t('session.belayerButton', {
+              n: position,
+              name: belayer?.nickname ?? t('session.belayerNobody'),
+            })
+          "
+          @click="emit('chooseBelayer')"
+        >
+          <UserAvatar
+            v-if="belayer"
+            :first-name="belayer.nickname"
+            last-name=""
+            :seed="belayer.nickname"
+            :src="belayer.avatarUrl"
+            :size="32"
+          />
+          <span class="flex-1 truncate" :class="belayer ? 'font-semibold' : 'text-ink-muted'">{{
+            belayer?.nickname ?? t('session.belayerNobody')
+          }}</span>
+          <ChevronRight :size="20" aria-hidden="true" />
+        </button>
       </div>
     </div>
   </li>

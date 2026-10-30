@@ -47,6 +47,9 @@ public class Ascent extends TimestampedEntity {
 
     private Integer feeling;
 
+    @Column(name = "belayer_id")
+    private UUID belayerId;
+
     protected Ascent() {
         // for JPA
     }
@@ -69,6 +72,7 @@ public class Ascent extends TimestampedEntity {
         this.falls = draft.falls();
         this.firstTry = draft.firstTry();
         this.feeling = draft.feeling();
+        this.belayerId = draft.belayerId();
     }
 
     public int position() {
@@ -101,6 +105,11 @@ public class Ascent extends TimestampedEntity {
 
     public Integer feeling() {
         return feeling;
+    }
+
+    /** Who held the rope, if the climber said so. */
+    public UUID belayerId() {
+        return belayerId;
     }
 
     /** The route and mode, for the "je sais la faire" bookkeeping. */

@@ -25,6 +25,7 @@ const HOUR_MINUTE = new Intl.DateTimeFormat('en-GB', {
   timeZone: ZONE,
 })
 const RELATIVE = new Intl.RelativeTimeFormat('fr-FR', { numeric: 'auto' })
+const AND = new Intl.ListFormat('fr-FR', { style: 'long', type: 'conjunction' })
 
 /** French writes the first day of a month "1er", which Intl does not. */
 const firstOfMonth = (formatted: string): string => formatted.replace(/^1(?= )/, '1er')
@@ -71,4 +72,9 @@ export function formatRelative(value: string, now: number = Date.now()): string 
     }
   }
   return RELATIVE.format(0, 'second')
+}
+
+/** "marie, tom et léa". */
+export function formatList(items: readonly string[]): string {
+  return AND.format(items)
 }

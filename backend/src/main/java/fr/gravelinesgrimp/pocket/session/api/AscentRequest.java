@@ -21,9 +21,10 @@ public record AscentRequest(
         @Schema(requiredMode = RequiredMode.REQUIRED) @Min(0) @Max(AscentDraft.MAX_FALLS) int falls,
         @Schema(requiredMode = RequiredMode.REQUIRED, description = "First try of my life")
                 boolean firstTry,
-        @Schema(description = "Out of 10") @Min(1) @Max(10) Integer feeling) {
+        @Schema(description = "Out of 10") @Min(1) @Max(10) Integer feeling,
+        @Schema(description = "Who held the rope: an active club member, not me") UUID belayerId) {
 
     AscentDraft toDraft() {
-        return new AscentDraft(routeId, mode, topped, clean, falls, firstTry, feeling);
+        return new AscentDraft(routeId, mode, topped, clean, falls, firstTry, feeling, belayerId);
     }
 }

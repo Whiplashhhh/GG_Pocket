@@ -5,6 +5,17 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- L’assureur : en saisissant ta séance, note qui tenait la corde, voie par voie (tes amis en tête, mais tout le club
+  est là). La voie suivante garde le même assureur, pas besoin de le rechoisir à chaque fois. Ça s’affiche sur ta
+  séance : « À l’assurage : jules et tom ».
+- Profil > Mes assurages : les séances où quelqu’un t’a noté à l’assurage. Pas d’accord ? Retire ton nom en un tap.
+
+### Modifié
+
+- « Tes données » et l’export de tes données parlent aussi de tes assurages.
+
 ## 0.7.0 — 2026-10-28
 
 ### Ajouté

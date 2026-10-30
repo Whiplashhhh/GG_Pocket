@@ -302,6 +302,12 @@ class AuthorizationMatrixIT {
                             "/api/v1/session-comments/" + SOME_ID,
                             null,
                             Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/belays", null, Role.CLIMBER),
+                    new Endpoint(
+                            HttpMethod.DELETE,
+                            "/api/v1/sessions/" + SOME_ID + "/belayer",
+                            null,
+                            Role.CLIMBER),
                     new Endpoint(
                             HttpMethod.GET, "/api/v1/admin/moderation/comments", null, Role.BOARD));
 

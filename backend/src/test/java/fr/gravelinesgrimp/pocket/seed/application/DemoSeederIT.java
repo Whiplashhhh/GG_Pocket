@@ -28,6 +28,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 /**
  * The demo seed in the dev profile, on its own database (not {@code @IntegrationTest}: the seed
  * must start from an empty club, and its accounts must not leak into the other tests).
@@ -116,6 +119,22 @@ class DemoSeederIT {
         assertThat(checks.findAllByMemberIdAndRouteIdIn(grimpeur.id(), routeIds))
                 .anySatisfy(check -> assertThat(check.source()).isEqualTo(CheckSource.ASCENT))
                 .anySatisfy(check -> assertThat(check.source()).isEqualTo(CheckSource.MANUAL));
+    }
+
+    @Test
+    void theDemoAccountsBelayEachOther() {
+        var grimpeur = members.findByNicknameIgnoreCase("grimpeur").orElseThrow();
+        var ids = sessions.findLatest(grimpeur.id(), 100).stream().map(s -> s.id()).toList();
+        var belayers =
+                sessions.findAllWithAscentsByIdIn(ids).stream()
+                        .flatMap(session -> session.ascents().stream())
+                        .map(ascent -> ascent.belayerId())
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+        assertThat(belayers)
+                .containsExactlyInAnyOrder(
+                        members.findByNicknameIgnoreCase("direction").orElseThrow().id(),
+                        members.findByNicknameIgnoreCase("ouvreur").orElseThrow().id());
     }
 
     @Test

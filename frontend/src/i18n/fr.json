@@ -32,6 +32,17 @@
   "newSession": {
     "fab": "Nouvelle séance"
   },
+  "belayerPicker": {
+    "title": "Qui t’assurait ?",
+    "description": "N’importe qui du club. Les voies que tu ajoutes ensuite gardent le même assureur.",
+    "search": "Chercher un membre",
+    "nobody": "Pas précisé",
+    "friends": "Tes amis",
+    "others": "Le reste du club",
+    "results": "Aucun membre trouvé | 1 membre trouvé | {n} membres trouvés",
+    "noMatch": "Personne à ce nom au club. Vérifie l’orthographe, ou c’était peut-être un invité.",
+    "loadError": "Impossible de charger la liste des membres. Vérifie ta connexion et réessaie."
+  },
   "session": {
     "newTitle": "Nouvelle séance",
     "editTitle": "Modifier la séance",
@@ -74,6 +85,11 @@
     "fallsMore": "Une chute de plus",
     "firstTry": "Premier essai de ma vie sur cette voie",
     "firstTryShort": "premier essai",
+    "belayer": "À l’assurage",
+    "belayerNobody": "Pas précisé",
+    "belayerButton": "À l’assurage sur la voie n° {n} : {name}. Changer",
+    "belayerShort": "à l’assurage : {name}",
+    "belayedBy": "À l’assurage : {names}",
     "feeling": "Ressenti",
     "feelingNone": "pas noté",
     "feelingValue": "{n}/10",
@@ -535,6 +551,7 @@
     "settings": "Réglages",
     "password": "Mot de passe",
     "devices": "Mes appareils",
+    "belays": "Mes assurages",
     "install": "Installer l’appli",
     "privacy": "Tes données",
     "account": "Mes données et mon compte",
@@ -743,7 +760,7 @@
     "whyTitle": "Pourquoi",
     "whyBody": "Seulement pour faire fonctionner l’appli du club : te connecter, tenir ton carnet, afficher le topo, les classements et le fil entre amis. Rien n’est vendu, rien ne sert à de la publicité.",
     "whoSeesTitle": "Qui voit quoi",
-    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut. Tes séances, leurs photos et ton carnet sont visibles de tes amis seulement, ou de toi seul·e. Tes réactions et tes commentaires sur une séance se voient par ceux qui voient la séance ; pour la modération, la direction lit les derniers commentaires du club, sans voir les séances. La direction voit ta fiche de membre, sans ta date de naissance. Personne en dehors de l’appli ne voit quoi que ce soit.",
+    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut. Tes séances, leurs photos et ton carnet sont visibles de tes amis seulement, ou de toi seul·e. Tes réactions et tes commentaires sur une séance se voient par ceux qui voient la séance ; pour la modération, la direction lit les derniers commentaires du club, sans voir les séances. Quand quelqu’un te note à l’assurage d’une de ses voies, ton pseudo s’affiche sur sa séance, pour ceux qui la voient ; tu le retires quand tu veux depuis « Mes assurages ». La direction voit ta fiche de membre, sans ta date de naissance. Personne en dehors de l’appli ne voit quoi que ce soit.",
     "minorsTitle": "Moins de 15 ans",
     "minorsBody": "Avant 15 ans, un parent ou responsable légal doit être d’accord. Le profil d’un ou une jeune n’est jamais visible en dehors des membres du club.",
     "howLongTitle": "Combien de temps",
@@ -758,13 +775,13 @@
   "account": {
     "title": "Mes données et mon compte",
     "exportTitle": "Télécharger mes données",
-    "exportBody": "Tout ce que GG Pocket garde sur toi, dans un seul fichier JSON : ton profil, tes séances et leurs voies, tes voies cochées, tes coups de cœur, tes commentaires et tes réactions, tes amis, tes appareils connectés et la liste de tes photos. De quoi tout relire, ou tout emporter ailleurs.",
+    "exportBody": "Tout ce que GG Pocket garde sur toi, dans un seul fichier JSON : ton profil, tes séances et leurs voies, tes voies cochées, tes coups de cœur, tes commentaires et tes réactions, tes amis, tes assurages, tes appareils connectés et la liste de tes photos. De quoi tout relire, ou tout emporter ailleurs.",
     "export": "Télécharger mes données",
     "exporting": "Préparation du fichier…",
     "exportDone": "C’est dans tes téléchargements.",
     "deleteTitle": "Supprimer mon compte",
-    "deleteGone": "Ce qui part : ton profil, ta photo, les photos et les commentaires de tes séances, tes voies cochées, tes coups de cœur, tes amis, tes réactions, tes commentaires sur les voies et les séances, et ce que les autres ont écrit sous tes séances. Toutes tes sessions sont fermées.",
-    "deleteKept": "Ce qui reste : tes séances et tes passages, pour ne pas fausser les statistiques des voies, et ton nom d’ouvreur·se sur les voies que tu as ouvertes. Tout ça passe au nom d’« Ancien·ne membre », et tes séances ne sont plus visibles de personne.",
+    "deleteGone": "Ce qui part : ton profil, ta photo, les photos et les commentaires de tes séances, tes voies cochées, tes coups de cœur, tes amis, tes réactions, tes commentaires sur les voies et les séances, ce que les autres ont écrit sous tes séances, et ton nom à l’assurage des voies des autres. Toutes tes sessions sont fermées.",
+    "deleteKept": "Ce qui reste : tes séances et tes passages, pour ne pas fausser les statistiques des voies, et ton nom d’ouvreur·se sur les voies que tu as ouvertes. Tout ça passe au nom d’« Ancien·ne membre », sans les noms de tes assureurs, et tes séances ne sont plus visibles de personne.",
     "deleteFinal": "C’est définitif : on ne pourra rien te rendre. Télécharge tes données avant si tu veux les garder.",
     "delete": "Supprimer mon compte",
     "password": "Ton mot de passe",
@@ -834,6 +851,19 @@
     "new": "Nouveau mot de passe",
     "submit": "Changer le mot de passe",
     "done": "Mot de passe changé. Tes autres appareils ont été déconnectés."
+  },
+  "belays": {
+    "title": "Mes assurages",
+    "intro": "Les séances où quelqu’un t’a noté à l’assurage. Tu ne vois que qui grimpait et quand : la séance elle-même, seulement si elle t’est partagée. Pas d’accord ? Retire ton nom.",
+    "sessionOf": "Séance {day} de {nickname}",
+    "routes": "Aucune voie | 1 voie assurée | {n} voies assurées",
+    "withdraw": "Retirer mon nom",
+    "withdrawNamed": "Retirer mon nom : {title}",
+    "withdrawTitle": "Retirer ton nom ?",
+    "withdrawBody": "Tu n’apparaîtras plus à l’assurage de cette séance de {nickname}. Ses voies et ses chiffres ne bougent pas.",
+    "more": "Voir plus",
+    "emptyTitle": "Pas encore d’assurage noté",
+    "emptyBody": "Quand quelqu’un te met à l’assurage sur sa séance, ça s’affiche ici."
   },
   "devices": {
     "title": "Mes appareils",

@@ -12,6 +12,7 @@ import {
   removeAscent,
   removeLastOf,
   requestToForm,
+  restoredForm,
   sessionToForm,
   setClean,
   setFalls,
@@ -32,6 +33,7 @@ function line(overrides: Partial<AscentLine> = {}): AscentLine {
     falls: 0,
     firstTry: false,
     feeling: null,
+    belayerId: null,
     ...overrides,
   }
 }
@@ -49,6 +51,13 @@ describe('adding a route', () => {
     const lines = addAscent([line({ mode: 'LEAD' })], 'r2', NEVER)
     expect(lines[1]?.mode).toBe('LEAD')
     expect(addAscent([], 'r2', NEVER)[0]?.mode).toBe('TOP_ROPE')
+  })
+
+  it('keeps the belayer of the line before, nobody to start with', () => {
+    const lines = addAscent([line({ belayerId: 'm1' })], 'r2', NEVER)
+    expect(lines[1]?.belayerId).toBe('m1')
+    expect(addAscent([], 'r2', NEVER)[0]?.belayerId).toBeNull()
+    expect(duplicateAscent(lines, 1)[2]?.belayerId).toBe('m1')
   })
 
   it('stops at 50 lines', () => {
@@ -153,6 +162,31 @@ describe('what is sent', () => {
     })
   })
 
+  it('sends the belayer only when there is one, and gets it back', () => {
+    const form = {
+      ...emptySessionForm('2026-10-20'),
+      ascents: [line({ belayerId: 'm1' }), line({ key: 'k2' })],
+    }
+    const body = toSessionRequest(form)
+    expect(body.ascents[0]?.belayerId).toBe('m1')
+    expect(body.ascents[1]).not.toHaveProperty('belayerId')
+    expect(requestToForm(body).ascents.map((item) => item.belayerId)).toEqual(['m1', null])
+  })
+
+  it('a draft from before belayers gets none', () => {
+    const old: Omit<AscentLine, 'belayerId'> = {
+      key: 'k',
+      routeId: 'r1',
+      mode: 'TOP_ROPE',
+      topped: true,
+      clean: false,
+      falls: 0,
+      firstTry: false,
+      feeling: null,
+    }
+    expect(restoredForm({ ...emptySessionForm(), ascents: [old] }).ascents[0]?.belayerId).toBeNull()
+  })
+
   it('a saved session comes back into the form with a new clientRef', () => {
     const session = {
       id: 's1',
@@ -171,6 +205,7 @@ describe('what is sent', () => {
           clean: true,
           falls: 0,
           firstTry: true,
+          belayer: { id: 'm1', nickname: 'tom' },
         },
       ],
     } as unknown as Session
@@ -186,6 +221,7 @@ describe('what is sent', () => {
       mode: 'LEAD',
       clean: true,
       feeling: null,
+      belayerId: 'm1',
     })
   })
 })

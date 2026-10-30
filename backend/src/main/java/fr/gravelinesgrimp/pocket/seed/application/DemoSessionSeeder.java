@@ -99,8 +99,16 @@ public class DemoSessionSeeder {
                 grades.findAll().stream().collect(Collectors.toMap(Grade::id, Function.identity()));
         var created = 0;
         var random = new Random(2026);
-        for (var nickname : List.of("grimpeur", "direction", "ouvreur")) {
+        // Its own sequence: the sessions stay the same as before belayers came along.
+        var belaying = new Random(2027);
+        var climbers = List.of("grimpeur", "direction", "ouvreur");
+        for (var nickname : climbers) {
             var member = accounts.get(nickname);
+            var partners =
+                    climbers.stream()
+                            .filter(other -> !other.equals(nickname))
+                            .map(other -> accounts.get(other).id())
+                            .toList();
             var level =
                     ranks.values().stream()
                             .filter(grade -> grade.code().equals(LEVELS.get(nickname)))
@@ -122,10 +130,22 @@ public class DemoSessionSeeder {
                 }
                 var ascents = new ArrayList<AscentDraft>();
                 var count = 3 + random.nextInt(5);
+                // Most evenings with one partner, now and then the other one; sometimes nobody
+                // said.
+                var partner = belaying.nextInt(partners.size());
+                var named = belaying.nextInt(4) > 0;
                 for (var i = 0; i < count; i++) {
                     var route = onTheWall.get(random.nextInt(onTheWall.size()));
                     var rank = ranks.get(route.gradeId()).rank();
-                    ascents.add(ascent(random, route, rank <= level, tried.add(route.id())));
+                    var belayer =
+                            named
+                                    ? partners.get(
+                                            belaying.nextInt(5) == 0
+                                                    ? (partner + 1) % partners.size()
+                                                    : partner)
+                                    : null;
+                    ascents.add(
+                            ascent(random, route, rank <= level, tried.add(route.id()), belayer));
                 }
                 var draft =
                         new SessionDraft(
@@ -157,12 +177,13 @@ public class DemoSessionSeeder {
     }
 
     private static AscentDraft ascent(
-            Random random, Route route, boolean atLevel, boolean firstTry) {
+            Random random, Route route, boolean atLevel, boolean firstTry, UUID belayerId) {
         var mode = random.nextInt(5) < 2 ? ClimbMode.LEAD : ClimbMode.TOP_ROPE;
         var topped = random.nextInt(100) < (atLevel ? 85 : 35);
         var clean = topped && random.nextInt(100) < 55;
         var falls = clean ? 0 : topped ? random.nextInt(3) : 1 + random.nextInt(4);
         Integer feeling = random.nextBoolean() ? null : 5 + random.nextInt(6);
-        return new AscentDraft(route.id(), mode, topped, clean, falls, firstTry, feeling);
+        return new AscentDraft(
+                route.id(), mode, topped, clean, falls, firstTry, feeling, belayerId);
     }
 }

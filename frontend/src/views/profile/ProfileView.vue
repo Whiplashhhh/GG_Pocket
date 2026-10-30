@@ -5,6 +5,7 @@ import {
   Download,
   FileDown,
   KeyRound,
+  Link2,
   ShieldCheck,
   Smartphone,
   Users,
@@ -189,6 +190,10 @@ const facts = computed(() => {
       <SettingsLink to="/annuaire?amis">
         <template #icon><Users :size="20" /></template>
         {{ t('profile.friends') }}
+      </SettingsLink>
+      <SettingsLink to="/profil/assurages">
+        <template #icon><Link2 :size="20" /></template>
+        {{ t('profile.belays') }}
       </SettingsLink>
       <SettingsLink to="/profil/mot-de-passe">
         <template #icon><KeyRound :size="20" /></template>
