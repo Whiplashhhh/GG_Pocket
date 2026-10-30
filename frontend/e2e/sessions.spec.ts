@@ -127,6 +127,24 @@ test.describe('a new session', () => {
     await expect(page.getByRole('heading', { name: 'Aucune voie pour l’instant' })).toBeVisible()
   })
 
+  test('drops from a kept draft the route dismounted since', async ({ page, club }) => {
+    await sameDay(page, club)
+    await page.goto('/seance/nouvelle')
+    await addRoute(page, '12', 'Bye Bye Morice')
+    await addRoute(page, 'reglisse', 'Réglisse')
+    await page.waitForTimeout(600)
+    await page.getByRole('link', { name: 'Fermer (ta saisie reste au chaud)' }).click()
+    await expect(page).toHaveURL(/\/actu$/)
+
+    // Taken off the wall while the draft waited on the phone.
+    club.topo.route('Réglisse').status = 'DISMOUNTED'
+    await page.goto('/seance/nouvelle')
+    await expect(page.getByText('Une voie n’est plus au mur depuis')).toBeVisible()
+    await expect(page.getByText('Voie introuvable')).toHaveCount(0)
+    await expect(line(page, 1)).toContainText('Bye Bye Morice')
+    await expect(page.getByRole('heading', { name: '1 voie' })).toBeVisible()
+  })
+
   test('without network, waits and leaves by itself', async ({ page, club }) => {
     await sameDay(page, club)
     await page.goto('/seance/nouvelle')

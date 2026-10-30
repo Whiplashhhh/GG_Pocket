@@ -5,6 +5,13 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Corrigé
+
+- Nouvelle séance : un brouillon gardé sur le téléphone n’affiche plus de « Voie introuvable » quand la voie a été
+  démontée entre-temps. La ligne est retirée, et on te le dit.
+- Téléphone partagé : chacun retrouve son propre brouillon, et une séance en attente de réseau ne part plus jamais
+  au nom de quelqu’un d’autre connecté après toi.
+
 ## 0.8.0 — 2026-10-30
 
 ### Ajouté

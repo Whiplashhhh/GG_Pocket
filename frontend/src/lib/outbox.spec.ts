@@ -4,7 +4,7 @@ import { ApiError } from '@/api/errors'
 import { SessionPhotoNotSaved, type Session, type SessionRequest } from '@/api/sessions'
 
 import { memoryStore } from './localStore'
-import { canWait, flushOutbox, queuedItem, type OutboxItem } from './outbox'
+import { belongsTo, canWait, flushOutbox, queuedItem, type OutboxItem } from './outbox'
 
 function body(clientRef: string): SessionRequest {
   return {
@@ -18,13 +18,14 @@ function body(clientRef: string): SessionRequest {
 }
 
 const saved = (id: string) => ({ id }) as unknown as Session
+const ME = 'id-marie'
 
 async function queueOf(...refs: string[]) {
   const store = memoryStore<OutboxItem>()
   for (const [index, ref] of refs.entries()) {
     await store.set(
       ref,
-      queuedItem(body(ref), undefined, new Date(Date.UTC(2026, 9, 20, 10, index))),
+      queuedItem(body(ref), undefined, ME, new Date(Date.UTC(2026, 9, 20, 10, index))),
     )
   }
   return store
@@ -45,10 +46,14 @@ describe('flushOutbox', () => {
   it('sends the oldest first and empties the queue', async () => {
     const store = await queueOf('a', 'b')
     const order: string[] = []
-    const sent = await flushOutbox(store, (request) => {
-      order.push(request.clientRef)
-      return Promise.resolve(saved(request.clientRef))
-    })
+    const sent = await flushOutbox(
+      store,
+      (request) => {
+        order.push(request.clientRef)
+        return Promise.resolve(saved(request.clientRef))
+      },
+      ME,
+    )
     expect(order).toEqual(['a', 'b'])
     expect(sent).toHaveLength(2)
     expect(await store.values()).toEqual([])
@@ -57,10 +62,14 @@ describe('flushOutbox', () => {
   it('stops while the network is down, and keeps everything', async () => {
     const store = await queueOf('a', 'b')
     let calls = 0
-    const sent = await flushOutbox(store, () => {
-      calls++
-      return Promise.reject(new ApiError('NETWORK'))
-    })
+    const sent = await flushOutbox(
+      store,
+      () => {
+        calls++
+        return Promise.reject(new ApiError('NETWORK'))
+      },
+      ME,
+    )
     expect(calls).toBe(1)
     expect(sent).toEqual([])
     expect((await store.values()).map((item) => item.state)).toEqual(['waiting', 'waiting'])
@@ -68,10 +77,13 @@ describe('flushOutbox', () => {
 
   it('keeps a refused session aside and goes on with the next one', async () => {
     const store = await queueOf('a', 'b')
-    const sent = await flushOutbox(store, (request) =>
-      request.clientRef === 'a'
-        ? Promise.reject(new ApiError('MONTH_FROZEN', { status: 409 }))
-        : Promise.resolve(saved('b')),
+    const sent = await flushOutbox(
+      store,
+      (request) =>
+        request.clientRef === 'a'
+          ? Promise.reject(new ApiError('MONTH_FROZEN', { status: 409 }))
+          : Promise.resolve(saved('b')),
+      ME,
     )
     expect(sent).toHaveLength(1)
     expect(await store.get('a')).toMatchObject({ state: 'refused', errorCode: 'MONTH_FROZEN' })
@@ -80,11 +92,14 @@ describe('flushOutbox', () => {
 
   it('a refused photo: the session is saved, the notice stays without the photo', async () => {
     const store = memoryStore<OutboxItem>()
-    await store.set('a', queuedItem(body('a'), new Blob(['x'])))
-    const sent = await flushOutbox(store, () =>
-      Promise.reject(
-        new SessionPhotoNotSaved(saved('s1'), new ApiError('IMAGE_UNSUPPORTED', { status: 400 })),
-      ),
+    await store.set('a', queuedItem(body('a'), new Blob(['x']), ME))
+    const sent = await flushOutbox(
+      store,
+      () =>
+        Promise.reject(
+          new SessionPhotoNotSaved(saved('s1'), new ApiError('IMAGE_UNSUPPORTED', { status: 400 })),
+        ),
+      ME,
     )
     expect(sent).toHaveLength(1)
     const item = await store.get('a')
@@ -98,21 +113,57 @@ describe('flushOutbox', () => {
 
   it('a photo lost on the way is sent again with its session, which the server knows', async () => {
     const store = memoryStore<OutboxItem>()
-    await store.set('a', queuedItem(body('a'), new Blob(['x'])))
-    await flushOutbox(store, () =>
-      Promise.reject(new SessionPhotoNotSaved(saved('s1'), new ApiError('NETWORK'))),
+    await store.set('a', queuedItem(body('a'), new Blob(['x']), ME))
+    await flushOutbox(
+      store,
+      () => Promise.reject(new SessionPhotoNotSaved(saved('s1'), new ApiError('NETWORK'))),
+      ME,
     )
     expect(await store.get('a')).toMatchObject({ state: 'waiting' })
   })
 
   it('leaves refused sessions alone', async () => {
     const store = memoryStore<OutboxItem>()
-    await store.set('a', { ...queuedItem(body('a'), undefined), state: 'refused' })
+    await store.set('a', { ...queuedItem(body('a'), undefined, ME), state: 'refused' })
     let calls = 0
-    await flushOutbox(store, () => {
-      calls++
-      return Promise.resolve(saved('a'))
-    })
+    await flushOutbox(
+      store,
+      () => {
+        calls++
+        return Promise.resolve(saved('a'))
+      },
+      ME,
+    )
     expect(calls).toBe(0)
+  })
+
+  it('never sends a session in the name of someone else signed in on the same phone', async () => {
+    const store = memoryStore<OutboxItem>()
+    await store.set('mine', queuedItem(body('mine'), undefined, ME))
+    await store.set('lea', queuedItem(body('lea'), undefined, 'id-lea'))
+    const unowned = queuedItem(body('old'), undefined, ME)
+    delete unowned.memberId
+    await store.set('old', unowned)
+    const order: string[] = []
+    await flushOutbox(
+      store,
+      (request) => {
+        order.push(request.clientRef)
+        return Promise.resolve(saved(request.clientRef))
+      },
+      ME,
+    )
+    // Queued before the queue knew whose it was: it goes with whoever is signed in, as before.
+    expect(order.sort()).toEqual(['mine', 'old'])
+    expect(await store.get('lea')).toMatchObject({ state: 'waiting', memberId: 'id-lea' })
+  })
+})
+
+describe('belongsTo', () => {
+  it('keeps the queue of each member apart', () => {
+    const item = queuedItem(body('a'), undefined, ME)
+    expect(belongsTo(item, ME)).toBe(true)
+    expect(belongsTo(item, 'id-lea')).toBe(false)
+    expect(belongsTo(item, undefined)).toBe(false)
   })
 })

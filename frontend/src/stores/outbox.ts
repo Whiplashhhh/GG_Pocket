@@ -4,15 +4,20 @@ import { computed, ref } from 'vue'
 import { queryClient } from '@/api/queryClient'
 import { sendSession, sessionsChanged, type SessionRequest } from '@/api/sessions'
 import { localStore } from '@/lib/localStore'
-import { flushOutbox, queuedItem, type OutboxItem } from '@/lib/outbox'
+import { belongsTo, flushOutbox, queuedItem, type OutboxItem } from '@/lib/outbox'
 
 const RETRY_EVERY_MS = 60_000
 
 const store = localStore<OutboxItem>('outbox')
 
-/** Sessions waiting for the network, and the ones the server refused (see lib/outbox.ts). */
+/**
+ * Sessions waiting for the network, and the ones the server refused (see lib/outbox.ts). Only
+ * those of the member signed in show and leave: the others wait for their owner on this phone.
+ */
 export const useOutboxStore = defineStore('outbox', () => {
-  const items = ref<OutboxItem[]>([])
+  const all = ref<OutboxItem[]>([])
+  const owner = ref<string | undefined>(undefined)
+  const items = computed(() => all.value.filter((item) => belongsTo(item, owner.value)))
   const flushing = ref(false)
   let started = false
 
@@ -20,18 +25,22 @@ export const useOutboxStore = defineStore('outbox', () => {
   const problems = computed(() => items.value.filter((item) => item.state !== 'waiting'))
 
   async function refresh() {
-    items.value = (await store.values()).sort((a, b) => a.queuedAt.localeCompare(b.queuedAt))
+    all.value = (await store.values()).sort((a, b) => a.queuedAt.localeCompare(b.queuedAt))
   }
 
   async function flush() {
-    if (flushing.value) return
+    const memberId = owner.value
+    if (flushing.value || memberId === undefined) return
     flushing.value = true
     try {
-      const sent = await flushOutbox(store, (body, photo) =>
-        sendSession({
-          body,
-          photo: photo === undefined ? { kind: 'keep' } : { kind: 'replace', photo },
-        }),
+      const sent = await flushOutbox(
+        store,
+        (body, photo) =>
+          sendSession({
+            body,
+            photo: photo === undefined ? { kind: 'keep' } : { kind: 'replace', photo },
+          }),
+        memberId,
       )
       if (sent.length > 0) sessionsChanged(queryClient)
     } finally {
@@ -40,8 +49,8 @@ export const useOutboxStore = defineStore('outbox', () => {
     }
   }
 
-  async function enqueue(body: SessionRequest, photo: Blob | undefined) {
-    await store.set(body.clientRef, queuedItem(body, photo))
+  async function enqueue(body: SessionRequest, photo: Blob | undefined, memberId: string) {
+    await store.set(body.clientRef, queuedItem(body, photo, memberId))
     await refresh()
   }
 
@@ -59,9 +68,17 @@ export const useOutboxStore = defineStore('outbox', () => {
     return item
   }
 
-  /** Once per app: sends what is waiting now, when the network is back, and every minute. */
-  function start() {
-    if (started) return
+  /**
+   * Once per app: sends what is waiting now, when the network is back, and every minute. Again
+   * at every sign-in, for the queue of whoever is now signed in.
+   */
+  function start(memberId: string) {
+    const changed = owner.value !== memberId
+    owner.value = memberId
+    if (started) {
+      if (changed) void refresh().then(flush)
+      return
+    }
     started = true
     void refresh().then(flush)
     window.addEventListener('online', () => void flush())

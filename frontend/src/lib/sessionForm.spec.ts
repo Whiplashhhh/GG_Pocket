@@ -18,6 +18,7 @@ import {
   setFalls,
   setTopped,
   toSessionRequest,
+  withoutGoneRoutes,
   type AscentLine,
 } from './sessionForm'
 
@@ -223,5 +224,18 @@ describe('what is sent', () => {
       feeling: null,
       belayerId: 'm1',
     })
+  })
+})
+
+describe('a draft kept while the wall changed', () => {
+  it('drops the lines on a route gone since, and says how many', () => {
+    const form = {
+      ...emptySessionForm('2026-10-20'),
+      ascents: [line({ key: 'a', routeId: 'r1' }), line({ key: 'b', routeId: 'gone' })],
+    }
+    const kept = withoutGoneRoutes(form, new Set(['r1']))
+    expect(kept.dropped).toBe(1)
+    expect(kept.form.ascents.map((ascent) => ascent.key)).toEqual(['a'])
+    expect(withoutGoneRoutes(kept.form, new Set(['r1']))).toEqual({ form: kept.form, dropped: 0 })
   })
 })

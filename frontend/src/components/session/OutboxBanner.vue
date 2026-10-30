@@ -4,6 +4,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import { useCurrentMember } from '@/api/auth'
 import { errorMessageKey, SERVER_ERROR_CODES, type ServerErrorCode } from '@/api/errors'
 import GgButton from '@/components/ui/GgButton.vue'
 import { draftKey } from '@/composables/useSessionDraft'
@@ -21,6 +22,7 @@ import { useOutboxStore } from '@/stores/outbox'
 const { t } = useI18n()
 const router = useRouter()
 const outbox = useOutboxStore()
+const me = useCurrentMember()
 
 const waitingCount = computed(() => outbox.waiting.length)
 
@@ -32,11 +34,13 @@ function reason(item: OutboxItem): string {
 
 /** Back into the session sheet, as the draft of a new session, to fix and send again. */
 async function reopen(item: OutboxItem) {
+  const memberId = me.value?.id
+  if (memberId === undefined) return
   const taken = await outbox.takeBack(item.clientRef)
   if (taken === undefined) return
   const draft: SessionDraft = { form: requestToForm(taken.body), savedAt: new Date().toISOString() }
   if (taken.photo !== undefined) draft.photo = taken.photo
-  await localStore<SessionDraft>('drafts').set(draftKey(), draft)
+  await localStore<SessionDraft>('drafts').set(draftKey(memberId), draft)
   await router.push('/seance/nouvelle')
 }
 </script>
