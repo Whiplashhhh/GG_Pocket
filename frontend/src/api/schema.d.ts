@@ -1262,6 +1262,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/stats/attendance': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The ascents of a month, route by route (setter+) */
+    get: operations['getMonthAttendance']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/stats/routes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The routes on the wall, with their ascents since they opened (setter+) */
+    get: operations['listRouteAttendance']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/topo/config': {
     parameters: {
       query?: never
@@ -1327,6 +1361,25 @@ export interface components {
       /** Format: uuid */
       routeId: string
       topped: boolean
+    }
+    /** @description Ascents over a period, topped or not. */
+    Attendance: {
+      /** Format: int32 */
+      ascentCount: number
+      /** Format: int32 */
+      cleanCount: number
+      /**
+       * Format: int32
+       * @description Distinct climbers
+       */
+      climberCount: number
+      /**
+       * Format: int32
+       * @description Rounded share of topped ascents; absent without any ascent
+       */
+      successPercent?: number
+      /** Format: int32 */
+      toppedCount: number
     }
     /** @description Who did what, to whom, when. */
     AuditEntry: {
@@ -1842,6 +1895,14 @@ export interface components {
       /** @description Pass it as ?cursor= for the next page; absent on the last page */
       nextCursor?: string
     }
+    MonthAttendance: {
+      /** @example 2026-10 */
+      month: string
+      /** @description Routes on the wall during the month, climbed or not, and those climbed in it; most climbed first */
+      routes: components['schemas']['RouteAttendance'][]
+      /** @description Every route together: a climber of several routes counts once */
+      total: components['schemas']['Attendance']
+    }
     /** @description climbingDays: days with a session (two sessions on a day make one); toppedCount: topped ascents, repeats included; maxGrade: the hardest topped; averageFeeling: of the rated sessions. */
     MonthTotals: {
       /** @example 7.5 */
@@ -2088,6 +2149,11 @@ export interface components {
     RoleChange: {
       /** @enum {string} */
       role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+    }
+    /** @description A route and its ascents over a period. */
+    RouteAttendance: {
+      attendance: components['schemas']['Attendance']
+      route: components['schemas']['RouteSummary']
     }
     RouteComment: {
       author: components['schemas']['MemberRef']
@@ -4396,6 +4462,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['SessionReactions']
+        }
+      }
+    }
+  }
+  getMonthAttendance: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM, this month by default; never a future month */
+        month?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MonthAttendance']
+        }
+      }
+    }
+  }
+  listRouteAttendance: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RouteAttendance'][]
         }
       }
     }

@@ -939,7 +939,9 @@
     "intro": "Ce que tu peux régler pour le club.",
     "soon": "bientôt",
     "lastChance": "Dernière chance",
-    "club": "Club"
+    "club": "Club",
+    "attendance": "Fréquentation",
+    "topoReview": "Bilan du topo"
   },
   "moderation": {
     "title": "Modération",
@@ -1146,6 +1148,91 @@
     "emptyTitle": "Aucune voie en dernière chance.",
     "emptyBody": "Tout le mur a encore de beaux jours devant lui.",
     "acknowledged": "Personne n’a encore accepté son destin | 1 grimpeur a accepté son destin | {n} grimpeurs ont accepté son destin"
+  },
+  "attendance": {
+    "title": "Fréquentation",
+    "intro": "Qui grimpe quoi, voie par voie. Toutes les tentatives du mois comptent, topées ou non, séances « juste moi » comprises : on compte, on ne nomme personne.",
+    "previous": "Mois précédent",
+    "next": "Mois suivant",
+    "loading": "On compte les cordées…",
+    "totalsLabel": "Le mois en chiffres",
+    "totals": {
+      "ascents": "ascension | ascension | ascensions",
+      "climbers": "grimpeur | grimpeur | grimpeurs",
+      "success": "de réussite",
+      "noSuccess": "Pas encore de taux"
+    },
+    "successHelp": "Réussite : la part des ascensions topées, avec ou sans chute.",
+    "sort": "Trier par",
+    "sorts": {
+      "ascents": "Les plus grimpées",
+      "climbers": "Le plus de grimpeurs",
+      "success": "Le meilleur taux de réussite",
+      "cord": "Numéro de corde",
+      "grade": "Cotation"
+    },
+    "export": "Exporter en CSV",
+    "exported": "Fichier « {name} » prêt : ouvre-le avec ton tableur préféré.",
+    "emptyTitle": "Aucune voie au mur ce mois-là.",
+    "emptyBody": "Rien à compter : le mur était nu, ou l’appli pas encore installée.",
+    "dismounted": "démontée",
+    "columns": {
+      "route": "Voie",
+      "sector": "Secteur",
+      "ascents": "Ascensions",
+      "topped": "Topées",
+      "clean": "Enchaînées",
+      "climbers": "Grimpeurs",
+      "success": "Réussite"
+    },
+    "line": {
+      "ascents": "Aucune ascension | 1 ascension | {n} ascensions",
+      "climbers": "personne | 1 grimpeur | {n} grimpeurs",
+      "success": "{n} % topées"
+    },
+    "csv": {
+      "cord": "Corde",
+      "sector": "Secteur",
+      "route": "Voie",
+      "grade": "Cotation",
+      "holds": "Prises",
+      "opened": "Ouverte le",
+      "ascents": "Ascensions",
+      "topped": "Topées",
+      "clean": "Enchaînées",
+      "climbers": "Grimpeurs",
+      "success": "Réussite (%)"
+    }
+  },
+  "topoReview": {
+    "title": "Bilan du topo",
+    "intro": "Une photo du mur aujourd’hui : ce qui manque, ce qui tourne, ce qui prend la poussière.",
+    "loading": "On fait le tour du mur…",
+    "total": "Aucune voie au mur | 1 voie au mur | {n} voies au mur",
+    "lastChance": "aucune en dernière chance | dont 1 en dernière chance | dont {n} en dernière chance",
+    "grades": "Par cotation",
+    "sectors": "Par secteur",
+    "cords": "Par corde",
+    "cord": "Corde {n}",
+    "freeCord": "Libre, à toi de jouer",
+    "routes": "Aucune voie | 1 voie | {n} voies",
+    "mostClimbed": "Les plus grimpées",
+    "leastClimbed": "Les moins grimpées",
+    "climbedHint": "Depuis leur ouverture, toutes tentatives comprises.",
+    "nobodyClimbed": "Personne n’a encore rien noté sur ces voies.",
+    "oldest": "Les plus anciennes",
+    "oldestHint": "Pour savoir quoi démonter en premier.",
+    "showAll": "Tout afficher ({n})",
+    "showLess": "En afficher moins",
+    "age": {
+      "days": "ouverte aujourd’hui | ouverte hier | ouverte il y a {n} jours",
+      "weeks": "ouverte il y a {n} semaine | ouverte il y a {n} semaine | ouverte il y a {n} semaines",
+      "months": "ouverte il y a {n} mois"
+    },
+    "loved": "Les coups de cœur",
+    "lovedEmpty": "Aucun coup de cœur pour l’instant. Les grimpeurs sont timides.",
+    "emptyTitle": "Le mur est vide.",
+    "emptyBody": "Ouvre une voie et le bilan se remplira tout seul."
   },
   "routeForm": {
     "createTitle": "Nouvelle voie",

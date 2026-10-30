@@ -1,5 +1,7 @@
 import {
+  ChartColumn,
   ClipboardList,
+  Grid3x3,
   Hourglass,
   MessageSquareWarning,
   Route,
@@ -17,6 +19,8 @@ export interface ManagementSection {
   labelKey:
     | 'management.routes'
     | 'management.lastChance'
+    | 'management.attendance'
+    | 'management.topoReview'
     | 'management.members'
     | 'management.moderation'
     | 'management.audit'
@@ -34,6 +38,18 @@ export const SECTIONS: readonly ManagementSection[] = [
     to: '/gestion/derniere-chance',
     labelKey: 'management.lastChance',
     icon: Hourglass,
+    minRole: 'SETTER',
+  },
+  {
+    to: '/gestion/frequentation',
+    labelKey: 'management.attendance',
+    icon: ChartColumn,
+    minRole: 'SETTER',
+  },
+  {
+    to: '/gestion/bilan-du-topo',
+    labelKey: 'management.topoReview',
+    icon: Grid3x3,
     minRole: 'SETTER',
   },
   { to: '/gestion/membres', labelKey: 'management.members', icon: Users, minRole: 'BOARD' },
