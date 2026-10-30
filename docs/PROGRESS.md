@@ -4,6 +4,53 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-30 — Phase 6, PR 6.1 : le podium
+
+**Branche** : `feature/podium-0.8.0` (depuis `main` 0.8.0, D-103).
+
+### Fait
+
+- Backend : V14 (`monthly_ranking_closure`, `monthly_ranking_snapshot`), module `ranking` (`Ranking` pur, `LiveRankings`,
+  `RankingClosure` idempotente, `MonthlyClosureJob` à 04:00 Europe/Paris, `@EnableScheduling`), `GET /rankings`,
+  `GET /rankings/months`. Suppression de compte (rangs → « Ancien·ne membre »), export (`frozenRanks`), seed via la
+  vraie clôture. Tests : `RankingTest`, `RankingStatusTest`, `RankingIT` (mois « vierge » pour la base partagée),
+  matrice d'autorisations.
+- Front : `PodiumView` (marches, liste, barre « Ta place », mois, Séances/Voies), `api/rankings.ts`, `lib/podium.ts`
+  + Vitest, invalidation après séance et profil, textes « Tes données ». e2e `podium.spec.ts` (Desktop Chrome),
+  captures 360 clair/sombre regardées (contraste des marches corrigé).
+
+### Reste
+
+- CI verte ; `main` (correctif #40) fusionnée dans la branche ; relecture et fusion par Willem.
+- PR 6.2 : Fréquentation (CSV) et Bilan du topo.
+- D-103 validée par Willem : séances « juste moi » comptées, rangs figés gardés au nom d'« Ancien·ne membre ».
+
+### Prochaine action
+
+- PR 6.2 (Fréquentation + CSV, Bilan du topo), branche `feature/stats-<version>` depuis `main` après fusion de 6.1.
+
+---
+
+## 2026-10-30 — Correctif : « Voie introuvable » dans un brouillon de séance (signalé par Willem sur dev)
+
+**Branche** : `fix/brouillon-voie-0.8.0` (depuis `main` 0.8.0, indépendante de la PR #39 du podium).
+
+### Fait
+- Cause : le brouillon (IndexedDB) garde l'identifiant des voies ; une voie démontée depuis, ou un topo de démo réinitialisé
+  (dev : nouveaux identifiants à chaque déploiement), laissait une ligne « Voie introuvable » que le serveur refuserait.
+  `withoutGoneRoutes` (lib/sessionForm.ts) retire ces lignes à la restauration, une fois les voies du mur chargées, avec un message.
+- Brouillons rangés par membre (`draftKey(memberId, …)`) ; file d'attente hors ligne marquée par membre (`memberId`, `belongsTo`) :
+  seule celle du membre connecté s'affiche et part. Les éléments déjà en file sans propriétaire partent comme avant.
+- Tests : Vitest (sessionForm, outbox), e2e « drops from a kept draft the route dismounted since ».
+
+### Reste / prochaine action
+- Willem relit et fusionne ; puis reprise de la phase 6 (PR #39, puis PR 6.2).
+
+### Points bloquants
+- Aucun.
+
+---
+
 ## 2026-10-29 — PR 5.3 : l'assureur (demande de Willem)
 
 **Branche** : `feature/assureur-0.7.0` (D-101).
@@ -29,32 +76,6 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 Attendre Willem (essai dev, fusion), puis phase 6 (podium), ou la PR `chore/` pour l'image Caddy s'il le demande.
 
 ---
-
-## 2026-10-30 — Phase 6, PR 6.1 : le podium
-
-**Branche** : `feature/podium-0.8.0` (depuis `main` 0.8.0, D-103).
-
-### Fait
-
-- Backend : V14 (`monthly_ranking_closure`, `monthly_ranking_snapshot`), module `ranking` (`Ranking` pur, `LiveRankings`,
-  `RankingClosure` idempotente, `MonthlyClosureJob` à 04:00 Europe/Paris, `@EnableScheduling`), `GET /rankings`,
-  `GET /rankings/months`. Suppression de compte (rangs → « Ancien·ne membre »), export (`frozenRanks`), seed via la
-  vraie clôture. Tests : `RankingTest`, `RankingStatusTest`, `RankingIT` (mois « vierge » pour la base partagée),
-  matrice d'autorisations.
-- Front : `PodiumView` (marches, liste, barre « Ta place », mois, Séances/Voies), `api/rankings.ts`, `lib/podium.ts`
-  + Vitest, invalidation après séance et profil, textes « Tes données ». e2e `podium.spec.ts` (Desktop Chrome),
-  captures 360 clair/sombre regardées (contraste des marches corrigé).
-
-### Reste
-
-- CI : backend (dont `RankingIT`), front et e2e verts sur 0789827 ; vérifier le dernier commit (docs, ajustements
-  d'écran), puis relecture et fusion par Willem.
-- PR 6.2 : Fréquentation (CSV) et Bilan du topo.
-- D-103 à valider (séances privées comptées, trous dans les rangs figés).
-
-### Prochaine action
-
-- PR 6.2 (Fréquentation + CSV, Bilan du topo), branche `feature/stats-<version>` depuis `main` après fusion de 6.1.
 
 ## 2026-10-28 — Phase 5, PR 5.2 : le fil d'actu
 

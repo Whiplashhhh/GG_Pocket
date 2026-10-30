@@ -52,6 +52,7 @@
     "dateHint": "Aujourd’hui ou jusqu’à 7 jours en arrière.",
     "draftRestored": "Brouillon retrouvé : on reprend là où tu t’étais arrêté·e.",
     "startOver": "Repartir de zéro",
+    "goneRoutes": "Une voie n’est plus au mur depuis : on l’a retirée. | {n} voies ne sont plus au mur depuis : on les a retirées.",
     "pickerTitle": "Ajouter une voie",
     "pickerSearch": "Ajouter une voie",
     "pickerPlaceholder": "Corde, nom, couleur ou cotation",

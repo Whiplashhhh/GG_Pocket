@@ -88,6 +88,19 @@ export function restoredForm(
   }
 }
 
+/**
+ * A draft waits on the phone while the wall changes: its lines on a route gone since (dismounted,
+ * or a demo topo seeded again) go, as the server would refuse them. `dropped` says how many.
+ */
+export function withoutGoneRoutes(
+  form: SessionForm,
+  wall: { has(routeId: string): boolean },
+): { form: SessionForm; dropped: number } {
+  const ascents = form.ascents.filter((line) => wall.has(line.routeId))
+  const dropped = form.ascents.length - ascents.length
+  return { form: dropped === 0 ? form : { ...form, ascents }, dropped }
+}
+
 /** Earliest and latest day the date field offers (YYYY-MM-DD). */
 export function dateBounds(today: string = clubToday()): { min: string; max: string } {
   const day = new Date(`${today}T12:00:00Z`)

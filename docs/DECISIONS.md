@@ -943,4 +943,4 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     l'adresse (`?classement=voies`) ; top 3 sur des marches (hauteur selon le rang, donc les ex æquo à la même
     hauteur), puis la liste ; quand ma ligne sort de l'écran, une barre « Ta place » au-dessus des onglets.
   - « Assureur du mois » (idée de D-101) : non fait, à demander au club.
-- **Statut** : à valider pour les séances privées qui comptent ; validée par Willem pour les rangs figés anonymisés.
+- **Statut** : validée par Willem le 2026-10-30 (les séances « juste moi » comptent ; rangs figés anonymisés plutôt que masqués).

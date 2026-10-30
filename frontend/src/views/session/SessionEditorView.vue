@@ -4,6 +4,7 @@ import { computed, onMounted, ref, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import { useCurrentMember } from '@/api/auth'
 import { errorMessageKey } from '@/api/errors'
 import {
   SessionPhotoNotSaved,
@@ -44,6 +45,7 @@ import {
   removeLastOf,
   sessionToForm,
   toSessionRequest,
+  withoutGoneRoutes,
   type AscentLine,
   type SessionForm,
 } from '@/lib/sessionForm'
@@ -71,8 +73,13 @@ const form = ref<SessionForm>(emptySessionForm())
 const photo = ref<Blob | undefined>(undefined)
 const removePhoto = ref(false)
 const preparingPhoto = ref(false)
-const draft = useSessionDraft(draftKey(sessionId.value), form, photo, removePhoto)
+const me = useCurrentMember()
+// The editor only opens signed in (router guard): the member is known by now.
+const memberId = me.value?.id ?? ''
+const draft = useSessionDraft(draftKey(memberId, sessionId.value), form, photo, removePhoto)
 const loaded = ref(false)
+/** Lines of a kept draft on a route that left the wall since: they go, with a word. */
+const goneLines = ref(0)
 
 const today = clubToday()
 const bounds = computed(() => {
@@ -116,6 +123,7 @@ async function startOver() {
       : emptySessionForm(today)
   photo.value = undefined
   removePhoto.value = false
+  goneLines.value = 0
   await draft.clear(true)
 }
 
@@ -126,6 +134,18 @@ const routeById = computed(() => {
   for (const item of routes.data.value ?? []) map.set(item.id, item)
   return map
 })
+watch(
+  [loaded, () => routes.data.value],
+  ([ready, wall]) => {
+    if (!ready || wall === undefined || !draft.restored.value) return
+    const kept = withoutGoneRoutes(form.value, routeById.value)
+    if (kept.dropped === 0) return
+    form.value = kept.form
+    goneLines.value += kept.dropped
+  },
+  { immediate: true },
+)
+
 /** The club, plus the belayers of the session being changed. */
 const directory = useDirectory()
 const belayerById = computed(() => {
@@ -209,7 +229,7 @@ function finish(kind: 'saved' | 'queued', target: string) {
 }
 
 async function queue() {
-  await outbox.enqueue(toSessionRequest(form.value), photo.value)
+  await outbox.enqueue(toSessionRequest(form.value), photo.value, memberId)
   await draft.clear()
   finish('queued', '/actu')
 }
@@ -275,7 +295,10 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
         v-if="draft.restored.value"
         class="flex flex-wrap items-center gap-2 bg-surface px-4 py-3"
       >
-        <p role="status" class="flex-1 text-sm">{{ t('session.draftRestored') }}</p>
+        <p role="status" class="flex-1 text-sm">
+          {{ t('session.draftRestored') }}
+          <template v-if="goneLines > 0">{{ t('session.goneRoutes', goneLines) }}</template>
+        </p>
         <GgButton variant="ghost" @click="startOver">{{ t('session.startOver') }}</GgButton>
       </div>
 
