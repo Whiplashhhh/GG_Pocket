@@ -4,6 +4,34 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-30 — Phase 6, PR 6.2 : Fréquentation et Bilan du topo
+
+**Branche** : `feature/stats-0.8.0` (depuis `main` 0.8.0 + #39 et #40, D-104).
+
+### Fait
+
+- Backend : module `stats` (`Attendance` + taux de réussite, `AttendanceRepository` sur les ascensions,
+  `StatsService` Ouvreur+, `GET /stats/attendance?month=`, `GET /stats/routes`), requête « voies au mur pendant le
+  mois » dans `RouteRepository`. Tests : `AttendanceTest`, `StatsIT` (mois vierge, voies non grimpées, démontées
+  exclues du bilan, 403 grimpeur, mois futur/mal formé), matrice d'autorisations.
+- Front : `AttendanceView` (mois, totaux, tri dans l'adresse `?tri=`, table ≥ 1024 px, liste sur mobile, export CSV),
+  `TopoReviewView` (cotations regroupées, secteurs, grille des cordes, plus/moins grimpées, anciennes, coups de cœur),
+  `api/stats.ts`, `lib/stats.ts` + Vitest (tri, CSV et injection de formules, agrégats, ancienneté).
+  e2e `stats.spec.ts` (Desktop Chrome en local), captures 360/1280 clair/sombre regardées (débordement mobile de la
+  grille et « % » orphelin corrigés).
+
+### Reste
+
+- CI verte sur la branche (le contrat OpenAPI écrit à la main est identique à celui généré par la CI), PR à ouvrir
+  puis relecture et fusion par Willem.
+- D-104 à valider (taux de réussite = topées / ascensions ; histogramme par cotation de base).
+
+### Prochaine action
+
+- Phase 7 (badges) après fusion de la 6.2 : branche `feature/badges-<version>` depuis `main`.
+
+---
+
 ## 2026-10-30 — Phase 6, PR 6.1 : le podium
 
 **Branche** : `feature/podium-0.8.0` (depuis `main` 0.8.0, D-103).

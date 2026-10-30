@@ -944,3 +944,28 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     hauteur), puis la liste ; quand ma ligne sort de l'écran, une barre « Ta place » au-dessus des onglets.
   - « Assureur du mois » (idée de D-101) : non fait, à demander au club.
 - **Statut** : validée par Willem le 2026-10-30 (les séances « juste moi » comptent ; rangs figés anonymisés plutôt que masqués).
+
+### D-104 — PR 6.2 : Fréquentation et Bilan du topo
+- **Contexte** : spec §8.10 (Responsable et +). La spec ne dit pas ce qu'est un « taux de réussite », ni quelles voies
+  lister pour un mois, ni comment compter « les plus et les moins grimpées ».
+- **Choix** :
+  - **Module `stats`** (backend), `GET /api/v1/stats/attendance?month=YYYY-MM` et `GET /api/v1/stats/routes`, réservés
+    au rôle Ouvreur et au-dessus (`@PreAuthorize`, matrice d'autorisations). Seuls des totaux sortent, jamais qui a
+    grimpé : les séances « juste moi » comptent donc aussi.
+  - **Taux de réussite** = part des ascensions **topées** (avec ou sans chute), arrondie ; absent sans ascension. Même
+    définition du succès que le podium (D-003). Les enchaînées ont leur propre colonne.
+  - **Voies d'un mois** : celles au mur pendant le mois (ouvertes au plus tard le dernier jour, pas démontées avant le
+    premier), grimpées ou non (pour voir celles que personne ne touche), plus celles grimpées dans le mois même si elles
+    sont démontées depuis. Tri par défaut : les plus grimpées.
+  - **Mois proposés** : ceux du podium (`/rankings/months`, du premier mois grimpé à aujourd'hui), jamais un mois futur.
+  - **Export CSV** généré dans le navigateur à partir des lignes affichées, dans l'ordre du tri : séparateur `;`, BOM
+    UTF-8, fins de ligne CRLF (ce qu'attendent Excel et LibreOffice en français) ; une cellule qui commence par `=`, `+`,
+    `-` ou `@` est préfixée d'une apostrophe (pas de formule exécutée par le tableur). Fichier
+    `gg-pocket-frequentation-AAAA-MM.csv`.
+  - **Bilan du topo** (voies au mur aujourd'hui, dernière chance comprise) : histogramme par cotation **de base**
+    (6a-, 6a, 6a+ → « 6a »), de la plus facile à la plus dure présente, trous compris ; répartition par secteur ;
+    grille des cordes actives (une corde libre est en pointillés) ; les 5 plus et les 5 moins grimpées depuis leur
+    ouverture, toutes tentatives comprises (à égalité, la plus ancienne d'abord) ; les plus anciennes (8, puis « Tout
+    afficher ») ; les 5 premiers coups de cœur. Les agrégats sont calculés côté front (`lib/stats.ts`, testés), le
+    backend ne donne que les voies et leurs compteurs.
+- **Statut** : à valider (définition du taux de réussite, cotations regroupées dans l'histogramme).

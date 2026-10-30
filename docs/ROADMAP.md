@@ -153,9 +153,10 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [x] Historique des mois
 - [x] Suppression de compte (« Ancien·ne membre »), export, seed par la vraie tâche
 
-### PR 6.2 — Statistiques de gestion
+### PR 6.2 — Statistiques de gestion (`feature/stats-0.8.0`, D-104)
 
-- [ ] Fréquentation (export CSV), Bilan du topo
+- [x] Fréquentation d'un mois par voie (ascensions, topées, enchaînées, grimpeurs, réussite), tri, export CSV
+- [x] Bilan du topo (cotations, secteurs, grille des cordes, plus/moins grimpées, ancienneté, coups de cœur)
 
 ## Phase 7 — Badges
 

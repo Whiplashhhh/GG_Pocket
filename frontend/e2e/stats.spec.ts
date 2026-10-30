@@ -60,7 +60,7 @@ test.describe('a setter', () => {
     await openSection(page, isMobile, 'Fréquentation')
     await expect(page.getByRole('heading', { level: 2, name: /octobre 2026/i })).toBeVisible()
     await expect(page.getByLabel('Le mois en chiffres')).toHaveText(
-      /ascensions\s*5\s*grimpeurs\s*2\s*de réussite\s*60 %/,
+      /ascensions\s*5\s*grimpeurs\s*2\s*de réussite\s*60\s%/,
     )
 
     const rows = isMobile
@@ -74,7 +74,7 @@ test.describe('a setter', () => {
     } else {
       // The header, then the most climbed first.
       await expect(rows.nth(1)).toContainText('Bye Bye Morice')
-      await expect(rows.nth(1).getByRole('cell')).toHaveText([/.+/, '3', '2', '1', '2', '67 %'])
+      await expect(rows.nth(1).getByRole('cell')).toHaveText([/.+/, '3', '2', '1', '2', /67\s%/])
     }
 
     await page.getByLabel('Trier par').selectOption('Le meilleur taux de réussite')
@@ -101,7 +101,7 @@ test.describe('a setter', () => {
     await expect(page.getByRole('heading', { level: 2, name: /septembre 2026/i })).toBeVisible()
     await expect(page).toHaveURL(/mois=2026-09/)
     await expect(page.getByLabel('Le mois en chiffres')).toHaveText(
-      /ascension\s*1\s*grimpeur\s*1\s*de réussite\s*100 %/,
+      /ascension\s*1\s*grimpeur\s*1\s*de réussite\s*100\s%/,
     )
   })
 

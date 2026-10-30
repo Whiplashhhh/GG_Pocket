@@ -103,12 +103,12 @@ function retry() {
       }}</span>
     </p>
 
-    <div class="grid gap-8 px-4 lg:grid-cols-2 lg:px-0">
+    <div class="grid grid-cols-1 gap-8 px-4 lg:grid-cols-2 lg:px-0">
       <section :aria-labelledby="ids.grades">
         <h2 :id="ids.grades" class="mb-3 text-lg font-title">{{ t('topoReview.grades') }}</h2>
         <ul class="flex flex-col gap-1">
-          <li v-for="bar in grades" :key="bar.item.id" class="flex items-center gap-3">
-            <span class="w-10 shrink-0 font-semibold tabular-nums">{{ bar.item.code }}</span>
+          <li v-for="bar in grades" :key="bar.item" class="flex items-center gap-3">
+            <span class="w-10 shrink-0 font-semibold tabular-nums">{{ bar.item }}</span>
             <span class="h-4 flex-1" aria-hidden="true">
               <span
                 v-if="bar.count > 0"
@@ -116,9 +116,11 @@ function retry() {
                 :style="{ width: `${String(bar.percent)}%` }"
               />
             </span>
-            <span class="w-20 shrink-0 text-right text-sm tabular-nums">{{
-              t('topoReview.routes', bar.count)
-            }}</span>
+            <span
+              class="w-20 shrink-0 text-right text-sm tabular-nums"
+              :class="{ 'text-ink-muted': bar.count === 0 }"
+              >{{ t('topoReview.routes', bar.count) }}</span
+            >
           </li>
         </ul>
       </section>
@@ -154,8 +156,10 @@ function retry() {
           class="flex flex-col gap-1.5 rounded-control border-2 p-2"
           :class="cell.routes.length === 0 ? 'border-dashed border-rule' : 'border-rule'"
         >
-          <span class="flex items-baseline justify-between gap-2">
-            <span class="font-title">{{ t('topoReview.cord', { n: cell.number }) }}</span>
+          <span class="flex min-w-0 flex-col">
+            <span class="font-title whitespace-nowrap">{{
+              t('topoReview.cord', { n: cell.number })
+            }}</span>
             <span class="truncate text-xs text-ink-muted">{{ cell.sectorName }}</span>
           </span>
           <ul v-if="cell.routes.length > 0" class="flex flex-wrap gap-x-3 gap-y-1">
@@ -175,7 +179,7 @@ function retry() {
       </ol>
     </section>
 
-    <div class="grid gap-8 px-4 lg:grid-cols-2 lg:px-0">
+    <div class="grid grid-cols-1 gap-8 px-4 lg:grid-cols-2 lg:px-0">
       <section :aria-labelledby="ids.most">
         <h2 :id="ids.most" class="text-lg font-title">{{ t('topoReview.mostClimbed') }}</h2>
         <p class="pb-2 text-sm text-ink-muted">{{ t('topoReview.climbedHint') }}</p>
@@ -183,9 +187,11 @@ function retry() {
           <li
             v-for="item in most"
             :key="item.route.id"
-            class="flex items-center justify-between gap-3 border-b border-rule py-2"
+            class="flex flex-col items-start gap-1 border-b border-rule py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
           >
-            <RouteSummaryLabel :route="item.route" size="sm" />
+            <span class="max-w-full min-w-0 sm:flex-1"
+              ><RouteSummaryLabel :route="item.route" size="sm"
+            /></span>
             <span class="shrink-0 text-sm font-semibold tabular-nums">{{
               t('attendance.line.ascents', item.attendance.ascentCount)
             }}</span>
@@ -201,10 +207,12 @@ function retry() {
           <li
             v-for="item in least"
             :key="item.route.id"
-            class="flex items-center justify-between gap-3 border-b border-rule py-2"
+            class="flex flex-col items-start gap-1 border-b border-rule py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
           >
-            <RouteSummaryLabel :route="item.route" size="sm" />
-            <span class="shrink-0 text-right text-sm tabular-nums">
+            <span class="max-w-full min-w-0 sm:flex-1"
+              ><RouteSummaryLabel :route="item.route" size="sm"
+            /></span>
+            <span class="shrink-0 text-sm tabular-nums sm:text-right">
               <span class="block font-semibold">{{
                 t('attendance.line.ascents', item.attendance.ascentCount)
               }}</span>
@@ -221,9 +229,11 @@ function retry() {
           <li
             v-for="route in oldestShown"
             :key="route.id"
-            class="flex items-center justify-between gap-3 border-b border-rule py-2"
+            class="flex flex-col items-start gap-1 border-b border-rule py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
           >
-            <RouteSummaryLabel :route="route" size="sm" />
+            <span class="max-w-full min-w-0 sm:flex-1"
+              ><RouteSummaryLabel :route="route" size="sm"
+            /></span>
             <span class="shrink-0 text-sm text-ink-muted">{{ age(route.openedOn) }}</span>
           </li>
         </ol>
@@ -244,9 +254,11 @@ function retry() {
           <li
             v-for="route in loved"
             :key="route.id"
-            class="flex items-center justify-between gap-3 border-b border-rule py-2"
+            class="flex flex-col items-start gap-1 border-b border-rule py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
           >
-            <RouteSummaryLabel :route="route" size="sm" />
+            <span class="max-w-full min-w-0 sm:flex-1"
+              ><RouteSummaryLabel :route="route" size="sm"
+            /></span>
             <span class="shrink-0 text-sm font-semibold tabular-nums">{{
               t('topo.row.favorites', route.favoriteCount)
             }}</span>

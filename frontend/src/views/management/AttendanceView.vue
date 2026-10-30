@@ -110,7 +110,8 @@ function exportCsv() {
   notice.value = t('attendance.exported', { name })
 }
 
-const percent = (value: number | undefined) => (value === undefined ? '–' : `${String(value)} %`)
+const percent = (value: number | undefined) =>
+  value === undefined ? '–' : `${String(value)}\u00a0%`
 </script>
 
 <template>
@@ -166,13 +167,17 @@ const percent = (value: number | undefined) => (value === undefined ? '–' : `$
         <dt class="text-sm text-ink-muted">
           {{ t('attendance.totals.ascents', current.total.ascentCount) }}
         </dt>
-        <dd class="text-3xl font-title tabular-nums">{{ current.total.ascentCount }}</dd>
+        <dd class="text-2xl font-title whitespace-nowrap tabular-nums sm:text-3xl">
+          {{ current.total.ascentCount }}
+        </dd>
       </div>
       <div class="flex flex-col-reverse border-l border-rule px-2 py-3">
         <dt class="text-sm text-ink-muted">
           {{ t('attendance.totals.climbers', current.total.climberCount) }}
         </dt>
-        <dd class="text-3xl font-title tabular-nums">{{ current.total.climberCount }}</dd>
+        <dd class="text-2xl font-title whitespace-nowrap tabular-nums sm:text-3xl">
+          {{ current.total.climberCount }}
+        </dd>
       </div>
       <div class="flex flex-col-reverse border-l border-rule px-2 py-3">
         <dt class="text-sm text-ink-muted">
@@ -182,7 +187,7 @@ const percent = (value: number | undefined) => (value === undefined ? '–' : `$
               : t('attendance.totals.success')
           }}
         </dt>
-        <dd class="text-3xl font-title tabular-nums">
+        <dd class="text-2xl font-title whitespace-nowrap tabular-nums sm:text-3xl">
           {{ percent(current.total.successPercent) }}
         </dd>
       </div>

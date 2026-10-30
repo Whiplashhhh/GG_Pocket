@@ -152,7 +152,6 @@ describe('attendanceCsv', () => {
 })
 
 const grade = (code: string, rank: number): Grade => ({ id: `g-${code}`, code, rank })
-const GRADES = [grade('5c', 9), grade('5a', 7), grade('5b', 8), grade('6a', 10), grade('6b', 11)]
 const SECTORS: Sector[] = [
   {
     id: 's-negatif',
@@ -182,15 +181,29 @@ describe('distributions', () => {
     route({ id: 'd', gradeRank: 9, cordNumber: 4 }),
   ]
 
-  it('counts the routes per grade between the easiest and the hardest, gaps included', () => {
+  it('counts the routes per grade, its "-" and "+" included, gaps included', () => {
+    const grades = [
+      grade('5a', 7),
+      grade('5a+', 8),
+      grade('5b', 9),
+      grade('5c-', 10),
+      grade('5c', 11),
+      grade('6a', 12),
+    ]
+    const routes = [
+      route({ id: 'a', gradeRank: 8 }),
+      route({ id: 'b', gradeRank: 10 }),
+      route({ id: 'c', gradeRank: 10 }),
+      route({ id: 'd', gradeRank: 11 }),
+    ]
     expect(
-      gradeDistribution(routes, GRADES).map((bar) => [bar.item.code, bar.count, bar.percent]),
+      gradeDistribution(routes, grades).map((bar) => [bar.item, bar.count, bar.percent]),
     ).toEqual([
       ['5a', 1, 33],
       ['5b', 0, 0],
       ['5c', 3, 100],
     ])
-    expect(gradeDistribution([], GRADES)).toEqual([])
+    expect(gradeDistribution([], grades)).toEqual([])
   })
 
   it('counts the routes per sector in the order of the wall', () => {
