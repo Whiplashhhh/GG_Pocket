@@ -1,5 +1,8 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
+import fr.gravelinesgrimp.pocket.badge.application.BadgeAwards;
+import fr.gravelinesgrimp.pocket.badge.domain.Award;
+import fr.gravelinesgrimp.pocket.badge.domain.BadgeCode;
 import fr.gravelinesgrimp.pocket.member.application.MediaService;
 import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
@@ -60,6 +63,7 @@ public class SessionService {
     private final SessionAudience audience;
     private final Friendships friendships;
     private final AutoRouteChecks autoChecks;
+    private final BadgeAwards badges;
     private final SessionViews views;
     private final MediaService media;
     private final RateLimiter rateLimiter;
@@ -74,6 +78,7 @@ public class SessionService {
             SessionAudience audience,
             Friendships friendships,
             AutoRouteChecks autoChecks,
+            BadgeAwards badges,
             SessionViews views,
             MediaService media,
             RateLimiter rateLimiter,
@@ -86,6 +91,7 @@ public class SessionService {
         this.audience = audience;
         this.friendships = friendships;
         this.autoChecks = autoChecks;
+        this.badges = badges;
         this.views = views;
         this.media = media;
         this.rateLimiter = rateLimiter;
@@ -115,7 +121,8 @@ public class SessionService {
         checkBelayers(memberId, draft);
         var session = sessions.save(ClimbingSession.create(memberId, clientRef, draft));
         autoChecks.refresh(memberId, routeModes(session));
-        return new Saved(views.of(session, memberId), true);
+        var unlocked = badges.refresh(memberId);
+        return new Saved(views.of(session, memberId).withUnlocked(codes(unlocked)), true);
     }
 
     @PreAuthorize("hasRole('CLIMBER')")
@@ -152,7 +159,8 @@ public class SessionService {
         session.update(draft);
         touched.addAll(routeModes(session));
         autoChecks.refresh(memberId, touched);
-        return views.of(session, memberId);
+        var unlocked = badges.refresh(memberId);
+        return views.of(session, memberId).withUnlocked(codes(unlocked));
     }
 
     /**
@@ -171,6 +179,7 @@ public class SessionService {
         var photoId = session.photoId();
         sessions.delete(session);
         autoChecks.refresh(memberId, touched);
+        badges.refresh(memberId);
         if (photoId != null) {
             media.delete(photoId);
         }
@@ -333,6 +342,10 @@ public class SessionService {
     private void lockMember(UUID memberId) {
         members.lockById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No member"));
+    }
+
+    private static List<BadgeCode> codes(List<Award> awards) {
+        return awards.stream().map(Award::code).toList();
     }
 
     private static Set<RouteMode> routeModes(ClimbingSession session) {

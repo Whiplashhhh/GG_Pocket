@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.member.application;
 
+import fr.gravelinesgrimp.pocket.badge.domain.Seniority;
 import fr.gravelinesgrimp.pocket.member.domain.Age;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
@@ -22,6 +23,7 @@ public record MyProfileView(
         boolean showAge,
         boolean parentalConsent,
         Integer clubArrivalYear,
+        Seniority seniority,
         Integer climbingSinceYear,
         String bio,
         boolean appearsInRankings,
@@ -42,6 +44,7 @@ public record MyProfileView(
                 member.showAge(),
                 member.hasParentalConsent(),
                 member.clubArrivalYear(),
+                Seniority.of(member.clubArrivalYear(), today.getYear()),
                 member.climbingSinceYear(),
                 member.bio(),
                 member.appearsInRankings(),

@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.seed.application;
 
+import fr.gravelinesgrimp.pocket.badge.application.BadgeAwards;
 import fr.gravelinesgrimp.pocket.club.domain.Grade;
 import fr.gravelinesgrimp.pocket.club.infra.GradeRepository;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
@@ -69,16 +70,19 @@ public class DemoSessionSeeder {
     private final RouteRepository routes;
     private final GradeRepository grades;
     private final AutoRouteChecks autoChecks;
+    private final BadgeAwards badges;
 
     public DemoSessionSeeder(
             ClimbingSessionRepository sessions,
             RouteRepository routes,
             GradeRepository grades,
-            AutoRouteChecks autoChecks) {
+            AutoRouteChecks autoChecks,
+            BadgeAwards badges) {
         this.sessions = sessions;
         this.routes = routes;
         this.grades = grades;
         this.autoChecks = autoChecks;
+        this.badges = badges;
     }
 
     /**
@@ -166,6 +170,8 @@ public class DemoSessionSeeder {
                 created++;
             }
             autoChecks.refresh(member.id(), touched);
+            // Spec §17: badges come from the real engine, never written by hand.
+            badges.refresh(member.id());
         }
         return created;
     }

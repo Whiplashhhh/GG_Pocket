@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
+import fr.gravelinesgrimp.pocket.badge.domain.BadgeCode;
 import fr.gravelinesgrimp.pocket.session.domain.ReactionKind;
 import fr.gravelinesgrimp.pocket.session.domain.SessionVisibility;
 import fr.gravelinesgrimp.pocket.topo.application.MemberRefView;
@@ -31,7 +32,30 @@ public record SessionView(
         SummaryView summary,
         List<AscentView> ascents,
         ReactionsView reactions,
-        long commentCount) {
+        long commentCount,
+        List<BadgeCode> badges,
+        List<BadgeCode> unlockedBadges) {
+
+    /** The same view, right after a save that unlocked {@code unlocked}. */
+    public SessionView withUnlocked(List<BadgeCode> unlocked) {
+        return new SessionView(
+                id,
+                memberId,
+                author,
+                climbedOn,
+                feeling,
+                comment,
+                photoId,
+                visibility,
+                createdAt,
+                editable,
+                summary,
+                ascents,
+                reactions,
+                commentCount,
+                badges,
+                List.copyOf(unlocked));
+    }
 
     /** The figures of the card; {@code maxGrade} is the hardest topped one. */
     public record SummaryView(

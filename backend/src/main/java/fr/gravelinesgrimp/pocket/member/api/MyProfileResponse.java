@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.member.api;
 
+import fr.gravelinesgrimp.pocket.badge.domain.Seniority;
 import fr.gravelinesgrimp.pocket.member.application.MyProfileView;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 
@@ -29,6 +30,8 @@ public record MyProfileResponse(
                         description = "A parent or legal guardian agreed (declared under 15)")
                 boolean parentalConsent,
         Integer clubArrivalYear,
+        @Schema(description = "Years at the club (spec §9.4); absent without a year of arrival")
+                Seniority seniority,
         Integer climbingSinceYear,
         String bio,
         @Schema(requiredMode = RequiredMode.REQUIRED) boolean appearsInRankings,
@@ -49,6 +52,7 @@ public record MyProfileResponse(
                 view.showAge(),
                 view.parentalConsent(),
                 view.clubArrivalYear(),
+                view.seniority(),
                 view.climbingSinceYear(),
                 view.bio(),
                 view.appearsInRankings(),
