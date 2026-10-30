@@ -30,6 +30,32 @@ Attendre Willem (essai dev, fusion), puis phase 6 (podium), ou la PR `chore/` po
 
 ---
 
+## 2026-10-30 — Phase 6, PR 6.1 : le podium
+
+**Branche** : `feature/podium-0.8.0` (depuis `main` 0.8.0, D-103).
+
+### Fait
+
+- Backend : V14 (`monthly_ranking_closure`, `monthly_ranking_snapshot`), module `ranking` (`Ranking` pur, `LiveRankings`,
+  `RankingClosure` idempotente, `MonthlyClosureJob` à 04:00 Europe/Paris, `@EnableScheduling`), `GET /rankings`,
+  `GET /rankings/months`. Suppression de compte (rangs → « Ancien·ne membre »), export (`frozenRanks`), seed via la
+  vraie clôture. Tests : `RankingTest`, `RankingStatusTest`, `RankingIT` (mois « vierge » pour la base partagée),
+  matrice d'autorisations.
+- Front : `PodiumView` (marches, liste, barre « Ta place », mois, Séances/Voies), `api/rankings.ts`, `lib/podium.ts`
+  + Vitest, invalidation après séance et profil, textes « Tes données ». e2e `podium.spec.ts` (Desktop Chrome),
+  captures 360 clair/sombre regardées (contraste des marches corrigé).
+
+### Reste
+
+- CI : backend (dont `RankingIT`), front et e2e verts sur 0789827 ; vérifier le dernier commit (docs, ajustements
+  d'écran), puis relecture et fusion par Willem.
+- PR 6.2 : Fréquentation (CSV) et Bilan du topo.
+- D-103 à valider (séances privées comptées, trous dans les rangs figés).
+
+### Prochaine action
+
+- PR 6.2 (Fréquentation + CSV, Bilan du topo), branche `feature/stats-<version>` depuis `main` après fusion de 6.1.
+
 ## 2026-10-28 — Phase 5, PR 5.2 : le fil d'actu
 
 **Branche** : `feature/fil-0.6.0` (PR 5.2, voir D-100).

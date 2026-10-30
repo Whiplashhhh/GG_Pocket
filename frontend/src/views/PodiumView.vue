@@ -137,9 +137,9 @@ function setMyLine(line: RankingLine) {
 }
 
 const stepClass: Record<string, string> = {
-  first: 'h-24 bg-brand',
-  second: 'h-16 bg-olive',
-  third: 'h-12 bg-surface-sunken',
+  first: 'h-24 bg-brand text-on-brand',
+  second: 'h-16 bg-olive text-on-olive',
+  third: 'h-12 bg-surface-sunken text-ink',
 }
 const columnClass: Record<number, string> = {
   1: 'col-start-1',
@@ -243,7 +243,7 @@ const columnClass: Record<number, string> = {
           </span>
           <span class="text-sm text-ink-muted">{{ valueLabel(step.line.value) }}</span>
           <div
-            class="flex w-full items-start justify-center rounded-t-control pt-1 text-ink"
+            class="flex w-full items-start justify-center rounded-t-control pt-1"
             :class="stepClass[step.height]"
           >
             <span class="text-2xl font-cord">{{ rankLabel(step.line.rank) }}</span>
@@ -310,7 +310,7 @@ const columnClass: Record<number, string> = {
         {{ t('podium.optedOutLink') }}
       </RouterLink>
     </p>
-    <p v-else-if="!me" class="px-4 py-4 text-sm text-ink-muted">
+    <p v-else-if="!me && lines.length > 0" class="px-4 py-4 text-sm text-ink-muted">
       {{ current.status === 'LIVE' ? t('podium.notRanked') : t('podium.notRankedPast') }}
     </p>
 
