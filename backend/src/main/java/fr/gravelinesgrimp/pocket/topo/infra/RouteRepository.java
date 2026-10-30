@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +26,15 @@ public interface RouteRepository extends JpaRepository<Route, UUID> {
     /** Callers never pass an empty collection. */
     @Query("select r from Route r left join fetch r.styles where r.id in :ids")
     List<Route> findAllWithStylesByIdIn(Collection<UUID> ids);
+
+    /**
+     * Routes on the wall at some point between two instants: opened by {@code lastDay}, not
+     * dismounted before {@code since} (the attendance of a month).
+     */
+    @Query(
+            "select r from Route r left join fetch r.styles where r.openedOn <= :lastDay"
+                    + " and (r.dismountedAt is null or r.dismountedAt >= :since)")
+    List<Route> findAllWithStylesOnTheWallDuring(Instant since, LocalDate lastDay);
 
     @Query("select r from Route r left join fetch r.styles where r.id = :id")
     Optional<Route> findWithStylesById(UUID id);
