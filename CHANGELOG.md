@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 0.8.0 — 2026-10-30
+
 ### Ajouté
 
 - L’assureur : en saisissant ta séance, note qui tenait la corde, voie par voie (tes amis en tête, mais tout le club
