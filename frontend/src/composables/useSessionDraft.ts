@@ -17,9 +17,12 @@ export interface SessionDraft {
 const store = localStore<SessionDraft>('drafts')
 const SAVE_DELAY_MS = 300
 
-/** The draft key: "new" for a new session, the id of a saved one being changed. */
-export function draftKey(sessionId?: string): string {
-  return sessionId === undefined ? 'new' : `session:${sessionId}`
+/**
+ * The draft key: "new" for a new session, the id of a saved one being changed. Each member has
+ * their own: on a shared phone, nobody finds (nor sends) the draft of someone else.
+ */
+export function draftKey(memberId: string, sessionId?: string): string {
+  return `${memberId}:${sessionId === undefined ? 'new' : `session:${sessionId}`}`
 }
 
 /**

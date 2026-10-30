@@ -4,6 +4,26 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-30 — Correctif : « Voie introuvable » dans un brouillon de séance (signalé par Willem sur dev)
+
+**Branche** : `fix/brouillon-voie-0.8.0` (depuis `main` 0.8.0, indépendante de la PR #39 du podium).
+
+### Fait
+- Cause : le brouillon (IndexedDB) garde l'identifiant des voies ; une voie démontée depuis, ou un topo de démo réinitialisé
+  (dev : nouveaux identifiants à chaque déploiement), laissait une ligne « Voie introuvable » que le serveur refuserait.
+  `withoutGoneRoutes` (lib/sessionForm.ts) retire ces lignes à la restauration, une fois les voies du mur chargées, avec un message.
+- Brouillons rangés par membre (`draftKey(memberId, …)`) ; file d'attente hors ligne marquée par membre (`memberId`, `belongsTo`) :
+  seule celle du membre connecté s'affiche et part. Les éléments déjà en file sans propriétaire partent comme avant.
+- Tests : Vitest (sessionForm, outbox), e2e « drops from a kept draft the route dismounted since ».
+
+### Reste / prochaine action
+- Willem relit et fusionne ; puis reprise de la phase 6 (PR #39, puis PR 6.2).
+
+### Points bloquants
+- Aucun.
+
+---
+
 ## 2026-10-29 — PR 5.3 : l'assureur (demande de Willem)
 
 **Branche** : `feature/assureur-0.7.0` (D-101).

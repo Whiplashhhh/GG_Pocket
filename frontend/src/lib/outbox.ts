@@ -22,6 +22,13 @@ export interface OutboxItem {
   errorCode?: string
   /** Once saved (photoRefused). */
   sessionId?: string
+  /** Who logged it: a shared phone never sends a session in someone else's name. */
+  memberId?: string
+}
+
+/** Mine, or queued before the queue knew whose it was. */
+export function belongsTo(item: OutboxItem, memberId: string | undefined): boolean {
+  return item.memberId === undefined || item.memberId === memberId
 }
 
 export type SessionSender = (body: SessionRequest, photo: Blob | undefined) => Promise<Session>
@@ -37,27 +44,34 @@ function codeOf(error: unknown): string {
   return error instanceof ApiError ? error.code : 'UNKNOWN'
 }
 
-export function queuedItem(body: SessionRequest, photo: Blob | undefined, now = new Date()) {
+export function queuedItem(
+  body: SessionRequest,
+  photo: Blob | undefined,
+  memberId: string,
+  now = new Date(),
+) {
   const item: OutboxItem = {
     clientRef: body.clientRef,
     body,
     queuedAt: now.toISOString(),
     state: 'waiting',
+    memberId,
   }
   if (photo !== undefined) item.photo = photo
   return item
 }
 
 /**
- * Sends the waiting sessions, oldest first. Stops at the first one that cannot go yet (still
+ * Sends the waiting sessions of the member signed in, oldest first. Stops at the first one that cannot go yet (still
  * offline): the next ones would not go either. Returns the sessions the server now has.
  */
 export async function flushOutbox(
   store: KeyValueStore<OutboxItem>,
   send: SessionSender,
+  memberId: string,
 ): Promise<Session[]> {
   const waiting = (await store.values())
-    .filter((item) => item.state === 'waiting')
+    .filter((item) => item.state === 'waiting' && belongsTo(item, memberId))
     .sort((a, b) => a.queuedAt.localeCompare(b.queuedAt))
   const sent: Session[] = []
   for (const item of waiting) {

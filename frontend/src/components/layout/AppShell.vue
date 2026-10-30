@@ -37,8 +37,14 @@ watch(
       invitationConsidered = true
       inviting.value = install.shouldInvite
     }
-    // Sessions logged offline leave as soon as someone is signed in.
-    if (authenticated === true) outbox.start()
+  },
+  { immediate: true },
+)
+// Sessions logged offline leave as soon as their author is signed in.
+watch(
+  () => auth.value?.member?.id,
+  (memberId) => {
+    if (memberId !== undefined) outbox.start(memberId)
   },
   { immediate: true },
 )
