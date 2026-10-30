@@ -8,6 +8,7 @@ import {
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 
 import { api } from './client'
+import { RANKINGS_KEY } from './rankings'
 import { request, requestNoContent } from './request'
 import type { components } from './schema'
 import { MY_TODO_KEY, ROUTES_KEY } from './topo'
@@ -141,6 +142,7 @@ export function sessionsChanged(queryClient: QueryClient, saved?: Session) {
   void queryClient.invalidateQueries({ queryKey: MY_PLANNING_KEY })
   void queryClient.invalidateQueries({ queryKey: MY_LOGBOOK_KEY })
   void queryClient.invalidateQueries({ queryKey: MY_TODO_KEY })
+  void queryClient.invalidateQueries({ queryKey: RANKINGS_KEY })
 }
 
 export function useSaveSession() {

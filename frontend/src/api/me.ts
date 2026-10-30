@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { AUTH_STATE_KEY, type AuthState } from './auth'
 import { api } from './client'
+import { RANKINGS_KEY } from './rankings'
 import { request, requestNoContent } from './request'
 import type { components } from './schema'
 
@@ -19,11 +20,15 @@ export function useMyProfile() {
   })
 }
 
-/** The header shows the name and photo too: keep the signed-in member in step. */
+/**
+ * The header shows the name and photo too: keep the signed-in member in step. The podium shows
+ * them as well, and whether I appear in it.
+ */
 function useProfileSaved() {
   const queryClient = useQueryClient()
   return (profile: MyProfile) => {
     queryClient.setQueryData(MY_PROFILE_KEY, profile)
+    void queryClient.invalidateQueries({ queryKey: RANKINGS_KEY })
     queryClient.setQueryData<AuthState>(AUTH_STATE_KEY, (state) =>
       state?.member
         ? {

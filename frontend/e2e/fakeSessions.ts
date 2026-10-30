@@ -47,6 +47,8 @@ export class FakeSessions implements AscentSource {
   offline = false
   /** Accepted friends with an active account (FakeClub knows both). */
   isFriend: (readerId: string, climberId: string) => boolean = () => false
+  /** Active and not opted out of the podium (FakeSocial knows). */
+  inRankings: (id: string) => boolean = () => true
   /** Nickname and photo of a member (FakeSocial knows them). */
   memberRef: (id: string) => Schemas['MemberRef'] = (id) => ({ id, nickname: id })
 
@@ -166,6 +168,64 @@ export class FakeSessions implements AscentSource {
       leadKnown: routes.filter((item) => item.lead !== 'TODO').length,
       routes,
     }
+  }
+
+  /**
+   * RankingService, counted live for every month: the fake has no closure (a frozen month counts
+   * the same, its sessions no longer change).
+   */
+  private ranking(me: TopoMember, month: string): Schemas['Ranking'] {
+    const days = new Map<string, Set<string>>()
+    const topped = new Map<string, number>()
+    for (const session of this.sessions) {
+      if (!session.climbedOn.startsWith(month) || !this.inRankings(session.memberId)) continue
+      days.set(session.memberId, (days.get(session.memberId) ?? new Set()).add(session.climbedOn))
+      topped.set(
+        session.memberId,
+        (topped.get(session.memberId) ?? 0) + session.ascents.filter((a) => a.topped).length,
+      )
+    }
+    const board = (scores: Map<string, number>): Schemas['RankingBoard'] => {
+      const sorted = [...scores.entries()]
+        .filter(([, value]) => value > 0)
+        .map(([id, value]) => ({ member: this.memberRef(id), value }))
+        .sort(
+          (a, b) =>
+            b.value - a.value ||
+            a.member.nickname.localeCompare(b.member.nickname, 'fr', { sensitivity: 'accent' }),
+        )
+      const lines: Schemas['RankingLine'][] = []
+      sorted.forEach((line, index) => {
+        const previous = index > 0 ? lines[index - 1] : undefined
+        const rank = previous?.value === line.value ? previous.rank : index + 1
+        lines.push({ ...line, rank })
+      })
+      const mine = lines.find((line) => line.member.id === me.id)
+      return { lines, ...(mine === undefined ? {} : { me: mine }) }
+    }
+    const status = this.rankingStatus(month)
+    const next = new Date(`${month}-01T12:00:00Z`)
+    next.setUTCMonth(next.getUTCMonth() + 1)
+    return {
+      month,
+      status,
+      ...(status === 'FROZEN'
+        ? {}
+        : { freezesAt: `${next.toISOString().slice(0, 7)}-08T03:00:00Z` }),
+      appearsInRankings: this.inRankings(me.id),
+      sessions: board(new Map([...days.entries()].map(([id, set]) => [id, set.size]))),
+      ascents: board(topped),
+    }
+  }
+
+  /** RankingStatus: the previous month freezes on the 8th at 04:00 (spec §9.2). */
+  private rankingStatus(month: string): Schemas['Ranking']['status'] {
+    const today = this.day()
+    if (month === today.slice(0, 7)) return 'LIVE'
+    const next = new Date(`${month}-01T12:00:00Z`)
+    next.setUTCMonth(next.getUTCMonth() + 1)
+    const isLastMonth = next.toISOString().slice(0, 7) === today.slice(0, 7)
+    return isLastMonth && today.slice(8, 10) < '08' ? 'PROVISIONAL' : 'FROZEN'
   }
 
   /** PlanningService, Streak and MonthTotals. */
@@ -570,6 +630,28 @@ export class FakeSessions implements AscentSource {
     }
     if (pathname === '/me/todo' && method === 'GET') return json(this.todo(me))
     if (pathname === '/me/logbook' && method === 'GET') return json(this.logbook(me))
+    if (pathname === '/rankings' && method === 'GET') {
+      const month = url.searchParams.get('month') ?? this.day().slice(0, 7)
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || month > this.day().slice(0, 7)) {
+        return problem(400, 'VALIDATION_FAILED')
+      }
+      return json(this.ranking(me, month))
+    }
+    if (pathname === '/rankings/months' && method === 'GET') {
+      const current = this.day().slice(0, 7)
+      const first = this.sessions.reduce(
+        (oldest, session) => (session.climbedOn < oldest ? session.climbedOn : oldest),
+        current,
+      )
+      const months: Schemas['RankingMonth'][] = []
+      const cursor = new Date(`${current}-01T12:00:00Z`)
+      while (cursor.toISOString().slice(0, 7) >= first.slice(0, 7)) {
+        const month = cursor.toISOString().slice(0, 7)
+        months.push({ month, status: this.rankingStatus(month) })
+        cursor.setUTCMonth(cursor.getUTCMonth() - 1)
+      }
+      return json(months)
+    }
     if (pathname === '/me/planning' && method === 'GET') {
       const month = url.searchParams.get('month') ?? this.day().slice(0, 7)
       if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || month > this.day().slice(0, 7)) {
