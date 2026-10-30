@@ -449,6 +449,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/badges': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** My badge library */
+    get: operations['getMyBadges']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/belays': {
     parameters: {
       query?: never
@@ -783,6 +800,23 @@ export interface paths {
     }
     /** The public profile of a member */
     get: operations['getMemberProfile']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/members/{id}/badges': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The badge library of a member */
+    get: operations['getMemberBadges']
     put?: never
     post?: never
     delete?: never
@@ -1443,6 +1477,76 @@ export interface components {
       /** @description Present when signed in */
       member?: components['schemas']['CurrentMember']
     }
+    BadgeLibrary: {
+      /** @description Every badge of the catalogue, in its order, earned or not */
+      badges: components['schemas']['BadgeLibraryEntry'][]
+    }
+    BadgeLibraryEntry: {
+      /** @enum {string} */
+      code:
+        | 'TOPPED_1'
+        | 'TOPPED_5'
+        | 'TOPPED_10'
+        | 'TOPPED_20'
+        | 'TOPPED_50'
+        | 'TOPPED_100'
+        | 'TOPPED_250'
+        | 'TOPPED_500'
+        | 'TOPPED_750'
+        | 'TOPPED_1000'
+        | 'LEAD_1'
+        | 'LEAD_5'
+        | 'LEAD_10'
+        | 'LEAD_20'
+        | 'LEAD_50'
+        | 'LEAD_100'
+        | 'LEAD_250'
+        | 'LEAD_500'
+        | 'LEAD_750'
+        | 'LEAD_1000'
+        | 'GRADE_5B'
+        | 'GRADE_5C'
+        | 'GRADE_6A'
+        | 'GRADE_6B'
+        | 'GRADE_6C'
+        | 'GRADE_7A'
+        | 'GRADE_7B'
+        | 'GRADE_7C'
+        | 'DAYS_10'
+        | 'DAYS_25'
+        | 'DAYS_50'
+        | 'DAYS_75'
+        | 'DAYS_100'
+        | 'DAYS_500'
+        | 'DAYS_750'
+        | 'DAYS_1000'
+        | 'WEEK_2'
+        | 'WEEK_3'
+        | 'WEEK_4'
+        | 'MONTH_COMPLETE'
+        | 'MONTH_12'
+        | 'STREAK_3W'
+        | 'MONTH_NO_MISS'
+        | 'FULL_LEAD'
+        | 'PERFECT'
+        | 'ZERO_REST'
+        | 'COMEBACK'
+        | 'FLASH'
+        | 'RECORD'
+      /**
+       * Format: int64
+       * @description Times earned, 0 when not earned yet
+       */
+      count: number
+      /** @enum {string} */
+      family: 'TOPPED' | 'LEAD' | 'FIRST_GRADE' | 'CLIMBING_DAYS' | 'REPEATABLE'
+      /** Format: date */
+      firstEarnedOn?: string
+      /** Format: date */
+      lastEarnedOn?: string
+      /** @description Earned again each time: shown ×N */
+      repeatable: boolean
+    }
     /** @description A session where I held the rope; readable says whether I may open it. */
     Belay: {
       /** Format: date */
@@ -1792,6 +1896,11 @@ export interface components {
       nickname: string
       /** @enum {string} */
       role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      /**
+       * @description Years at the club (spec §9.4); absent without a year of arrival
+       * @enum {string}
+       */
+      seniority?: 'FRESH' | 'BABY_CARABINER' | 'PRO_BEGINNER' | 'FORCER' | 'RESIDENT' | 'FOSSIL'
     }
     /** @description The member sheet, with what the caller may do. */
     MemberDetail: {
@@ -1968,6 +2077,11 @@ export interface components {
       parentalConsent: boolean
       /** @enum {string} */
       role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      /**
+       * @description Years at the club (spec §9.4); absent without a year of arrival
+       * @enum {string}
+       */
+      seniority?: 'FRESH' | 'BABY_CARABINER' | 'PRO_BEGINNER' | 'FORCER' | 'RESIDENT' | 'FOSSIL'
       showAge: boolean
     }
     /** @description One of my ascents of the route. */
@@ -2313,6 +2427,58 @@ export interface components {
       ascents: components['schemas']['Ascent'][]
       /** @description The climber */
       author: components['schemas']['MemberRef']
+      /** @description The badges this session earned, in the catalogue order (a code twice when earned twice) */
+      badges: (
+        | 'TOPPED_1'
+        | 'TOPPED_5'
+        | 'TOPPED_10'
+        | 'TOPPED_20'
+        | 'TOPPED_50'
+        | 'TOPPED_100'
+        | 'TOPPED_250'
+        | 'TOPPED_500'
+        | 'TOPPED_750'
+        | 'TOPPED_1000'
+        | 'LEAD_1'
+        | 'LEAD_5'
+        | 'LEAD_10'
+        | 'LEAD_20'
+        | 'LEAD_50'
+        | 'LEAD_100'
+        | 'LEAD_250'
+        | 'LEAD_500'
+        | 'LEAD_750'
+        | 'LEAD_1000'
+        | 'GRADE_5B'
+        | 'GRADE_5C'
+        | 'GRADE_6A'
+        | 'GRADE_6B'
+        | 'GRADE_6C'
+        | 'GRADE_7A'
+        | 'GRADE_7B'
+        | 'GRADE_7C'
+        | 'DAYS_10'
+        | 'DAYS_25'
+        | 'DAYS_50'
+        | 'DAYS_75'
+        | 'DAYS_100'
+        | 'DAYS_500'
+        | 'DAYS_750'
+        | 'DAYS_1000'
+        | 'WEEK_2'
+        | 'WEEK_3'
+        | 'WEEK_4'
+        | 'MONTH_COMPLETE'
+        | 'MONTH_12'
+        | 'STREAK_3W'
+        | 'MONTH_NO_MISS'
+        | 'FULL_LEAD'
+        | 'PERFECT'
+        | 'ZERO_REST'
+        | 'COMEBACK'
+        | 'FLASH'
+        | 'RECORD'
+      )[]
       /** Format: date */
       climbedOn: string
       comment?: string
@@ -2340,6 +2506,58 @@ export interface components {
       photoUrl?: string
       reactions: components['schemas']['SessionReactions']
       summary: components['schemas']['SessionSummary']
+      /** @description Right after saving it: the badges just unlocked, wherever they landed; empty otherwise */
+      unlockedBadges: (
+        | 'TOPPED_1'
+        | 'TOPPED_5'
+        | 'TOPPED_10'
+        | 'TOPPED_20'
+        | 'TOPPED_50'
+        | 'TOPPED_100'
+        | 'TOPPED_250'
+        | 'TOPPED_500'
+        | 'TOPPED_750'
+        | 'TOPPED_1000'
+        | 'LEAD_1'
+        | 'LEAD_5'
+        | 'LEAD_10'
+        | 'LEAD_20'
+        | 'LEAD_50'
+        | 'LEAD_100'
+        | 'LEAD_250'
+        | 'LEAD_500'
+        | 'LEAD_750'
+        | 'LEAD_1000'
+        | 'GRADE_5B'
+        | 'GRADE_5C'
+        | 'GRADE_6A'
+        | 'GRADE_6B'
+        | 'GRADE_6C'
+        | 'GRADE_7A'
+        | 'GRADE_7B'
+        | 'GRADE_7C'
+        | 'DAYS_10'
+        | 'DAYS_25'
+        | 'DAYS_50'
+        | 'DAYS_75'
+        | 'DAYS_100'
+        | 'DAYS_500'
+        | 'DAYS_750'
+        | 'DAYS_1000'
+        | 'WEEK_2'
+        | 'WEEK_3'
+        | 'WEEK_4'
+        | 'MONTH_COMPLETE'
+        | 'MONTH_12'
+        | 'STREAK_3W'
+        | 'MONTH_NO_MISS'
+        | 'FULL_LEAD'
+        | 'PERFECT'
+        | 'ZERO_REST'
+        | 'COMEBACK'
+        | 'FLASH'
+        | 'RECORD'
+      )[]
       /** @enum {string} */
       visibility: 'FRIENDS' | 'PRIVATE'
     }
@@ -3120,6 +3338,26 @@ export interface operations {
       }
     }
   }
+  getMyBadges: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BadgeLibrary']
+        }
+      }
+    }
+  }
   listMyBelays: {
     parameters: {
       query?: {
@@ -3577,6 +3815,28 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['MemberProfile']
+        }
+      }
+    }
+  }
+  getMemberBadges: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BadgeLibrary']
         }
       }
     }

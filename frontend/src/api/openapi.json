@@ -929,6 +929,27 @@
         ]
       }
     },
+    "/api/v1/me/badges": {
+      "get": {
+        "operationId": "getMyBadges",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadgeLibrary"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "My badge library",
+        "tags": [
+          "Badges"
+        ]
+      }
+    },
     "/api/v1/me/belays": {
       "get": {
         "operationId": "listMyBelays",
@@ -1490,6 +1511,38 @@
         "summary": "The public profile of a member",
         "tags": [
           "Social"
+        ]
+      }
+    },
+    "/api/v1/members/{id}/badges": {
+      "get": {
+        "operationId": "getMemberBadges",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadgeLibrary"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "The badge library of a member",
+        "tags": [
+          "Badges"
         ]
       }
     },
@@ -3087,6 +3140,113 @@
           "authenticated"
         ]
       },
+      "BadgeLibrary": {
+        "type": "object",
+        "properties": {
+          "badges": {
+            "type": "array",
+            "description": "Every badge of the catalogue, in its order, earned or not",
+            "items": {
+              "$ref": "#/components/schemas/BadgeLibraryEntry"
+            }
+          }
+        },
+        "required": [
+          "badges"
+        ]
+      },
+      "BadgeLibraryEntry": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "TOPPED_1",
+              "TOPPED_5",
+              "TOPPED_10",
+              "TOPPED_20",
+              "TOPPED_50",
+              "TOPPED_100",
+              "TOPPED_250",
+              "TOPPED_500",
+              "TOPPED_750",
+              "TOPPED_1000",
+              "LEAD_1",
+              "LEAD_5",
+              "LEAD_10",
+              "LEAD_20",
+              "LEAD_50",
+              "LEAD_100",
+              "LEAD_250",
+              "LEAD_500",
+              "LEAD_750",
+              "LEAD_1000",
+              "GRADE_5B",
+              "GRADE_5C",
+              "GRADE_6A",
+              "GRADE_6B",
+              "GRADE_6C",
+              "GRADE_7A",
+              "GRADE_7B",
+              "GRADE_7C",
+              "DAYS_10",
+              "DAYS_25",
+              "DAYS_50",
+              "DAYS_75",
+              "DAYS_100",
+              "DAYS_500",
+              "DAYS_750",
+              "DAYS_1000",
+              "WEEK_2",
+              "WEEK_3",
+              "WEEK_4",
+              "MONTH_COMPLETE",
+              "MONTH_12",
+              "STREAK_3W",
+              "MONTH_NO_MISS",
+              "FULL_LEAD",
+              "PERFECT",
+              "ZERO_REST",
+              "COMEBACK",
+              "FLASH",
+              "RECORD"
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Times earned, 0 when not earned yet"
+          },
+          "family": {
+            "type": "string",
+            "enum": [
+              "TOPPED",
+              "LEAD",
+              "FIRST_GRADE",
+              "CLIMBING_DAYS",
+              "REPEATABLE"
+            ]
+          },
+          "firstEarnedOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "lastEarnedOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "repeatable": {
+            "type": "boolean",
+            "description": "Earned again each time: shown ×N"
+          }
+        },
+        "required": [
+          "code",
+          "count",
+          "family",
+          "repeatable"
+        ]
+      },
       "Belay": {
         "type": "object",
         "description": "A session where I held the rope; readable says whether I may open it.",
@@ -4076,6 +4236,18 @@
               "BOARD",
               "ADMIN"
             ]
+          },
+          "seniority": {
+            "type": "string",
+            "description": "Years at the club (spec §9.4); absent without a year of arrival",
+            "enum": [
+              "FRESH",
+              "BABY_CARABINER",
+              "PRO_BEGINNER",
+              "FORCER",
+              "RESIDENT",
+              "FOSSIL"
+            ]
           }
         },
         "required": [
@@ -4607,6 +4779,18 @@
               "SETTER",
               "BOARD",
               "ADMIN"
+            ]
+          },
+          "seniority": {
+            "type": "string",
+            "description": "Years at the club (spec §9.4); absent without a year of arrival",
+            "enum": [
+              "FRESH",
+              "BABY_CARABINER",
+              "PRO_BEGINNER",
+              "FORCER",
+              "RESIDENT",
+              "FOSSIL"
             ]
           },
           "showAge": {
@@ -5646,6 +5830,64 @@
             "$ref": "#/components/schemas/MemberRef",
             "description": "The climber"
           },
+          "badges": {
+            "type": "array",
+            "description": "The badges this session earned, in the catalogue order (a code twice when earned twice)",
+            "items": {
+              "type": "string",
+              "enum": [
+                "TOPPED_1",
+                "TOPPED_5",
+                "TOPPED_10",
+                "TOPPED_20",
+                "TOPPED_50",
+                "TOPPED_100",
+                "TOPPED_250",
+                "TOPPED_500",
+                "TOPPED_750",
+                "TOPPED_1000",
+                "LEAD_1",
+                "LEAD_5",
+                "LEAD_10",
+                "LEAD_20",
+                "LEAD_50",
+                "LEAD_100",
+                "LEAD_250",
+                "LEAD_500",
+                "LEAD_750",
+                "LEAD_1000",
+                "GRADE_5B",
+                "GRADE_5C",
+                "GRADE_6A",
+                "GRADE_6B",
+                "GRADE_6C",
+                "GRADE_7A",
+                "GRADE_7B",
+                "GRADE_7C",
+                "DAYS_10",
+                "DAYS_25",
+                "DAYS_50",
+                "DAYS_75",
+                "DAYS_100",
+                "DAYS_500",
+                "DAYS_750",
+                "DAYS_1000",
+                "WEEK_2",
+                "WEEK_3",
+                "WEEK_4",
+                "MONTH_COMPLETE",
+                "MONTH_12",
+                "STREAK_3W",
+                "MONTH_NO_MISS",
+                "FULL_LEAD",
+                "PERFECT",
+                "ZERO_REST",
+                "COMEBACK",
+                "FLASH",
+                "RECORD"
+              ]
+            }
+          },
           "climbedOn": {
             "type": "string",
             "format": "date"
@@ -5689,6 +5931,64 @@
           "summary": {
             "$ref": "#/components/schemas/SessionSummary"
           },
+          "unlockedBadges": {
+            "type": "array",
+            "description": "Right after saving it: the badges just unlocked, wherever they landed; empty otherwise",
+            "items": {
+              "type": "string",
+              "enum": [
+                "TOPPED_1",
+                "TOPPED_5",
+                "TOPPED_10",
+                "TOPPED_20",
+                "TOPPED_50",
+                "TOPPED_100",
+                "TOPPED_250",
+                "TOPPED_500",
+                "TOPPED_750",
+                "TOPPED_1000",
+                "LEAD_1",
+                "LEAD_5",
+                "LEAD_10",
+                "LEAD_20",
+                "LEAD_50",
+                "LEAD_100",
+                "LEAD_250",
+                "LEAD_500",
+                "LEAD_750",
+                "LEAD_1000",
+                "GRADE_5B",
+                "GRADE_5C",
+                "GRADE_6A",
+                "GRADE_6B",
+                "GRADE_6C",
+                "GRADE_7A",
+                "GRADE_7B",
+                "GRADE_7C",
+                "DAYS_10",
+                "DAYS_25",
+                "DAYS_50",
+                "DAYS_75",
+                "DAYS_100",
+                "DAYS_500",
+                "DAYS_750",
+                "DAYS_1000",
+                "WEEK_2",
+                "WEEK_3",
+                "WEEK_4",
+                "MONTH_COMPLETE",
+                "MONTH_12",
+                "STREAK_3W",
+                "MONTH_NO_MISS",
+                "FULL_LEAD",
+                "PERFECT",
+                "ZERO_REST",
+                "COMEBACK",
+                "FLASH",
+                "RECORD"
+              ]
+            }
+          },
           "visibility": {
             "type": "string",
             "enum": [
@@ -5700,6 +6000,7 @@
         "required": [
           "ascents",
           "author",
+          "badges",
           "climbedOn",
           "commentCount",
           "createdAt",
@@ -5708,6 +6009,7 @@
           "memberId",
           "reactions",
           "summary",
+          "unlockedBadges",
           "visibility"
         ]
       },
