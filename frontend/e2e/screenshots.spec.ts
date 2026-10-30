@@ -136,6 +136,35 @@ const marieOnTheWall = (club: FakeClub) => {
 }
 
 /** A month of Marie at the gym, a route dismounted since in her history, a few marks. */
+/** The club's October: a tie at the top, a long list, Marie far enough down for her bar. */
+const clubPodium = (club: FakeClub) => {
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  if (marie === undefined) return
+  const climbers: [string, string, string, number, number][] = [
+    ['lea.dyno', 'Léa', 'Dupont', 9, 2],
+    ['Tom', 'Tom', 'Bloc', 9, 3],
+    ['jules', 'Jules', 'Martin', 8, 2],
+    ['bernard-emmanuel', 'Bernard-Emmanuel', 'Delacroix-Vandenberghe', 6, 4],
+    ['nina', 'Nina', 'Roche', 6, 1],
+    ['paulo', 'Paulo', 'Prise', 5, 2],
+    ['zoe', 'Zoé', 'Arête', 4, 2],
+    ['kiki', 'Kiki', 'Dalle', 4, 1],
+  ]
+  for (const [nickname, firstName, lastName, days, topped] of climbers) {
+    const member = club.addMember({ nickname, firstName, lastName })
+    for (let day = 1; day <= days; day++) {
+      club.climbs.add(
+        member,
+        day * 2,
+        Array.from({ length: topped }, () => ({ route: 'Bye Bye Morice' })),
+      )
+    }
+  }
+  for (const day of [1, 4, 6]) {
+    club.climbs.add(marie, day, [{ route: 'Réglisse' }, { route: 'Iron Man' }])
+  }
+}
+
 const marieSeason = (club: FakeClub) => {
   marieClimbs(club)
   marieOnTheWall(club)
@@ -323,6 +352,17 @@ const CAPTURES: Capture[] = [
     },
   },
   { name: 'planning-vide', path: '/planning', as: 'CLIMBER' },
+  { name: 'podium', path: '/podium', as: 'CLIMBER', prepare: clubPodium },
+  {
+    name: 'podium-voies',
+    path: '/podium?classement=voies',
+    as: 'CLIMBER',
+    prepare: clubPodium,
+    act: async (page) => {
+      await page.getByRole('list', { name: 'Les trois premiers' }).waitFor()
+    },
+  },
+  { name: 'podium-vide', path: '/podium', as: 'CLIMBER' },
   { name: 'carnet', path: '/carnet', as: 'CLIMBER', prepare: marieSeason },
   {
     name: 'seance-saisie',

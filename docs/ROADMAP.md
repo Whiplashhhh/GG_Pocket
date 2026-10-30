@@ -146,9 +146,15 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 
 ## Phase 6 — Podium et statistiques
 
-- [ ] Classements en direct (séances, voies), ex-aequo
-- [ ] Tâche de clôture mensuelle (le 8 à 04:00, idempotente) + verrouillage des séances du mois figé
-- [ ] Historique des mois
+### PR 6.1 — Le podium (`feature/podium-0.8.0`, D-103)
+
+- [x] Classements en direct (séances, voies), ex-aequo
+- [x] Tâche de clôture mensuelle (le 8 à 04:00, idempotente) + verrouillage des séances du mois figé
+- [x] Historique des mois
+- [x] Suppression de compte (« Ancien·ne membre »), export, seed par la vraie tâche
+
+### PR 6.2 — Statistiques de gestion
+
 - [ ] Fréquentation (export CSV), Bilan du topo
 
 ## Phase 7 — Badges

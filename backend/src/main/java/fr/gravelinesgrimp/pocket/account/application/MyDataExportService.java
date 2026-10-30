@@ -7,6 +7,7 @@ import fr.gravelinesgrimp.pocket.member.infra.MediaFileRepository;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
+import fr.gravelinesgrimp.pocket.ranking.infra.MonthlyRankingRepository;
 import fr.gravelinesgrimp.pocket.session.domain.Ascent;
 import fr.gravelinesgrimp.pocket.session.domain.ClimbingSession;
 import fr.gravelinesgrimp.pocket.session.infra.AscentRepository;
@@ -58,7 +59,8 @@ public class MyDataExportService {
             List<ExportedFriendship> friendships,
             List<ExportedSessionComment> sessionComments,
             List<ExportedSessionReaction> sessionReactions,
-            List<ExportedBelay> belays) {}
+            List<ExportedBelay> belays,
+            List<ExportedRank> frozenRanks) {}
 
     public record ExportedProfile(
             String nickname,
@@ -129,6 +131,9 @@ public class MyDataExportService {
     /** A session where someone named me as their belayer, on {@code routeCount} routes. */
     public record ExportedBelay(ExportedSessionRef session, int routeCount) {}
 
+    /** A rank of mine in a frozen month's ranking. */
+    public record ExportedRank(String month, String ranking, int rank, int value) {}
+
     private final MemberRepository members;
     private final ClimbingSessionRepository sessions;
     private final RouteRepository routes;
@@ -142,6 +147,7 @@ public class MyDataExportService {
     private final SessionCommentRepository sessionComments;
     private final SessionReactionRepository sessionReactions;
     private final AscentRepository ascents;
+    private final MonthlyRankingRepository rankings;
     private final Clock clock;
 
     public MyDataExportService(
@@ -158,6 +164,7 @@ public class MyDataExportService {
             SessionCommentRepository sessionComments,
             SessionReactionRepository sessionReactions,
             AscentRepository ascents,
+            MonthlyRankingRepository rankings,
             Clock clock) {
         this.members = members;
         this.sessions = sessions;
@@ -172,6 +179,7 @@ public class MyDataExportService {
         this.sessionComments = sessionComments;
         this.sessionReactions = sessionReactions;
         this.ascents = ascents;
+        this.rankings = rankings;
         this.clock = clock;
     }
 
@@ -336,6 +344,15 @@ public class MyDataExportService {
                         .sorted(
                                 Comparator.comparing(
                                         (ExportedBelay belay) -> belay.session().climbedOn()))
+                        .toList(),
+                rankings.findAllByMemberIdOrderByMonthAscKindAsc(memberId).stream()
+                        .map(
+                                rank ->
+                                        new ExportedRank(
+                                                rank.month().toString(),
+                                                rank.kind().name(),
+                                                rank.rank(),
+                                                rank.value()))
                         .toList());
     }
 

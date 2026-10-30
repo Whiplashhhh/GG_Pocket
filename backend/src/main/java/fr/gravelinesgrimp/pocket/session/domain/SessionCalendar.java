@@ -28,14 +28,16 @@ public final class SessionCalendar {
 
     /** Whether the month of {@code day} is frozen at {@code now}. */
     public static boolean isFrozen(LocalDate day, Instant now) {
-        var freezesAt =
-                YearMonth.from(day)
-                        .plusMonths(1)
-                        .atDay(FREEZE_DAY)
-                        .atTime(FREEZE_TIME)
-                        .atZone(ClubTime.ZONE)
-                        .toInstant();
-        return !now.isBefore(freezesAt);
+        return !now.isBefore(freezesAt(YearMonth.from(day)));
+    }
+
+    /** When {@code month} freezes: the {@value #FREEZE_DAY}th of the next month at 04:00. */
+    public static Instant freezesAt(YearMonth month) {
+        return month.plusMonths(1)
+                .atDay(FREEZE_DAY)
+                .atTime(FREEZE_TIME)
+                .atZone(ClubTime.ZONE)
+                .toInstant();
     }
 
     /**

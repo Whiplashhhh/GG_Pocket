@@ -5,6 +5,22 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- Le podium ouvre ! Deux classements du mois, en direct : **Séances** (tes jours de grimpe, deux séances le même
+  jour comptent pour un) et **Voies** (tes voies topées, répétitions comprises). Le top 3 monte sur les marches,
+  les ex æquo partagent la même, et ta place reste affichée en bas de l’écran même quand tu es loin dans la liste.
+- Remonte le temps avec les flèches : le mois dernier reste « provisoire » jusqu’au 8 à 4 h (les retardataires
+  ont 7 jours pour noter leurs séances), puis il est figé pour de bon.
+  Les places d’un mois figé ne bougent plus : qui quitte le club ou les classements ensuite garde sa ligne, au nom
+  d’« Ancien·ne membre ».
+- Pas envie d’y apparaître ? Décoche « Apparaître dans les classements du podium » dans ton profil : tu grimpes
+  incognito.
+
+### Modifié
+
+- « Tes données » et l’export de tes données parlent aussi du podium.
+
 ### Corrigé
 
 - Nouvelle séance : un brouillon gardé sur le téléphone n’affiche plus de « Voie introuvable » quand la voie a été

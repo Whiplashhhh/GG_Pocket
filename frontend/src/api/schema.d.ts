@@ -842,6 +842,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/rankings': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** One month of the podium: the sessions and routes rankings, and my lines */
+    get: operations['getRanking']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/rankings/months': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The months that have rankings, this one first */
+    get: operations['listRankingMonths']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/route-comments/{id}': {
     parameters: {
       query?: never
@@ -1512,6 +1546,14 @@ export interface components {
       showAge?: boolean
       status?: string
     }
+    ExportedRank: {
+      month?: string
+      /** Format: int32 */
+      rank?: number
+      ranking?: string
+      /** Format: int32 */
+      value?: number
+    }
     ExportedRoute: {
       /** Format: uuid */
       id?: string
@@ -1821,6 +1863,7 @@ export interface components {
       exportedAt?: string
       favorites?: components['schemas']['ExportedTick'][]
       friendships?: components['schemas']['ExportedFriendship'][]
+      frozenRanks?: components['schemas']['ExportedRank'][]
       lastChanceAcknowledgements?: components['schemas']['ExportedTick'][]
       photos?: components['schemas']['ExportedPhoto'][]
       profile?: components['schemas']['ExportedProfile']
@@ -1946,6 +1989,45 @@ export interface components {
       /** @description Declares that a parent agreed; required once under 15 */
       parentalConsent?: boolean
       showAge?: boolean
+    }
+    Ranking: {
+      /** @description False when I chose not to appear in the rankings */
+      appearsInRankings: boolean
+      /** @description Topped ascents, every mode, repeats included */
+      ascents: components['schemas']['RankingBoard']
+      /**
+       * Format: date-time
+       * @description When the month freezes; absent once frozen
+       */
+      freezesAt?: string
+      /** @example 2026-10 */
+      month: string
+      /** @description Climbing days (two sessions on a day make one) */
+      sessions: components['schemas']['RankingBoard']
+      /**
+       * @description LIVE: this month; PROVISIONAL: last month, sessions may still be logged; FROZEN: final
+       * @enum {string}
+       */
+      status: 'LIVE' | 'PROVISIONAL' | 'FROZEN'
+    }
+    RankingBoard: {
+      /** @description Best first; ties share a rank, then alphabetical order */
+      lines: components['schemas']['RankingLine'][]
+      /** @description My line, absent when I am not ranked */
+      me?: components['schemas']['RankingLine']
+    }
+    RankingLine: {
+      member: components['schemas']['MemberRef']
+      /** Format: int32 */
+      rank: number
+      /** Format: int32 */
+      value: number
+    }
+    RankingMonth: {
+      /** @example 2026-10 */
+      month: string
+      /** @enum {string} */
+      status: 'LIVE' | 'PROVISIONAL' | 'FROZEN'
     }
     ReactionCount: {
       /** Format: int32 */
@@ -3496,6 +3578,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['Meta']
+        }
+      }
+    }
+  }
+  getRanking: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM, this month by default; never a future month */
+        month?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Ranking']
+        }
+      }
+    }
+  }
+  listRankingMonths: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RankingMonth'][]
         }
       }
     }

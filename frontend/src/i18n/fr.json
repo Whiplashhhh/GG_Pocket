@@ -538,8 +538,38 @@
   },
   "podium": {
     "title": "Podium",
+    "loading": "Chargement du podium…",
+    "previous": "Mois précédent",
+    "next": "Mois suivant",
+    "boardChoice": "Classement",
+    "boards": {
+      "sessions": "Séances",
+      "ascents": "Voies"
+    },
+    "status": {
+      "LIVE": "En direct : ça bouge à chaque séance.",
+      "PROVISIONAL": "Provisoire jusqu’au {day}, 4 h : les retardataires ont encore le temps de noter leurs séances.",
+      "FROZEN": "Figé : c’est gravé dans la résine."
+    },
+    "value": {
+      "sessions": "Aucun jour | 1 jour | {n} jours",
+      "ascents": "Aucune voie | 1 voie | {n} voies"
+    },
+    "rank": "{rank}e",
+    "rankFirst": "1er",
+    "tie": "ex æquo",
+    "me": "toi",
+    "podiumLabel": "Les trois premiers",
+    "restLabel": "La suite du classement",
+    "profileOf": "Profil de {nickname}",
+    "myPlace": "Ta place",
+    "notRanked": "Pas encore classé·e ce mois-ci : une séance et tu entres dans la course.",
+    "notRankedPast": "Pas classé·e ce mois-là. Le mur t’attendait.",
+    "optedOut": "Tu as choisi de ne pas apparaître dans les classements : tu grimpes incognito.",
+    "optedOutLink": "Changer d’avis",
     "emptyTitle": "Le podium attend ses premières grimpes.",
-    "emptyBody": "Personne n’a encore grimpé ce mois-ci. C’est le moment de prendre la tête (de cordée)."
+    "emptyBody": "Personne n’a encore grimpé ce mois-ci. C’est le moment de prendre la tête (de cordée).",
+    "emptyPastBody": "Personne n’a grimpé ce mois-là. Même les prises ont pris des vacances."
   },
   "profile": {
     "title": "Mon profil",
@@ -757,11 +787,11 @@
     "whoTitle": "Qui s’en occupe",
     "whoBody": "Le club Gravelines Grimp, association qui fait tourner l’appli. Pour toute question ou demande sur tes données, adresse-toi à la direction du club.",
     "whatTitle": "Ce qu’on garde",
-    "whatBody": "Ton prénom, ton nom, ton pseudo et ton mot de passe (enregistré chiffré : personne ne peut le lire, pas même le club). Si tu les donnes : ton e-mail, ta date de naissance, ta photo et les infos de ton profil. Tes séances (voies, essais, ressentis, commentaires, photos), tes voies cochées, tes coups de cœur, tes commentaires sur les voies et sur les séances, tes réactions et la liste de tes amis. Bientôt : tes badges.",
+    "whatBody": "Ton prénom, ton nom, ton pseudo et ton mot de passe (enregistré chiffré : personne ne peut le lire, pas même le club). Si tu les donnes : ton e-mail, ta date de naissance, ta photo et les infos de ton profil. Tes séances (voies, essais, ressentis, commentaires, photos), tes voies cochées, tes coups de cœur, tes commentaires sur les voies et sur les séances, tes réactions, la liste de tes amis et tes places au podium des mois terminés. Bientôt : tes badges.",
     "whyTitle": "Pourquoi",
     "whyBody": "Seulement pour faire fonctionner l’appli du club : te connecter, tenir ton carnet, afficher le topo, les classements et le fil entre amis. Rien n’est vendu, rien ne sert à de la publicité.",
     "whoSeesTitle": "Qui voit quoi",
-    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut. Tes séances, leurs photos et ton carnet sont visibles de tes amis seulement, ou de toi seul·e. Tes réactions et tes commentaires sur une séance se voient par ceux qui voient la séance ; pour la modération, la direction lit les derniers commentaires du club, sans voir les séances. Quand quelqu’un te note à l’assurage d’une de ses voies, ton pseudo s’affiche sur sa séance, pour ceux qui la voient ; tu le retires quand tu veux depuis « Mes assurages ». La direction voit ta fiche de membre, sans ta date de naissance. Personne en dehors de l’appli ne voit quoi que ce soit.",
+    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut. Tes séances, leurs photos et ton carnet sont visibles de tes amis seulement, ou de toi seul·e. Tes réactions et tes commentaires sur une séance se voient par ceux qui voient la séance ; pour la modération, la direction lit les derniers commentaires du club, sans voir les séances. Quand quelqu’un te note à l’assurage d’une de ses voies, ton pseudo s’affiche sur sa séance, pour ceux qui la voient ; tu le retires quand tu veux depuis « Mes assurages ». Au podium, tous les membres voient ton nombre de jours de grimpe et de voies topées du mois (séances « juste moi » comprises, jamais leur détail), sauf si tu choisis de ne pas y apparaître : tes places des mois déjà terminés restent alors, au nom d’« Ancien·ne membre ». La direction voit ta fiche de membre, sans ta date de naissance. Personne en dehors de l’appli ne voit quoi que ce soit.",
     "minorsTitle": "Moins de 15 ans",
     "minorsBody": "Avant 15 ans, un parent ou responsable légal doit être d’accord. Le profil d’un ou une jeune n’est jamais visible en dehors des membres du club.",
     "howLongTitle": "Combien de temps",
@@ -769,7 +799,7 @@
     "cookiesTitle": "Cookies",
     "cookiesBody": "Un cookie garde ta session ouverte et un autre protège tes envois contre les sites malveillants. C’est tout : pas de pub, pas de pisteur, pas de mesure d’audience.",
     "rightsTitle": "Tes droits",
-    "rightsBody": "Tu peux voir et corriger ton profil quand tu veux, depuis l’appli. Dans ton profil, « Mes données et mon compte » te permet de télécharger tout ce qu’on garde sur toi (un fichier JSON) et de supprimer ton compte toi-même. Tes infos, tes photos et tes commentaires disparaissent ; tes séances restent pour les statistiques des voies, mais au nom d’« Ancien·ne membre », sans commentaire ni photo, et plus personne ne les voit. Tu peux aussi saisir la CNIL.",
+    "rightsBody": "Tu peux voir et corriger ton profil quand tu veux, depuis l’appli. Dans ton profil, « Mes données et mon compte » te permet de télécharger tout ce qu’on garde sur toi (un fichier JSON) et de supprimer ton compte toi-même. Tes infos, tes photos et tes commentaires disparaissent ; tes séances restent pour les statistiques des voies, mais au nom d’« Ancien·ne membre », sans commentaire ni photo, et plus personne ne les voit ; tes places aux podiums des mois terminés restent aussi, à ce nom-là. Tu peux aussi saisir la CNIL.",
     "back": "Retour",
     "toAccount": "Mes données et mon compte"
   },

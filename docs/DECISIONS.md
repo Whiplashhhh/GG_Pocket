@@ -916,3 +916,31 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   officiel dès qu'il est corrigé. Le proxy d'entrée (`deploy/edge`, image officielle, non scanné par la CI) a la même
   faille : à mettre à jour sur le serveur quand l'image officielle sera corrigée.
 - **Statut** : à valider.
+
+### D-103 — PR 6.1 : le podium, la clôture mensuelle et les mois figés
+- **Contexte** : phase 6 (spec §8.7, §9.2, D-003, D-004, D-009, D-084). La spec fixe les deux classements, l'ex-aequo,
+  la clôture du 8 à 04:00 et l'entité `MonthlyRankingSnapshot` ; le reste est à trancher.
+- **Choix** :
+  - Module `ranking` (V14) : `monthly_ranking_closure` (une ligne par mois figé, clé primaire = le mois : c'est elle
+    qui rend la tâche idempotente, même lancée deux fois en même temps) et `monthly_ranking_snapshot` (mois, type,
+    rang, membre, valeur).
+  - **Rangs** : rang olympique (1, 1, 3), puis ordre alphabétique des pseudos (collation française, sans casse :
+    « abel » avant « Zazie »). Ne sont classés que les membres actifs qui apparaissent dans les classements, avec au
+    moins 1. Les séances « juste moi » **comptent** (le podium montre des totaux, jamais le détail) : dit dans
+    « Tes données ».
+  - **Tâche** : tous les jours à 04:00 (Europe/Paris), elle fige chaque mois échu (D-084) pas encore figé, depuis le
+    mois de la première séance du club. Le 8, c'est le mois précédent ; les autres jours, elle rattrape une nuit où
+    le serveur était arrêté. Entre-temps, un mois échu non figé est compté en direct (ses séances ne bougent plus,
+    les chiffres sont les mêmes). Le seed de démo appelle la même clôture (spec §17).
+  - **API** : `GET /rankings?month=YYYY-MM` (les deux classements, statut `LIVE` / `PROVISIONAL` / `FROZEN`, date de
+    gel, mes lignes, si j'apparais) et `GET /rankings/months`, pour tout membre connecté.
+  - **Mois figé** : les rangs restent ceux du jour de la clôture, lignes comprises. Un membre désactivé ou qui s'est
+    retiré des classements depuis **garde sa ligne, au nom d'« Ancien·ne membre »** (sans photo ni lien de profil) :
+    personne ne bouge et le classement ne montre pas de trou (choix de Willem du 2026-10-30, à la place des
+    lignes masquées). Un compte supprimé cède ses rangs à « Ancien·ne membre », comme ses séances (D-096).
+    L'export contient mes rangs figés.
+  - **Écran** : sélecteur de mois par flèches (comme le Planning), borné au premier mois ; Séances / Voies dans
+    l'adresse (`?classement=voies`) ; top 3 sur des marches (hauteur selon le rang, donc les ex æquo à la même
+    hauteur), puis la liste ; quand ma ligne sort de l'écran, une barre « Ta place » au-dessus des onglets.
+  - « Assureur du mois » (idée de D-101) : non fait, à demander au club.
+- **Statut** : validée par Willem le 2026-10-30 (les séances « juste moi » comptent ; rangs figés anonymisés plutôt que masqués).
