@@ -11,6 +11,7 @@ import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 import fr.gravelinesgrimp.pocket.platform.domain.DeploymentEnvironment;
 import fr.gravelinesgrimp.pocket.platform.domain.InstanceMarker;
 import fr.gravelinesgrimp.pocket.platform.infra.InstanceMarkerRepository;
+import fr.gravelinesgrimp.pocket.ranking.application.RankingClosure;
 import fr.gravelinesgrimp.pocket.seed.domain.DemoSeedGuard;
 import fr.gravelinesgrimp.pocket.seed.infra.DemoSeedRegistry;
 
@@ -67,6 +68,7 @@ public class DemoSeeder implements ApplicationRunner {
     private final DemoSessionSeeder sessions;
     private final DemoSocialSeeder social;
     private final DemoFeedSeeder feed;
+    private final RankingClosure closure;
     private final DemoSeedRegistry registry;
     private final InstanceMarkerRepository markers;
     private final PasswordEncoder passwordEncoder;
@@ -82,6 +84,7 @@ public class DemoSeeder implements ApplicationRunner {
             DemoSessionSeeder sessions,
             DemoSocialSeeder social,
             DemoFeedSeeder feed,
+            RankingClosure closure,
             DemoSeedRegistry registry,
             InstanceMarkerRepository markers,
             PasswordEncoder passwordEncoder,
@@ -95,6 +98,7 @@ public class DemoSeeder implements ApplicationRunner {
         this.sessions = sessions;
         this.social = social;
         this.feed = feed;
+        this.closure = closure;
         this.registry = registry;
         this.markers = markers;
         this.passwordEncoder = passwordEncoder;
@@ -169,15 +173,19 @@ public class DemoSeeder implements ApplicationRunner {
         var sessionCount = complete ? sessions.seed(accounts, today) : 0;
         var friendshipCount = complete ? social.seed(accounts, now) : 0;
         var feedCount = complete ? feed.seed(accounts) : 0;
+        // The past months are frozen by the real closure, never written by hand (spec §17); the
+        // scheduled job does the same every night.
+        var frozen = closure.closeDueMonths(now);
         log.info(
                 "Demo seed: {} account(s), {} route(s), {} session(s), {} friendship(s) and {}"
-                        + " reaction(s) or comment(s) created (admin, direction, ouvreur,"
-                        + " grimpeur){}",
+                        + " reaction(s) or comment(s) created, rankings frozen for {} (admin,"
+                        + " direction, ouvreur, grimpeur){}",
                 created,
                 routes,
                 sessionCount,
                 friendshipCount,
                 feedCount,
+                frozen,
                 withCode ? ", registration code DEMO2026" : "");
     }
 }

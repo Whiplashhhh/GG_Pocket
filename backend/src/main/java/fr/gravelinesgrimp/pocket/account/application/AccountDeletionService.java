@@ -17,6 +17,7 @@ import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
+import fr.gravelinesgrimp.pocket.ranking.infra.MonthlyRankingRepository;
 import fr.gravelinesgrimp.pocket.session.infra.AscentRepository;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
 import fr.gravelinesgrimp.pocket.session.infra.SessionCommentRepository;
@@ -54,6 +55,7 @@ public class AccountDeletionService {
     private final SessionReactionRepository sessionReactions;
     private final SessionCommentRepository sessionComments;
     private final RouteRepository routes;
+    private final MonthlyRankingRepository rankings;
     private final MemberSessionStore devices;
     private final AuditLog auditLog;
     private final PasswordEncoder passwordEncoder;
@@ -69,6 +71,7 @@ public class AccountDeletionService {
             SessionReactionRepository sessionReactions,
             SessionCommentRepository sessionComments,
             RouteRepository routes,
+            MonthlyRankingRepository rankings,
             MemberSessionStore devices,
             AuditLog auditLog,
             PasswordEncoder passwordEncoder,
@@ -82,6 +85,7 @@ public class AccountDeletionService {
         this.sessionReactions = sessionReactions;
         this.sessionComments = sessionComments;
         this.routes = routes;
+        this.rankings = rankings;
         this.devices = devices;
         this.auditLog = auditLog;
         this.passwordEncoder = passwordEncoder;
@@ -137,6 +141,7 @@ public class AccountDeletionService {
         ascents.clearBelayersOnSessionsOf(member.id(), now);
         sessions.handOver(member.id(), FormerMember.ID, now);
         routes.creditSetter(member.id(), FormerMember.ID);
+        rankings.handOver(member.id(), FormerMember.ID, now);
         member.changeAvatar(null);
         mediaFiles.findAllByOwnerIdAndUsageIn(member.id(), PERSONAL_MEDIA).stream()
                 .map(MediaFile::id)

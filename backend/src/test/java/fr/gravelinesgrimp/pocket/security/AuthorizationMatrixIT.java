@@ -309,7 +309,9 @@ class AuthorizationMatrixIT {
                             null,
                             Role.CLIMBER),
                     new Endpoint(
-                            HttpMethod.GET, "/api/v1/admin/moderation/comments", null, Role.BOARD));
+                            HttpMethod.GET, "/api/v1/admin/moderation/comments", null, Role.BOARD),
+                    new Endpoint(HttpMethod.GET, "/api/v1/rankings", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/rankings/months", null, Role.CLIMBER));
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;
