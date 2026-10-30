@@ -934,12 +934,13 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     les chiffres sont les mêmes). Le seed de démo appelle la même clôture (spec §17).
   - **API** : `GET /rankings?month=YYYY-MM` (les deux classements, statut `LIVE` / `PROVISIONAL` / `FROZEN`, date de
     gel, mes lignes, si j'apparais) et `GET /rankings/months`, pour tout membre connecté.
-  - **Mois figé** : les rangs restent ceux du jour de la clôture. Un membre désactivé ou qui s'est retiré des
-    classements depuis disparaît de l'affichage **sans faire remonter les autres** (un trou dans les rangs plutôt
-    qu'un podium réécrit après coup). Un compte supprimé cède ses rangs à « Ancien·ne membre », comme ses séances
-    (D-096). L'export contient mes rangs figés.
+  - **Mois figé** : les rangs restent ceux du jour de la clôture, lignes comprises. Un membre désactivé ou qui s'est
+    retiré des classements depuis **garde sa ligne, au nom d'« Ancien·ne membre »** (sans photo ni lien de profil) :
+    personne ne bouge et le classement ne montre pas de trou (choix de Willem du 2026-10-30, à la place des
+    lignes masquées). Un compte supprimé cède ses rangs à « Ancien·ne membre », comme ses séances (D-096).
+    L'export contient mes rangs figés.
   - **Écran** : sélecteur de mois par flèches (comme le Planning), borné au premier mois ; Séances / Voies dans
     l'adresse (`?classement=voies`) ; top 3 sur des marches (hauteur selon le rang, donc les ex æquo à la même
     hauteur), puis la liste ; quand ma ligne sort de l'écran, une barre « Ta place » au-dessus des onglets.
   - « Assureur du mois » (idée de D-101) : non fait, à demander au club.
-- **Statut** : à valider (les séances privées comptent ; les rangs figés gardent leurs trous).
+- **Statut** : à valider pour les séances privées qui comptent ; validée par Willem pour les rangs figés anonymisés.

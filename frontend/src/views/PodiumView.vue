@@ -210,8 +210,8 @@ const columnClass: Record<number, string> = {
         :aria-label="t('podium.podiumLabel')"
       >
         <li
-          v-for="step in steps"
-          :key="step.line.member.id"
+          v-for="(step, index) in steps"
+          :key="`${String(index)}-${step.line.member.id}`"
           :ref="setMyLine(step.line)"
           class="row-start-1 flex min-w-0 flex-col items-center gap-1"
           :class="columnClass[step.column]"
@@ -258,8 +258,8 @@ const columnClass: Record<number, string> = {
         <h2 :id="restTitleId" class="sr-only">{{ t('podium.restLabel') }}</h2>
         <ol class="border-t border-rule">
           <li
-            v-for="line in rest"
-            :key="line.member.id"
+            v-for="(line, index) in rest"
+            :key="`${String(index)}-${line.member.id}`"
             :ref="setMyLine(line)"
             class="flex min-h-14 items-center gap-3 border-b border-rule px-4 py-2"
             :class="isMine(line) ? 'border-l-4 border-l-brand bg-surface pl-3' : ''"

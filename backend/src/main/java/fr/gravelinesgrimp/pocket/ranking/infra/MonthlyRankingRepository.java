@@ -61,18 +61,14 @@ public interface MonthlyRankingRepository extends JpaRepository<MonthlyRankingSn
             nativeQuery = true)
     int close(LocalDate month, Instant now);
 
-    /**
-     * The ranks of a frozen month, of the members still shown: active and in the rankings, or
-     * "Ancien·ne membre" (the ranks of deleted accounts).
-     */
+    /** The ranks of a frozen month, with who holds them today (D-103). */
     @Query(
             "select new fr.gravelinesgrimp.pocket.ranking.infra.FrozenRow("
-                    + "r.kind, r.rank, r.value, m.id, m.nickname, m.avatarId)"
+                    + "r.kind, r.rank, r.value, m.id, m.nickname, m.avatarId, m.status,"
+                    + " m.appearsInRankings)"
                     + " from MonthlyRankingSnapshot r join Member m on m.id = r.memberId"
-                    + " where r.month = :month and (m.id = :formerMemberId"
-                    + " or (m.status = :active and m.appearsInRankings = true))"
-                    + " order by r.kind, r.rank")
-    List<FrozenRow> findShown(LocalDate month, UUID formerMemberId, MemberStatus active);
+                    + " where r.month = :month order by r.kind, r.rank")
+    List<FrozenRow> findFrozen(LocalDate month);
 
     /** My frozen ranks, oldest first (my data export). */
     List<MonthlyRankingSnapshot> findAllByMemberIdOrderByMonthAscKindAsc(UUID memberId);

@@ -31,7 +31,7 @@ export function belowPodium(lines: readonly RankingLine[]): RankingLine[] {
 
 /** Whether someone else shares this line's rank. */
 export function isTie(lines: readonly RankingLine[], line: RankingLine): boolean {
-  return lines.some((other) => other.member.id !== line.member.id && other.rank === line.rank)
+  return lines.filter((other) => other.rank === line.rank).length > 1
 }
 
 /** Where I am: the profile page for me, a member's page otherwise, nowhere for a former member. */

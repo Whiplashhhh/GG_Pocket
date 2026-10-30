@@ -52,6 +52,15 @@ describe('belowPodium and isTie', () => {
     // My line comes apart from the list: the same member is no tie.
     expect(isTie(lines, { ...ana })).toBe(false)
   })
+
+  it('spots a tie between two former members, who share one id', () => {
+    const former = { id: FORMER_MEMBER_ID, nickname: 'Ancien·ne membre' }
+    const both = [
+      { rank: 1, value: 3, member: former },
+      { rank: 1, value: 3, member: former },
+    ]
+    expect(isTie(both, both[1] ?? ana)).toBe(true)
+  })
 })
 
 describe('profileLink', () => {

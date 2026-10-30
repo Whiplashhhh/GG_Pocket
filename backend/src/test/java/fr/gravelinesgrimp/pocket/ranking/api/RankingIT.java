@@ -169,7 +169,8 @@ class RankingIT {
                 .andExpect(jsonPath("$.sessions.me.value").value(1))
                 .andExpect(jsonPath("$.ascents.lines[*].rank").value(contains(1, 2)));
 
-        // Leaving the rankings hides a frozen rank, without moving the others.
+        // Leaving the rankings, like deleting the account, keeps the frozen rank, held by
+        // "Ancien·ne membre": nobody moves.
         second.describe(new MemberDetails(null, null, null, false, false));
         memberRepository.saveAndFlush(second);
         mockMvc.perform(
@@ -180,11 +181,23 @@ class RankingIT {
 
         mockMvc.perform(get("/api/v1/rankings").param("month", month.toString()).with(as(reader)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.sessions.lines.length()").value(1))
-                .andExpect(jsonPath("$.sessions.lines[0].rank").value(1))
-                .andExpect(jsonPath("$.sessions.lines[0].value").value(2))
+                .andExpect(jsonPath("$.sessions.lines[*].rank").value(contains(1, 2)))
+                .andExpect(jsonPath("$.sessions.lines[*].value").value(contains(2, 1)))
                 .andExpect(
-                        jsonPath("$.sessions.lines[0].member.id").value(FormerMember.ID.toString()))
+                        jsonPath("$.sessions.lines[*].member.id")
+                                .value(
+                                        contains(
+                                                FormerMember.ID.toString(),
+                                                FormerMember.ID.toString())))
+                .andExpect(
+                        jsonPath("$.sessions.lines[*].member.nickname")
+                                .value(contains("Ancien·ne membre", "Ancien·ne membre")))
+                .andExpect(jsonPath("$.sessions.lines[1].member.avatarUrl").doesNotExist())
+                .andExpect(jsonPath("$.sessions.me").doesNotExist());
+
+        mockMvc.perform(get("/api/v1/rankings").param("month", month.toString()).with(as(second)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.appearsInRankings").value(false))
                 .andExpect(jsonPath("$.sessions.me").doesNotExist());
 
         mockMvc.perform(get("/api/v1/me/export").with(as(second)))

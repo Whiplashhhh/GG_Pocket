@@ -2,7 +2,6 @@ package fr.gravelinesgrimp.pocket.ranking.application;
 
 import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
-import fr.gravelinesgrimp.pocket.member.domain.MemberStatus;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 import fr.gravelinesgrimp.pocket.ranking.domain.RankedScore;
@@ -28,8 +27,8 @@ import java.util.UUID;
 
 /**
  * The podium (spec §8.7, §9.2): any member reads the rankings of every month. The months not frozen
- * yet are counted live; a frozen month shows its frozen ranks, without the members who have since
- * been disabled or left the rankings (their ranks are kept, D-103).
+ * yet are counted live; a frozen month shows its frozen ranks, as they were: the members who have
+ * since been disabled or left the rankings keep their line, as "Ancien·ne membre" (D-103).
  */
 @Service
 public class RankingService {
@@ -82,14 +81,15 @@ public class RankingService {
         var shown = PlanningMonth.parse(month, today);
         var appears = members.findById(memberId).map(Member::appearsInRankings).orElse(false);
         if (rankings.isClosed(shown.atDay(1))) {
-            var rows = rankings.findShown(shown.atDay(1), FormerMember.ID, MemberStatus.ACTIVE);
+            var rows = rankings.findFrozen(shown.atDay(1));
+            var former = members.findById(FormerMember.ID).orElseThrow().nickname();
             return new RankingView(
                     shown,
                     RankingStatus.FROZEN,
                     null,
                     appears,
-                    RankingView.Board.of(frozen(rows, RankingKind.SESSIONS), memberId),
-                    RankingView.Board.of(frozen(rows, RankingKind.ASCENTS), memberId));
+                    RankingView.Board.of(frozen(rows, RankingKind.SESSIONS, former), memberId),
+                    RankingView.Board.of(frozen(rows, RankingKind.ASCENTS, former), memberId));
         }
         var status = RankingStatus.of(shown, now, today);
         return new RankingView(
@@ -102,12 +102,13 @@ public class RankingService {
     }
 
     /** The frozen ranks of one ranking, ties in the alphabetical order of today's nicknames. */
-    private static List<RankedScore> frozen(List<FrozenRow> rows, RankingKind kind) {
+    private static List<RankedScore> frozen(
+            List<FrozenRow> rows, RankingKind kind, String formerNickname) {
         var collator = Collator.getInstance(Locale.FRENCH);
         collator.setStrength(Collator.SECONDARY);
         return rows.stream()
                 .filter(row -> row.kind() == kind)
-                .map(FrozenRow::toRankedScore)
+                .map(row -> row.toRankedScore(formerNickname))
                 .sorted(
                         Comparator.comparingInt(RankedScore::rank)
                                 .thenComparing(ranked -> ranked.score().nickname(), collator))
