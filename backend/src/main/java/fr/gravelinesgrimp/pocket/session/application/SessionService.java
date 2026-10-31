@@ -337,9 +337,7 @@ public class SessionService {
         }
         var active =
                 members.findAllById(ids).stream()
-                        .filter(
-                                member ->
-                                        member.isVisibleInClub() && !FormerMember.is(member.id()))
+                        .filter(member -> member.isVisibleInClub() && !FormerMember.is(member.id()))
                         .count();
         if (active != ids.size()) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "No such belayer");
