@@ -1,3 +1,4 @@
+import type { BadgeCode, Seniority } from '@/lib/badges'
 import type { HoldColor } from '@/lib/route'
 
 /** Default hold colours of the club configuration seed (docs/DESIGN.md §2). Dev gallery only. */
@@ -42,3 +43,30 @@ export const SAMPLE_ROUTES = [
     status: 'ACTIVE',
   },
 ] as const
+
+/** One badge per drawing (docs/DESIGN.md §7). Dev gallery only. */
+export const SAMPLE_BADGES: readonly BadgeCode[] = [
+  'TOPPED_50',
+  'LEAD_10',
+  'GRADE_6A',
+  'DAYS_100',
+  'WEEK_2',
+  'MONTH_COMPLETE',
+  'STREAK_3W',
+  'MONTH_NO_MISS',
+  'FULL_LEAD',
+  'PERFECT',
+  'ZERO_REST',
+  'COMEBACK',
+  'FLASH',
+  'RECORD',
+]
+
+export const SENIORITIES: readonly Seniority[] = [
+  'FRESH',
+  'BABY_CARABINER',
+  'PRO_BEGINNER',
+  'FORCER',
+  'RESIDENT',
+  'FOSSIL',
+]

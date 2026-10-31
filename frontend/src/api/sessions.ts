@@ -7,6 +7,7 @@ import {
 } from '@tanstack/vue-query'
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 
+import { MY_BADGES_KEY } from './badges'
 import { api } from './client'
 import { RANKINGS_KEY } from './rankings'
 import { request, requestNoContent } from './request'
@@ -132,7 +133,10 @@ export async function sendSession(input: {
   return savePhoto(saved, input.photo)
 }
 
-/** What a saved, changed or deleted session touches: my lists, and the routes (stats, checks). */
+/**
+ * What a saved, changed or deleted session touches: my lists, my badges, and the routes (stats,
+ * checks).
+ */
 export function sessionsChanged(queryClient: QueryClient, saved?: Session) {
   if (saved !== undefined) queryClient.setQueryData(sessionKey(saved.id), saved)
   void queryClient.invalidateQueries({ queryKey: MY_SESSIONS_KEY })
@@ -143,6 +147,7 @@ export function sessionsChanged(queryClient: QueryClient, saved?: Session) {
   void queryClient.invalidateQueries({ queryKey: MY_LOGBOOK_KEY })
   void queryClient.invalidateQueries({ queryKey: MY_TODO_KEY })
   void queryClient.invalidateQueries({ queryKey: RANKINGS_KEY })
+  void queryClient.invalidateQueries({ queryKey: MY_BADGES_KEY })
 }
 
 export function useSaveSession() {

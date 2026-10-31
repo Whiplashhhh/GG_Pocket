@@ -9,6 +9,7 @@ import { ApiError, errorMessageKey } from '@/api/errors'
 import { useMemberProfile, useMemberSessions } from '@/api/social'
 import { useRouteDetail } from '@/api/topo'
 import SubPageHeader from '@/components/layout/SubPageHeader.vue'
+import BadgeLibrarySection from '@/components/badge/BadgeLibrarySection.vue'
 import SessionCard from '@/components/session/SessionCard.vue'
 import FriendshipActions from '@/components/social/FriendshipActions.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
@@ -16,6 +17,7 @@ import EmptyState from '@/components/ui/EmptyState.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import RoleBadge from '@/components/ui/RoleBadge.vue'
+import SeniorityBadge from '@/components/ui/SeniorityBadge.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
 
@@ -121,7 +123,10 @@ useIntersectionObserver(sentinel, ([entry]) => {
             {{ data.member.firstName }} {{ data.member.lastName }}
           </h2>
           <p class="max-w-full wrap-anywhere text-ink-muted">@{{ data.member.nickname }}</p>
-          <RoleBadge :role="data.member.role" />
+          <div class="flex flex-wrap gap-1.5">
+            <RoleBadge :role="data.member.role" />
+            <SeniorityBadge v-if="data.member.seniority" :seniority="data.member.seniority" />
+          </div>
         </div>
       </div>
       <p v-if="data.bio" class="mt-4 max-w-prose">{{ data.bio }}</p>
@@ -177,6 +182,12 @@ useIntersectionObserver(sentinel, ([entry]) => {
         </li>
       </ul>
     </section>
+
+    <BadgeLibrarySection
+      :member-id="data.member.id"
+      :title="t('badges.theirs')"
+      heading-id="ses-badges"
+    />
 
     <section class="border-t border-rule pt-5 pb-2" aria-labelledby="ses-seances">
       <h2 id="ses-seances" class="px-4 text-lg font-title">{{ t('memberProfile.sessions') }}</h2>

@@ -26,17 +26,19 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import RoleBadge from '@/components/ui/RoleBadge.vue'
+import SeniorityBadge from '@/components/ui/SeniorityBadge.vue'
 import SegmentedControl from '@/components/ui/SegmentedControl.vue'
 import SettingsLink from '@/components/ui/SettingsLink.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
 import AppUpdateCheck from '@/components/profile/AppUpdateCheck.vue'
+import BadgeLibrarySection from '@/components/badge/BadgeLibrarySection.vue'
 import { errorMessageKey } from '@/api/errors'
 import { formatDate } from '@/lib/format'
 import { isAtLeast } from '@/lib/roles'
 import { useThemeStore, type ThemePreference } from '@/stores/theme'
 
-/** Spec §8.8: my profile and settings. Badges and key figures come with later phases. */
+/** Spec §8.8: my profile, my badges and my settings. Key figures come with a later phase. */
 const { t } = useI18n()
 const { data: profile, isPending, isError, error, refetch } = useMyProfile()
 const { data: meta } = useMetaQuery()
@@ -102,7 +104,10 @@ const facts = computed(() => {
           {{ profile.firstName }} {{ profile.lastName }}
         </h2>
         <p class="text-ink-muted">@{{ profile.nickname }}</p>
-        <RoleBadge :role="profile.role" />
+        <div class="flex flex-wrap gap-1.5">
+          <RoleBadge :role="profile.role" />
+          <SeniorityBadge v-if="profile.seniority" :seniority="profile.seniority" />
+        </div>
       </div>
     </div>
     <p v-if="profile.bio" class="mt-4 max-w-prose">{{ profile.bio }}</p>
@@ -179,6 +184,8 @@ const facts = computed(() => {
     </RouterLink>
     <p class="mt-4 px-4 text-sm text-ink-muted">{{ t('profile.comingSoon') }}</p>
   </section>
+
+  <BadgeLibrarySection v-if="profile" :title="t('badges.mine')" heading-id="mes-badges" />
 
   <section class="border-t border-rule" aria-labelledby="reglages">
     <h2 id="reglages" class="px-4 pt-6 pb-2 text-lg font-title">{{ t('profile.settings') }}</h2>

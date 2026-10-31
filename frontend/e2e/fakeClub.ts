@@ -3,7 +3,7 @@ import type { Page, Route } from '@playwright/test'
 import type { components } from '../src/api/schema'
 
 import { FakeSessions } from './fakeSessions'
-import { FakeSocial } from './fakeSocial'
+import { FakeSocial, seniorityOf } from './fakeSocial'
 import { FakeTopo } from './fakeTopo'
 
 type Schemas = components['schemas']
@@ -216,6 +216,7 @@ export class FakeClub {
       parentalConsent: member.parentalConsent,
       appearsInRankings: member.appearsInRankings,
       clubArrivalYear: member.clubArrivalYear,
+      seniority: seniorityOf(member.clubArrivalYear, this.now),
       climbingSinceYear: member.climbingSinceYear,
       bio: member.bio,
       favoriteRouteId: member.favoriteRouteId,

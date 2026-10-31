@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import BadgeMedal from '@/components/badge/BadgeMedal.vue'
 import PageTitle from '@/components/layout/PageTitle.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import GgButton from '@/components/ui/GgButton.vue'
@@ -9,10 +10,11 @@ import HoldSwatch from '@/components/ui/HoldSwatch.vue'
 import RoleBadge from '@/components/ui/RoleBadge.vue'
 import RouteLabel from '@/components/ui/RouteLabel.vue'
 import SegmentedControl from '@/components/ui/SegmentedControl.vue'
+import SeniorityBadge from '@/components/ui/SeniorityBadge.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
 
-import { HOLD_COLORS, SAMPLE_ROUTES } from './galleryFixtures'
+import { HOLD_COLORS, SAMPLE_BADGES, SAMPLE_ROUTES, SENIORITIES } from './galleryFixtures'
 
 const { t } = useI18n()
 
@@ -90,6 +92,27 @@ const topped = ref<'yes' | 'no'>('yes')
         {{ hold.label }}
       </li>
     </ul>
+  </section>
+
+  <section class="space-y-3 border-t border-rule px-4 py-6">
+    <h2 class="text-lg font-title">{{ t('gallery.badges') }}</h2>
+    <ul v-for="earned in [true, false]" :key="String(earned)" class="flex flex-wrap gap-2">
+      <li
+        v-for="code in SAMPLE_BADGES"
+        :key="code"
+        class="flex w-20 flex-col items-center text-center text-micro break-all text-ink-muted"
+      >
+        <BadgeMedal :code="code" :earned="earned" />
+        {{ code }}
+      </li>
+    </ul>
+    <div class="flex items-center gap-2">
+      <BadgeMedal code="FLASH" earned :size="96" />
+      <BadgeMedal code="GRADE_7A" earned :size="96" />
+    </div>
+    <div class="flex flex-wrap gap-1.5">
+      <SeniorityBadge v-for="seniority in SENIORITIES" :key="seniority" :seniority="seniority" />
+    </div>
   </section>
 
   <section class="space-y-3 border-t border-rule px-4 py-6">

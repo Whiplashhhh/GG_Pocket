@@ -39,6 +39,37 @@ const marieClimbs = (club: FakeClub) => {
   })
 }
 
+/** Tom's badges, earned over a few seasons (the fake has no engine: they are set by hand). */
+const tomBadges = (club: FakeClub, tom: FakeMember) => {
+  for (const code of ['TOPPED_1', 'TOPPED_5', 'TOPPED_10', 'TOPPED_20', 'TOPPED_50'] as const) {
+    club.social.award(tom, code, '2024-03-12')
+  }
+  for (const code of ['LEAD_1', 'LEAD_5', 'LEAD_10', 'GRADE_5B', 'GRADE_5C', 'GRADE_6A'] as const) {
+    club.social.award(tom, code, '2024-05-02')
+  }
+  club.social.award(tom, 'DAYS_10', '2024-04-20')
+  club.social.award(tom, 'DAYS_25', '2024-09-14')
+  club.social.award(tom, 'WEEK_2', '2024-03-18', 14, '2026-10-13')
+  club.social.award(tom, 'FLASH', '2025-01-08', 3, '2026-10-17')
+}
+
+/** Marie's badges: a good start, one repeatable earned many times, plenty left to go for. */
+const marieBadges = (club: FakeClub) => {
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  if (marie === undefined) return
+  marie.clubArrivalYear = 2025
+  for (const code of ['TOPPED_1', 'TOPPED_5', 'TOPPED_10', 'LEAD_1', 'LEAD_5'] as const) {
+    club.social.award(marie, code, '2025-10-02')
+  }
+  for (const code of ['GRADE_5B', 'GRADE_5C', 'GRADE_6A', 'GRADE_6B', 'DAYS_10'] as const) {
+    club.social.award(marie, code, '2026-02-11')
+  }
+  club.social.award(marie, 'WEEK_2', '2025-10-06', 6, '2026-10-13')
+  club.social.award(marie, 'WEEK_3', '2026-10-13')
+  club.social.award(marie, 'PERFECT', '2026-03-04', 2, '2026-09-30')
+  club.social.award(marie, 'COMEBACK', '2026-09-01')
+}
+
 /** Marie's friends: Tom and Léa, a request from Jules, one sent to Sam, and strangers. */
 const marieFriends = (club: FakeClub) => {
   const marie = club.members.find((member) => member.nickname === 'marie')
@@ -70,6 +101,7 @@ const marieFriends = (club: FakeClub) => {
   club.social.link(jules, marie, false)
   club.social.link(marie, sam, false)
   club.topo.favorite(tom, 'Iron Man')
+  tomBadges(club, tom)
   club.climbs.add(
     tom,
     1,
@@ -263,6 +295,7 @@ const routeActionOf = async (page: Page, name: string, word: string, label: stri
 
 /** Screens captured for visual review (the gallery only exists on the dev server). */
 const CAPTURES: Capture[] = [
+  { name: 'galerie', path: '/dev/galerie', as: null },
   { name: 'accueil', path: '/accueil', as: null },
   { name: 'connexion', path: '/connexion?fin=1', as: null },
   { name: 'inscription-code', path: '/inscription', as: null },
@@ -295,6 +328,16 @@ const CAPTURES: Capture[] = [
   { name: 'premiers-pas-installer', path: '/premiers-pas/installer', as: 'CLIMBER' },
   { name: 'actu-invitation', path: '/actu', as: 'CLIMBER', installInvite: true },
   { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
+  {
+    name: 'profil-badges',
+    path: '/profil',
+    as: 'CLIMBER',
+    prepare: marieBadges,
+    act: async (page) => {
+      await page.getByRole('heading', { name: 'Mes badges' }).scrollIntoViewIfNeeded()
+      await page.getByText('14 sur 49 débloqués').waitFor()
+    },
+  },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
   { name: 'actu-fil', path: '/actu', as: 'CLIMBER', prepare: feedAlive },
   {

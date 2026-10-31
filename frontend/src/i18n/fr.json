@@ -226,7 +226,6 @@
     "filterAll": "Tout le club",
     "filterFriends": "Mes amis ({n})",
     "count": "Personne | 1 grimpeur | {n} grimpeurs",
-    "clubSince": "Au club depuis {year}",
     "noMatchTitle": "Personne à ce nom sur le mur.",
     "noMatchBody": "Vérifie l’orthographe, ou cherche par pseudo.",
     "noFriendsTitle": "Pas encore d’amis par ici.",
@@ -250,6 +249,122 @@
     "loadError": "Impossible de charger ce profil.",
     "notFoundTitle": "Ce grimpeur n’est plus sur le mur.",
     "notFoundBody": "Son compte a peut-être été désactivé ou supprimé."
+  },
+  "badges": {
+    "mine": "Mes badges",
+    "theirs": "Ses badges",
+    "earnedCount": "{earned} sur {total} débloqués",
+    "loadError": "Impossible de charger les badges.",
+    "times": "×{n}",
+    "earnedOn": "Débloqué le {date}",
+    "lastEarnedOn": "Dernière fois le {date}",
+    "notYet": "Pas encore",
+    "srEarned": "débloqué le {date}",
+    "srRepeated": "obtenu {n} fois, la dernière le {date}",
+    "srNotYet": "pas encore débloqué",
+    "families": {
+      "TOPPED": {
+        "title": "Voies topées",
+        "hint": "Chaque ascension topée compte, en tête comme en moulinette, même la dixième sur la même voie."
+      },
+      "LEAD": {
+        "title": "Voies en tête",
+        "hint": "Seules les voies topées en tête comptent."
+      },
+      "FIRST_GRADE": {
+        "title": "Première cotation",
+        "hint": "Ta première voie topée à cette cotation ou plus dure. Un 7a d’emblée, et c’est la pluie de badges."
+      },
+      "CLIMBING_DAYS": {
+        "title": "Jours de grimpe",
+        "hint": "Deux séances le même jour comptent pour un seul jour."
+      },
+      "REPEATABLE": {
+        "title": "À répéter sans modération",
+        "hint": "Ceux-là se gagnent encore et encore."
+      }
+    },
+    "tiers": {
+      "TOPPED": {
+        "name": "{n} voie topée | {n} voies topées",
+        "condition": "Toper ta première voie. | Toper {n} voies, tous modes confondus."
+      },
+      "LEAD": {
+        "name": "{n} voie en tête | {n} voies en tête",
+        "condition": "Toper ta première voie en tête. | Toper {n} voies en tête."
+      },
+      "FIRST_GRADE": {
+        "name": "Premier {grade}",
+        "condition": "Toper une voie en {grade} ou plus dure."
+      },
+      "CLIMBING_DAYS": {
+        "name": "{n} jours de grimpe",
+        "condition": "Grimper {n} jours différents."
+      }
+    },
+    "repeatable": {
+      "WEEK_2": {
+        "name": "2 séances dans la semaine",
+        "condition": "Grimper 2 jours différents dans la même semaine, du lundi au dimanche."
+      },
+      "WEEK_3": {
+        "name": "3 séances dans la semaine",
+        "condition": "Grimper 3 jours différents dans la même semaine, du lundi au dimanche."
+      },
+      "WEEK_4": {
+        "name": "4 séances dans la semaine",
+        "condition": "Grimper 4 jours différents dans la même semaine. Le canapé t’oublie."
+      },
+      "MONTH_COMPLETE": {
+        "name": "Mois complet",
+        "condition": "Grimper 10 jours différents dans le même mois."
+      },
+      "MONTH_12": {
+        "name": "12 séances dans le mois",
+        "condition": "Grimper 12 jours différents dans le même mois. Tu dors à la salle ?"
+      },
+      "STREAK_3W": {
+        "name": "3 semaines d’affilée",
+        "condition": "Trois semaines de suite avec au moins 2 jours de grimpe chacune."
+      },
+      "MONTH_NO_MISS": {
+        "name": "Un mois sans rater une semaine",
+        "condition": "Grimper au moins une fois chaque semaine qui commence dans le mois."
+      },
+      "FULL_LEAD": {
+        "name": "Séance full tête",
+        "condition": "Une séance d’au moins 3 voies, toutes en tête."
+      },
+      "PERFECT": {
+        "name": "Séance parfaite",
+        "condition": "Une séance d’au moins 3 voies, toutes enchaînées."
+      },
+      "ZERO_REST": {
+        "name": "Séance zéro repos",
+        "condition": "Toper au moins 10 voies dans la même séance."
+      },
+      "COMEBACK": {
+        "name": "Le retour en force",
+        "condition": "Revenir grimper après au moins 30 jours sans. On t’attendait."
+      },
+      "FLASH": {
+        "name": "Le flash",
+        "condition": "Enchaîner du premier coup une voie ouverte depuis 14 jours au plus."
+      },
+      "RECORD": {
+        "name": "La séance record",
+        "condition": "Battre ton record de voies topées en une séance, à partir de ta 4e séance."
+      }
+    }
+  },
+  "seniority": {
+    "label": "Ancienneté au club",
+    "FRESH": "Tout frais",
+    "BABY_CARABINER": "Le bébé mousqueton",
+    "PRO_BEGINNER": "Le débutant professionnel",
+    "FORCER": "Le forceur",
+    "RESIDENT": "Le résident de la salle",
+    "FOSSIL": "Le GG fossile"
   },
   "topo": {
     "title": "Topo",
@@ -578,7 +693,7 @@
     "climbingSince": "Grimpe depuis {year}",
     "clubSince": "Au club depuis {year}",
     "age": "{age} ans",
-    "comingSoon": "Badges et chiffres clés arrivent bientôt : en attendant, ton carnet tient les comptes.",
+    "comingSoon": "Les chiffres clés arrivent bientôt : en attendant, ton carnet tient les comptes.",
     "settings": "Réglages",
     "password": "Mot de passe",
     "devices": "Mes appareils",
@@ -674,6 +789,7 @@
     "title": "Galerie des composants",
     "intro": "Page de travail, absente des builds de prod. Bascule le thème dans ton profil ou ton système pour vérifier les deux rendus.",
     "palette": "Palette",
+    "badges": "Badges et ancienneté",
     "type": "Typographie",
     "typeSample": "Le grimpeur topa la voie, puis l’enchaîna.",
     "buttons": "Boutons",
