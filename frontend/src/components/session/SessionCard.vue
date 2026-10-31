@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n'
 import { useCurrentMember } from '@/api/auth'
 import type { Session } from '@/api/sessions'
 import FavoriteBadges from '@/components/badge/FavoriteBadges.vue'
+import SessionUnlocks from '@/components/badge/SessionUnlocks.vue'
 import SessionReactions from '@/components/session/SessionReactions.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
@@ -15,8 +16,8 @@ import { ascentOutcome, sessionDay } from '@/lib/sessionView'
 
 /**
  * A session as a full-width block, Strava style (docs/DESIGN.md, « Actu »): who climbed (in the
- * feed), figures, photo, the routes, the comment, then the reactions and the comment count. In a
- * list it opens the session; on its own page it shows every ascent.
+ * feed), figures, photo, the routes, the comment, the badges it unlocked, then the reactions and the
+ * comment count. In a list it opens the session; on its own page it shows every ascent.
  */
 const props = withDefaults(
   defineProps<{
@@ -177,6 +178,14 @@ const belayers = computed(() =>
     <blockquote v-if="session.comment" class="font-hand text-lg leading-snug">
       {{ t('session.commentQuote', { comment: session.comment }) }}
     </blockquote>
+
+    <SessionUnlocks
+      v-if="session.badges.length > 0"
+      :codes="session.badges"
+      :title="
+        mine ? t('badges.unlockedByMe') : t('badges.unlockedBy', { nickname: author.nickname })
+      "
+    />
 
     <footer class="relative z-10 flex flex-wrap items-center justify-between gap-2 empty:hidden">
       <SessionReactions :session="session" :mine="mine" />

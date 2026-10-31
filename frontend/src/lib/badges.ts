@@ -53,13 +53,20 @@ const TIERED: Readonly<Partial<Record<string, Badge>>> = {
   DAYS: 'CLIMBING_DAYS',
 }
 
-/** How many levels each tier family has (spec §9.5). */
-export const TIER_COUNTS: Readonly<Partial<Record<Badge, number>>> = {
-  TOPPED: 10,
-  LEAD: 10,
-  FIRST_GRADE: 8,
-  CLIMBING_DAYS: 8,
+const COUNTS = ['1', '5', '10', '20', '50', '100', '250', '500', '750', '1000']
+
+/** The tiers of each family, lowest first, as marked in their codes (spec §9.5). */
+const TIER_MARKS: Readonly<Partial<Record<Badge, readonly string[]>>> = {
+  TOPPED: COUNTS,
+  LEAD: COUNTS,
+  FIRST_GRADE: ['5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c'],
+  CLIMBING_DAYS: ['10', '25', '50', '75', '100', '500', '750', '1000'],
 }
+
+/** How many levels each tier family has. */
+export const TIER_COUNTS: Readonly<Partial<Record<Badge, number>>> = Object.fromEntries(
+  Object.entries(TIER_MARKS).map(([badge, marks]) => [badge, marks.length]),
+)
 
 const GLYPHS: Readonly<Record<Badge, BadgeGlyph>> = {
   TOPPED: 'topped',
@@ -147,6 +154,40 @@ export function isMaxLevel(badge: Badge, level: number): boolean {
 /** "50" for TOPPED_50, "6b" for GRADE_6B. */
 export function tierMark(code: BadgeCode): string {
   return code.slice(code.indexOf('_') + 1).toLowerCase()
+}
+
+/** The level a tier code stands for (TOPPED_10 is level 3); 1 for a repeatable code. */
+export function levelOfCode(code: BadgeCode): number {
+  const marks = TIER_MARKS[badgeOf(code)]
+  return marks === undefined ? 1 : marks.indexOf(tierMark(code)) + 1
+}
+
+/** A badge unlocked by a session: its highest new level, or the times it was earned there. */
+export interface Unlock {
+  badge: Badge
+  /** The highest tier reached (tiers); 1 for a repeatable badge. */
+  level: number
+  /** Times a repeatable badge was earned by the session; 1 for the tiers. */
+  times: number
+}
+
+/**
+ * The badges unlocked by a session, in the catalogue's order: the tiers of a family fold into the
+ * highest one (a first 7a unlocks five grades at once), a repeatable badge earned twice shows ×2.
+ */
+export function unlocks(codes: readonly BadgeCode[]): Unlock[] {
+  const found = new Map<Badge, Unlock>()
+  for (const code of codes) {
+    const badge = badgeOf(code)
+    const known = found.get(badge)
+    if (isTiered(badge)) {
+      const level = levelOfCode(code)
+      found.set(badge, { badge, level: Math.max(level, known?.level ?? 0), times: 1 })
+    } else {
+      found.set(badge, { badge, level: 1, times: (known?.times ?? 0) + 1 })
+    }
+  }
+  return BADGES.flatMap((badge) => found.get(badge) ?? [])
 }
 
 /** A badge of a library: its level (tiers earned, or times earned) and its dates. */

@@ -32,6 +32,8 @@ interface FakeSession {
   /** Member id → their reaction. */
   reactions: Map<string, ReactionKind>
   comments: FakeSessionComment[]
+  /** The badges this session earned (set by the tests: the fake has no badge engine). */
+  badges?: Schemas['BadgeLibraryEntry']['code'][]
 }
 
 const DAY = 24 * 3600 * 1000
@@ -53,6 +55,8 @@ export class FakeSessions implements AscentSource {
   memberRef: (id: string) => Schemas['MemberRef'] = (id) => ({ id, nickname: id })
   /** Favourite badges of a member at their level (FakeSocial knows them). */
   authorBadges: (id: string) => Schemas['ShownBadge'][] = () => []
+  /** What the next created session unlocks, as the server's badge engine would say. */
+  nextUnlocks: Schemas['BadgeLibraryEntry']['code'][] = []
 
   constructor(
     private readonly nextId: () => string,
@@ -79,7 +83,9 @@ export class FakeSessions implements AscentSource {
       clean?: boolean
       belayerId?: string
     }[],
-    extra: Partial<Pick<FakeSession, 'comment' | 'feeling' | 'frozen' | 'visibility'>> = {},
+    extra: Partial<
+      Pick<FakeSession, 'comment' | 'feeling' | 'frozen' | 'visibility' | 'badges'>
+    > = {},
   ): FakeSession {
     const session: FakeSession = {
       id: this.nextId(),
@@ -550,7 +556,7 @@ export class FakeSessions implements AscentSource {
       })),
       reactions: this.reactions(me, session),
       commentCount: session.comments.filter((comment) => !comment.deleted).length,
-      badges: [],
+      badges: session.badges ?? [],
       unlockedBadges: [],
       authorBadges: this.authorBadges(session.memberId),
     }
@@ -740,9 +746,12 @@ export class FakeSessions implements AscentSource {
         comments: [],
       }
       this.apply(session, sent)
+      const unlocked = this.nextUnlocks
+      this.nextUnlocks = []
+      session.badges = unlocked
       this.sessions.push(session)
       this.refreshChecks(me.id)
-      return json(this.view(me, session), 201)
+      return json({ ...this.view(me, session), unlockedBadges: unlocked }, 201)
     }
 
     if (pathname === '/me/belays' && method === 'GET') {

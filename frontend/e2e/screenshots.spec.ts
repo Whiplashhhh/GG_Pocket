@@ -113,7 +113,11 @@ const marieFriends = (club: FakeClub) => {
       { route: 'Réglisse', mode: 'LEAD' },
       { route: 'Tonton Talon', mode: 'TOP_ROPE', topped: false },
     ],
-    { comment: 'Enfin enchaînée, Iron Man.', feeling: 9 },
+    {
+      comment: 'Enfin enchaînée, Iron Man.',
+      feeling: 9,
+      badges: ['TOPPED_50', 'LEAD_10', 'GRADE_6A', 'FLASH'],
+    },
   )
   club.climbs.add(tom, 4, [{ route: 'Sec !', clean: true }])
 }
@@ -331,6 +335,19 @@ const CAPTURES: Capture[] = [
   { name: 'premiers-pas-installer', path: '/premiers-pas/installer', as: 'CLIMBER' },
   { name: 'actu-invitation', path: '/actu', as: 'CLIMBER', installInvite: true },
   { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
+  {
+    name: 'seance-deblocage',
+    path: '/seance/nouvelle',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      club.climbs.nextUnlocks = ['GRADE_5B', 'GRADE_5C', 'GRADE_6A', 'FLASH']
+    },
+    act: async (page) => {
+      await addToSession(page, '12', 'Bye Bye Morice')
+      await page.getByRole('button', { name: 'Enregistrer la séance' }).click()
+      await page.getByText('Badge débloqué ! · 1 sur 2').waitFor()
+    },
+  },
   {
     name: 'profil-badges',
     path: '/profil',
