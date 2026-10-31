@@ -11,11 +11,20 @@ import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import TextField from '@/components/ui/TextField.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
 import { formatDate, formatRelative } from '@/lib/format'
-import { filterMembers, sortMembers, type MemberSortKey, type SortDirection } from '@/lib/members'
+import {
+  awaitingValidation,
+  filterMembers,
+  sortMembers,
+  type MemberSortKey,
+  type SortDirection,
+} from '@/lib/members'
 
 import ManagementTitle from './ManagementTitle.vue'
 
-/** Spec §8.11: searchable, sortable members table; a list on phones, a table on large screens. */
+/**
+ * Spec §8.11: searchable, sortable members table; a list on phones, a table on large screens. New
+ * accounts awaiting validation come first, apart (D-107).
+ */
 const COLUMNS: MemberSortKey[] = [
   'name',
   'nickname',
@@ -35,6 +44,9 @@ const query = ref('')
 const sortKey = ref<MemberSortKey>('name')
 const direction = ref<SortDirection>('asc')
 const sortSelectId = useId()
+
+const pending = computed(() => awaitingValidation(members.data.value ?? []))
+const pendingTitleId = useId()
 
 const shown = computed(() =>
   sortMembers(filterMembers(members.data.value ?? [], query.value), sortKey.value, direction.value),
@@ -62,6 +74,51 @@ function fullName(member: MemberSummary): string {
 
 <template>
   <ManagementTitle>{{ t('members.title') }}</ManagementTitle>
+
+  <section
+    v-if="pending.length > 0"
+    class="mx-4 mt-4 border-l-4 border-brand bg-surface lg:mx-0"
+    :aria-labelledby="pendingTitleId"
+  >
+    <div class="px-4 pt-3">
+      <h2 :id="pendingTitleId" class="text-lg font-title">
+        {{ t('members.pendingTitle') }}
+        <span class="font-sans text-base font-semibold text-ink-muted tabular-nums"
+          >({{ pending.length }})</span
+        >
+      </h2>
+      <p class="text-sm text-ink-muted">{{ t('members.pendingIntro') }}</p>
+    </div>
+    <ul class="mt-2">
+      <li v-for="member in pending" :key="member.id">
+        <RouterLink
+          :to="`/gestion/membres/${member.id}`"
+          class="flex items-center gap-3 border-t border-rule px-4 py-3 hover:bg-surface-sunken"
+        >
+          <UserAvatar
+            :first-name="member.firstName"
+            :last-name="member.lastName"
+            :seed="member.nickname"
+            :src="member.avatarUrl"
+          />
+          <span class="flex min-w-0 flex-1 flex-col items-start gap-0.5">
+            <span class="truncate font-semibold">{{ fullName(member) }}</span>
+            <span class="truncate text-sm text-ink-muted">@{{ member.nickname }}</span>
+            <span class="flex flex-wrap gap-x-2 text-sm text-ink-muted">
+              <span v-if="member.declaredLicensed === true">{{
+                t('members.declaredLicensed')
+              }}</span>
+              <span v-else-if="member.declaredLicensed === false">{{
+                t('members.declaredVisitor')
+              }}</span>
+              <span>{{ formatRelative(member.registeredAt) }}</span>
+            </span>
+          </span>
+          <ChevronRight :size="20" class="text-ink-muted" aria-hidden="true" />
+        </RouterLink>
+      </li>
+    </ul>
+  </section>
 
   <div class="flex flex-col gap-3 px-4 py-4 lg:flex-row lg:items-end lg:px-0">
     <div class="lg:w-80">
@@ -135,6 +192,11 @@ function fullName(member: MemberSummary): string {
                 class="rounded-control border border-danger px-1.5 text-micro font-semibold text-danger"
                 >{{ t('members.disabledChip') }}</span
               >
+              <span
+                v-else-if="!member.validated"
+                class="rounded-control border border-ink px-1.5 text-micro font-semibold text-ink"
+                >{{ t('members.pendingChip') }}</span
+              >
             </span>
           </span>
           <ChevronRight :size="20" class="text-ink-muted" aria-hidden="true" />
@@ -187,7 +249,14 @@ function fullName(member: MemberSummary): string {
             </RouterLink>
           </td>
           <td class="py-2 pr-3 text-ink-muted">@{{ member.nickname }}</td>
-          <td class="py-2 pr-3">{{ t(`roleNames.${member.role}`) }}</td>
+          <td class="py-2 pr-3">
+            {{ t(`roleNames.${member.role}`) }}
+            <span
+              v-if="!member.validated"
+              class="ml-1 rounded-control border border-ink px-1.5 text-micro font-semibold text-ink"
+              >{{ t('members.pendingChip') }}</span
+            >
+          </td>
           <td
             class="py-2 pr-3"
             :class="{ 'font-semibold text-danger': member.status === 'DISABLED' }"

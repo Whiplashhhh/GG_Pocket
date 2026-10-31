@@ -21,6 +21,7 @@
     "profileLinkRequests": "Mon profil, 1 demande d’ami en attente | Mon profil, 1 demande d’ami en attente | Mon profil, {n} demandes d’ami en attente"
   },
   "roles": {
+    "TOURIST": "Touriste",
     "CLIMBER": "Grimpeur GG",
     "SETTER": "Ouvreur·se",
     "BOARD": "Direction (ça grimpe en haut)",
@@ -741,12 +742,15 @@
     "PASSWORD_TOO_COMMON": "Ce mot de passe fait partie des plus courants : n’importe qui le devinerait. Une petite phrase, c’est plus solide.",
     "CURRENT_PASSWORD_WRONG": "Ce n’est pas ton mot de passe actuel. Réessaie.",
     "PARENTAL_CONSENT_REQUIRED": "Avant 15 ans, il faut l’accord d’un parent ou responsable légal : coche la case.",
+    "JOIN_NOTE_REQUIRED": "Sans licence, dis-nous en quelques mots qui tu es pour le club (10 à 300 caractères).",
     "YEAR_IN_THE_FUTURE": "Cette année n’est pas encore arrivée. Vérifie les années saisies.",
     "PASSWORD_RESET_LINK_INVALID": "Ce lien ne fonctionne plus : déjà utilisé, expiré ou remplacé. Demande-en un nouveau à la direction.",
     "IMAGE_UNSUPPORTED": "Cette image ne passe pas : choisis une photo JPEG, PNG ou WebP.",
     "IMAGE_TOO_LARGE": "Cette photo est trop grande. Choisis-en une plus petite.",
     "SELF_MANAGEMENT_FORBIDDEN": "Personne ne modifie son propre rôle ni son propre compte, même pas toi.",
     "LAST_ADMIN": "Il faut toujours au moins un·e Président·e actif·ve : nomme quelqu’un d’autre avant.",
+    "MEMBER_ALREADY_VALIDATED": "Ce compte a déjà été validé, quelqu’un a été plus rapide que toi. La fiche est à jour.",
+    "MEMBER_AWAITING_VALIDATION": "Ce compte attend encore sa validation par la direction : ça viendra après.",
     "FAVORITES_FULL": "Ton cœur est plein : deux coups de cœur au maximum. Lâches-en un pour faire de la place.",
     "ROUTE_DISMOUNTED": "Cette voie a été démontée : elle est en lecture seule.",
     "ROUTE_STATUS_CONFLICT": "La voie a changé d’état entre-temps. Recharge la fiche et réessaie.",
@@ -807,6 +811,7 @@
     "saved": "C’est enregistré."
   },
   "roleNames": {
+    "TOURIST": "Touriste",
     "CLIMBER": "Grimpeur·se",
     "SETTER": "Ouvreur·se",
     "BOARD": "Direction",
@@ -842,6 +847,15 @@
     "birthDateHint": "Ton âge reste caché, sauf si tu choisis de l’afficher.",
     "parentalConsent": "Un parent ou responsable légal est d’accord pour que j’utilise GG Pocket.",
     "parentalConsentHint": "Obligatoire avant 15 ans.",
+    "licenceLegend": "Tu as ta licence au club ?",
+    "licenceYes": "Oui, je suis licencié·e GG",
+    "licenceYesHint": "La direction vérifie et te passe Grimpeur GG.",
+    "licenceNo": "Non, je passe de temps en temps",
+    "licenceNoHint": "Tu seras Touriste : mêmes droits, sans la licence.",
+    "joinNote": "Qui es-tu pour le club ?",
+    "joinNoteHint": "Pour que la direction te reconnaisse, par exemple « copain de Julie, je viens deux fois par an ». Seule la direction le lit, et il est effacé dès que ton compte est validé.",
+    "joinNoteCounter": "{count} sur {max} caractères",
+    "validationNotice": "Dernière prise : la direction valide chaque nouveau compte. En attendant, ton carnet est déjà à toi.",
     "privacy": "J’ai lu la page {link} et je suis d’accord.",
     "privacyLinkText": "Tes données",
     "rememberMe": "Rester connecté·e sur cet appareil",
@@ -1082,7 +1096,13 @@
     "never": "Jamais",
     "noMatch": "Personne ne correspond à « {query} ».",
     "open": "Voir la fiche de {name}",
-    "disabledChip": "Compte désactivé"
+    "disabledChip": "Compte désactivé",
+    "pendingTitle": "En attente de validation",
+    "pendingIntro": "Nouveaux comptes à valider. Un clic sur un nom pour voir ce qu’ils ont déclaré.",
+    "pendingCount": "Aucun compte en attente | 1 compte en attente | {n} comptes en attente",
+    "pendingChip": "En attente",
+    "declaredLicensed": "Se dit licencié·e",
+    "declaredVisitor": "Pas licencié·e"
   },
   "member": {
     "back": "Tous les membres",
@@ -1119,7 +1139,21 @@
     "delete": "Supprimer définitivement le compte",
     "deleteConfirm": "Supprimer pour de bon",
     "deleteConfirmTitle": "Supprimer pour de bon le compte de {name} ?",
-    "deleteConfirmBody": "Son profil, ses photos et ses commentaires sont effacés, ses sessions fermées. Ses séances restent pour les statistiques des voies, au nom d’« Ancien·ne membre ». Impossible de revenir en arrière : pour une pause, désactive plutôt le compte."
+    "deleteConfirmBody": "Son profil, ses photos et ses commentaires sont effacés, ses sessions fermées. Ses séances restent pour les statistiques des voies, au nom d’« Ancien·ne membre ». Impossible de revenir en arrière : pour une pause, désactive plutôt le compte.",
+    "validationTitle": "Nouveau compte à valider",
+    "validationIntro": "Ce compte a été créé avec le code du club. Tant qu’il n’est pas validé, il n’a que son carnet : invisible des autres, pas de fil ni de podium.",
+    "declaredLicensed": "Se déclare licencié·e au club.",
+    "declaredVisitor": "Se déclare non licencié·e. Son petit mot :",
+    "declaredUnknown": "Pas de déclaration (compte créé avant cette question).",
+    "noteErased": "Le petit mot sera effacé dès ta décision.",
+    "validateClimber": "Valider : Grimpeur GG (licencié·e)",
+    "validateTourist": "Valider : Touriste (pas licencié·e)",
+    "validated": "Compte validé : {name} est maintenant {role}.",
+    "refuse": "Refuser et supprimer le compte",
+    "refuseConfirm": "Refuser",
+    "refuseConfirmTitle": "Refuser le compte de {name} ?",
+    "refuseConfirmBody": "Le compte est supprimé pour de bon, avec le peu qu’il contient. Si c’était une erreur, la personne pourra se réinscrire avec le code du club.",
+    "refused": "Compte refusé et supprimé."
   },
   "audit": {
     "title": "Journal d’audit",
@@ -1132,7 +1166,9 @@
       "MEMBER_ROLE_CHANGED": "{actor} a fait passer {target} de {before} à {after}",
       "MEMBER_DISABLED": "{actor} a désactivé le compte de {target}",
       "MEMBER_ENABLED": "{actor} a réactivé le compte de {target}",
+      "MEMBER_VALIDATED": "{actor} a validé le compte de {target} ({after})",
       "MEMBER_DELETED": "{actor} a supprimé le compte de {target}",
+      "MEMBER_REFUSED": "{actor} a refusé le compte de {target}",
       "PASSWORD_RESET_LINK_CREATED": "{actor} a créé un lien de réinitialisation pour {target}",
       "REGISTRATION_CODE_CREATED": "{actor} a créé le code d’inscription « {target} »",
       "REGISTRATION_CODE_UPDATED": "{actor} a modifié le code d’inscription « {target} »",
@@ -1501,9 +1537,12 @@
     "year": "Une année entre 1950 et cette année.",
     "number": "Un nombre entier, au moins 1.",
     "invalid": "Ce champ ne passe pas. Vérifie-le.",
-    "plainText": "Un caractère invisible s’est glissé dans ce texte. Efface-le ou retape le texte."
+    "plainText": "Un caractère invisible s’est glissé dans ce texte. Efface-le ou retape le texte.",
+    "licence": "Dis-nous si tu as ta licence au club.",
+    "joinNote": "Quelques mots de plus : 10 caractères minimum."
   },
   "rolesShort": {
+    "TOURIST": "Touriste",
     "CLIMBER": "Grimpeur GG",
     "SETTER": "Ouvreur·se",
     "BOARD": "Direction",
@@ -1520,5 +1559,14 @@
       "failed": "La nouvelle version n’a pas pu s’installer : ton téléphone a refusé des fichiers. Copie le détail et envoie-le à la direction.",
       "error": "Impossible de chercher une mise à jour pour l’instant. Vérifie ta connexion et réessaie."
     }
+  },
+  "awaiting": {
+    "title": "Ton compte attend le feu vert de la direction",
+    "body": "La direction du club valide chaque nouveau compte, en général sous quelques jours. En attendant, ton carnet est à toi : topo, séances, à faire, planning.",
+    "locked": "Le fil des amis, l’annuaire et le podium s’ouvriront dès la validation.",
+    "podium": "Le podium s’ouvre dès que la direction a validé ton compte. Tes séances comptent déjà : elles seront là le jour J.",
+    "directory": "L’annuaire du club s’ouvre dès que la direction a validé ton compte.",
+    "belayer": "Tu pourras dire qui t’assurait dès que la direction aura validé ton compte.",
+    "comments": "Tu pourras commenter les voies dès que la direction aura validé ton compte."
   }
 }

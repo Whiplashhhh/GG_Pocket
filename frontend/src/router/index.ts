@@ -31,6 +31,11 @@ declare module 'vue-router' {
     wide?: boolean
     /** Lowest role allowed (spec §5); the server checks it again on every call. */
     minRole?: Role
+    /**
+     * Only once the board has validated the account (D-107); before, the profile says why. The
+     * server checks it again on every call.
+     */
+    validated?: boolean
     /** A sheet over its parent screen (route sheet): the screen under it keeps its scroll. */
     sheet?: boolean
   }
@@ -88,17 +93,17 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/annuaire',
     component: () => import('@/views/social/DirectoryView.vue'),
-    meta: { titleKey: 'directory.title' },
+    meta: { titleKey: 'directory.title', validated: true },
   },
   {
     path: '/membres/:id',
     component: () => import('@/views/social/MemberProfileView.vue'),
-    meta: { titleKey: 'memberProfile.title' },
+    meta: { titleKey: 'memberProfile.title', validated: true },
   },
   {
     path: '/membres/:id/carnet',
     component: () => import('@/views/LogbookView.vue'),
-    meta: { titleKey: 'logbook.friend.docTitle' },
+    meta: { titleKey: 'logbook.friend.docTitle', validated: true },
   },
   {
     path: '/podium',

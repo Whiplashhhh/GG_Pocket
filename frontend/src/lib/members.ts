@@ -61,3 +61,12 @@ export function sortMembers(
     (a, b) => sign * compare(a, b, key) || compare(a, b, 'name') || a.id.localeCompare(b.id),
   )
 }
+
+/** New accounts the board still has to validate (D-107), the longest waiting first. */
+export function awaitingValidation<T extends { validated: boolean; registeredAt: string }>(
+  members: readonly T[],
+): T[] {
+  return members
+    .filter((member) => !member.validated)
+    .sort((a, b) => a.registeredAt.localeCompare(b.registeredAt))
+}

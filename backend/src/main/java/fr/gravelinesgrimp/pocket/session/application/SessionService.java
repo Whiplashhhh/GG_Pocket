@@ -320,7 +320,8 @@ public class SessionService {
 
     /**
      * Any active member of the club may have held the rope, friend or not, but not the climber
-     * themself (D-101).
+     * themself (D-101). Accounts awaiting validation stay out of it both ways (D-107): naming
+     * someone would show them in that person's belays.
      */
     private void checkBelayers(UUID memberId, SessionDraft draft) {
         var ids = draft.belayerIds();
@@ -330,9 +331,15 @@ public class SessionService {
         if (ids.contains(memberId)) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Nobody belays themself");
         }
+        if (members.findById(memberId).filter(Member::isValidated).isEmpty()) {
+            throw new BusinessException(
+                    ErrorCode.MEMBER_AWAITING_VALIDATION, "No belayer before validation");
+        }
         var active =
                 members.findAllById(ids).stream()
-                        .filter(member -> member.isActive() && !FormerMember.is(member.id()))
+                        .filter(
+                                member ->
+                                        member.isVisibleInClub() && !FormerMember.is(member.id()))
                         .count();
         if (active != ids.size()) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "No such belayer");

@@ -62,6 +62,21 @@ export function useChangeRole() {
   })
 }
 
+/** The board accepts a new account as a tourist or a climber (D-107). */
+export function useValidateMember() {
+  const changed = useMemberChanged()
+  return useMutation({
+    mutationFn: ({ id, role }: { id: string; role: 'TOURIST' | 'CLIMBER' }) =>
+      request(
+        api.PUT('/api/v1/admin/members/{id}/validation', {
+          params: { path: { id } },
+          body: { role },
+        }),
+      ),
+    onSuccess: changed,
+  })
+}
+
 export function useChangeStatus() {
   const changed = useMemberChanged()
   return useMutation({
@@ -76,7 +91,10 @@ export function useChangeStatus() {
   })
 }
 
-/** For good (admin): the sheet goes, the table and the audit log follow. */
+/**
+ * For good (admin), or a new account refused by the board (D-107): the sheet goes, the table and
+ * the audit log follow.
+ */
 export function useDeleteMember() {
   const queryClient = useQueryClient()
   return useMutation({

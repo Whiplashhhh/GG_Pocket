@@ -10,6 +10,7 @@ import {
   useCreateResetLink,
   useDeleteMember,
   useMember,
+  useValidateMember,
   type MemberDetail,
 } from '@/api/admin'
 import { useCurrentMember } from '@/api/auth'
@@ -28,7 +29,8 @@ import ManagementTitle from './ManagementTitle.vue'
 
 /**
  * Spec §8.11: the member sheet. Only the actions the server allows are offered (it checks them
- * again anyway); the birth date is never shown (DECISIONS D-045).
+ * again anyway); the birth date is never shown (DECISIONS D-045). A new account awaiting
+ * validation shows what it declared at sign-up, to validate it or refuse it (D-107).
  */
 const { t } = useI18n()
 const route = useRoute()
@@ -40,12 +42,14 @@ const changeRole = useChangeRole()
 const changeStatus = useChangeStatus()
 const createLink = useCreateResetLink()
 const deleteMember = useDeleteMember()
+const validateMember = useValidateMember()
 const { copy, copied, isSupported: canCopy } = useClipboard({ copiedDuring: 2500 })
 const { share, isSupported: canShare } = useShare()
 
 const selectedRole = ref<Role>('CLIMBER')
 const confirmingDisable = ref(false)
 const confirmingDelete = ref(false)
+const confirmingRefusal = ref(false)
 const notice = ref<string | null>(null)
 const failure = ref<unknown>(null)
 const resetLink = ref<{ url: string; expiresAt: string } | null>(null)
@@ -117,6 +121,18 @@ function setStatus(status: 'ACTIVE' | 'DISABLED') {
   )
 }
 
+function validate(role: 'TOURIST' | 'CLIMBER') {
+  validateMember.mutate(
+    { id: id.value, role },
+    {
+      onSuccess: () => {
+        done(t('member.validated', { name: name.value, role: t(`roles.${role}`) }))
+      },
+      onError: failed,
+    },
+  )
+}
+
 function remove() {
   deleteMember.mutate(id.value, {
     onSuccess: () => void router.replace('/gestion/membres'),
@@ -180,6 +196,56 @@ function makeResetLink() {
       <FormAlert v-if="isSelf" tone="success">{{ t('member.self') }}</FormAlert>
       <p v-else-if="outOfReach" class="text-ink-muted">{{ t('member.outOfReach') }}</p>
     </div>
+
+    <section
+      v-if="detail.permissions.canValidate"
+      class="mx-4 mt-4 flex flex-col gap-3 border-l-4 border-brand bg-surface px-4 py-4 lg:mx-0"
+      aria-labelledby="validation-title"
+    >
+      <h2 id="validation-title" class="text-lg font-title">
+        {{ t('member.validationTitle') }}
+      </h2>
+      <p class="text-ink-muted">{{ t('member.validationIntro') }}</p>
+      <p v-if="detail.member.declaredLicensed === true" class="font-semibold">
+        {{ t('member.declaredLicensed') }}
+      </p>
+      <template v-else-if="detail.member.declaredLicensed === false">
+        <p class="font-semibold">{{ t('member.declaredVisitor') }}</p>
+        <blockquote
+          v-if="detail.joinNote"
+          class="border-l-2 border-rule pl-3 whitespace-pre-line italic"
+        >
+          {{ detail.joinNote }}
+        </blockquote>
+      </template>
+      <p v-else class="text-ink-muted">{{ t('member.declaredUnknown') }}</p>
+      <p v-if="detail.joinNote" class="text-sm text-ink-muted">{{ t('member.noteErased') }}</p>
+      <div class="flex flex-wrap gap-3">
+        <GgButton
+          :variant="detail.member.declaredLicensed === false ? 'secondary' : 'primary'"
+          :disabled="validateMember.isPending.value"
+          @click="validate('CLIMBER')"
+        >
+          {{ t('member.validateClimber') }}
+        </GgButton>
+        <GgButton
+          :variant="detail.member.declaredLicensed === false ? 'primary' : 'secondary'"
+          :disabled="validateMember.isPending.value"
+          @click="validate('TOURIST')"
+        >
+          {{ t('member.validateTourist') }}
+        </GgButton>
+      </div>
+      <GgButton
+        v-if="detail.permissions.canDelete"
+        variant="danger"
+        class="self-start"
+        :disabled="deleteMember.isPending.value"
+        @click="confirmingRefusal = true"
+      >
+        {{ t('member.refuse') }}
+      </GgButton>
+    </section>
 
     <dl
       class="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 border-t border-rule px-4 py-5 sm:grid-cols-2 lg:px-0"
@@ -299,7 +365,7 @@ function makeResetLink() {
       v-if="
         detail.permissions.canDisable ||
         detail.permissions.canEnable ||
-        detail.permissions.canDelete
+        (detail.permissions.canDelete && !detail.permissions.canValidate)
       "
       class="flex flex-col gap-3 border-t border-rule px-4 py-5 lg:px-0"
       aria-labelledby="account-title"
@@ -323,7 +389,7 @@ function makeResetLink() {
         {{ t('member.enable') }}
       </GgButton>
       <GgButton
-        v-if="detail.permissions.canDelete"
+        v-if="detail.permissions.canDelete && !detail.permissions.canValidate"
         variant="danger"
         class="self-start"
         :disabled="deleteMember.isPending.value"
@@ -346,6 +412,14 @@ function makeResetLink() {
       :title="t('member.deleteConfirmTitle', { name })"
       :body="t('member.deleteConfirmBody')"
       :confirm-label="t('member.deleteConfirm')"
+      danger
+      @confirm="remove"
+    />
+    <ConfirmDialog
+      v-model:open="confirmingRefusal"
+      :title="t('member.refuseConfirmTitle', { name })"
+      :body="t('member.refuseConfirmBody')"
+      :confirm-label="t('member.refuseConfirm')"
       danger
       @confirm="remove"
     />

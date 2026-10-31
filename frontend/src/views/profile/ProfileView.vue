@@ -15,12 +15,13 @@ import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useLogout } from '@/api/auth'
+import { useAwaitingValidation, useLogout } from '@/api/auth'
 import { useBadgeLibrary } from '@/api/badges'
 import { useMyProfile } from '@/api/me'
 import { useMetaQuery } from '@/api/meta'
 import { useMyFavorites, useRouteDetail } from '@/api/topo'
 import PageTitle from '@/components/layout/PageTitle.vue'
+import AwaitingValidationNotice from '@/components/member/AwaitingValidationNotice.vue'
 import FriendRequests from '@/components/social/FriendRequests.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
@@ -43,6 +44,7 @@ import { useThemeStore, type ThemePreference } from '@/stores/theme'
 
 /** Spec §8.8: my profile, my badges and my settings. Key figures come with a later phase. */
 const { t } = useI18n()
+const awaiting = useAwaitingValidation()
 const { data: profile, isPending, isError, error, refetch } = useMyProfile()
 const { data: meta } = useMetaQuery()
 const { preference } = storeToRefs(useThemeStore())
@@ -84,6 +86,11 @@ const facts = computed(() => {
 
 <template>
   <PageTitle>{{ t('profile.title') }}</PageTitle>
+  <div v-if="awaiting" class="px-4 pt-3">
+    <AwaitingValidationNotice :title="t('awaiting.title')">
+      {{ t('awaiting.body') }} {{ t('awaiting.locked') }}
+    </AwaitingValidationNotice>
+  </div>
   <FriendRequests />
 
   <div v-if="isPending" class="flex items-center gap-4 px-4 py-6" aria-hidden="true">
@@ -204,7 +211,7 @@ const facts = computed(() => {
         <template #icon><Wrench :size="20" /></template>
         {{ t('profile.management') }}
       </SettingsLink>
-      <SettingsLink to="/annuaire?amis">
+      <SettingsLink v-if="!awaiting" to="/annuaire?amis">
         <template #icon><Users :size="20" /></template>
         {{ t('profile.friends') }}
       </SettingsLink>

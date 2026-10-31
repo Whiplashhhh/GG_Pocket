@@ -4,9 +4,11 @@ import { ChevronRight, Users } from 'lucide-vue-next'
 import { computed, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { useAwaitingValidation } from '@/api/auth'
 import { errorMessageKey } from '@/api/errors'
 import { useFeed } from '@/api/feed'
 import { useDirectory } from '@/api/social'
+import AwaitingValidationNotice from '@/components/member/AwaitingValidationNotice.vue'
 import SessionCard from '@/components/session/SessionCard.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
@@ -16,11 +18,13 @@ import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 /**
  * The feed (spec §8.2): the club header with its climber count (the way to the directory), then my
  * sessions and the ones my friends share, latest first, page by page as I scroll. Friend requests
- * wait on my profile (D-099).
+ * wait on my profile (D-099). An account awaiting validation sees its own sessions only, and why
+ * (D-107).
  */
 const { t } = useI18n()
 const sessions = useFeed()
 const directory = useDirectory()
+const awaiting = useAwaitingValidation()
 
 const items = computed(() => sessions.data.value?.pages.flatMap((page) => page.items) ?? [])
 
@@ -36,7 +40,14 @@ useIntersectionObserver(sentinel, ([entry]) => {
   <h1 class="sr-only">{{ t('actu.title') }}</h1>
   <section class="border-b border-rule px-4 py-3">
     <p class="text-ink-muted">{{ t('actu.clubTagline') }}</p>
+    <AwaitingValidationNotice
+      v-if="awaiting"
+      class="mt-3"
+      :title="t('awaiting.title')"
+      :body="t('awaiting.locked')"
+    />
     <RouterLink
+      v-else
       to="/annuaire"
       class="-mx-1 mt-1 inline-flex min-h-11 items-center gap-2 rounded-control px-1 font-semibold text-brand-ink hover:underline"
     >
@@ -64,7 +75,9 @@ useIntersectionObserver(sentinel, ([entry]) => {
     :title="t('actu.emptyTitle')"
     :body="t('actu.emptyBody')"
   >
-    <GgButton variant="secondary" to="/annuaire">{{ t('actu.findFriends') }}</GgButton>
+    <GgButton v-if="!awaiting" variant="secondary" to="/annuaire">{{
+      t('actu.findFriends')
+    }}</GgButton>
   </EmptyState>
   <template v-else>
     <h2 class="sr-only">{{ t('actu.feed') }}</h2>

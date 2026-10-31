@@ -24,6 +24,10 @@ export interface FakeMember {
   password: string
   role: Role
   status: 'ACTIVE' | 'DISABLED'
+  /** False while the board has not validated the account (D-107). */
+  validated: boolean
+  declaredLicensed?: boolean
+  joinNote?: string
   email?: string
   birthDate?: string
   parentalConsent: boolean
@@ -120,6 +124,7 @@ export class FakeClub {
       password: 'avant-bras en béton',
       role: 'CLIMBER',
       status: 'ACTIVE',
+      validated: true,
       parentalConsent: false,
       showAge: false,
       appearsInRankings: true,
@@ -203,6 +208,7 @@ export class FakeClub {
       firstName: member.firstName,
       lastName: member.lastName,
       role: member.role,
+      validated: member.validated,
       ...(member.avatarUrl ? { avatarUrl: member.avatarUrl } : {}),
     }
   }
@@ -240,6 +246,8 @@ export class FakeClub {
       lastName: member.lastName,
       role: member.role,
       status: member.status,
+      validated: member.validated,
+      declaredLicensed: member.declaredLicensed,
       registeredAt: member.registeredAt,
       lastSeenAt: member.lastSeenAt,
       sessionCount: this.climbs.sessions.filter((session) => session.memberId === member.id).length,
@@ -248,19 +256,20 @@ export class FakeClub {
 
   private detail(actor: FakeMember, member: FakeMember): Schemas['MemberDetail'] {
     const self = actor.id === member.id
-    const manageable =
-      !self &&
-      (actor.role === 'ADMIN' || (actor.role === 'BOARD' && ROLES.indexOf(member.role) < 2))
-    const assignable = self
-      ? []
-      : actor.role === 'ADMIN'
-        ? ROLES.filter((role) => role !== member.role)
-        : actor.role === 'BOARD' && ROLES.indexOf(member.role) < 2
-          ? (['CLIMBER', 'SETTER'] as Role[]).filter((role) => role !== member.role)
-          : []
+    const boardReach = ROLES.indexOf(member.role) < ROLES.indexOf('BOARD')
+    const manageable = !self && (actor.role === 'ADMIN' || (actor.role === 'BOARD' && boardReach))
+    const assignable =
+      self || !member.validated
+        ? []
+        : actor.role === 'ADMIN'
+          ? ROLES.filter((role) => role !== member.role)
+          : actor.role === 'BOARD' && boardReach
+            ? (['TOURIST', 'CLIMBER', 'SETTER'] as Role[]).filter((role) => role !== member.role)
+            : []
     return {
       member: this.summary(member),
       email: member.email,
+      joinNote: member.joinNote,
       underFifteenWithParentalConsent: false,
       clubArrivalYear: member.clubArrivalYear,
       climbingSinceYear: member.climbingSinceYear,
@@ -269,7 +278,8 @@ export class FakeClub {
         canDisable: manageable && member.status === 'ACTIVE',
         canEnable: manageable && member.status === 'DISABLED',
         canCreateResetLink: manageable && member.status === 'ACTIVE',
-        canDelete: actor.role === 'ADMIN' && !self,
+        canDelete: !self && (actor.role === 'ADMIN' || (manageable && !member.validated)),
+        canValidate: manageable && !member.validated,
       },
     }
   }
@@ -367,6 +377,9 @@ export class FakeClub {
         return fail(409, 'NICKNAME_TAKEN')
       }
       if (form.password.toLowerCase() === 'azertyuiop') return fail(400, 'PASSWORD_TOO_COMMON')
+      const note = form.licensed ? undefined : (form.joinNote ?? '').trim()
+      if (note !== undefined && (note.length < 10 || note.length > 300))
+        return fail(400, 'JOIN_NOTE_REQUIRED')
       const member = this.addMember({
         nickname: form.nickname,
         firstName: form.firstName,
@@ -376,6 +389,11 @@ export class FakeClub {
         birthDate: form.birthDate,
         parentalConsent: form.parentalConsent ?? false,
         registeredAt: new Date(this.now).toISOString(),
+        // Club codes open tourist accounts awaiting the board (D-107).
+        role: 'TOURIST',
+        validated: false,
+        declaredLicensed: form.licensed,
+        joinNote: note,
       })
       code.useCount += 1
       this.openSession(member, form.rememberMe ?? false)
@@ -509,7 +527,7 @@ export class FakeClub {
       if (action === undefined && method === 'DELETE') {
         if (!this.detail(me, member).permissions.canDelete) return fail(403, 'ACCESS_DENIED')
         this.remove(member)
-        this.record(me, 'MEMBER_DELETED', member.nickname)
+        this.record(me, member.validated ? 'MEMBER_DELETED' : 'MEMBER_REFUSED', member.nickname)
         return route.fulfill({ status: 204 })
       }
       if (action === undefined) return json(this.detail(me, member))
@@ -519,6 +537,15 @@ export class FakeClub {
           return fail(403, 'ACCESS_DENIED')
         this.record(me, 'MEMBER_ROLE_CHANGED', member.nickname, member.role, role)
         member.role = role
+        return json(this.detail(me, member))
+      }
+      if (action === 'validation') {
+        const { role } = body() as { role: Role }
+        if (!this.detail(me, member).permissions.canValidate) return fail(403, 'ACCESS_DENIED')
+        member.role = role
+        member.validated = true
+        member.joinNote = undefined
+        this.record(me, 'MEMBER_VALIDATED', member.nickname, undefined, role)
         return json(this.detail(me, member))
       }
       if (action === 'status') {

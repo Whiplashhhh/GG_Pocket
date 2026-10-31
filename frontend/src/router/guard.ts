@@ -4,6 +4,8 @@ import type { AuthState } from '@/api/auth'
 import { isAtLeast } from '@/lib/roles'
 
 export const HOME = '/actu'
+/** Where an account awaiting validation lands when it tries the rest of the club (D-107). */
+export const PROFILE = '/profil'
 export const WELCOME = '/accueil'
 /** Query parameter carrying where to go back after signing in. */
 export const RETURN_PARAM = 'retour'
@@ -29,6 +31,9 @@ export function decideNavigation(
   }
   if (to.meta.minRole !== undefined && !isAtLeast(state.member?.role, to.meta.minRole)) {
     return HOME
+  }
+  if (to.meta.validated === true && state.member?.validated === false) {
+    return PROFILE
   }
   return true
 }
