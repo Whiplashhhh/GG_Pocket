@@ -1,6 +1,7 @@
 package fr.gravelinesgrimp.pocket.badge.api;
 
 import fr.gravelinesgrimp.pocket.badge.application.BadgeLibraryView;
+import fr.gravelinesgrimp.pocket.badge.domain.Badge;
 import fr.gravelinesgrimp.pocket.badge.domain.BadgeCode;
 import fr.gravelinesgrimp.pocket.badge.domain.BadgeFamily;
 
@@ -15,7 +16,20 @@ public record BadgeLibraryResponse(
         @Schema(
                         requiredMode = RequiredMode.REQUIRED,
                         description = "Every badge of the catalogue, in its order, earned or not")
-                List<Entry> badges) {
+                List<Entry> badges,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description = "The badges shown next to the name, in order (earned ones)")
+                List<Badge> favorites,
+        @Schema(description = "Where I stand on the counted tiers: in my own library only")
+                Progress progress) {
+
+    @Schema(name = "BadgeProgress")
+    public record Progress(
+            @Schema(requiredMode = RequiredMode.REQUIRED, description = "Topped ascents")
+                    long topped,
+            @Schema(requiredMode = RequiredMode.REQUIRED, description = "Topped in lead") long lead,
+            @Schema(requiredMode = RequiredMode.REQUIRED) long climbingDays) {}
 
     @Schema(name = "BadgeLibraryEntry")
     public record Entry(
@@ -44,6 +58,13 @@ public record BadgeLibraryResponse(
                                                 entry.count(),
                                                 entry.firstEarnedOn(),
                                                 entry.lastEarnedOn()))
-                        .toList());
+                        .toList(),
+                view.favorites(),
+                view.progress() == null
+                        ? null
+                        : new Progress(
+                                view.progress().topped(),
+                                view.progress().lead(),
+                                view.progress().climbingDays()));
     }
 }

@@ -133,6 +133,7 @@ export class FakeSocial {
             : { firstEarnedOn: award.firstEarnedOn, lastEarnedOn: award.lastEarnedOn }),
         }
       }),
+      favorites: [],
     }
   }
 

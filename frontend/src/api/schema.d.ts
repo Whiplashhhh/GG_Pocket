@@ -1347,6 +1347,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/badges/favorites': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Choose the badges shown next to my name (up to 3, earned ones) */
+    put: operations['chooseFavoriteBadges']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -1480,6 +1497,27 @@ export interface components {
     BadgeLibrary: {
       /** @description Every badge of the catalogue, in its order, earned or not */
       badges: components['schemas']['BadgeLibraryEntry'][]
+      /** @description The badges shown next to the name, in order (earned ones) */
+      favorites: (
+        | 'TOPPED'
+        | 'LEAD'
+        | 'FIRST_GRADE'
+        | 'CLIMBING_DAYS'
+        | 'WEEK_2'
+        | 'WEEK_3'
+        | 'WEEK_4'
+        | 'MONTH_COMPLETE'
+        | 'MONTH_12'
+        | 'STREAK_3W'
+        | 'MONTH_NO_MISS'
+        | 'FULL_LEAD'
+        | 'PERFECT'
+        | 'ZERO_REST'
+        | 'COMEBACK'
+        | 'FLASH'
+        | 'RECORD'
+      )[]
+      progress?: components['schemas']['BadgeProgress']
     }
     BadgeLibraryEntry: {
       /** @enum {string} */
@@ -2560,6 +2598,8 @@ export interface components {
       )[]
       /** @enum {string} */
       visibility: 'FRIENDS' | 'PRIVATE'
+      /** @description The favourite badges of the climber, next to their name */
+      authorBadges: components['schemas']['ShownBadge'][]
     }
     SessionComment: {
       author: components['schemas']['MemberRef']
@@ -2658,6 +2698,69 @@ export interface components {
       grades: components['schemas']['Grade'][]
       holdColors: components['schemas']['HoldColor'][]
       sectors: components['schemas']['Sector'][]
+    }
+    BadgeProgress: {
+      /** Format: int64 */
+      climbingDays: number
+      /**
+       * Format: int64
+       * @description Topped in lead
+       */
+      lead: number
+      /**
+       * Format: int64
+       * @description Topped ascents
+       */
+      topped: number
+    }
+    FavoriteBadgesRequest: {
+      /** @description In display order, earned ones, empty to show none */
+      badges: (
+        | 'TOPPED'
+        | 'LEAD'
+        | 'FIRST_GRADE'
+        | 'CLIMBING_DAYS'
+        | 'WEEK_2'
+        | 'WEEK_3'
+        | 'WEEK_4'
+        | 'MONTH_COMPLETE'
+        | 'MONTH_12'
+        | 'STREAK_3W'
+        | 'MONTH_NO_MISS'
+        | 'FULL_LEAD'
+        | 'PERFECT'
+        | 'ZERO_REST'
+        | 'COMEBACK'
+        | 'FLASH'
+        | 'RECORD'
+      )[]
+    }
+    /** @description A favourite badge next to a name (D-106). */
+    ShownBadge: {
+      /** @enum {string} */
+      badge:
+        | 'TOPPED'
+        | 'LEAD'
+        | 'FIRST_GRADE'
+        | 'CLIMBING_DAYS'
+        | 'WEEK_2'
+        | 'WEEK_3'
+        | 'WEEK_4'
+        | 'MONTH_COMPLETE'
+        | 'MONTH_12'
+        | 'STREAK_3W'
+        | 'MONTH_NO_MISS'
+        | 'FULL_LEAD'
+        | 'PERFECT'
+        | 'ZERO_REST'
+        | 'COMEBACK'
+        | 'FLASH'
+        | 'RECORD'
+      /**
+       * Format: int64
+       * @description Tiers earned, or times earned for a repeatable badge
+       */
+      level: number
     }
   }
   responses: never
@@ -4785,6 +4888,30 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['TopoConfig']
+        }
+      }
+    }
+  }
+  chooseFavoriteBadges: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FavoriteBadgesRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BadgeLibrary']
         }
       }
     }

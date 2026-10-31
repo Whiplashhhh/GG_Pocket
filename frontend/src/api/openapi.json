@@ -2871,6 +2871,37 @@
           "Topo"
         ]
       }
+    },
+    "/api/v1/me/badges/favorites": {
+      "put": {
+        "operationId": "chooseFavoriteBadges",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FavoriteBadgesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadgeLibrary"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Choose the badges shown next to my name (up to 3, earned ones)",
+        "tags": [
+          "Badges"
+        ]
+      }
     }
   },
   "components": {
@@ -3149,10 +3180,40 @@
             "items": {
               "$ref": "#/components/schemas/BadgeLibraryEntry"
             }
+          },
+          "favorites": {
+            "type": "array",
+            "description": "The badges shown next to the name, in order (earned ones)",
+            "items": {
+              "type": "string",
+              "enum": [
+                "TOPPED",
+                "LEAD",
+                "FIRST_GRADE",
+                "CLIMBING_DAYS",
+                "WEEK_2",
+                "WEEK_3",
+                "WEEK_4",
+                "MONTH_COMPLETE",
+                "MONTH_12",
+                "STREAK_3W",
+                "MONTH_NO_MISS",
+                "FULL_LEAD",
+                "PERFECT",
+                "ZERO_REST",
+                "COMEBACK",
+                "FLASH",
+                "RECORD"
+              ]
+            }
+          },
+          "progress": {
+            "$ref": "#/components/schemas/BadgeProgress"
           }
         },
         "required": [
-          "badges"
+          "badges",
+          "favorites"
         ]
       },
       "BadgeLibraryEntry": {
@@ -5995,11 +6056,19 @@
               "FRIENDS",
               "PRIVATE"
             ]
+          },
+          "authorBadges": {
+            "type": "array",
+            "description": "The favourite badges of the climber, next to their name",
+            "items": {
+              "$ref": "#/components/schemas/ShownBadge"
+            }
           }
         },
         "required": [
           "ascents",
           "author",
+          "authorBadges",
           "badges",
           "climbedOn",
           "commentCount",
@@ -6320,6 +6389,103 @@
           "grades",
           "holdColors",
           "sectors"
+        ]
+      },
+      "BadgeProgress": {
+        "type": "object",
+        "properties": {
+          "climbingDays": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lead": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Topped in lead"
+          },
+          "topped": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Topped ascents"
+          }
+        },
+        "required": [
+          "climbingDays",
+          "lead",
+          "topped"
+        ]
+      },
+      "FavoriteBadgesRequest": {
+        "type": "object",
+        "properties": {
+          "badges": {
+            "type": "array",
+            "description": "In display order, earned ones, empty to show none",
+            "items": {
+              "type": "string",
+              "enum": [
+                "TOPPED",
+                "LEAD",
+                "FIRST_GRADE",
+                "CLIMBING_DAYS",
+                "WEEK_2",
+                "WEEK_3",
+                "WEEK_4",
+                "MONTH_COMPLETE",
+                "MONTH_12",
+                "STREAK_3W",
+                "MONTH_NO_MISS",
+                "FULL_LEAD",
+                "PERFECT",
+                "ZERO_REST",
+                "COMEBACK",
+                "FLASH",
+                "RECORD"
+              ]
+            },
+            "maxItems": 3,
+            "minItems": 0
+          }
+        },
+        "required": [
+          "badges"
+        ]
+      },
+      "ShownBadge": {
+        "type": "object",
+        "description": "A favourite badge next to a name (D-106).",
+        "properties": {
+          "badge": {
+            "type": "string",
+            "enum": [
+              "TOPPED",
+              "LEAD",
+              "FIRST_GRADE",
+              "CLIMBING_DAYS",
+              "WEEK_2",
+              "WEEK_3",
+              "WEEK_4",
+              "MONTH_COMPLETE",
+              "MONTH_12",
+              "STREAK_3W",
+              "MONTH_NO_MISS",
+              "FULL_LEAD",
+              "PERFECT",
+              "ZERO_REST",
+              "COMEBACK",
+              "FLASH",
+              "RECORD"
+            ]
+          },
+          "level": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tiers earned, or times earned for a repeatable badge"
+          }
+        },
+        "required": [
+          "badge",
+          "level"
         ]
       }
     }

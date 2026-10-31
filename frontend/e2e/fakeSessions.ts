@@ -550,6 +550,7 @@ export class FakeSessions implements AscentSource {
       commentCount: session.comments.filter((comment) => !comment.deleted).length,
       badges: [],
       unlockedBadges: [],
+      authorBadges: [],
     }
   }
 
