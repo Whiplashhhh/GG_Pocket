@@ -324,7 +324,13 @@
       "LEAD": "toper ta première voie en tête. | toper {n} voies en tête.",
       "FIRST_GRADE": "toper une voie en {grade} ou plus dure.",
       "CLIMBING_DAYS": "grimper {n} jours différents."
-    }
+    },
+    "unlockedBy": "{nickname} a débloqué",
+    "unlockedByMe": "Tu as débloqué",
+    "unlockedTitle": "Badge débloqué !",
+    "unlockedStep": "{n} sur {total}",
+    "nextBadge": "Badge suivant",
+    "continue": "Continuer"
   },
   "seniority": {
     "label": "Ancienneté au club",

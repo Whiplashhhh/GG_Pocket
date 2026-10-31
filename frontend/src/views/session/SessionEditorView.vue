@@ -29,6 +29,7 @@ import SegmentedControl from '@/components/ui/SegmentedControl.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import TextField from '@/components/ui/TextField.vue'
 import { draftKey, useSessionDraft } from '@/composables/useSessionDraft'
+import type { BadgeCode } from '@/lib/badges'
 import { clubToday } from '@/lib/age'
 import { canWait } from '@/lib/outbox'
 import { canLogOn } from '@/lib/planning'
@@ -217,15 +218,18 @@ const commentId = useId()
 
 const problem = ref<string | null>(null)
 const moment = ref<'saved' | 'queued' | null>(null)
-const MOMENT_MS = 1400
+const momentTarget = ref('/actu')
+const unlocked = ref<BadgeCode[]>([])
 
 function closeTarget() {
   return editing.value ? `/seances/${sessionId.value ?? ''}` : '/actu'
 }
 
-function finish(kind: 'saved' | 'queued', target: string) {
+/** The saved moment, then `target` (SessionSavedMoment says when). */
+function finish(kind: 'saved' | 'queued', target: string, badges: BadgeCode[] = []) {
+  unlocked.value = badges
+  momentTarget.value = target
   moment.value = kind
-  window.setTimeout(() => void router.replace(target), MOMENT_MS)
 }
 
 async function queue() {
@@ -255,7 +259,7 @@ async function submit() {
   try {
     const saved = await save.mutateAsync({ id: sessionId.value, body, photo: change })
     await draft.clear()
-    finish('saved', editing.value ? `/seances/${saved.id}` : '/actu')
+    finish('saved', editing.value ? `/seances/${saved.id}` : '/actu', saved.unlockedBadges)
   } catch (error) {
     if (error instanceof SessionPhotoNotSaved) {
       await draft.clear()
@@ -273,7 +277,12 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
 </script>
 
 <template>
-  <SessionSavedMoment v-if="moment" :queued="moment === 'queued'" />
+  <SessionSavedMoment
+    v-if="moment"
+    :queued="moment === 'queued'"
+    :unlocked="unlocked"
+    @done="router.replace(momentTarget)"
+  />
   <form class="flex min-h-dvh flex-col" novalidate @submit.prevent="submit">
     <header class="sticky top-0 z-20 flex items-center gap-2 border-b border-rule bg-bg px-2 py-2">
       <GgIconButton :to="closeTarget()" :label="t('session.close')">

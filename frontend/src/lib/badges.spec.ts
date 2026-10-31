@@ -6,6 +6,7 @@ import {
   badgeOf,
   badgeStates,
   isMaxLevel,
+  levelOfCode,
   nextProgress,
   nextTier,
   rarity,
@@ -14,6 +15,7 @@ import {
   recentBadges,
   shownFavorites,
   type BadgeCode,
+  unlocks,
 } from './badges'
 
 const TOPPED: BadgeCode[] = [
@@ -169,5 +171,29 @@ describe('shownFavorites', () => {
         { badge: 'TOPPED', level: 2 },
       ],
     )
+  })
+})
+
+describe('unlocks', () => {
+  it('reads the level of a tier from its code', () => {
+    expect(levelOfCode('TOPPED_1')).toBe(1)
+    expect(levelOfCode('TOPPED_10')).toBe(3)
+    expect(levelOfCode('GRADE_7C')).toBe(8)
+    expect(levelOfCode('DAYS_25')).toBe(2)
+    expect(levelOfCode('FLASH')).toBe(1)
+  })
+
+  it('folds the tiers of a family into the highest, a first 7a included', () => {
+    expect(
+      unlocks(['GRADE_5B', 'GRADE_5C', 'GRADE_6A', 'GRADE_6B', 'GRADE_6C', 'GRADE_7A']),
+    ).toEqual([{ badge: 'FIRST_GRADE', level: 6, times: 1 }])
+  })
+
+  it('counts a repeatable badge earned twice by the same session', () => {
+    expect(unlocks(['FLASH', 'TOPPED_5', 'FLASH', 'COMEBACK'])).toEqual([
+      { badge: 'TOPPED', level: 2, times: 1 },
+      { badge: 'COMEBACK', level: 1, times: 1 },
+      { badge: 'FLASH', level: 1, times: 2 },
+    ])
   })
 })

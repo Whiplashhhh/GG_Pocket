@@ -4,6 +4,38 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-31 — Phase 7, PR 7.3 : badges dans le fil et moment de déblocage
+
+**Branche** : `feature/badges-unlock-0.8.0` (depuis `feature/badges-library-0.8.0`, #43 pas encore fusionnée).
+
+### Fait
+
+- `lib/badges.ts` : `levelOfCode`, `unlocks` (paliers d'une famille regroupés au plus haut, répétable gagné deux fois
+  dans la séance = ×2).
+- Carte de séance : bloc `SessionUnlocks` (« Tu as débloqué » / « tom.bloc a débloqué », médaille au niveau, nom,
+  niveau ou ×N) depuis `Session.badges`.
+- `SessionSavedMoment` : tampon, puis chaque badge de `unlockedBadges` en grand (rebond, statique avec
+  `prefers-reduced-motion`), « Badge suivant » / « Continuer » focalisés ; sans badge ou hors ligne, départ automatique
+  comme avant. L'éditeur passe la destination au moment (`@done`).
+- Fakes : `FakeSession.badges`, `club.climbs.nextUnlocks`. Vitest `SessionSavedMoment.spec.ts`, `unlocks` ; e2e
+  « une séance enregistrée présente ses badges… » ; captures `seance-deblocage`, `actu-fil` relues (clair, sombre, 360 px).
+- ROADMAP phase 7 entièrement cochée, DESIGN §8, CHANGELOG.
+
+### Reste
+
+- Relecture et fusion de #43 puis de cette PR (Willem). D-105 (club) et D-106 (Willem) à valider.
+- Phase 8 : finitions et lancement.
+
+### Prochaine action
+
+Après fusion : phase 8, premier item de la ROADMAP (logo téléversable, icônes PWA, captures du manifeste).
+
+### Points bloquants
+
+- Aucun.
+
+---
+
 ## 2026-10-31 — Phase 7, PR 7.2 : badges à niveaux, favoris et ancienneté
 
 **Branche** : `feature/badges-library-0.8.0` (depuis `main` 0.8.0 + #42). PR #43.

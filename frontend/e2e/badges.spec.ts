@@ -92,4 +92,41 @@ test.describe('badges', () => {
     await expect(dialog.getByRole('button', { name: 'Mettre en avant' })).toHaveCount(0)
     await expect(dialog.getByRole('progressbar')).toHaveCount(0)
   })
+
+  test('a saved session presents its new badges one at a time, then its card keeps them', async ({
+    page,
+    club,
+  }) => {
+    await page.clock.setSystemTime(new Date(club.now))
+    club.climbs.nextUnlocks = ['TOPPED_1', 'LEAD_1', 'GRADE_5B', 'GRADE_5C', 'GRADE_6A', 'FLASH']
+
+    await page.goto('/seance/nouvelle')
+    await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('12')
+    await page.getByRole('button', { name: 'Ajouter Bye Bye Morice' }).click()
+    await page.getByRole('button', { name: 'Enregistrer la séance' }).click()
+
+    await expect(page.getByText('Séance au carnet !')).toBeVisible()
+    const moment = page.getByRole('status')
+    await expect(moment.getByText('Badge débloqué ! · 1 sur 4')).toBeVisible()
+    await expect(moment.getByText('Voies topées')).toBeVisible()
+    await expect(moment.getByText('Niveau 1')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Badge suivant' })).toBeFocused()
+    await page.getByRole('button', { name: 'Badge suivant' }).click()
+    await expect(moment.getByText('Voies en tête')).toBeVisible()
+    await page.getByRole('button', { name: 'Badge suivant' }).click()
+    await expect(moment.getByText('Première cotation')).toBeVisible()
+    await expect(moment.getByText('Niveau 3')).toBeVisible()
+    await page.getByRole('button', { name: 'Badge suivant' }).click()
+    await expect(moment.getByText('Le flash')).toBeVisible()
+    await page.getByRole('button', { name: 'Continuer' }).click()
+
+    await expect(page).toHaveURL(/\/actu$/)
+    const unlocked = page.getByRole('list', { name: 'Tu as débloqué' })
+    await expect(unlocked.getByRole('listitem')).toHaveText([
+      'Voies topées · Niveau 1',
+      'Voies en tête · Niveau 1',
+      'Première cotation · Niveau 3',
+      'Le flash',
+    ])
+  })
 })
