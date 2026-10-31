@@ -52,7 +52,7 @@ public class BelayService {
     }
 
     /** Latest day first, with the cursor of the sessions. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public BelayView.Page mine(UUID me, String cursor, int size) {
         var limit = Math.clamp(size, 1, SessionService.MAX_PAGE_SIZE);
@@ -118,7 +118,7 @@ public class BelayService {
      *
      * @throws BusinessException {@code NOT_FOUND} (I am not named on that session)
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void withdraw(UUID me, UUID sessionId) {
         if (ascents.clearBelayer(sessionId, me, clock.instant()) == 0) {

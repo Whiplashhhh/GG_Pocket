@@ -5,9 +5,19 @@ import fr.gravelinesgrimp.pocket.member.domain.Role;
 
 import java.util.UUID;
 
-/** What the app shell needs about the signed-in member (header, menus, permissions). */
+/**
+ * What the app shell needs about the signed-in member (header, menus, permissions).
+ *
+ * @param validated false while the board has not validated the account (D-107)
+ */
 public record CurrentMemberView(
-        UUID id, String nickname, String firstName, String lastName, Role role, UUID avatarId) {
+        UUID id,
+        String nickname,
+        String firstName,
+        String lastName,
+        Role role,
+        boolean validated,
+        UUID avatarId) {
 
     public static CurrentMemberView of(Member member) {
         return new CurrentMemberView(
@@ -16,6 +26,7 @@ public record CurrentMemberView(
                 member.firstName(),
                 member.lastName(),
                 member.role(),
+                member.isValidated(),
                 member.avatarId());
     }
 }

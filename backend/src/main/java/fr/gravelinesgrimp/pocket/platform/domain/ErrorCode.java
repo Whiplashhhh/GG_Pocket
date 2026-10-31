@@ -34,6 +34,7 @@ public enum ErrorCode {
     PASSWORD_TOO_COMMON(ErrorCategory.INVALID),
     CURRENT_PASSWORD_WRONG(ErrorCategory.INVALID),
     PARENTAL_CONSENT_REQUIRED(ErrorCategory.INVALID),
+    JOIN_NOTE_REQUIRED(ErrorCategory.INVALID),
     YEAR_IN_THE_FUTURE(ErrorCategory.INVALID),
     PASSWORD_RESET_LINK_INVALID(ErrorCategory.INVALID),
 
@@ -44,6 +45,8 @@ public enum ErrorCode {
     // Member management
     SELF_MANAGEMENT_FORBIDDEN(ErrorCategory.FORBIDDEN),
     LAST_ADMIN(ErrorCategory.CONFLICT),
+    MEMBER_ALREADY_VALIDATED(ErrorCategory.CONFLICT),
+    MEMBER_AWAITING_VALIDATION(ErrorCategory.CONFLICT),
 
     // Club configuration
     ALREADY_EXISTS(ErrorCategory.CONFLICT),

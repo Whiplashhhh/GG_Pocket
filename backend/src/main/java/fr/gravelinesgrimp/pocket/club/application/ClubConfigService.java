@@ -80,7 +80,7 @@ public class ClubConfigService {
         this.auditLog = auditLog;
     }
 
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public TopoConfigView config() {
         return toConfigView(layouts.read());

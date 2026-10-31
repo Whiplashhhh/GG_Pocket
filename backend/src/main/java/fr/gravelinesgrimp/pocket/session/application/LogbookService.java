@@ -41,7 +41,7 @@ public class LogbookService {
         this.audience = audience;
     }
 
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public LogbookView of(UUID memberId) {
         return build(ascents.findAllMine(memberId), memberId);
@@ -50,7 +50,7 @@ public class LogbookService {
     /**
      * @throws BusinessException {@code NOT_FOUND} (not a friend, or not an active member)
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public LogbookView ofFriend(UUID readerId, UUID climberId) {
         if (readerId.equals(climberId)) {

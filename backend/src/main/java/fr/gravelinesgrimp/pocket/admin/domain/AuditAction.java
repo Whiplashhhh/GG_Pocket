@@ -5,8 +5,12 @@ public enum AuditAction {
     MEMBER_ROLE_CHANGED,
     MEMBER_DISABLED,
     MEMBER_ENABLED,
+    /** A new account accepted by the board, as a tourist or a climber (D-107). */
+    MEMBER_VALIDATED,
     /** For good, by the member or by the admin (spec §14). */
     MEMBER_DELETED,
+    /** A new account the board did not recognise, deleted before any validation (D-107). */
+    MEMBER_REFUSED,
     PASSWORD_RESET_LINK_CREATED,
     REGISTRATION_CODE_CREATED,
     REGISTRATION_CODE_UPDATED,

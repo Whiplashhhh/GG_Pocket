@@ -15,7 +15,7 @@ import java.util.UUID;
 
 /**
  * The monthly rankings (spec §9.2): live scores counted from the sessions, and the frozen months.
- * Live scores only count the active members who appear in the rankings.
+ * Live scores only count the active, validated members who appear in the rankings (D-107).
  */
 public interface MonthlyRankingRepository extends JpaRepository<MonthlyRankingSnapshot, UUID> {
 
@@ -25,7 +25,8 @@ public interface MonthlyRankingRepository extends JpaRepository<MonthlyRankingSn
                     + "m.id, m.nickname, m.avatarId, count(distinct s.climbedOn))"
                     + " from ClimbingSession s join Member m on m.id = s.memberId"
                     + " where s.climbedOn between :from and :to"
-                    + " and m.status = :active and m.appearsInRankings = true"
+                    + " and m.status = :active and m.validatedAt is not null"
+                    + " and m.appearsInRankings = true"
                     + " group by m.id, m.nickname, m.avatarId")
     List<ScoreRow> countClimbingDays(LocalDate from, LocalDate to, MemberStatus active);
 
@@ -35,7 +36,8 @@ public interface MonthlyRankingRepository extends JpaRepository<MonthlyRankingSn
                     + "m.id, m.nickname, m.avatarId, count(a))"
                     + " from ClimbingSession s join s.ascents a join Member m on m.id = s.memberId"
                     + " where s.climbedOn between :from and :to and a.topped = true"
-                    + " and m.status = :active and m.appearsInRankings = true"
+                    + " and m.status = :active and m.validatedAt is not null"
+                    + " and m.appearsInRankings = true"
                     + " group by m.id, m.nickname, m.avatarId")
     List<ScoreRow> countToppedAscents(LocalDate from, LocalDate to, MemberStatus active);
 

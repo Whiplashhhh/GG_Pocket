@@ -8,6 +8,7 @@ import fr.gravelinesgrimp.pocket.badge.domain.FavoriteBadge;
 import fr.gravelinesgrimp.pocket.badge.infra.BadgeAwardRepository;
 import fr.gravelinesgrimp.pocket.badge.infra.BadgeHistoryRepository;
 import fr.gravelinesgrimp.pocket.badge.infra.FavoriteBadgeRepository;
+import fr.gravelinesgrimp.pocket.member.application.ValidatedMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
@@ -46,7 +47,7 @@ public class BadgeService {
         this.members = members;
     }
 
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public BadgeLibraryView mine(UUID memberId) {
         var progress = BadgeProgress.of(BadgeAwards.records(history.historyOf(memberId)));
@@ -56,11 +57,11 @@ public class BadgeService {
     /**
      * @throws BusinessException {@code NOT_FOUND} (unknown, disabled or former member)
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @ValidatedMember
     @Transactional(readOnly = true)
     public BadgeLibraryView of(UUID memberId) {
         members.findById(memberId)
-                .filter(Member::isActive)
+                .filter(Member::isVisibleInClub)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No member"));
         return BadgeLibraryView.of(awards.countPerCode(memberId), favoritesOf(memberId), null);
     }
@@ -71,7 +72,7 @@ public class BadgeService {
      * @throws BusinessException {@code VALIDATION_FAILED} (more than {@link FavoriteBadge#MAX}, the
      *     same one twice, or one I have not earned)
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public BadgeLibraryView chooseFavorites(UUID memberId, List<Badge> chosen) {
         if (chosen.size() > FavoriteBadge.MAX || new HashSet<>(chosen).size() != chosen.size()) {

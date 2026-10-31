@@ -4,10 +4,15 @@ import fr.gravelinesgrimp.pocket.member.domain.MemberIdentity;
 
 import java.time.LocalDate;
 
-/** What someone fills in to join (spec §6). Field formats are validated by the API layer. */
+/**
+ * What someone fills in to join (spec §6), including whether they are licensed at the club and, if
+ * not, who they are to it (D-107). Field formats are validated by the API layer.
+ */
 public record Registration(
         String code,
         MemberIdentity identity,
         String password,
         LocalDate birthDate,
-        boolean parentalConsent) {}
+        boolean parentalConsent,
+        boolean licensed,
+        String joinNote) {}

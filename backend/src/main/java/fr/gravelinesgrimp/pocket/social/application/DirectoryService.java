@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.social.application;
 
+import fr.gravelinesgrimp.pocket.member.application.ValidatedMember;
 import fr.gravelinesgrimp.pocket.member.domain.Age;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
@@ -11,7 +12,6 @@ import fr.gravelinesgrimp.pocket.social.domain.FriendshipState;
 import fr.gravelinesgrimp.pocket.social.infra.FriendshipRepository;
 import fr.gravelinesgrimp.pocket.topo.application.FavoriteService;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,14 +48,15 @@ public class DirectoryService {
     }
 
     /** By last name then first name. At most a couple hundred members: no paging. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @ValidatedMember
     @Transactional(readOnly = true)
     public DirectoryView directory(UUID me) {
         Map<UUID, Friendship> mine =
                 friendships.findAllOf(me).stream()
                         .collect(Collectors.toMap(f -> f.otherThan(me), Function.identity()));
         var today = ClubTime.today(clock);
-        var active = members.findAllForDirectory().stream().filter(Member::isActive).toList();
+        var active =
+                members.findAllForDirectory().stream().filter(Member::isVisibleInClub).toList();
         var entries =
                 active.stream()
                         .filter(member -> !member.id().equals(me))
@@ -71,12 +72,12 @@ public class DirectoryService {
     /**
      * @throws BusinessException {@code NOT_FOUND} (unknown, disabled or former member)
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @ValidatedMember
     @Transactional(readOnly = true)
     public MemberProfileView profile(UUID me, UUID memberId) {
         var member =
                 members.findById(memberId)
-                        .filter(Member::isActive)
+                        .filter(Member::isVisibleInClub)
                         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No member"));
         var age =
                 member.showAge() && member.birthDate() != null

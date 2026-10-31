@@ -3,6 +3,7 @@ package fr.gravelinesgrimp.pocket.topo.application;
 import fr.gravelinesgrimp.pocket.admin.application.AuditLog;
 import fr.gravelinesgrimp.pocket.admin.domain.AuditAction;
 import fr.gravelinesgrimp.pocket.admin.domain.AuditTargetType;
+import fr.gravelinesgrimp.pocket.member.application.ValidatedMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
@@ -60,7 +61,7 @@ public class RouteCommentService {
     }
 
     /** Oldest first, deleted ones left out; dismounted routes keep theirs. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public List<RouteCommentView> list(UUID readerId, UUID routeId) {
         var reader = loadMember(readerId);
@@ -83,7 +84,7 @@ public class RouteCommentService {
      *     VALIDATION_FAILED} for an empty or too long text, {@code RATE_LIMITED} beyond 20 comments
      *     an hour
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @ValidatedMember
     @Transactional
     public RouteCommentView add(UUID authorId, UUID routeId, String body) {
         var author = loadMember(authorId);
@@ -103,7 +104,7 @@ public class RouteCommentService {
      *
      * @throws BusinessException {@code ACCESS_DENIED} for someone else's comment below BOARD
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void delete(UUID actorId, UUID commentId) {
         var actor = loadMember(actorId);

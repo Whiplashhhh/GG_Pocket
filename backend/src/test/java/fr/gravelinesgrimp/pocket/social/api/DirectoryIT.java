@@ -1,11 +1,13 @@
 package fr.gravelinesgrimp.pocket.social.api;
 
 import static fr.gravelinesgrimp.pocket.MemberFixtures.as;
+import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -111,6 +113,22 @@ class DirectoryIT {
             mockMvc.perform(get("/api/v1/members/" + id).with(as(me)))
                     .andExpect(status().isNotFound());
         }
+    }
+
+    @Test
+    void anAccountAwaitingValidationIsInvisibleToTheClub() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var newcomer = members.createAwaitingValidation();
+
+        mockMvc.perform(get("/api/v1/members").with(as(me)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(entry(newcomer.id())).isEmpty());
+        mockMvc.perform(get("/api/v1/members/" + newcomer.id()).with(as(me)))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/members/" + newcomer.id() + "/badges").with(as(me)))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(put("/api/v1/me/friends/" + newcomer.id()).with(as(me)).with(xsrf()))
+                .andExpect(status().isNotFound());
     }
 
     @Test

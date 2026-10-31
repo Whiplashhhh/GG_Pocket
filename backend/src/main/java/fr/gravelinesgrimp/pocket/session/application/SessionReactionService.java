@@ -43,7 +43,7 @@ public class SessionReactionService {
      * @throws BusinessException {@code NOT_FOUND} for a session I cannot read, {@code
      *     VALIDATION_FAILED} on my own session, {@code RATE_LIMITED}
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public SessionView.ReactionsView react(UUID memberId, UUID sessionId, ReactionKind kind) {
         var session = readable.load(memberId, sessionId);
@@ -57,7 +57,7 @@ public class SessionReactionService {
     }
 
     /** Nothing happens without a reaction to take back. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public SessionView.ReactionsView takeBack(UUID memberId, UUID sessionId) {
         readable.load(memberId, sessionId);

@@ -37,6 +37,18 @@ public record RegisterRequest(
                 String password,
         @Past LocalDate birthDate,
         @Schema(description = "Required when the birth date says under 15") boolean parentalConsent,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description = "Licensed at the club, as declared by the person")
+                @NotNull
+                Boolean licensed,
+        @Schema(
+                        description =
+                                "Who the person is to the club, required (10 to 300 characters)"
+                                        + " when not licensed; ignored otherwise")
+                @PlainText
+                @Size(max = 2000)
+                String joinNote,
         @Schema(requiredMode = RequiredMode.REQUIRED, description = "\"Tes données\" accepted")
                 @AssertTrue
                 boolean privacyAccepted,
@@ -48,6 +60,8 @@ public record RegisterRequest(
                 new MemberIdentity(nickname, firstName, lastName, email),
                 password,
                 birthDate,
-                parentalConsent);
+                parentalConsent,
+                licensed,
+                joinNote);
     }
 }

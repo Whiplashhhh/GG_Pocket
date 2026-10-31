@@ -4,6 +4,7 @@ import static fr.gravelinesgrimp.pocket.member.domain.Role.ADMIN;
 import static fr.gravelinesgrimp.pocket.member.domain.Role.BOARD;
 import static fr.gravelinesgrimp.pocket.member.domain.Role.CLIMBER;
 import static fr.gravelinesgrimp.pocket.member.domain.Role.SETTER;
+import static fr.gravelinesgrimp.pocket.member.domain.Role.TOURIST;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,9 +16,13 @@ import org.junit.jupiter.params.provider.EnumSource;
 class MemberGovernanceTest {
 
     @Test
-    void theBoardGivesAndTakesTheSetterRoleOnly() {
-        assertThat(MemberGovernance.assignableRoles(BOARD, false, CLIMBER)).containsExactly(SETTER);
-        assertThat(MemberGovernance.assignableRoles(BOARD, false, SETTER)).containsExactly(CLIMBER);
+    void theBoardSwitchesTouristsClimbersAndSettersOnly() {
+        assertThat(MemberGovernance.assignableRoles(BOARD, false, TOURIST))
+                .containsExactlyInAnyOrder(CLIMBER, SETTER);
+        assertThat(MemberGovernance.assignableRoles(BOARD, false, CLIMBER))
+                .containsExactlyInAnyOrder(TOURIST, SETTER);
+        assertThat(MemberGovernance.assignableRoles(BOARD, false, SETTER))
+                .containsExactlyInAnyOrder(TOURIST, CLIMBER);
         assertThat(MemberGovernance.assignableRoles(BOARD, false, BOARD)).isEmpty();
         assertThat(MemberGovernance.assignableRoles(BOARD, false, ADMIN)).isEmpty();
     }
@@ -25,9 +30,9 @@ class MemberGovernanceTest {
     @Test
     void theAdminGivesAnyRole() {
         assertThat(MemberGovernance.assignableRoles(ADMIN, false, CLIMBER))
-                .containsExactlyInAnyOrder(SETTER, BOARD, ADMIN);
+                .containsExactlyInAnyOrder(TOURIST, SETTER, BOARD, ADMIN);
         assertThat(MemberGovernance.assignableRoles(ADMIN, false, ADMIN))
-                .containsExactlyInAnyOrder(CLIMBER, SETTER, BOARD);
+                .containsExactlyInAnyOrder(TOURIST, CLIMBER, SETTER, BOARD);
     }
 
     @ParameterizedTest
@@ -35,21 +40,32 @@ class MemberGovernanceTest {
     void nobodyChangesTheirOwnRoleNorManagesTheirOwnAccount(Role role) {
         assertThat(MemberGovernance.assignableRoles(role, true, role)).isEmpty();
         assertThat(MemberGovernance.canManageAccount(role, true, role)).isFalse();
+        assertThat(MemberGovernance.canDelete(role, true, false)).isFalse();
     }
 
     @ParameterizedTest
     @EnumSource(
             value = Role.class,
-            names = {"CLIMBER", "SETTER"})
-    void climbersAndSettersManageNobody(Role actor) {
+            names = {"TOURIST", "CLIMBER", "SETTER"})
+    void touristsClimbersAndSettersManageNobody(Role actor) {
         for (var target : Role.values()) {
             assertThat(MemberGovernance.assignableRoles(actor, false, target)).isEmpty();
             assertThat(MemberGovernance.canManageAccount(actor, false, target)).isFalse();
         }
+        assertThat(MemberGovernance.canDelete(actor, false, false)).isFalse();
     }
 
     @Test
-    void theBoardManagesTheAccountsOfClimbersAndSettersOnly() {
+    void theBoardOnlyDeletesAccountsItNeverValidated() {
+        assertThat(MemberGovernance.canDelete(BOARD, false, false)).isTrue();
+        assertThat(MemberGovernance.canDelete(BOARD, false, true)).isFalse();
+        assertThat(MemberGovernance.canDelete(ADMIN, false, true)).isTrue();
+        assertThat(MemberGovernance.canDelete(ADMIN, false, false)).isTrue();
+    }
+
+    @Test
+    void theBoardManagesTheAccountsOfTouristsClimbersAndSettersOnly() {
+        assertThat(MemberGovernance.canManageAccount(BOARD, false, TOURIST)).isTrue();
         assertThat(MemberGovernance.canManageAccount(BOARD, false, CLIMBER)).isTrue();
         assertThat(MemberGovernance.canManageAccount(BOARD, false, SETTER)).isTrue();
         assertThat(MemberGovernance.canManageAccount(BOARD, false, BOARD)).isFalse();

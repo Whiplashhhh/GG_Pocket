@@ -2,6 +2,7 @@ package fr.gravelinesgrimp.pocket.seed.application;
 
 import fr.gravelinesgrimp.pocket.auth.domain.RegistrationCode;
 import fr.gravelinesgrimp.pocket.auth.infra.RegistrationCodeRepository;
+import fr.gravelinesgrimp.pocket.member.domain.LicenceDeclaration;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.MemberIdentity;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
@@ -50,7 +51,21 @@ public class DemoSeeder implements ApplicationRunner {
 
     static final String DEMO_CODE = "DEMO2026";
 
-    record DemoAccount(String nickname, String firstName, String lastName, Role role) {}
+    /**
+     * @param awaiting what a new account declared at sign-up, still awaiting validation by the
+     *     board (D-107); null for a validated account
+     */
+    record DemoAccount(
+            String nickname,
+            String firstName,
+            String lastName,
+            Role role,
+            LicenceDeclaration awaiting) {
+
+        DemoAccount(String nickname, String firstName, String lastName, Role role) {
+            this(nickname, firstName, lastName, role, null);
+        }
+    }
 
     /** Fictional people (spec §17: no real person). */
     static final List<DemoAccount> ACCOUNTS =
@@ -58,7 +73,16 @@ public class DemoSeeder implements ApplicationRunner {
                     new DemoAccount("admin", "Camille", "Roux", Role.ADMIN),
                     new DemoAccount("direction", "Sacha", "Lefebvre", Role.BOARD),
                     new DemoAccount("ouvreur", "Noa", "Martin", Role.SETTER),
-                    new DemoAccount("grimpeur", "Lou", "Bernard", Role.CLIMBER));
+                    new DemoAccount("grimpeur", "Lou", "Bernard", Role.CLIMBER),
+                    new DemoAccount("touriste", "Eli", "Garnier", Role.TOURIST),
+                    new DemoAccount(
+                            "nouveau",
+                            "Alix",
+                            "Moreau",
+                            Role.TOURIST,
+                            LicenceDeclaration.of(
+                                    false,
+                                    "Collègue de Lou, je viens essayer le mur un jeudi sur deux.")));
 
     private static final Logger log = LoggerFactory.getLogger(DemoSeeder.class);
 
@@ -137,19 +161,22 @@ public class DemoSeeder implements ApplicationRunner {
             if (members.findByNicknameIgnoreCase(account.nickname()).isPresent()) {
                 continue;
             }
+            var identity =
+                    new MemberIdentity(
+                            account.nickname(), account.firstName(), account.lastName(), null);
+            var birthDate = LocalDate.of(1992, 6, 15);
             var member =
                     members.save(
-                            new Member(
-                                    new MemberIdentity(
-                                            account.nickname(),
-                                            account.firstName(),
-                                            account.lastName(),
-                                            null),
-                                    hash,
-                                    account.role(),
-                                    LocalDate.of(1992, 6, 15),
-                                    false,
-                                    now));
+                            account.awaiting() == null
+                                    ? new Member(
+                                            identity, hash, account.role(), birthDate, false, now)
+                                    : Member.awaitingValidation(
+                                            identity,
+                                            hash,
+                                            birthDate,
+                                            false,
+                                            account.awaiting(),
+                                            now));
             members.flush();
             registry.register(member.id(), now);
             created++;
@@ -160,7 +187,7 @@ public class DemoSeeder implements ApplicationRunner {
         if (withCode && !codes.existsByCode(DEMO_CODE)) {
             codes.save(
                     new RegistrationCode(
-                            DEMO_CODE, "Code de démonstration", Role.CLIMBER, null, null, null));
+                            DEMO_CODE, "Code de démonstration", Role.TOURIST, null, null, null));
         }
         var accounts = new HashMap<String, Member>();
         for (var account : ACCOUNTS) {

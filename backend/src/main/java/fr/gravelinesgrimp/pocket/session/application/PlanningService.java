@@ -37,7 +37,7 @@ public class PlanningService {
      * @throws fr.gravelinesgrimp.pocket.platform.domain.BusinessException {@code VALIDATION_FAILED}
      *     for a malformed or future month
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public PlanningView of(UUID memberId, String month) {
         var today = ClubTime.today(clock);

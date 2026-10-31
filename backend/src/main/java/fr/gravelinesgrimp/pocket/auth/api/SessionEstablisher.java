@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -73,7 +71,7 @@ public class SessionEstablisher {
                 UsernamePasswordAuthenticationToken.authenticated(
                         new MemberPrincipal(member.id()),
                         null,
-                        List.of(new SimpleGrantedAuthority(member.role().authority())));
+                        MemberAuthorities.of(member.role(), member.validated()));
         var context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);

@@ -4,7 +4,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import fr.gravelinesgrimp.pocket.member.domain.LicenceDeclaration;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
+import fr.gravelinesgrimp.pocket.member.domain.MemberAccess;
 import fr.gravelinesgrimp.pocket.member.domain.MemberIdentity;
 import fr.gravelinesgrimp.pocket.member.domain.MemberPrincipal;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
@@ -65,13 +67,30 @@ public class MemberFixtures {
         return members.saveAndFlush(member);
     }
 
+    /** A new tourist account the board has not validated yet (D-107), not licensed. */
+    public Member createAwaitingValidation() {
+        var n = SEQUENCE.incrementAndGet();
+        var member =
+                Member.awaitingValidation(
+                        new MemberIdentity("Nouveau" + n, "Prénom" + n, "Nom" + n, null),
+                        passwordEncoder.encode(PASSWORD),
+                        LocalDate.of(1990, 1, 1),
+                        false,
+                        LicenceDeclaration.of(false, "Ami de Lou, je viens l'été."),
+                        clock.instant());
+        return members.saveAndFlush(member);
+    }
+
     /** Acts as the member for one request, without a server session. */
     public static RequestPostProcessor as(Member member) {
+        var role = new SimpleGrantedAuthority(member.role().authority());
         return authentication(
                 UsernamePasswordAuthenticationToken.authenticated(
                         new MemberPrincipal(member.id()),
                         null,
-                        List.of(new SimpleGrantedAuthority(member.role().authority()))));
+                        member.isValidated()
+                                ? List.of(role, new SimpleGrantedAuthority(MemberAccess.VALIDATED))
+                                : List.of(role)));
     }
 
     /**

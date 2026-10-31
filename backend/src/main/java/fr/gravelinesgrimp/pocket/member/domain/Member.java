@@ -1,5 +1,7 @@
 package fr.gravelinesgrimp.pocket.member.domain;
 
+import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
+import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
 import fr.gravelinesgrimp.pocket.platform.domain.TimestampedEntity;
 
 import jakarta.persistence.Column;
@@ -80,13 +82,25 @@ public class Member extends TimestampedEntity {
     @Column(name = "favorite_route_id")
     private UUID favoriteRouteId;
 
+    /** Null while the board has not validated the account (D-107). */
+    @Column(name = "validated_at")
+    private Instant validatedAt;
+
+    /** Declared at sign-up; null for accounts that never went through it. */
+    @Column(name = "declared_licensed")
+    private Boolean declaredLicensed;
+
+    /** Who a person not licensed is to the club; erased once the board has decided. */
+    @Column(name = "join_note", length = LicenceDeclaration.NOTE_MAX)
+    private String joinNote;
+
     protected Member() {
         // for JPA
     }
 
     /**
-     * A new member, right after registration: privacy page accepted, parental consent recorded if
-     * the member declared it (the caller checks when it is required).
+     * A validated member: the first admin, the demo accounts. Privacy page accepted, parental
+     * consent recorded if declared (the caller checks when it is required).
      */
     public Member(
             MemberIdentity identity,
@@ -107,6 +121,26 @@ public class Member extends TimestampedEntity {
         this.appearsInRankings = true;
         this.privacyAcceptedAt = now;
         this.parentalConsentAt = parentalConsent ? now : null;
+        this.validatedAt = now;
+    }
+
+    /**
+     * A new account from a club code (D-107): a tourist awaiting validation by the board, with what
+     * they declared at sign-up.
+     */
+    public static Member awaitingValidation(
+            MemberIdentity identity,
+            String passwordHash,
+            LocalDate birthDate,
+            boolean parentalConsent,
+            LicenceDeclaration declaration,
+            Instant now) {
+        var member =
+                new Member(identity, passwordHash, Role.TOURIST, birthDate, parentalConsent, now);
+        member.validatedAt = null;
+        member.declaredLicensed = declaration.licensed();
+        member.joinNote = declaration.joinNote();
+        return member;
     }
 
     public void rename(MemberIdentity identity) {
@@ -143,6 +177,26 @@ public class Member extends TimestampedEntity {
         this.role = role;
     }
 
+    /**
+     * The board's decision on a new account: climber (licensed) or tourist. The join note has
+     * served its purpose and is erased.
+     *
+     * @throws BusinessException {@code MEMBER_ALREADY_VALIDATED}, or {@code VALIDATION_FAILED} for
+     *     a role other than tourist or climber
+     */
+    public void validate(Role role, Instant now) {
+        if (isValidated()) {
+            throw new BusinessException(ErrorCode.MEMBER_ALREADY_VALIDATED, "Already validated");
+        }
+        if (role != Role.TOURIST && role != Role.CLIMBER) {
+            throw new BusinessException(
+                    ErrorCode.VALIDATION_FAILED, "A new account becomes a tourist or a climber");
+        }
+        this.role = role;
+        this.validatedAt = now;
+        this.joinNote = null;
+    }
+
     public void disable() {
         this.status = MemberStatus.DISABLED;
     }
@@ -166,6 +220,23 @@ public class Member extends TimestampedEntity {
 
     public boolean isActive() {
         return status == MemberStatus.ACTIVE;
+    }
+
+    public boolean isValidated() {
+        return validatedAt != null;
+    }
+
+    /** Shown to the other members: in the directory, on profiles, as a friend (D-107). */
+    public boolean isVisibleInClub() {
+        return isActive() && isValidated();
+    }
+
+    public Boolean declaredLicensed() {
+        return declaredLicensed;
+    }
+
+    public String joinNote() {
+        return joinNote;
     }
 
     public boolean hasParentalConsent() {

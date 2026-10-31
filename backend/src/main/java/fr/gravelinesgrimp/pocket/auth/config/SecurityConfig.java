@@ -123,6 +123,8 @@ class SecurityConfig {
                 .implies(Role.SETTER.name())
                 .role(Role.SETTER.name())
                 .implies(Role.CLIMBER.name())
+                .role(Role.CLIMBER.name())
+                .implies(Role.TOURIST.name())
                 .build();
     }
 

@@ -64,7 +64,7 @@ public class RegistrationCodeAdminService {
     @Transactional(readOnly = true)
     public List<RegistrationCodeView> list() {
         var now = clock.instant();
-        return codes.findAllByGrantedRoleOrderByCreatedAtDesc(Role.CLIMBER).stream()
+        return codes.findAllByGrantedRoleOrderByCreatedAtDesc(Role.TOURIST).stream()
                 .map(code -> toView(code, now))
                 .toList();
     }
@@ -82,7 +82,7 @@ public class RegistrationCodeAdminService {
                         new RegistrationCode(
                                 value,
                                 settings.label(),
-                                Role.CLIMBER,
+                                Role.TOURIST,
                                 settings.expiresAt(),
                                 settings.maxUses(),
                                 actor.id()));
@@ -106,7 +106,7 @@ public class RegistrationCodeAdminService {
         var actor = load(actorId);
         var code =
                 codes.findById(codeId)
-                        .filter(found -> found.grantedRole() == Role.CLIMBER)
+                        .filter(found -> found.grantedRole() == Role.TOURIST)
                         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No code"));
         var before = describe(code);
         code.update(settings.label(), settings.expiresAt(), settings.maxUses(), settings.active());

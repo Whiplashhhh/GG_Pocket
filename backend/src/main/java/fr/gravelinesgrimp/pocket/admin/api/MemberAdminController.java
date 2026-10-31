@@ -63,6 +63,17 @@ class MemberAdminController {
         return MemberDetailResponse.from(service.changeRole(me.memberId(), id, body.role()));
     }
 
+    @PutMapping("/{id}/validation")
+    @Operation(
+            operationId = "validateMember",
+            summary = "Accept a new account as a tourist or a climber (board+, D-107)")
+    MemberDetailResponse validate(
+            @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
+            @PathVariable UUID id,
+            @Valid @RequestBody RoleChangeRequest body) {
+        return MemberDetailResponse.from(service.validate(me.memberId(), id, body.role()));
+    }
+
     @PutMapping("/{id}/status")
     @Operation(
             operationId = "changeMemberStatus",
@@ -79,8 +90,8 @@ class MemberAdminController {
     @Operation(
             operationId = "deleteMember",
             summary =
-                    "Delete an account for good (admin); its sessions stay as \"Ancien·ne"
-                            + " membre\"")
+                    "Delete an account for good (admin), or refuse one never validated (board);"
+                            + " its sessions stay as \"Ancien·ne membre\"")
     void delete(
             @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
             @PathVariable UUID id) {
