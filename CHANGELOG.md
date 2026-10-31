@@ -5,6 +5,20 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- Nouveau rôle **Touriste** pour celles et ceux qui passent grimper sans licence au club : mêmes droits qu’un
+  grimpeur GG (carnet, fil, amis, podium, badges), seule la licence change.
+- À l’inscription, une question en plus : « Tu as ta licence au club ? ». Si ce n’est pas le cas, un petit mot pour
+  dire qui tu es (« copain de Julie, je viens deux fois par an »). Seule la direction le lit, et il est effacé dès
+  que ton compte est validé.
+- La direction valide maintenant chaque nouveau compte. En attendant, ton carnet est déjà à toi (topo, séances,
+  à faire, planning), mais l’annuaire, les profils des autres, le podium et les commentaires de voies attendent
+  le feu vert. Ton profil t’explique tout ça.
+- Pour la direction : les nouveaux comptes s’affichent en tête de la liste des membres. Un clic pour lire ce qu’ils
+  ont déclaré, puis « Grimpeur GG », « Touriste », ou « Refuser » si personne ne les connaît (le compte est alors
+  supprimé). Tout est noté dans le journal.
+
 ## 0.9.0 — 2026-10-31
 
 ### Ajouté

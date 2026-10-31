@@ -66,6 +66,7 @@ class RankingIT {
         var bruno = climber("bruno");
         var hidden = climber("hidden");
         var gone = climber("gone");
+        var newcomer = members.createAwaitingValidation();
         // Days: Zazie and abel 2 each, bruno 1 (two sessions that day). Topped: bruno 5, the others
         // 2.
         sessions.log(
@@ -95,8 +96,8 @@ class RankingIT {
                 null,
                 topped(route, ClimbMode.LEAD),
                 topped(route, ClimbMode.TOP_ROPE));
-        // Out of the rankings: they would lead both.
-        for (var member : new Member[] {hidden, gone}) {
+        // Out of the rankings: they would lead both (opted out, disabled, awaiting validation).
+        for (var member : new Member[] {hidden, gone, newcomer}) {
             for (var day = 1; day <= 6; day++) {
                 sessions.log(member, month.atDay(day), null, topped(route, ClimbMode.LEAD));
             }

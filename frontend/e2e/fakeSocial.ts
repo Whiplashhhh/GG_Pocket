@@ -186,7 +186,9 @@ export class FakeSocial {
   }
 
   private active(id: string): FakeMember | undefined {
-    return this.members().find((member) => member.id === id && member.status === 'ACTIVE')
+    return this.members().find(
+      (member) => member.id === id && member.status === 'ACTIVE' && member.validated,
+    )
   }
 
   private card(member: FakeMember): Schemas['MemberCard'] {
@@ -212,7 +214,7 @@ export class FakeSocial {
 
     if (path === '/members' && method === 'GET') {
       const active = this.members()
-        .filter((member) => member.status === 'ACTIVE')
+        .filter((member) => member.status === 'ACTIVE' && member.validated)
         .sort((a, b) => a.lastName.localeCompare(b.lastName, 'fr'))
       return json({
         climberCount: active.length,

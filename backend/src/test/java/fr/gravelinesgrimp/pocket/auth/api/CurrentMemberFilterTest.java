@@ -75,8 +75,23 @@ class CurrentMemberFilterTest {
 
         assertThat(seenByTheApp.get().getAuthorities())
                 .extracting(Object::toString)
-                .containsExactly("ROLE_BOARD");
+                .containsExactly("ROLE_BOARD", "VALIDATED");
         assertThat(session.isInvalid()).isFalse();
+    }
+
+    @Test
+    void anAccountAwaitingValidationOnlyHasItsRole() throws Exception {
+        when(memberAccess.loadAndMarkSeen(MEMBER))
+                .thenReturn(
+                        Optional.of(
+                                new MemberAccess(
+                                        MEMBER, Role.TOURIST, MemberStatus.ACTIVE, false, null)));
+
+        run();
+
+        assertThat(seenByTheApp.get().getAuthorities())
+                .extracting(Object::toString)
+                .containsExactly("ROLE_TOURIST");
     }
 
     @Test
@@ -139,7 +154,7 @@ class CurrentMemberFilterTest {
 
     private void memberIs(Role role, MemberStatus status) {
         when(memberAccess.loadAndMarkSeen(MEMBER))
-                .thenReturn(Optional.of(new MemberAccess(MEMBER, role, status, null)));
+                .thenReturn(Optional.of(new MemberAccess(MEMBER, role, status, true, null)));
     }
 
     private void run() throws Exception {

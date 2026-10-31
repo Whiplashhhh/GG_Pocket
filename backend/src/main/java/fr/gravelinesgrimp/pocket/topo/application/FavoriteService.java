@@ -61,7 +61,7 @@ public class FavoriteService {
      *
      * @throws BusinessException {@code ROUTE_DISMOUNTED}, {@code FAVORITES_FULL}
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void add(UUID memberId, UUID routeId, UUID replaceRouteId) {
         lockMember(memberId);
@@ -82,7 +82,7 @@ public class FavoriteService {
     }
 
     /** Idempotent. A heart on a dismounted route stays: that route is read-only. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void remove(UUID memberId, UUID routeId) {
         loadRoute(routeId).ensureOnTheWall();
@@ -92,7 +92,7 @@ public class FavoriteService {
     }
 
     /** All my hearts, dismounted routes included, newest first. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public List<RouteSummaryView> listMine(UUID memberId) {
         return listOf(memberId, memberId);
@@ -102,7 +102,7 @@ public class FavoriteService {
      * The hearts of a member, as {@code readerId} sees them (their own heart on each route). Hearts
      * are public among members, like the rest of a profile.
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public List<RouteSummaryView> listOf(UUID memberId, UUID readerId) {
         var mine = favorites.findAllByMemberIdOrderByCreatedAtDesc(memberId);
@@ -119,7 +119,7 @@ public class FavoriteService {
     }
 
     /** "Je sais la faire" in this mode. Idempotent. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void check(UUID memberId, UUID routeId, ClimbMode mode) {
         lockMember(memberId);
@@ -135,7 +135,7 @@ public class FavoriteService {
      *
      * @throws BusinessException {@code ROUTE_DISMOUNTED}, {@code CHECK_FROM_ASCENT}
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void uncheck(UUID memberId, UUID routeId, ClimbMode mode) {
         lockMember(memberId);
@@ -149,7 +149,7 @@ public class FavoriteService {
     }
 
     /** The favourite route of my profile; a dismounted route is fine (spec §7). */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void chooseFavoriteRoute(UUID memberId, UUID routeId) {
         var member = loadMember(memberId);
@@ -157,7 +157,7 @@ public class FavoriteService {
         member.changeFavoriteRoute(routeId);
     }
 
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void clearFavoriteRoute(UUID memberId) {
         loadMember(memberId).changeFavoriteRoute(null);

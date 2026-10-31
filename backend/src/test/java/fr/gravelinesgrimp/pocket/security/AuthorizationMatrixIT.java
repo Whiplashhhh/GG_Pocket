@@ -72,17 +72,17 @@ class AuthorizationMatrixIT {
 
     private static final List<Endpoint> ENDPOINTS =
             List.of(
-                    new Endpoint(HttpMethod.GET, "/api/v1/me", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.PUT, "/api/v1/me/profile", "{}", Role.CLIMBER),
-                    new Endpoint(HttpMethod.PUT, "/api/v1/me/avatar", "{}", Role.CLIMBER),
-                    new Endpoint(HttpMethod.DELETE, "/api/v1/me/avatar", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.PUT, "/api/v1/me/password", "{}", Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/devices", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.PUT, "/api/v1/me/profile", "{}", Role.TOURIST),
+                    new Endpoint(HttpMethod.PUT, "/api/v1/me/avatar", "{}", Role.TOURIST),
+                    new Endpoint(HttpMethod.DELETE, "/api/v1/me/avatar", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.PUT, "/api/v1/me/password", "{}", Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/devices", null, Role.TOURIST),
                     new Endpoint(
-                            HttpMethod.DELETE, "/api/v1/me/devices/" + SOME_ID, null, Role.CLIMBER),
+                            HttpMethod.DELETE, "/api/v1/me/devices/" + SOME_ID, null, Role.TOURIST),
                     new Endpoint(
-                            HttpMethod.POST, "/api/v1/me/devices/close-others", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/media/" + SOME_ID, null, Role.CLIMBER),
+                            HttpMethod.POST, "/api/v1/me/devices/close-others", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/media/" + SOME_ID, null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/admin/members", null, Role.BOARD),
                     new Endpoint(
                             HttpMethod.GET, "/api/v1/admin/members/" + SOME_ID, null, Role.BOARD),
@@ -112,7 +112,7 @@ class AuthorizationMatrixIT {
                             "{\"label\": \"Affiche\", \"active\": true}",
                             Role.ADMIN),
                     // Topo (phase 3)
-                    new Endpoint(HttpMethod.GET, "/api/v1/topo/config", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/topo/config", null, Role.TOURIST),
                     new Endpoint(HttpMethod.POST, "/api/v1/admin/club/sectors", "{}", Role.ADMIN),
                     new Endpoint(
                             HttpMethod.PUT,
@@ -134,9 +134,9 @@ class AuthorizationMatrixIT {
                             "/api/v1/admin/club/hold-colors/" + SOME_ID,
                             "{}",
                             Role.ADMIN),
-                    new Endpoint(HttpMethod.GET, "/api/v1/routes", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/routes/archive", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/routes/" + SOME_ID, null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/routes", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/routes/archive", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/routes/" + SOME_ID, null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/routes/setters", null, Role.SETTER),
                     new Endpoint(HttpMethod.POST, "/api/v1/routes", ROUTE_SETTINGS, Role.SETTER),
                     new Endpoint(
@@ -179,148 +179,182 @@ class AuthorizationMatrixIT {
                             HttpMethod.GET,
                             "/api/v1/routes/last-chance/unacknowledged",
                             null,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.POST,
                             "/api/v1/routes/last-chance/acknowledgements",
                             "{\"routeIds\": [\"" + SOME_ID + "\"]}",
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.GET,
                             "/api/v1/routes/" + SOME_ID + "/comments",
                             null,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.POST,
                             "/api/v1/routes/" + SOME_ID + "/comments",
                             "{\"body\": \"Belle voie\"}",
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.DELETE,
                             "/api/v1/route-comments/" + SOME_ID,
                             null,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.PUT,
                             "/api/v1/routes/" + SOME_ID + "/favorite",
                             "{}",
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.DELETE,
                             "/api/v1/routes/" + SOME_ID + "/favorite",
                             null,
-                            Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/favorites", null, Role.CLIMBER),
+                            Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/favorites", null, Role.TOURIST),
                     new Endpoint(
                             HttpMethod.PUT,
                             "/api/v1/routes/" + SOME_ID + "/checks/LEAD",
                             null,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.DELETE,
                             "/api/v1/routes/" + SOME_ID + "/checks/TOP_ROPE",
                             null,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.PUT,
                             "/api/v1/me/favorite-route",
                             "{\"routeId\": \"" + SOME_ID + "\"}",
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
-                            HttpMethod.DELETE, "/api/v1/me/favorite-route", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.POST, "/api/v1/sessions", SESSION, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/sessions/" + SOME_ID, null, Role.CLIMBER),
+                            HttpMethod.DELETE, "/api/v1/me/favorite-route", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.POST, "/api/v1/sessions", SESSION, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/sessions/" + SOME_ID, null, Role.TOURIST),
                     new Endpoint(
-                            HttpMethod.PUT, "/api/v1/sessions/" + SOME_ID, SESSION, Role.CLIMBER),
+                            HttpMethod.PUT, "/api/v1/sessions/" + SOME_ID, SESSION, Role.TOURIST),
                     new Endpoint(
-                            HttpMethod.DELETE, "/api/v1/sessions/" + SOME_ID, null, Role.CLIMBER),
+                            HttpMethod.DELETE, "/api/v1/sessions/" + SOME_ID, null, Role.TOURIST),
                     new Endpoint(
                             HttpMethod.PUT,
                             "/api/v1/sessions/" + SOME_ID + "/photo",
                             MULTIPART,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.DELETE,
                             "/api/v1/sessions/" + SOME_ID + "/photo",
                             null,
-                            Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/sessions", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/climbed-routes", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/todo", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/planning", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/logbook", null, Role.CLIMBER),
+                            Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/sessions", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/climbed-routes", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/todo", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/planning", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/logbook", null, Role.TOURIST),
                     // Accounts and personal data (PR 4.3)
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/export", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/export", null, Role.TOURIST),
                     // An empty body: refused before the service, the account stays.
-                    new Endpoint(HttpMethod.POST, "/api/v1/me/deletion", "{}", Role.CLIMBER),
+                    new Endpoint(HttpMethod.POST, "/api/v1/me/deletion", "{}", Role.TOURIST),
                     new Endpoint(
                             HttpMethod.DELETE,
                             "/api/v1/admin/members/" + SOME_ID,
                             null,
-                            Role.ADMIN),
+                            Role.BOARD),
+                    new Endpoint(
+                            HttpMethod.PUT,
+                            "/api/v1/admin/members/" + SOME_ID + "/validation",
+                            "{\"role\": \"CLIMBER\"}",
+                            Role.BOARD),
                     // Friends (PR 5.1)
-                    new Endpoint(HttpMethod.GET, "/api/v1/members", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/members/" + SOME_ID, null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/members", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/members/" + SOME_ID, null, Role.TOURIST),
                     new Endpoint(
                             HttpMethod.GET,
                             "/api/v1/members/" + SOME_ID + "/sessions",
                             null,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.GET,
                             "/api/v1/members/" + SOME_ID + "/logbook",
                             null,
-                            Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/friends", null, Role.CLIMBER),
+                            Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/friends", null, Role.TOURIST),
                     new Endpoint(
-                            HttpMethod.PUT, "/api/v1/me/friends/" + SOME_ID, null, Role.CLIMBER),
+                            HttpMethod.PUT, "/api/v1/me/friends/" + SOME_ID, null, Role.TOURIST),
                     new Endpoint(
-                            HttpMethod.DELETE, "/api/v1/me/friends/" + SOME_ID, null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/feed", null, Role.CLIMBER),
+                            HttpMethod.DELETE, "/api/v1/me/friends/" + SOME_ID, null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/feed", null, Role.TOURIST),
                     new Endpoint(
                             HttpMethod.PUT,
                             "/api/v1/sessions/" + SOME_ID + "/reaction",
                             "{\"kind\": \"FIRE\"}",
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.DELETE,
                             "/api/v1/sessions/" + SOME_ID + "/reaction",
                             null,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.GET,
                             "/api/v1/sessions/" + SOME_ID + "/comments",
                             null,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.POST,
                             "/api/v1/sessions/" + SOME_ID + "/comments",
                             "{\"body\": \"Allez !\"}",
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.DELETE,
                             "/api/v1/session-comments/" + SOME_ID,
                             null,
-                            Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/belays", null, Role.CLIMBER),
+                            Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/belays", null, Role.TOURIST),
                     new Endpoint(
                             HttpMethod.DELETE,
                             "/api/v1/sessions/" + SOME_ID + "/belayer",
                             null,
-                            Role.CLIMBER),
+                            Role.TOURIST),
                     new Endpoint(
                             HttpMethod.GET, "/api/v1/admin/moderation/comments", null, Role.BOARD),
-                    new Endpoint(HttpMethod.GET, "/api/v1/rankings", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/rankings/months", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/rankings", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/rankings/months", null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/stats/attendance", null, Role.SETTER),
                     new Endpoint(HttpMethod.GET, "/api/v1/stats/routes", null, Role.SETTER),
-                    new Endpoint(HttpMethod.GET, "/api/v1/me/badges", null, Role.CLIMBER),
-                    new Endpoint(HttpMethod.PUT, "/api/v1/me/badges/favorites", "{}", Role.CLIMBER),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/badges", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.PUT, "/api/v1/me/badges/favorites", "{}", Role.TOURIST),
                     new Endpoint(
                             HttpMethod.GET,
                             "/api/v1/members/" + SOME_ID + "/badges",
                             null,
-                            Role.CLIMBER));
+                            Role.TOURIST));
+
+    /** What an account awaiting validation may not reach (D-107): the rest of the club. */
+    static final List<Endpoint> VALIDATED_ONLY =
+            List.of(
+                    new Endpoint(HttpMethod.GET, "/api/v1/members", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/members/" + SOME_ID, null, Role.TOURIST),
+                    new Endpoint(
+                            HttpMethod.GET,
+                            "/api/v1/members/" + SOME_ID + "/badges",
+                            null,
+                            Role.TOURIST),
+                    new Endpoint(
+                            HttpMethod.PUT, "/api/v1/me/friends/" + SOME_ID, null, Role.TOURIST),
+                    new Endpoint(
+                            HttpMethod.POST,
+                            "/api/v1/routes/" + SOME_ID + "/comments",
+                            "{\"body\": \"Belle voie\"}",
+                            Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/rankings", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/rankings/months", null, Role.TOURIST));
+
+    /** And what it keeps: its own logbook. */
+    static final List<Endpoint> OWN_LOGBOOK =
+            List.of(
+                    new Endpoint(HttpMethod.GET, "/api/v1/me", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/sessions", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/friends", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/feed", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/badges", null, Role.TOURIST));
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;
@@ -348,6 +382,44 @@ class AuthorizationMatrixIT {
         } else {
             assertThat(status).as("allowed").isNotIn(401, 403).isLessThan(500);
         }
+    }
+
+    static Stream<Endpoint> validatedOnly() {
+        return VALIDATED_ONLY.stream();
+    }
+
+    static Stream<Endpoint> ownLogbook() {
+        return OWN_LOGBOOK.stream();
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("validatedOnly")
+    void anAccountAwaitingValidationStaysOutOfTheClub(Endpoint endpoint) throws Exception {
+        var status =
+                mockMvc.perform(awaitingValidation(endpoint)).andReturn().getResponse().getStatus();
+
+        assertThat(status).isEqualTo(403);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("ownLogbook")
+    void anAccountAwaitingValidationKeepsItsOwnLogbook(Endpoint endpoint) throws Exception {
+        var status =
+                mockMvc.perform(awaitingValidation(endpoint)).andReturn().getResponse().getStatus();
+
+        assertThat(status).isNotIn(401, 403).isLessThan(500);
+    }
+
+    private RequestBuilder awaitingValidation(Endpoint endpoint) {
+        var request =
+                request(endpoint.method(), endpoint.path())
+                        .with(xsrf())
+                        .with(MemberFixtures.freshAddress())
+                        .with(MemberFixtures.as(members.createAwaitingValidation()));
+        if (endpoint.body() != null) {
+            request.contentType(MediaType.APPLICATION_JSON).content(endpoint.body());
+        }
+        return request;
     }
 
     private RequestBuilder build(Endpoint endpoint, Role caller) {

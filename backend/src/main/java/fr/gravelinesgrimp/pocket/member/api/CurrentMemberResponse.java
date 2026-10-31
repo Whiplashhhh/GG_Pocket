@@ -15,6 +15,12 @@ public record CurrentMemberResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) String firstName,
         @Schema(requiredMode = RequiredMode.REQUIRED) String lastName,
         @Schema(requiredMode = RequiredMode.REQUIRED) Role role,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description =
+                                "False while the board has not validated the account: the member"
+                                        + " only has their own logbook until then")
+                boolean validated,
         @Schema(description = "Profile photo, absent when the member has none") String avatarUrl) {
 
     public static CurrentMemberResponse from(CurrentMemberView view) {
@@ -24,6 +30,7 @@ public record CurrentMemberResponse(
                 view.firstName(),
                 view.lastName(),
                 view.role(),
+                view.validated(),
                 MediaUrls.of(view.avatarId()));
     }
 }

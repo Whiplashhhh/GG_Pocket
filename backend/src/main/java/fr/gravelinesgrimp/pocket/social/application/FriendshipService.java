@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.social.application;
 
+import fr.gravelinesgrimp.pocket.member.application.ValidatedMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
@@ -53,7 +54,7 @@ public class FriendshipService {
      * @throws BusinessException {@code VALIDATION_FAILED} (myself), {@code NOT_FOUND}, {@code
      *     RATE_LIMITED}
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @ValidatedMember
     @Transactional
     public FriendshipState befriend(UUID me, UUID otherId) {
         if (me.equals(otherId)) {
@@ -76,14 +77,14 @@ public class FriendshipService {
      * Declines their request, cancels mine, or ends our friendship: whatever there is between us
      * goes. Nothing between us is fine too.
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void unfriend(UUID me, UUID otherId) {
         friendships.findBetween(me, otherId).ifPresent(friendships::delete);
     }
 
     /** Only active members show: a disabled friend comes back when their account does. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public FriendsView overview(UUID me) {
         var mine = friendships.findAllOf(me);
@@ -122,7 +123,7 @@ public class FriendshipService {
         var first = members.lockById(meFirst ? me : otherId);
         var second = members.lockById(meFirst ? otherId : me);
         var other = meFirst ? second : first;
-        if (other.filter(Member::isActive).isEmpty()) {
+        if (other.filter(Member::isVisibleInClub).isEmpty()) {
             throw new BusinessException(ErrorCode.NOT_FOUND, "No member");
         }
     }

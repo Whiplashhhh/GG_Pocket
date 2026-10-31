@@ -19,6 +19,15 @@ public record MemberSummaryResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) String lastName,
         @Schema(requiredMode = RequiredMode.REQUIRED) Role role,
         @Schema(requiredMode = RequiredMode.REQUIRED) MemberStatus status,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description = "False while the board has not validated the account")
+                boolean validated,
+        @Schema(
+                        description =
+                                "Licensed at the club, as declared at sign-up; absent for accounts"
+                                        + " that never went through it")
+                Boolean declaredLicensed,
         String avatarUrl,
         @Schema(requiredMode = RequiredMode.REQUIRED) Instant registeredAt,
         @Schema(description = "Roughly, to the hour; absent if never seen since registration")
@@ -34,6 +43,8 @@ public record MemberSummaryResponse(
                 view.lastName(),
                 view.role(),
                 view.status(),
+                view.validated(),
+                view.declaredLicensed(),
                 MediaUrls.of(view.avatarId()),
                 view.createdAt(),
                 view.lastSeenAt(),

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/vue-query'
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 
+import { useAwaitingValidation } from './auth'
 import { api } from './client'
 import { request } from './request'
 import type { components } from './schema'
@@ -17,6 +18,7 @@ const RANKING_MONTHS_KEY = [...RANKINGS_KEY, 'months'] as const
 
 /** One month of the podium (spec §8.7): both rankings and my lines. */
 export function useRanking(month: MaybeRefOrGetter<string>) {
+  const awaiting = useAwaitingValidation()
   return useQuery({
     queryKey: computed(() => [...RANKINGS_KEY, toValue(month)] as const),
     queryFn: ({ signal }) =>
@@ -24,13 +26,17 @@ export function useRanking(month: MaybeRefOrGetter<string>) {
         api.GET('/api/v1/rankings', { params: { query: { month: toValue(month) } }, signal }),
       ),
     placeholderData: (previous) => previous,
+    // Closed until the board validates my account (D-107).
+    enabled: computed(() => !awaiting.value),
   })
 }
 
 /** The months that have rankings, this one first. */
 export function useRankingMonths() {
+  const awaiting = useAwaitingValidation()
   return useQuery({
     queryKey: RANKING_MONTHS_KEY,
     queryFn: ({ signal }) => request(api.GET('/api/v1/rankings/months', { signal })),
+    enabled: computed(() => !awaiting.value),
   })
 }

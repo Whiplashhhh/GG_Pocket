@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.ranking.application;
 
+import fr.gravelinesgrimp.pocket.member.application.ValidatedMember;
 import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
@@ -12,7 +13,6 @@ import fr.gravelinesgrimp.pocket.ranking.infra.MonthlyRankingRepository;
 import fr.gravelinesgrimp.pocket.session.domain.PlanningMonth;
 import fr.gravelinesgrimp.pocket.session.domain.SessionCalendar;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +50,7 @@ public class RankingService {
     }
 
     /** The months that have rankings, from this one back to the first climbed one. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @ValidatedMember
     @Transactional(readOnly = true)
     public List<RankingView.Month> months() {
         var now = clock.instant();
@@ -73,7 +73,7 @@ public class RankingService {
      * @throws fr.gravelinesgrimp.pocket.platform.domain.BusinessException {@code VALIDATION_FAILED}
      *     for a malformed or future month
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @ValidatedMember
     @Transactional(readOnly = true)
     public RankingView of(UUID memberId, String month) {
         var now = clock.instant();

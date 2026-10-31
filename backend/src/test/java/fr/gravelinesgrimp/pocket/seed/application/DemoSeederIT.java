@@ -66,7 +66,19 @@ class DemoSeederIT {
                         tuple("admin", Role.ADMIN),
                         tuple("direction", Role.BOARD),
                         tuple("ouvreur", Role.SETTER),
-                        tuple("grimpeur", Role.CLIMBER));
+                        tuple("grimpeur", Role.CLIMBER),
+                        tuple("touriste", Role.TOURIST),
+                        tuple("nouveau", Role.TOURIST));
+        assertThat(members.findByNicknameIgnoreCase("nouveau"))
+                .get()
+                .satisfies(
+                        member -> {
+                            assertThat(member.isValidated()).isFalse();
+                            assertThat(member.joinNote()).isNotBlank();
+                        });
+        assertThat(members.findByNicknameIgnoreCase("touriste"))
+                .get()
+                .satisfies(member -> assertThat(member.isValidated()).isTrue());
         assertThat(members.findByNicknameIgnoreCase("grimpeur"))
                 .get()
                 .satisfies(
@@ -174,7 +186,7 @@ class DemoSeederIT {
         assertThat(friendships.count()).isEqualTo(friendshipsBefore);
         assertThat(reactions.count()).isEqualTo(reactionsBefore);
         assertThat(sessionComments.count()).isEqualTo(commentsBefore);
-        assertThat(members.countMembers()).isEqualTo(4);
+        assertThat(members.countMembers()).isEqualTo(DemoSeeder.ACCOUNTS.size());
         assertThat(routes.count()).isEqualTo(DemoTopoSeeder.NAMES.size());
         assertThat(sessions.count()).isEqualTo(before);
     }

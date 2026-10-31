@@ -6,6 +6,7 @@ import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -18,6 +19,7 @@ import fr.gravelinesgrimp.pocket.IntegrationTest;
 import fr.gravelinesgrimp.pocket.MemberFixtures;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
+import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,7 @@ class MemberAdminIT {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;
+    @Autowired private MemberRepository memberRepository;
 
     @Test
     void theBoardSeesTheMembersTable() throws Exception {
@@ -52,7 +55,10 @@ class MemberAdminIT {
                 .andExpect(jsonPath("$.member.nickname").value(climber.nickname()))
                 .andExpect(jsonPath("$.birthDate").doesNotExist())
                 .andExpect(jsonPath("$.underFifteenWithParentalConsent").value(false))
-                .andExpect(jsonPath("$.permissions.assignableRoles[0]").value("SETTER"))
+                .andExpect(jsonPath("$.permissions.assignableRoles[0]").value("TOURIST"))
+                .andExpect(jsonPath("$.permissions.assignableRoles[1]").value("SETTER"))
+                .andExpect(jsonPath("$.permissions.canValidate").value(false))
+                .andExpect(jsonPath("$.permissions.canDelete").value(false))
                 .andExpect(jsonPath("$.permissions.canDisable").value(true))
                 .andExpect(jsonPath("$.permissions.canCreateResetLink").value(true));
     }
@@ -222,6 +228,114 @@ class MemberAdminIT {
     }
 
     @Test
+    void theBoardSeesANewAccountWithWhatItDeclared() throws Exception {
+        var board = members.create(Role.BOARD);
+        var newcomer = members.createAwaitingValidation();
+
+        mockMvc.perform(get("/api/v1/admin/members").with(as(board)))
+                .andExpect(status().isOk())
+                .andExpect(
+                        jsonPath(
+                                        "$[?(@.nickname == '%s')].validated"
+                                                .formatted(newcomer.nickname()))
+                                .value(hasItem(false)))
+                .andExpect(
+                        jsonPath(
+                                        "$[?(@.nickname == '%s')].declaredLicensed"
+                                                .formatted(newcomer.nickname()))
+                                .value(hasItem(false)));
+        mockMvc.perform(get("/api/v1/admin/members/" + newcomer.id()).with(as(board)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.member.role").value("TOURIST"))
+                .andExpect(jsonPath("$.joinNote").value("Ami de Lou, je viens l'été."))
+                .andExpect(jsonPath("$.permissions.canValidate").value(true))
+                .andExpect(jsonPath("$.permissions.canDelete").value(true))
+                .andExpect(jsonPath("$.permissions.assignableRoles").isEmpty());
+    }
+
+    @Test
+    void theBoardValidatesALicensedClimberAndTheNoteIsErased() throws Exception {
+        var board = members.create(Role.BOARD);
+        var newcomer = members.createAwaitingValidation();
+
+        validate(board, newcomer, Role.CLIMBER)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.member.role").value("CLIMBER"))
+                .andExpect(jsonPath("$.member.validated").value(true))
+                .andExpect(jsonPath("$.joinNote").doesNotExist())
+                .andExpect(jsonPath("$.permissions.canValidate").value(false))
+                .andExpect(jsonPath("$.permissions.canDelete").value(false));
+        validate(board, newcomer, Role.TOURIST)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MEMBER_ALREADY_VALIDATED"));
+        mockMvc.perform(get("/api/v1/admin/audit").param("size", "5").with(as(board)))
+                .andExpect(
+                        jsonPath(
+                                        "$.entries[?(@.targetLabel == '%s')].action"
+                                                .formatted(newcomer.nickname()))
+                                .value(hasItem("MEMBER_VALIDATED")));
+    }
+
+    @Test
+    void aNewAccountOpensUpToTheClubOnceValidated() throws Exception {
+        var board = members.create(Role.BOARD);
+        var newcomer = members.createAwaitingValidation();
+        mockMvc.perform(get("/api/v1/members").with(as(newcomer)))
+                .andExpect(status().isForbidden());
+
+        validate(board, newcomer, Role.TOURIST).andExpect(status().isOk());
+
+        var validated = memberRepository.findById(newcomer.id()).orElseThrow();
+        mockMvc.perform(get("/api/v1/members").with(as(validated))).andExpect(status().isOk());
+    }
+
+    @Test
+    void aNewAccountBecomesATouristOrAClimberNothingElse() throws Exception {
+        var admin = members.create(Role.ADMIN);
+        var newcomer = members.createAwaitingValidation();
+
+        validate(admin, newcomer, Role.SETTER)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+        changeRole(admin, newcomer, Role.CLIMBER)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MEMBER_AWAITING_VALIDATION"));
+    }
+
+    @Test
+    void theBoardRefusesAnAccountItDoesNotRecogniseButDeletesNoOneElse() throws Exception {
+        var board = members.create(Role.BOARD);
+        var stranger = members.createAwaitingValidation();
+        var tourist = members.create(Role.TOURIST);
+
+        mockMvc.perform(
+                        delete("/api/v1/admin/members/" + stranger.id())
+                                .with(as(board))
+                                .with(xsrf()))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(get("/api/v1/admin/members/" + stranger.id()).with(as(board)))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(
+                        delete("/api/v1/admin/members/" + tourist.id())
+                                .with(as(board))
+                                .with(xsrf()))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/v1/admin/audit").param("size", "5").with(as(board)))
+                .andExpect(
+                        jsonPath(
+                                        "$.entries[?(@.targetLabel == '%s')].action"
+                                                .formatted(stranger.nickname()))
+                                .value(hasItem("MEMBER_REFUSED")));
+    }
+
+    @Test
+    void aClimberCannotValidateAnyone() throws Exception {
+        var newcomer = members.createAwaitingValidation();
+        validate(members.create(Role.CLIMBER), newcomer, Role.CLIMBER)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void everyChangeIsInTheAuditLog() throws Exception {
         var admin = members.create(Role.ADMIN);
         var climber = members.create(Role.CLIMBER);
@@ -271,6 +385,15 @@ class MemberAdminIT {
     private ResultActions changeRole(Member actor, Member target, Role role) throws Exception {
         return mockMvc.perform(
                 put("/api/v1/admin/members/" + target.id() + "/role")
+                        .with(as(actor))
+                        .with(xsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"role\": \"%s\"}".formatted(role)));
+    }
+
+    private ResultActions validate(Member actor, Member target, Role role) throws Exception {
+        return mockMvc.perform(
+                put("/api/v1/admin/members/" + target.id() + "/validation")
                         .with(as(actor))
                         .with(xsrf())
                         .contentType(MediaType.APPLICATION_JSON)

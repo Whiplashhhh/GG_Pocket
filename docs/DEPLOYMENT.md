@@ -111,7 +111,8 @@ Le déploiement attend ton approbation (Actions → le run → *Review deploymen
 démarrage, attente des healthchecks, test de fumée (`/api/v1/meta` doit annoncer le bon commit), retour automatique
 à la version précédente sinon.
 
-Comptes de test du dev : `admin`, `direction`, `ouvreur`, `grimpeur`, mot de passe commun lisible par Willem :
+Comptes de test du dev : `admin`, `direction`, `ouvreur`, `grimpeur`, `touriste`, et `nouveau` (compte en attente de
+validation, D-107), mot de passe commun lisible par Willem :
 `sudo grep GG_SEED_PASSWORD /opt/gg-pocket/dev/.env`. Le bandeau « DEV » s'affiche en haut de l'appli.
 
 ### Fermer davantage le dev (optionnel)

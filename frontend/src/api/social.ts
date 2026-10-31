@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 
+import { useAwaitingValidation } from './auth'
 import { api } from './client'
 import { request, requestNoContent } from './request'
 import type { components } from './schema'
@@ -24,9 +25,12 @@ const PAGE_SIZE = 10
 
 /** The club directory: every active member but me, and the climber count of the feed header. */
 export function useDirectory() {
+  const awaiting = useAwaitingValidation()
   return useQuery({
     queryKey: MEMBERS_KEY,
     queryFn: ({ signal }) => request(api.GET('/api/v1/members', { signal })),
+    // Closed until the board validates my account (D-107): no point asking for a refusal.
+    enabled: computed(() => !awaiting.value),
   })
 }
 

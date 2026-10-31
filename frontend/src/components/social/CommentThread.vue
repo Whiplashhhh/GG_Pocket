@@ -3,9 +3,11 @@ import { Trash2 } from 'lucide-vue-next'
 import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { useAwaitingValidation } from '@/api/auth'
 import { errorMessageKey } from '@/api/errors'
 import { useAddSessionComment, useDeleteSessionComment, useSessionComments } from '@/api/feed'
 import { useAddComment, useDeleteComment, useRouteComments, type RouteComment } from '@/api/topo'
+import AwaitingValidationNotice from '@/components/member/AwaitingValidationNotice.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
@@ -17,7 +19,8 @@ import { formatDateTime, formatRelative } from '@/lib/format'
 /**
  * Comments of a route sheet or of a session: oldest first, mine (or anyone's for the board, as the
  * server says with `deletable`) can be deleted. A dismounted route takes no new comment, but its
- * comments can still be deleted (D-081). The target never changes for a given thread.
+ * comments can still be deleted (D-081). An account awaiting validation reads a route's comments
+ * but does not post any: everyone would see it (D-107). The target never changes for a given thread.
  */
 const props = defineProps<{
   target: { kind: 'route' | 'session'; id: string }
@@ -45,6 +48,8 @@ const { comments, add, remove } =
         remove: useDeleteSessionComment(targetId),
       }
 
+const awaiting = useAwaitingValidation()
+const closedToMe = computed(() => awaiting.value && props.target.kind === 'route')
 const headingId = useId()
 const fieldId = useId()
 const body = ref('')
@@ -172,8 +177,13 @@ function confirmDelete() {
       {{ notice }}
     </p>
 
+    <AwaitingValidationNotice
+      v-if="!readOnly && closedToMe"
+      class="mx-4 mt-4"
+      :body="t('awaiting.comments')"
+    />
     <form
-      v-if="!readOnly"
+      v-else-if="!readOnly"
       class="flex flex-col gap-1.5 px-4 pt-4"
       novalidate
       @submit.prevent="submit"

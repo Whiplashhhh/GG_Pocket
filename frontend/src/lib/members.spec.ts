@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { MemberSummary } from '@/api/admin'
 
-import { filterMembers, sortMembers } from './members'
+import { awaitingValidation, filterMembers, sortMembers } from './members'
 
 const member = (
   id: string,
@@ -16,6 +16,7 @@ const member = (
   nickname: firstName.toLowerCase(),
   role: 'CLIMBER',
   status: 'ACTIVE',
+  validated: true,
   registeredAt: '2026-01-01T10:00:00Z',
   sessionCount: 0,
   ...overrides,
@@ -66,5 +67,23 @@ describe('sortMembers', () => {
     expect(sortMembers(MEMBERS, 'sessionCount', 'desc').map((m) => m.id)).toEqual(['3', '1', '2'])
     const tied = [...MEMBERS, member('4', 'Anne', 'Aaron')]
     expect(sortMembers(tied, 'sessionCount', 'asc').map((m) => m.id)).toEqual(['4', '2', '1', '3'])
+  })
+})
+
+describe('awaitingValidation', () => {
+  it('keeps the new accounts only, the longest waiting first', () => {
+    const later = member('4', 'Alix', 'Moreau', {
+      role: 'TOURIST',
+      validated: false,
+      registeredAt: '2026-10-30T18:00:00Z',
+    })
+    const earlier = member('5', 'Eli', 'Garnier', {
+      role: 'TOURIST',
+      validated: false,
+      registeredAt: '2026-10-28T09:00:00Z',
+    })
+
+    expect(awaitingValidation([...MEMBERS, later, earlier]).map((m) => m.id)).toEqual(['5', '4'])
+    expect(awaitingValidation(MEMBERS)).toEqual([])
   })
 })

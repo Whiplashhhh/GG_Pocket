@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useCheckRegistrationCode, useRegister } from '@/api/auth'
 import DoorHeader from '@/components/auth/DoorHeader.vue'
+import LicenceQuestion from '@/components/auth/LicenceQuestion.vue'
 import CheckboxField from '@/components/ui/CheckboxField.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
@@ -12,6 +13,7 @@ import PasswordField from '@/components/ui/PasswordField.vue'
 import TextField from '@/components/ui/TextField.vue'
 import { clubToday, needsParentalConsent } from '@/lib/age'
 import {
+  codePointLength,
   EMAIL_PATTERN,
   focusFirstInvalid,
   NICKNAME_PATTERN,
@@ -23,7 +25,8 @@ import {
 
 /**
  * Spec §6: the club code first (shown at the gym), then one short page. The code can arrive in
- * the link (?code=…), as shared by the club.
+ * the link (?code=…), as shared by the club. The page asks whether the person is licensed at the
+ * club and, if not, who they are to it: the board reads it before validating the account (D-107).
  */
 const FIELDS = [
   'code',
@@ -34,6 +37,8 @@ const FIELDS = [
   'password',
   'birthDate',
   'parentalConsent',
+  'licensed',
+  'joinNote',
   'privacyAccepted',
 ] as const
 type Field = (typeof FIELDS)[number]
@@ -54,6 +59,8 @@ const form = reactive({
   password: '',
   birthDate: '',
   parentalConsent: false,
+  licensed: null as boolean | null,
+  joinNote: '',
   privacyAccepted: false,
   rememberMe: true,
 })
@@ -113,6 +120,9 @@ function validate(): FieldErrors<Field> {
     found.birthDate = { key: 'validation.dateInFuture' }
   if (minor.value && !form.parentalConsent)
     found.parentalConsent = { key: 'validation.parentalConsent' }
+  if (form.licensed === null) found.licensed = { key: 'validation.licence' }
+  if (form.licensed === false && codePointLength(form.joinNote.trim()) < 10)
+    found.joinNote = { key: 'validation.joinNote' }
   if (!form.privacyAccepted) found.privacyAccepted = { key: 'validation.privacy' }
   return found
 }
@@ -134,6 +144,8 @@ function submitForm() {
       password: form.password,
       birthDate: form.birthDate === '' ? undefined : form.birthDate,
       parentalConsent: minor.value && form.parentalConsent,
+      licensed: form.licensed === true,
+      joinNote: form.licensed === false ? form.joinNote.trim() : undefined,
       privacyAccepted: form.privacyAccepted,
       rememberMe: form.rememberMe,
     },
@@ -248,6 +260,12 @@ function submitForm() {
       >
         {{ t('register.parentalConsent') }}
       </CheckboxField>
+      <LicenceQuestion
+        v-model:licensed="form.licensed"
+        v-model:join-note="form.joinNote"
+        :licence-error="message('licensed')"
+        :note-error="message('joinNote')"
+      />
       <CheckboxField v-model="form.privacyAccepted" :error="message('privacyAccepted')">
         <I18nT keypath="register.privacy" tag="span" scope="global">
           <template #link>
@@ -259,6 +277,7 @@ function submitForm() {
       </CheckboxField>
       <CheckboxField v-model="form.rememberMe">{{ t('register.rememberMe') }}</CheckboxField>
 
+      <p class="text-sm text-ink-muted">{{ t('register.validationNotice') }}</p>
       <GgButton type="submit" size="lg" block :disabled="register.isPending.value">
         {{ t('register.submit') }}
       </GgButton>

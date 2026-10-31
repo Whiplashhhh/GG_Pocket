@@ -27,7 +27,7 @@ public class RegistrationCode extends TimestampedEntity {
     @Column(nullable = false, length = 80)
     private String label;
 
-    /** CLIMBER for club codes; ADMIN only for the first-start code. */
+    /** TOURIST for club codes (D-107); ADMIN only for the first-start code. */
     @Enumerated(EnumType.STRING)
     @Column(name = "granted_role", nullable = false, updatable = false, length = 16)
     private Role grantedRole;

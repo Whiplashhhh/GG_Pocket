@@ -62,7 +62,7 @@ public class LastChanceService {
     }
 
     /** What the pop-up lists: routes in last chance I have not acknowledged yet. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public List<RouteSummaryView> listUnacknowledged(UUID memberId) {
         var pending =
@@ -77,7 +77,7 @@ public class LastChanceService {
      * Records that I saw these routes. Ids of routes no longer in last chance are ignored (the
      * pop-up may be a little late); already acknowledged ones too.
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void acknowledge(UUID memberId, List<UUID> routeIds) {
         // One request at a time per member: no duplicate acknowledgement.

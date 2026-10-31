@@ -63,7 +63,7 @@ public class RouteService {
     }
 
     /** Routes on the wall (active and last chance), easiest first. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public List<RouteSummaryView> listOnTheWall(UUID readerId) {
         var onTheWall =
@@ -75,7 +75,7 @@ public class RouteService {
     }
 
     /** The archive: dismounted routes, most recently dismounted first. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public List<RouteSummaryView> listDismounted(UUID readerId) {
         var dismounted = routes.findAllWithStylesByStatusIn(List.of(RouteStatus.DISMOUNTED));
@@ -85,7 +85,7 @@ public class RouteService {
     }
 
     /** Any route, dismounted ones included. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public RouteDetailView get(UUID readerId, UUID routeId) {
         return views.detail(load(routeId), readerId);

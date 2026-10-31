@@ -13,6 +13,11 @@ public record MemberDetailResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) MemberSummaryResponse member,
         String email,
         @Schema(
+                        description =
+                                "Who a person not licensed is to the club, until the board decides"
+                                        + " on the account")
+                String joinNote,
+        @Schema(
                         requiredMode = RequiredMode.REQUIRED,
                         description = "Under 15, with a parental consent declared (no birth date)")
                 boolean underFifteenWithParentalConsent,
@@ -28,14 +33,21 @@ public record MemberDetailResponse(
             @Schema(requiredMode = RequiredMode.REQUIRED) boolean canCreateResetLink,
             @Schema(
                             requiredMode = RequiredMode.REQUIRED,
-                            description = "Delete the account for good (admin, not oneself)")
-                    boolean canDelete) {}
+                            description =
+                                    "Delete the account for good (admin, not oneself), or refuse"
+                                            + " an account never validated (board)")
+                    boolean canDelete,
+            @Schema(
+                            requiredMode = RequiredMode.REQUIRED,
+                            description = "Validate this new account as a tourist or a climber")
+                    boolean canValidate) {}
 
     static MemberDetailResponse from(MemberDetailView view) {
         var permissions = view.permissions();
         return new MemberDetailResponse(
                 MemberSummaryResponse.from(view.summary()),
                 view.email(),
+                view.joinNote(),
                 view.underFifteenWithParentalConsent(),
                 view.clubArrivalYear(),
                 view.climbingSinceYear(),
@@ -44,6 +56,7 @@ public record MemberDetailResponse(
                         permissions.canDisable(),
                         permissions.canEnable(),
                         permissions.canCreateResetLink(),
-                        permissions.canDelete()));
+                        permissions.canDelete(),
+                        permissions.canValidate()));
     }
 }

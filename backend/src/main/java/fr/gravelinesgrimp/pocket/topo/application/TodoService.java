@@ -41,7 +41,7 @@ public class TodoService {
     }
 
     /** Routes easiest first, like the topo. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public TodoView of(UUID memberId) {
         var onTheWall =

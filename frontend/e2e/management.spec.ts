@@ -66,8 +66,9 @@ test.describe('the board', () => {
     await page.getByRole('link', { name: /Talon/ }).first().click()
 
     await expect(page.getByRole('heading', { level: 1, name: 'Tonton Talon' })).toBeVisible()
-    // The board only hands out the setter role.
+    // The board switches between tourist and climber and hands out the setter role, no more.
     await expect(page.getByLabel('Choisir le rôle').locator('option')).toHaveText([
+      'Touriste',
       'Grimpeur·se',
       'Ouvreur·se',
     ])

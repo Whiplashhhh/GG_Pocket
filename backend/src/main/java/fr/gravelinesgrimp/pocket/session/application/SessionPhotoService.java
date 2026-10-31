@@ -51,7 +51,7 @@ public class SessionPhotoService {
      * @throws fr.gravelinesgrimp.pocket.platform.domain.BusinessException {@code NOT_FOUND}, {@code
      *     MONTH_FROZEN}, {@code IMAGE_UNSUPPORTED}, {@code IMAGE_TOO_LARGE}, {@code RATE_LIMITED}
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public SessionView replace(UUID memberId, UUID sessionId, byte[] upload) {
         var session = sessions.load(memberId, sessionId);
@@ -68,7 +68,7 @@ public class SessionPhotoService {
     }
 
     /** Idempotent. */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void remove(UUID memberId, UUID sessionId) {
         var session = sessions.load(memberId, sessionId);

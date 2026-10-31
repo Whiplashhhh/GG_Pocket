@@ -105,6 +105,21 @@ class BelayIT {
     }
 
     @Test
+    void anAccountAwaitingValidationNeitherNamesNorIsNamedAsABelayer() throws Exception {
+        var climber = members.create(Role.CLIMBER);
+        var newcomer = members.createAwaitingValidation();
+        var route = route();
+
+        save(climber, ascent(route, newcomer.id()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+        save(newcomer, ascent(route, climber.id()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MEMBER_AWAITING_VALIDATION"));
+        save(newcomer, ascent(route, null)).andExpect(status().isCreated());
+    }
+
+    @Test
     void aDisabledBelayerDropsOutOfSight() throws Exception {
         var me = members.create(Role.CLIMBER);
         var belayer = members.create(Role.CLIMBER);

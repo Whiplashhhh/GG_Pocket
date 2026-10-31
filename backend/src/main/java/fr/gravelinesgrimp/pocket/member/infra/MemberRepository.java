@@ -40,7 +40,8 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     /** Read on every authenticated request: keep it to a handful of columns. */
     @Query(
             "select new fr.gravelinesgrimp.pocket.member.domain.MemberAccess("
-                    + "m.id, m.role, m.status, m.lastSeenAt) from Member m where m.id = :id")
+                    + "m.id, m.role, m.status, (m.validatedAt is not null), m.lastSeenAt)"
+                    + " from Member m where m.id = :id")
     Optional<MemberAccess> findAccess(UUID id);
 
     @Modifying

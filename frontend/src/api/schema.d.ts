@@ -168,7 +168,7 @@ export interface paths {
     get: operations['getMember']
     put?: never
     post?: never
-    /** Delete an account for good (admin); its sessions stay as "Ancien·ne membre" */
+    /** Delete an account for good (admin), or refuse one never validated (board); its sessions stay as "Ancien·ne membre" */
     delete: operations['deleteMember']
     options?: never
     head?: never
@@ -219,6 +219,23 @@ export interface paths {
     get?: never
     /** Disable (closes all sessions) or enable an account */
     put: operations['changeMemberStatus']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/admin/members/{id}/validation': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Accept a new account as a tourist or a climber (board+, D-107) */
+    put: operations['validateMember']
     post?: never
     delete?: never
     options?: never
@@ -1439,7 +1456,9 @@ export interface components {
         | 'MEMBER_ROLE_CHANGED'
         | 'MEMBER_DISABLED'
         | 'MEMBER_ENABLED'
+        | 'MEMBER_VALIDATED'
         | 'MEMBER_DELETED'
+        | 'MEMBER_REFUSED'
         | 'PASSWORD_RESET_LINK_CREATED'
         | 'REGISTRATION_CODE_CREATED'
         | 'REGISTRATION_CODE_UPDATED'
@@ -1649,7 +1668,9 @@ export interface components {
       lastName: string
       nickname: string
       /** @enum {string} */
-      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      role: 'TOURIST' | 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      /** @description False while the board has not validated the account: the member only has their own logbook until then */
+      validated: boolean
     }
     /** @description An open session of the member ("Mes appareils"). */
     Device: {
@@ -1970,7 +1991,7 @@ export interface components {
       lastName: string
       nickname: string
       /** @enum {string} */
-      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      role: 'TOURIST' | 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
       /**
        * @description Years at the club (spec §9.4); absent without a year of arrival
        * @enum {string}
@@ -1984,18 +2005,22 @@ export interface components {
       /** Format: int32 */
       clubArrivalYear?: number
       email?: string
+      /** @description Who a person not licensed is to the club, until the board decides on the account */
+      joinNote?: string
       member: components['schemas']['MemberSummary']
       permissions: components['schemas']['MemberPermissions']
       /** @description Under 15, with a parental consent declared (no birth date) */
       underFifteenWithParentalConsent: boolean
     }
     MemberPermissions: {
-      assignableRoles: ('CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN')[]
+      assignableRoles: ('TOURIST' | 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN')[]
       canCreateResetLink: boolean
-      /** @description Delete the account for good (admin, not oneself) */
+      /** @description Delete the account for good (admin, not oneself), or refuse an account never validated (board) */
       canDelete: boolean
       canDisable: boolean
       canEnable: boolean
+      /** @description Validate this new account as a tourist or a climber */
+      canValidate: boolean
     }
     /** @description age is absent unless the member chose to show it. */
     MemberProfile: {
@@ -2020,6 +2045,8 @@ export interface components {
     /** @description A line of the members table. */
     MemberSummary: {
       avatarUrl?: string
+      /** @description Licensed at the club, as declared at sign-up; absent for accounts that never went through it */
+      declaredLicensed?: boolean
       firstName: string
       /** Format: uuid */
       id: string
@@ -2033,7 +2060,7 @@ export interface components {
       /** Format: date-time */
       registeredAt: string
       /** @enum {string} */
-      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      role: 'TOURIST' | 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
       /**
        * Format: int64
        * @description Sessions logged, ever
@@ -2041,6 +2068,8 @@ export interface components {
       sessionCount: number
       /** @enum {string} */
       status: 'ACTIVE' | 'DISABLED'
+      /** @description False while the board has not validated the account */
+      validated: boolean
     }
     /** @description What is running on the server. */
     Meta: {
@@ -2151,7 +2180,7 @@ export interface components {
       /** @description A parent or legal guardian agreed (declared under 15) */
       parentalConsent: boolean
       /** @enum {string} */
-      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      role: 'TOURIST' | 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
       /**
        * @description Years at the club (spec §9.4); absent without a year of arrival
        * @enum {string}
@@ -2293,7 +2322,11 @@ export interface components {
       /** Format: email */
       email?: string
       firstName: string
+      /** @description Who the person is to the club, required (10 to 300 characters) when not licensed; ignored otherwise */
+      joinNote?: string
       lastName: string
+      /** @description Licensed at the club, as declared by the person */
+      licensed: boolean
       nickname: string
       /** @description Required when the birth date says under 15 */
       parentalConsent?: boolean
@@ -2337,7 +2370,7 @@ export interface components {
     }
     RoleChange: {
       /** @enum {string} */
-      role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+      role: 'TOURIST' | 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
     }
     /** @description A route and its ascents over a period. */
     RouteAttendance: {
@@ -3090,6 +3123,32 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['StatusChange']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MemberDetail']
+        }
+      }
+    }
+  }
+  validateMember: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoleChange']
       }
     }
     responses: {

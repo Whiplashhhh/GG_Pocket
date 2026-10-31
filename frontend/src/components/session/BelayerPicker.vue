@@ -3,8 +3,10 @@ import { Check, UserX } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { useAwaitingValidation } from '@/api/auth'
 import { errorMessageKey } from '@/api/errors'
 import { useDirectory, type MemberCard } from '@/api/social'
+import AwaitingValidationNotice from '@/components/member/AwaitingValidationNotice.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgDialog from '@/components/ui/GgDialog.vue'
 import GgButton from '@/components/ui/GgButton.vue'
@@ -23,6 +25,7 @@ const open = defineModel<boolean>('open', { required: true })
 
 const { t } = useI18n()
 const directory = useDirectory()
+const awaiting = useAwaitingValidation()
 const search = ref('')
 const choices = computed(() => belayerChoices(directory.data.value?.members ?? [], search.value))
 const searching = computed(() => search.value.trim() !== '')
@@ -84,7 +87,8 @@ const row =
         <Check v-if="props.selectedId === null" :size="20" aria-hidden="true" />
       </button>
 
-      <div v-if="directory.isPending.value" class="flex flex-col gap-2" aria-hidden="true">
+      <AwaitingValidationNotice v-if="awaiting" :body="t('awaiting.belayer')" />
+      <div v-else-if="directory.isPending.value" class="flex flex-col gap-2" aria-hidden="true">
         <SkeletonBlock v-for="n in 4" :key="n" class="h-12 w-full" />
       </div>
       <div v-else-if="directory.isError.value" class="flex flex-col items-start gap-2">

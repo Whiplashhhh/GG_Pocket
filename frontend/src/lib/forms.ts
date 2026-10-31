@@ -20,6 +20,11 @@ export interface Message {
 
 export type FieldErrors<F extends string> = Partial<Record<F, Message>>
 
+/** Length in code points, the way the server counts it (an emoji is one character). */
+export function codePointLength(text: string): number {
+  return Array.from(text).length
+}
+
 /** Business errors that belong to one field of a form. */
 const FIELD_OF_CODE: Partial<Record<ErrorCode, string>> = {
   NICKNAME_TAKEN: 'nickname',
@@ -29,6 +34,7 @@ const FIELD_OF_CODE: Partial<Record<ErrorCode, string>> = {
   PASSWORD_TOO_COMMON: 'password',
   CURRENT_PASSWORD_WRONG: 'currentPassword',
   PARENTAL_CONSENT_REQUIRED: 'parentalConsent',
+  JOIN_NOTE_REQUIRED: 'joinNote',
   REGISTRATION_CODE_INVALID: 'code',
 }
 

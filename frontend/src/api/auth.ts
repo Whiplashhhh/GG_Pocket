@@ -40,6 +40,15 @@ export function useCurrentMember() {
 }
 
 /**
+ * True while the board has not validated my account (D-107): only my own logbook until then, the
+ * rest of the club (directory, profiles, podium, comments on routes) stays closed.
+ */
+export function useAwaitingValidation() {
+  const member = useCurrentMember()
+  return computed(() => member.value?.validated === false)
+}
+
+/**
  * After a sign-in of any kind (login, registration, reset): forget everything cached for the
  * previous member, then remember the new one.
  */

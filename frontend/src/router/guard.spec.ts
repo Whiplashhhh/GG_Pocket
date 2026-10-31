@@ -6,9 +6,12 @@ import type { AuthState } from '@/api/auth'
 import { decideNavigation, safeReturnPath } from './guard'
 
 const SIGNED_OUT: AuthState = { authenticated: false }
-const signedInAs = (role: 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'): AuthState => ({
+const signedInAs = (
+  role: 'TOURIST' | 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN',
+  validated = true,
+): AuthState => ({
   authenticated: true,
-  member: { id: '1', nickname: 'marie', firstName: 'Marie', lastName: 'H', role },
+  member: { id: '1', nickname: 'marie', firstName: 'Marie', lastName: 'H', role, validated },
 })
 const to = (fullPath: string, meta: RouteMeta = {}) => ({ fullPath, meta })
 
@@ -37,6 +40,13 @@ describe('decideNavigation', () => {
     expect(decideNavigation(members, signedInAs('SETTER'))).toBe('/actu')
     expect(decideNavigation(members, signedInAs('BOARD'))).toBe(true)
     expect(decideNavigation(members, signedInAs('ADMIN'))).toBe(true)
+  })
+
+  it('sends an account awaiting validation back to its profile, which says why', () => {
+    const directory = to('/annuaire', { validated: true })
+    expect(decideNavigation(directory, signedInAs('TOURIST', false))).toBe('/profil')
+    expect(decideNavigation(directory, signedInAs('TOURIST'))).toBe(true)
+    expect(decideNavigation(to('/topo'), signedInAs('TOURIST', false))).toBe(true)
   })
 
   it('does not sign anyone out because the network is down', () => {

@@ -62,7 +62,8 @@ class AuthFlowIT {
                 register(code, nickname, PASSWORD, null, false)
                         .andExpect(status().isCreated())
                         .andExpect(jsonPath("$.nickname").value(nickname))
-                        .andExpect(jsonPath("$.role").value("CLIMBER"))
+                        .andExpect(jsonPath("$.role").value("TOURIST"))
+                        .andExpect(jsonPath("$.validated").value(false))
                         .andExpect(jsonPath("$.avatarUrl").doesNotExist())
                         .andReturn()
                         .getResponse();
@@ -146,12 +147,90 @@ class AuthFlowIT {
                                         """
                                         {"code": "%s", "firstName": "Léa", "lastName": "Dupont",
                                          "nickname": "%s", "password": "%s",
-                                         "privacyAccepted": false}
+                                         "licensed": true, "privacyAccepted": false}
                                         """
                                                 .formatted(newCode(null), nickname(), PASSWORD)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
                 .andExpect(jsonPath("$.errors[0].field").value("privacyAccepted"));
+    }
+
+    @Test
+    void aNewAccountAwaitsTheBoardWithWhatItDeclared() throws Exception {
+        var licensed = nickname();
+        register(newCode(null), licensed, true, "  ignorée car licenciée  ")
+                .andExpect(status().isCreated());
+        assertThat(memberRepository.findByNicknameIgnoreCase(licensed))
+                .get()
+                .satisfies(
+                        member -> {
+                            assertThat(member.role()).isEqualTo(Role.TOURIST);
+                            assertThat(member.isValidated()).isFalse();
+                            assertThat(member.declaredLicensed()).isTrue();
+                            assertThat(member.joinNote()).isNull();
+                        });
+
+        var visitor = nickname();
+        register(newCode(null), visitor, false, "  Copine de Lou, je viens l'été.  ")
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.validated").value(false));
+        assertThat(memberRepository.findByNicknameIgnoreCase(visitor))
+                .get()
+                .satisfies(
+                        member -> {
+                            assertThat(member.declaredLicensed()).isFalse();
+                            assertThat(member.joinNote())
+                                    .isEqualTo("Copine de Lou, je viens l'été.");
+                        });
+    }
+
+    @Test
+    void notLicensedNeedsToSayWhoTheyAre() throws Exception {
+        var code = newCode(null);
+        register(code, nickname(), false, null)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("JOIN_NOTE_REQUIRED"));
+        register(code, nickname(), false, "  Un ami  ")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("JOIN_NOTE_REQUIRED"));
+        register(code, nickname(), false, "x".repeat(301))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("JOIN_NOTE_REQUIRED"));
+        assertThat(codes.findByCode(code))
+                .get()
+                .extracting(RegistrationCode::useCount)
+                .isEqualTo(0);
+    }
+
+    @Test
+    void theLicenceQuestionMustBeAnswered() throws Exception {
+        mockMvc.perform(
+                        post("/api/v1/auth/register")
+                                .with(xsrf())
+                                .with(freshAddress())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
+                                        {"code": "%s", "firstName": "Léa", "lastName": "Dupont",
+                                         "nickname": "%s", "password": "%s",
+                                         "privacyAccepted": true}
+                                        """
+                                                .formatted(newCode(null), nickname(), PASSWORD)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+                .andExpect(jsonPath("$.errors[0].field").value("licensed"));
+    }
+
+    @Test
+    void theFirstStartCodeMakesAValidatedPresident() throws Exception {
+        var value = RegistrationCodeFormat.generate(new SecureRandom());
+        codes.saveAndFlush(
+                new RegistrationCode(value, "Premier démarrage", Role.ADMIN, null, 1, null));
+        var nickname = nickname();
+        register(value, nickname, true, null)
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.role").value("ADMIN"))
+                .andExpect(jsonPath("$.validated").value(true));
     }
 
     @Test
@@ -264,7 +343,25 @@ class AuthFlowIT {
             LocalDate birthDate,
             boolean parentalConsent)
             throws Exception {
+        return register(code, nickname, password, birthDate, parentalConsent, true, null);
+    }
+
+    private ResultActions register(String code, String nickname, boolean licensed, String joinNote)
+            throws Exception {
+        return register(code, nickname, PASSWORD, null, false, licensed, joinNote);
+    }
+
+    private ResultActions register(
+            String code,
+            String nickname,
+            String password,
+            LocalDate birthDate,
+            boolean parentalConsent,
+            boolean licensed,
+            String joinNote)
+            throws Exception {
         var birth = birthDate == null ? "null" : "\"" + birthDate + "\"";
+        var note = joinNote == null ? "null" : "\"" + joinNote + "\"";
         return mockMvc.perform(
                 post("/api/v1/auth/register")
                         .with(xsrf())
@@ -275,17 +372,24 @@ class AuthFlowIT {
                                 {"code": "%s", "firstName": "Léa", "lastName": "Dupont",
                                  "nickname": "%s", "email": null, "password": "%s",
                                  "birthDate": %s, "parentalConsent": %s,
+                                 "licensed": %s, "joinNote": %s,
                                  "privacyAccepted": true, "rememberMe": true}
                                 """
                                         .formatted(
-                                                code, nickname, password, birth, parentalConsent)));
+                                                code,
+                                                nickname,
+                                                password,
+                                                birth,
+                                                parentalConsent,
+                                                licensed,
+                                                note)));
     }
 
     /** A club code, in its stored form. */
     private String newCode(Integer maxUses) {
         var value = RegistrationCodeFormat.generate(new SecureRandom());
         codes.saveAndFlush(
-                new RegistrationCode(value, "Affiche de test", Role.CLIMBER, null, maxUses, null));
+                new RegistrationCode(value, "Affiche de test", Role.TOURIST, null, maxUses, null));
         return value;
     }
 

@@ -68,7 +68,7 @@ public class SessionCommentService {
      *
      * @throws BusinessException {@code NOT_FOUND} for a session I cannot read
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public List<SessionCommentView> list(UUID readerId, UUID sessionId) {
         var reader = loadMember(readerId);
@@ -91,7 +91,7 @@ public class SessionCommentService {
      *     VALIDATION_FAILED} for an empty or too long text, {@code RATE_LIMITED} beyond 40 comments
      *     an hour
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public SessionCommentView add(UUID authorId, UUID sessionId, String body) {
         var author = loadMember(authorId);
@@ -112,7 +112,7 @@ public class SessionCommentService {
      *
      * @throws BusinessException {@code NOT_FOUND} for a comment I neither wrote nor moderate
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void delete(UUID actorId, UUID commentId) {
         var actor = loadMember(actorId);

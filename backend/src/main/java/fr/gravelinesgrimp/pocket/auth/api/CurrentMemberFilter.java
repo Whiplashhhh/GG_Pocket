@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 import org.springframework.session.web.http.CookieSerializer;
@@ -21,7 +20,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Duration;
-import java.util.List;
 
 /**
  * Runs on every request of a signed-in member, before authorization:
@@ -75,7 +73,7 @@ public class CurrentMemberFilter extends OncePerRequestFilter {
     private static void refreshAuthorities(MemberPrincipal me, MemberAccess access) {
         var fresh =
                 UsernamePasswordAuthenticationToken.authenticated(
-                        me, null, List.of(new SimpleGrantedAuthority(access.role().authority())));
+                        me, null, MemberAuthorities.of(access.role(), access.validated()));
         var context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(fresh);
         SecurityContextHolder.setContext(context);

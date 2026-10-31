@@ -7,6 +7,7 @@ import fr.gravelinesgrimp.pocket.auth.infra.RegistrationCodeRepository;
 import fr.gravelinesgrimp.pocket.member.application.CurrentMemberView;
 import fr.gravelinesgrimp.pocket.member.application.UniqueMemberFields;
 import fr.gravelinesgrimp.pocket.member.domain.Age;
+import fr.gravelinesgrimp.pocket.member.domain.LicenceDeclaration;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
@@ -80,17 +81,29 @@ public class RegistrationService {
             throw new BusinessException(
                     ErrorCode.PARENTAL_CONSENT_REQUIRED, "Under 15 without parental consent");
         }
+        var declaration = LicenceDeclaration.of(registration.licensed(), registration.joinNote());
         var identity = registration.identity();
         uniqueFields.check(identity.nickname(), identity.email(), UniqueMemberFields.NOBODY);
 
+        var passwordHash = passwordEncoder.encode(registration.password());
+        // The first-start code makes the president, validated at once; club codes make tourists
+        // awaiting validation by the board (D-107).
         var member =
-                new Member(
-                        identity,
-                        passwordEncoder.encode(registration.password()),
-                        code.grantedRole(),
-                        registration.birthDate(),
-                        needsConsent,
-                        now);
+                code.grantedRole() == Role.ADMIN
+                        ? new Member(
+                                identity,
+                                passwordHash,
+                                Role.ADMIN,
+                                registration.birthDate(),
+                                needsConsent,
+                                now)
+                        : Member.awaitingValidation(
+                                identity,
+                                passwordHash,
+                                registration.birthDate(),
+                                needsConsent,
+                                declaration,
+                                now);
         code.recordUse();
         try {
             members.saveAndFlush(member);

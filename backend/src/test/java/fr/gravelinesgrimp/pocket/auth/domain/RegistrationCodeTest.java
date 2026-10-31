@@ -64,6 +64,6 @@ class RegistrationCodeTest {
     }
 
     private static RegistrationCode code(Instant expiresAt, Integer maxUses) {
-        return new RegistrationCode("K7XMP2QA", "Affiche", Role.CLIMBER, expiresAt, maxUses, null);
+        return new RegistrationCode("K7XMP2QA", "Affiche", Role.TOURIST, expiresAt, maxUses, null);
     }
 }

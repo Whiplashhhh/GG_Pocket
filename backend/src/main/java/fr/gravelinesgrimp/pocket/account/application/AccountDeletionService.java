@@ -9,6 +9,7 @@ import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.MediaFile;
 import fr.gravelinesgrimp.pocket.member.domain.MediaUsage;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
+import fr.gravelinesgrimp.pocket.member.domain.MemberGovernance;
 import fr.gravelinesgrimp.pocket.member.domain.MemberStatus;
 import fr.gravelinesgrimp.pocket.member.domain.Nickname;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
@@ -109,8 +110,11 @@ public class AccountDeletionService {
         erase(member, member);
     }
 
-    /** Spec §5: the admin only, never on their own account (that is the self-service). */
-    @PreAuthorize("hasRole('ADMIN')")
+    /**
+     * Spec §5: the admin, never on their own account (that is the self-service). The board may also
+     * refuse a new account it does not recognise, as long as it was never validated (D-107).
+     */
+    @PreAuthorize("hasRole('BOARD')")
     @Transactional
     public void deleteMember(UUID actorId, UUID memberId) {
         if (actorId.equals(memberId)) {
@@ -118,22 +122,27 @@ public class AccountDeletionService {
                     ErrorCode.SELF_MANAGEMENT_FORBIDDEN, "Members do not manage their own account");
         }
         var actor = lock(actorId);
-        erase(actor, lock(memberId));
+        var member = lock(memberId);
+        if (!MemberGovernance.canDelete(actor.role(), false, member.isValidated())) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED, "Only the admin deletes");
+        }
+        erase(
+                actor,
+                member,
+                member.isValidated() ? AuditAction.MEMBER_DELETED : AuditAction.MEMBER_REFUSED);
     }
 
     private void erase(Member actor, Member member) {
+        erase(actor, member, AuditAction.MEMBER_DELETED);
+    }
+
+    private void erase(Member actor, Member member, AuditAction action) {
         if (member.role() == Role.ADMIN && member.isActive()) {
             ensureAnotherActiveAdmin(member);
         }
         // Written first: the entry keeps the names once the account is gone (actor_id goes null).
         auditLog.record(
-                actor,
-                AuditAction.MEMBER_DELETED,
-                AuditTargetType.MEMBER,
-                member.id(),
-                member.nickname(),
-                null,
-                null);
+                actor, action, AuditTargetType.MEMBER, member.id(), member.nickname(), null, null);
         var now = clock.instant();
         // Before the hand-over, while the sessions are still mine.
         sessionReactions.deleteAllOnSessionsOf(member.id());

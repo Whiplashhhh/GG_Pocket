@@ -44,6 +44,8 @@ public class MemberAdminService {
             String lastName,
             Role role,
             MemberStatus status,
+            boolean validated,
+            Boolean declaredLicensed,
             UUID avatarId,
             Instant createdAt,
             Instant lastSeenAt,
@@ -55,15 +57,17 @@ public class MemberAdminService {
             boolean canDisable,
             boolean canEnable,
             boolean canCreateResetLink,
-            boolean canDelete) {}
+            boolean canDelete,
+            boolean canValidate) {}
 
     /**
      * The member sheet (DECISIONS D-045): no birth date, only whether a parental consent covers a
-     * member under 15.
+     * member under 15. The join note is there until the board decides on the account (D-107).
      */
     public record MemberDetailView(
             MemberSummaryView summary,
             String email,
+            String joinNote,
             boolean underFifteenWithParentalConsent,
             Integer clubArrivalYear,
             Integer climbingSinceYear,
@@ -120,6 +124,10 @@ public class MemberAdminService {
             return detail(actor, member);
         }
         checkNotSelf(actor, member);
+        if (!member.isValidated()) {
+            throw new BusinessException(
+                    ErrorCode.MEMBER_AWAITING_VALIDATION, "Validate the account before");
+        }
         if (!MemberGovernance.assignableRoles(actor.role(), false, member.role()).contains(role)) {
             throw denied("Role " + role + " not assignable to this member");
         }
@@ -136,6 +144,31 @@ public class MemberAdminService {
                 member.id(),
                 member.nickname(),
                 before.name(),
+                role.name());
+        return detail(actor, member);
+    }
+
+    /**
+     * The board accepts a new account (D-107): climber when licensed at the club, tourist
+     * otherwise. Refusing it is deleting it ({@code AccountDeletionService#deleteMember}).
+     *
+     * @throws BusinessException {@code MEMBER_ALREADY_VALIDATED}, {@code VALIDATION_FAILED} (a role
+     *     other than tourist or climber)
+     */
+    @PreAuthorize("hasRole('BOARD')")
+    @Transactional
+    public MemberDetailView validate(UUID actorId, UUID memberId, Role role) {
+        var actor = load(actorId);
+        var member = load(memberId);
+        checkManageable(actor, member);
+        member.validate(role, clock.instant());
+        auditLog.record(
+                actor,
+                AuditAction.MEMBER_VALIDATED,
+                AuditTargetType.MEMBER,
+                member.id(),
+                member.nickname(),
+                null,
                 role.name());
         return detail(actor, member);
     }
@@ -197,16 +230,22 @@ public class MemberAdminService {
     private MemberDetailView detail(Member actor, Member member) {
         var self = actor.id().equals(member.id());
         var manageable = MemberGovernance.canManageAccount(actor.role(), self, member.role());
+        var validated = member.isValidated();
         var permissions =
                 new Permissions(
-                        MemberGovernance.assignableRoles(actor.role(), self, member.role()),
+                        validated
+                                ? MemberGovernance.assignableRoles(
+                                        actor.role(), self, member.role())
+                                : Set.of(),
                         manageable && member.isActive(),
                         manageable && !member.isActive(),
                         manageable && member.isActive(),
-                        actor.role() == Role.ADMIN && !self);
+                        MemberGovernance.canDelete(actor.role(), self, validated),
+                        manageable && !validated);
         return new MemberDetailView(
                 summary(member, sessions.countByMemberId(member.id())),
                 member.email(),
+                member.joinNote(),
                 Age.needsParentalConsent(member.birthDate(), ClubTime.today(clock))
                         && member.hasParentalConsent(),
                 member.clubArrivalYear(),
@@ -222,6 +261,8 @@ public class MemberAdminService {
                 member.lastName(),
                 member.role(),
                 member.status(),
+                member.isValidated(),
+                member.declaredLicensed(),
                 member.avatarId(),
                 member.createdAt(),
                 member.lastSeenAt(),

@@ -35,7 +35,6 @@ direction) ou **Willem**.
 | D-044 | Durée de conservation des comptes inactifs ? | club | Suppression après 3 ans sans connexion |
 | D-045 | Ce que la direction voit dans la fiche d'un membre ? | club | Tout sauf la date de naissance |
 | D-046 | Format du pseudo ? | Willem | 3 à 20 caractères, `a-z 0-9 . _ -`, insensible à la casse |
-| D-047 | Qui reçoit le code admin de premier démarrage ? | Willem | Willem, qui le transmet au président |
 | D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
@@ -316,7 +315,11 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Contexte** : spec §16 : au premier démarrage de la prod, un code d'inscription admin à usage unique (24 h) s'affiche une fois dans les logs.
 - **Choix** : Willem le récupère et le transmet au président, qui crée le premier compte admin. Willem peut garder son propre compte
   avec le rôle de son choix (créé ensuite par code d'inscription normal, rôle donné par l'admin).
-- **Statut** : à valider (sert à rédiger `DEPLOYMENT.md` et `GUIDE_CLUB.md`).
+- **Ce qui s'est passé** (2026-10-31) : Willem a utilisé le code lui-même, son compte est donc le seul admin de la prod
+  (badge « Le Président·e »). Passation décidée dans D-107 : le président crée son compte, Willem le passe Admin,
+  puis le président passe Willem Touriste (Grimpeur en attendant que le rôle existe). Personne ne modifie son propre
+  rôle et le dernier admin ne peut pas être retiré : l'ordre compte.
+- **Statut** : tranchée par l'usage ; l'admin est réservé au président (D-107).
 
 
 ### D-048 — Session longue : cookie « Rester connecté » et durées
@@ -1026,3 +1029,51 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     choisis depuis la fenêtre d'un badge. Affichés au niveau actuel à côté du nom (profils, `Session.authorBadges` dans
     le fil) ; un favori perdu depuis (séance supprimée) n'est plus affiché mais reste choisi s'il revient.
 - **À valider** : l'échelle de couleurs et les paliers des répétables (Willem), coût faible à changer (`lib/badges.ts`).
+
+### D-107 — Comptes « Touriste » et validation des nouveaux comptes par la direction
+- **Contexte** : Willem n'est ni président ni licencié, et ne veut pas de droits qui ne correspondent pas à son rôle
+  dans le club : l'admin est réservé au président. Le club accueille aussi des grimpeurs occasionnels non licenciés
+  qui veulent garder une trace de leurs séances. Un compte admin « invisible » a été écarté : un compte qui voit les
+  données de tout le monde (dont des mineurs) doit rester visible de la direction.
+- **Choix** (validés par Willem le 2026-10-31) :
+  - **Nouveau rôle `TOURIST`** (« Touriste »), sous Grimpeur, **avec les mêmes droits** : carnet, à faire, fil, amis,
+    podium, badges. La seule différence avec Grimpeur est la licence au club.
+  - **Validation** : tout nouveau compte naît Touriste et **en attente** (indicateur de validation distinct du rôle,
+    car un touriste validé et un nouveau venu n'ont pas le même statut). Les codes d'inscription du club donnent
+    Touriste au lieu de Grimpeur. Le profil affiche un message : la direction doit valider le compte. Les comptes
+    existant avant la migration sont considérés comme validés.
+  - **Déclaration à l'inscription** : la personne choisit « Je suis licencié·e au club » ou « Je ne suis pas
+    licencié·e ». Dans le second cas, une zone de texte **obligatoire** apparaît : qui elle est par rapport au club
+    (ex. « copain de Julie, je viens deux fois par an »), 10 à 300 caractères, contrôlés côté serveur. C'est une simple
+    déclaration, pas une preuve : le compte reste en attente dans les deux cas. La direction voit la déclaration et le
+    texte dans la liste des comptes en attente ; le rôle proposé par défaut à la validation suit la déclaration
+    (licencié·e → Grimpeur, sinon Touriste), mais la direction choisit librement.
+  - **Le texte de présentation** n'est visible que de la direction et du président, et il est **effacé une fois la
+    décision prise** (validation ou suppression) : il ne sert qu'à décider (minimisation des données). La décision
+    reste dans le journal d'audit.
+  - **Compte en attente = carnet personnel seulement** : topo, séances, à faire ; invisible des autres (pas de fil, pas
+    d'amis, pas de recherche, pas de podium) tant qu'il n'est pas validé. Protège les membres, dont des mineurs, d'un
+    inconnu qui aurait le code affiché à la salle.
+  - **La direction (et le président)** valide : licencié → Grimpeur, occasionnel → Touriste validé ; elle peut ensuite
+    passer un compte de Touriste à Grimpeur et inversement, comme pour le rôle Responsable. Liste « comptes en attente »
+    dans l'espace Gestion.
+  - **Refus** : la direction peut supprimer définitivement un compte **jamais validé** (exception à « suppression =
+    admin », il n'y a presque pas de données). Tracé dans le journal d'audit.
+  - Toute la logique est vérifiée côté serveur (en attente ⇒ refus des endpoints sociaux, IDOR testés).
+- **Par défaut, à revoir si besoin** : pas de purge automatique des comptes en attente en v1 ; les rôles Responsable
+  et au-dessus restent réservés aux licenciés de fait (pas de contrôle technique de la licence).
+- **Mise en œuvre** (choix par défaut, faciles à revoir) :
+  - Rôle `TOURIST` sous `CLIMBER` dans la hiérarchie ; toutes les méthodes « membre » passent de `hasRole('CLIMBER')`
+    à `hasRole('TOURIST')`. La validation est une autorité à part (`VALIDATED`, ajoutée par `CurrentMemberFilter`),
+    exigée par `@ValidatedMember` : annuaire, profils et badges des autres, demande d'ami, podium, ajout d'un
+    commentaire de voie. Colonnes `validated_at`, `declared_licensed`, `join_note` (V17).
+  - Un compte en attente garde son fil (il n'y voit que ses séances : il n'a pas d'amis), lit les commentaires des
+    voies sans en écrire, et ne peut ni nommer un assureur ni être nommé (ça le rendrait visible).
+  - Les autres ne le voient nulle part : absent de l'annuaire, profil et badges en 404, demande d'ami refusée,
+    exclu des scores du podium (ses séances comptent dès la validation, pour les mois pas encore figés).
+  - Pas de changement de rôle avant validation (`MEMBER_AWAITING_VALIDATION`) : on valide d'abord, on promeut
+    ensuite. Audit : `MEMBER_VALIDATED` (après = rôle choisi) et `MEMBER_REFUSED`.
+  - Le code de premier démarrage crée toujours un admin validé d'office. Seed : comptes `touriste` (validé) et
+    `nouveau` (en attente, non licencié).
+- **Statut** : validée par Willem (déclaration et texte ajoutés le 2026-10-31) ; à présenter au club (libellé « Touriste »,
+  message d'attente) ; l'effacement du texte après décision est un choix par défaut, à valider.

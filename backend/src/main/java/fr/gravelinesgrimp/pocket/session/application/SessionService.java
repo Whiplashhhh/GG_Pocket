@@ -106,7 +106,7 @@ public class SessionService {
      *     DATE_IN_THE_FUTURE}, {@code SESSION_TOO_OLD}, {@code MONTH_FROZEN}, {@code NOT_FOUND}
      *     (route), {@code ROUTE_DISMOUNTED}, {@code VALIDATION_FAILED} (belayer)
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public Saved create(UUID memberId, UUID clientRef, SessionDraft draft) {
         lockMember(memberId);
@@ -125,7 +125,7 @@ public class SessionService {
         return new Saved(views.of(session, memberId).withUnlocked(codes(unlocked)), true);
     }
 
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public SessionView get(UUID readerId, UUID sessionId) {
         var session =
@@ -141,7 +141,7 @@ public class SessionService {
      *
      * @throws BusinessException the ones of {@link #create}
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public SessionView update(UUID memberId, UUID sessionId, SessionDraft draft) {
         lockMember(memberId);
@@ -168,7 +168,7 @@ public class SessionService {
      *
      * @throws BusinessException {@code NOT_FOUND}, {@code MONTH_FROZEN}
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void delete(UUID memberId, UUID sessionId) {
         lockMember(memberId);
@@ -186,7 +186,7 @@ public class SessionService {
     }
 
     /** My sessions, latest day first (then latest saved first). */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public SessionPage listMine(UUID memberId, String cursor, int size) {
         var limit = Math.clamp(size, 1, MAX_PAGE_SIZE);
@@ -213,7 +213,7 @@ public class SessionService {
      *
      * @throws BusinessException {@code NOT_FOUND} (not a friend, or not an active member)
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public SessionPage listOf(UUID readerId, UUID climberId, String cursor, int size) {
         if (readerId.equals(climberId)) {
@@ -241,7 +241,7 @@ public class SessionService {
      * The feed (spec §8.2): my sessions and the ones my friends share with friends, latest day
      * first. A friend whose account is disabled drops out, like everywhere else.
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public SessionPage feed(UUID readerId, String cursor, int size) {
         var limit = Math.clamp(size, 1, MAX_PAGE_SIZE);
@@ -292,7 +292,7 @@ public class SessionService {
     /**
      * Every route I climbed, the most recently climbed first (the quick picker, "premier essai").
      */
-    @PreAuthorize("hasRole('CLIMBER')")
+    @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
     public List<ClimbedRoute> climbedRoutes(UUID memberId) {
         return ascents.findClimbedRoutes(memberId);
@@ -320,7 +320,8 @@ public class SessionService {
 
     /**
      * Any active member of the club may have held the rope, friend or not, but not the climber
-     * themself (D-101).
+     * themself (D-101). Accounts awaiting validation stay out of it both ways (D-107): naming
+     * someone would show them in that person's belays.
      */
     private void checkBelayers(UUID memberId, SessionDraft draft) {
         var ids = draft.belayerIds();
@@ -330,9 +331,13 @@ public class SessionService {
         if (ids.contains(memberId)) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Nobody belays themself");
         }
+        if (members.findById(memberId).filter(Member::isValidated).isEmpty()) {
+            throw new BusinessException(
+                    ErrorCode.MEMBER_AWAITING_VALIDATION, "No belayer before validation");
+        }
         var active =
                 members.findAllById(ids).stream()
-                        .filter(member -> member.isActive() && !FormerMember.is(member.id()))
+                        .filter(member -> member.isVisibleInClub() && !FormerMember.is(member.id()))
                         .count();
         if (active != ids.size()) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "No such belayer");
