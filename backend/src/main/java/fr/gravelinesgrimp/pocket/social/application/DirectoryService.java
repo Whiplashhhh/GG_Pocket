@@ -54,6 +54,7 @@ public class DirectoryService {
         Map<UUID, Friendship> mine =
                 friendships.findAllOf(me).stream()
                         .collect(Collectors.toMap(f -> f.otherThan(me), Function.identity()));
+        var today = ClubTime.today(clock);
         var active = members.findAllForDirectory().stream().filter(Member::isActive).toList();
         var entries =
                 active.stream()
@@ -61,7 +62,7 @@ public class DirectoryService {
                         .map(
                                 member ->
                                         new DirectoryView.EntryView(
-                                                MemberCardView.of(member),
+                                                MemberCardView.of(member, today),
                                                 FriendshipState.of(mine.get(member.id()), me)))
                         .toList();
         return new DirectoryView(active.size(), entries);
@@ -82,7 +83,7 @@ public class DirectoryService {
                         ? Age.yearsOn(member.birthDate(), ClubTime.today(clock))
                         : null;
         return new MemberProfileView(
-                MemberCardView.of(member),
+                MemberCardView.of(member, ClubTime.today(clock)),
                 age,
                 member.climbingSinceYear(),
                 member.bio(),

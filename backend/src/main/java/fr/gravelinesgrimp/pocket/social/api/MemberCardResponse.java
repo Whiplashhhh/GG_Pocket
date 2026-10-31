@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.social.api;
 
+import fr.gravelinesgrimp.pocket.badge.domain.Seniority;
 import fr.gravelinesgrimp.pocket.member.api.MediaUrls;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.social.application.MemberCardView;
@@ -17,7 +18,9 @@ public record MemberCardResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) String lastName,
         String avatarUrl,
         @Schema(requiredMode = RequiredMode.REQUIRED) Role role,
-        Integer clubArrivalYear) {
+        Integer clubArrivalYear,
+        @Schema(description = "Years at the club (spec §9.4); absent without a year of arrival")
+                Seniority seniority) {
 
     static MemberCardResponse from(MemberCardView view) {
         return new MemberCardResponse(
@@ -27,6 +30,7 @@ public record MemberCardResponse(
                 view.lastName(),
                 MediaUrls.of(view.avatarId()),
                 view.role(),
-                view.clubArrivalYear());
+                view.clubArrivalYear(),
+                view.seniority());
     }
 }

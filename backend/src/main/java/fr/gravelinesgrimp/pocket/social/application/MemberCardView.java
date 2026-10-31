@@ -1,8 +1,10 @@
 package fr.gravelinesgrimp.pocket.social.application;
 
+import fr.gravelinesgrimp.pocket.badge.domain.Seniority;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 /** A member as listed in the directory and among my friends: what any member may see. */
@@ -13,9 +15,11 @@ public record MemberCardView(
         String lastName,
         UUID avatarId,
         Role role,
-        Integer clubArrivalYear) {
+        Integer clubArrivalYear,
+        Seniority seniority) {
 
-    static MemberCardView of(Member member) {
+    /** {@code today} in Gravelines time. */
+    static MemberCardView of(Member member, LocalDate today) {
         return new MemberCardView(
                 member.id(),
                 member.nickname(),
@@ -23,6 +27,7 @@ public record MemberCardView(
                 member.lastName(),
                 member.avatarId(),
                 member.role(),
-                member.clubArrivalYear());
+                member.clubArrivalYear(),
+                Seniority.of(member.clubArrivalYear(), today.getYear()));
     }
 }

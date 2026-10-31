@@ -4,6 +4,36 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-30 — Phase 7, PR 7.1 : le moteur de badges (backend)
+
+**Branche** : `feature/badges-0.8.0` (depuis `main` 0.8.0 + #39, #40, #41).
+
+### Fait
+
+- Module `badge` : catalogue `BadgeCode` (4 familles à paliers + 13 répétables, D-004 à D-006), `GradeScale`
+  (comparaison des cotations sans base), moteur pur `BadgeEngine` (historique rejoué, clé stable par obtention, séance de
+  rattachement), `AwardDiff`, `Seniority` (§9.4, D-008, année à Gravelines). Tests : `BadgeEngineTest` (une classe par
+  badge, seuil exact / seuil −1, semaine à cheval, fin de mois, ordre de l'historique, causalité), `GradeScaleTest`,
+  `SeniorityTest` (dont le Nouvel An UTC/Gravelines), `AwardDiffTest`, `BadgeCodeTest`.
+- V15 `badge_award` ; `BadgeAwards.refresh` appelé par `SessionService` après création, modification et suppression
+  (badge retiré si la condition ne tient plus, déplacé si une autre séance la remplit) ; seed de démo par le vrai moteur.
+- API : `GET /me/badges`, `GET /members/{id}/badges` (bibliothèque complète, ×N, dates) ; `Session.badges` (rattachés)
+  et `Session.unlockedBadges` (juste après un enregistrement) ; `seniority` dans le profil et les cartes de membre.
+  `BadgeIT` + matrice d'autorisations. Contrat OpenAPI et types front régénérés. D-105.
+
+### Reste
+
+- Relecture et fusion de la PR 7.1 par Willem ; D-105 à valider par le club.
+- PR 7.2 (front) : icônes SVG dessinées, bibliothèque de badges (mon profil, profil d'un autre), ancienneté profil +
+  annuaire. PR 7.3 (front) : badges dans la carte du fil, moment de déblocage (reduced-motion).
+
+### Prochaine action
+
+- Si la CI est rouge : lire le journal du job Backend (`gh run view <run> --job <id> --log`, une fois le run fini).
+  Sinon ouvrir la PR 7.1, puis enchaîner la 7.2 sur une branche depuis celle-ci ou depuis `main` après fusion.
+
+---
+
 ## 2026-10-30 — Phase 6, PR 6.2 : Fréquentation et Bilan du topo
 
 **Branche** : `feature/stats-0.8.0` (depuis `main` 0.8.0 + #39 et #40, D-104).

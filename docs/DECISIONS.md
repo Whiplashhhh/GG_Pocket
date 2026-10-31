@@ -43,6 +43,7 @@ direction) ou **Willem**.
 | D-090 | « Réalisations » du topo = ascensions topées ? | club | Oui, par tout le monde, répétitions comprises |
 | D-093 | Série du planning : semaines d'affilée à 2 séances ou plus ? | club | Oui, la semaine en cours ne casse pas la série |
 | D-094 | Le carnet : chiffres, pyramide par cotation, toutes mes voies ? | Willem | Oui, depuis le Profil ; celui des amis en phase 5 |
+| D-105 | Badges : un 6a- ne donne pas « 6a » ; « retour » à 30 jours d'écart ; un flash par voie ? | club | Oui (détails dans D-105) |
 
 ---
 
@@ -969,3 +970,37 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     afficher ») ; les 5 premiers coups de cœur. Les agrégats sont calculés côté front (`lib/stats.ts`, testés), le
     backend ne donne que les voies et leurs compteurs.
 - **Statut** : à valider (définition du taux de réussite, cotations regroupées dans l'histogramme).
+
+### D-105 — PR 7.1 : le moteur de badges
+- **Contexte** : spec §9.4, §9.5. Plusieurs conditions laissent un choix : les cotations en « - » (D-002), le décompte
+  des 30 jours d'absence, le flash répété sur une même voie, la séance à laquelle rattacher un badge de semaine ou de mois.
+- **Choix** :
+  - **Moteur pur** (`badge/domain/BadgeEngine`) : l'historique complet est rejoué de la plus ancienne séance à la plus
+    récente (jour, puis heure d'enregistrement) ; chaque obtention a une clé stable (vide pour un palier ; la semaine,
+    le mois, la séance, le jour ou la voie pour un répétable) et va à la séance qui a rempli la condition. Une obtention
+    ne dépend que des séances d'avant : modifier une séance ne touche jamais les badges des mois figés.
+  - **Enregistrement** : une ligne par obtention (`badge_award`, V15). Après chaque création, modification ou suppression
+    de séance, la différence est écrite : ajoutées (renvoyées dans `unlockedBadges` pour le moment de déblocage),
+    retirées, ou déplacées vers une autre séance (même clé : pas de nouveau déblocage). Nombre, première et dernière
+    date se lisent sur ces lignes. Renvoyer une séance déjà reçue (même `clientRef`) ne débloque rien.
+  - **Première cotation** : « 6a » demande 6a, 6a+ ou plus dur ; un **6a- ne compte pas** (lecture littérale de « ≥ X »).
+  - **Jours de grimpe** (D-004) pour les semaines, les mois, les paliers « séances réalisées » et le retour en force ;
+    le badge va à la première séance du jour. Les badges « séance » (full tête, parfaite, zéro repos, record) restent
+    par séance : deux séances le même jour ne s'additionnent pas.
+  - **Le retour en force** : au moins **30 jours entre deux jours de grimpe** (grimpé le 1er mars, revenu le 31 : oui ;
+    le 30 : non). Une fois par jour de retour.
+  - **Le flash** : une fois **par voie** (on ne flashe une voie qu'une fois, même si « premier essai » est recoché plus
+    tard) ; la voie doit avoir été ouverte au plus 14 jours avant (le jour d'ouverture compte).
+  - **Un mois sans rater une semaine** : les semaines qui commencent (lundi) dans le mois ; la dernière peut finir le mois
+    suivant, le badge tombe alors à la première séance de cette semaine-là.
+  - **3 semaines d'affilée** : blocs de 3 semaines consécutives à 2 jours ou plus, sans chevauchement (6 semaines = ×2).
+  - **La séance record** : à partir de la 4e séance (séances, pas jours), strictement plus de voies topées que toutes les
+    séances d'avant.
+  - **Ancienneté** : calculée côté serveur (année en cours à Gravelines − année d'arrivée), absente sans année d'arrivée,
+    dans le profil et les cartes de l'annuaire et des amis. Une année d'arrivée future compte comme « Tout frais ».
+  - **Visibilité** : la bibliothèque de badges fait partie du profil public (tout grimpeur la lit, membre actif seulement) ;
+    les badges d'une séance suivent la visibilité de la séance (fil). Toutes les séances comptent, « juste moi » comprises.
+  - **Suppression de compte** : les badges partent avec le compte (clé étrangère), les séances passent à « Ancien·ne
+    membre » sans badge.
+- **Statut** : à valider (6a-, décompte des 30 jours, flash une fois par voie).
+

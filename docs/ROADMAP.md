@@ -160,7 +160,7 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 
 ## Phase 7 — Badges
 
-- [ ] Moteur pur et recalculable, catalogue complet, un test par badge
+- [x] Moteur pur et recalculable, catalogue complet, un test par badge (PR 7.1, D-105)
 - [ ] Icônes de badges dessinées
 - [ ] Bibliothèque de badges, badges dans le fil, ancienneté
 - [ ] Moment de déblocage

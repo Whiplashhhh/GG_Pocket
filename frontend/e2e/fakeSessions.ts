@@ -548,6 +548,8 @@ export class FakeSessions implements AscentSource {
       })),
       reactions: this.reactions(me, session),
       commentCount: session.comments.filter((comment) => !comment.deleted).length,
+      badges: [],
+      unlockedBadges: [],
     }
   }
 

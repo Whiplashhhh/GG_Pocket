@@ -4,6 +4,7 @@ import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
+import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
 import fr.gravelinesgrimp.pocket.social.domain.Friendship;
 import fr.gravelinesgrimp.pocket.social.domain.FriendshipState;
@@ -86,6 +87,7 @@ public class FriendshipService {
     @Transactional(readOnly = true)
     public FriendsView overview(UUID me) {
         var mine = friendships.findAllOf(me);
+        var today = ClubTime.today(clock);
         Map<UUID, Member> others =
                 members.findAllById(mine.stream().map(f -> f.otherThan(me)).toList()).stream()
                         .filter(Member::isActive)
@@ -98,7 +100,7 @@ public class FriendshipService {
             if (other == null) {
                 continue;
             }
-            var card = MemberCardView.of(other);
+            var card = MemberCardView.of(other, today);
             switch (FriendshipState.of(friendship, me)) {
                 case INCOMING ->
                         incoming.add(new FriendsView.FriendView(card, friendship.createdAt()));

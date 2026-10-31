@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.session.api;
 
+import fr.gravelinesgrimp.pocket.badge.domain.BadgeCode;
 import fr.gravelinesgrimp.pocket.member.api.MediaUrls;
 import fr.gravelinesgrimp.pocket.session.application.SessionView;
 import fr.gravelinesgrimp.pocket.session.domain.SessionVisibility;
@@ -35,7 +36,19 @@ public record SessionResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) List<AscentItem> ascents,
         @Schema(requiredMode = RequiredMode.REQUIRED) SessionReactionsResponse reactions,
         @Schema(requiredMode = RequiredMode.REQUIRED, description = "Deleted ones left out")
-                long commentCount) {
+                long commentCount,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description =
+                                "The badges this session earned, in the catalogue order (a code"
+                                        + " twice when earned twice)")
+                List<BadgeCode> badges,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description =
+                                "Right after saving it: the badges just unlocked, wherever they"
+                                        + " landed; empty otherwise")
+                List<BadgeCode> unlockedBadges) {
 
     @Schema(name = "SessionSummary", description = "maxGrade: the hardest topped grade.")
     public record Summary(
@@ -94,6 +107,8 @@ public record SessionResponse(
                                                         : MemberRefResponse.from(ascent.belayer())))
                         .toList(),
                 SessionReactionsResponse.from(view.reactions()),
-                view.commentCount());
+                view.commentCount(),
+                view.badges(),
+                view.unlockedBadges());
     }
 }

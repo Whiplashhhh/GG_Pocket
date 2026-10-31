@@ -1,5 +1,8 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
+import fr.gravelinesgrimp.pocket.badge.domain.BadgeAward;
+import fr.gravelinesgrimp.pocket.badge.domain.BadgeCode;
+import fr.gravelinesgrimp.pocket.badge.infra.BadgeAwardRepository;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.session.domain.Ascent;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +52,7 @@ public class SessionViews {
     private final MemberRepository members;
     private final SessionReactionRepository reactions;
     private final SessionCommentRepository comments;
+    private final BadgeAwardRepository badges;
     private final Clock clock;
 
     public SessionViews(
@@ -56,12 +61,14 @@ public class SessionViews {
             MemberRepository members,
             SessionReactionRepository reactions,
             SessionCommentRepository comments,
+            BadgeAwardRepository badges,
             Clock clock) {
         this.routes = routes;
         this.routeViews = routeViews;
         this.members = members;
         this.reactions = reactions;
         this.comments = comments;
+        this.badges = badges;
         this.clock = clock;
     }
 
@@ -118,6 +125,13 @@ public class SessionViews {
                                 .collect(
                                         Collectors.toMap(
                                                 RouteSummaryView::id, Function.identity()));
+        Map<UUID, List<BadgeCode>> badgesBySession =
+                badges.findAllBySessionIdIn(sessionIds).stream()
+                        .sorted(Comparator.comparing(BadgeAward::code))
+                        .collect(
+                                Collectors.groupingBy(
+                                        BadgeAward::sessionId,
+                                        Collectors.mapping(BadgeAward::code, Collectors.toList())));
         var now = clock.instant();
         var noReaction = SessionView.ReactionsView.of(Map.of(), null);
         return sessions.stream()
@@ -131,6 +145,7 @@ public class SessionViews {
                                         belayers,
                                         reactionsBySession.getOrDefault(session.id(), noReaction),
                                         commentCounts.getOrDefault(session.id(), 0L),
+                                        badgesBySession.getOrDefault(session.id(), List.of()),
                                         readerId,
                                         now))
                 .toList();
@@ -172,6 +187,7 @@ public class SessionViews {
             Map<UUID, MemberRefView> belayers,
             SessionView.ReactionsView reactions,
             long commentCount,
+            List<BadgeCode> badges,
             UUID readerId,
             Instant now) {
         // The foreign key guarantees that every route exists.
@@ -207,7 +223,9 @@ public class SessionViews {
                 summary(ascents),
                 ascents,
                 reactions,
-                commentCount);
+                commentCount,
+                badges,
+                List.of());
     }
 
     private static SessionView.SummaryView summary(List<SessionView.AscentView> ascents) {
