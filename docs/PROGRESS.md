@@ -4,6 +4,35 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-31 — Décision : comptes « Touriste » et validation par la direction
+
+**Branche** : `chore/comptes-touristes-decision` (depuis `main` en 0.9.0, docs seulement).
+
+### Fait
+
+- D-107 : rôle Touriste (mêmes droits que Grimpeur, distinction = licence), nouveaux comptes Touriste en attente de
+  validation par la direction, compte en attente limité au carnet personnel, refus = suppression d'un compte jamais validé.
+- D-047 mise à jour : Willem a utilisé le code admin de premier démarrage ; passation de l'admin au président prévue.
+- ROADMAP phase 8 : ligne « Comptes Touriste » ajoutée.
+
+### Reste
+
+- Implémenter D-107 (`feature/comptes-touristes-0.9.0`) : migration Flyway (rôle, indicateur de validation, comptes
+  existants validés), codes d'inscription → Touriste, règles serveur des comptes en attente, liste « en attente » en
+  Gestion, message de profil, i18n, tests (unitaires, IT par rôle, e2e).
+- Hors code : passation de l'admin en prod (le président crée son compte, Willem le passe Admin, le président passe
+  Willem Grimpeur puis Touriste).
+
+### Prochaine action
+
+Créer `feature/comptes-touristes-0.9.0` depuis `main` et commencer par la migration et `MemberGovernance`.
+
+### Points bloquants
+
+Aucun.
+
+---
+
 ## 2026-10-31 — Phase 7, PR 7.3 : badges dans le fil et moment de déblocage
 
 **Branche** : `feature/badges-unlock-0.8.0` (depuis `feature/badges-library-0.8.0`, #43 pas encore fusionnée).
