@@ -5,6 +5,61 @@ import type { FakeSessions } from './fakeSessions'
 import type { FakeTopo, TopoAnswer } from './fakeTopo'
 
 type Schemas = components['schemas']
+type BadgeCode = Schemas['BadgeLibraryEntry']['code']
+type Badge = Schemas['ShownBadge']['badge']
+type Seniority = NonNullable<Schemas['MemberCard']['seniority']>
+
+/** The catalogue in the server's order (BadgeCode). */
+const TIERS = ['1', '5', '10', '20', '50', '100', '250', '500', '750', '1000']
+const BADGE_CODES = [
+  ...TIERS.map((n) => `TOPPED_${n}`),
+  ...TIERS.map((n) => `LEAD_${n}`),
+  ...['5B', '5C', '6A', '6B', '6C', '7A', '7B', '7C'].map((grade) => `GRADE_${grade}`),
+  ...['10', '25', '50', '75', '100', '500', '750', '1000'].map((n) => `DAYS_${n}`),
+  'WEEK_2',
+  'WEEK_3',
+  'WEEK_4',
+  'MONTH_COMPLETE',
+  'MONTH_12',
+  'STREAK_3W',
+  'MONTH_NO_MISS',
+  'FULL_LEAD',
+  'PERFECT',
+  'ZERO_REST',
+  'COMEBACK',
+  'FLASH',
+  'RECORD',
+] as BadgeCode[]
+const TIER_PREFIXES: Partial<Record<Badge, string>> = {
+  TOPPED: 'TOPPED_',
+  LEAD: 'LEAD_',
+  FIRST_GRADE: 'GRADE_',
+  CLIMBING_DAYS: 'DAYS_',
+}
+const BADGE_FAMILIES: Record<string, Schemas['BadgeLibraryEntry']['family']> = {
+  TOPPED: 'TOPPED',
+  LEAD: 'LEAD',
+  GRADE: 'FIRST_GRADE',
+  DAYS: 'CLIMBING_DAYS',
+}
+
+interface FakeAward {
+  count: number
+  firstEarnedOn: string
+  lastEarnedOn: string
+}
+
+/** Years at the club as a nickname (Seniority.of), on the fake clock's year. */
+export function seniorityOf(arrivalYear: number | undefined, now: number): Seniority | undefined {
+  if (arrivalYear === undefined) return undefined
+  const years = new Date(now).getUTCFullYear() - arrivalYear
+  if (years >= 15) return 'FOSSIL'
+  if (years >= 10) return 'RESIDENT'
+  if (years >= 5) return 'FORCER'
+  if (years >= 2) return 'PRO_BEGINNER'
+  if (years >= 1) return 'BABY_CARABINER'
+  return 'FRESH'
+}
 
 interface FakeFriendship {
   requesterId: string
@@ -20,6 +75,15 @@ interface FakeFriendship {
  */
 export class FakeSocial {
   readonly friendships: FakeFriendship[] = []
+  /**
+   * Earned badges per member, set by the tests: the fake has no badge engine (the server's is
+   * tested on its own), it only serves libraries.
+   */
+  readonly badges = new Map<string, Map<BadgeCode, FakeAward>>()
+  /** Favourite badges per member, in order (BadgeService.chooseFavorites). */
+  readonly favorites = new Map<string, Badge[]>()
+  /** Where a member stands on the counted tiers, set by the tests (zero otherwise). */
+  readonly progress = new Map<string, Schemas['BadgeProgress']>()
 
   constructor(
     private readonly clock: () => number,
@@ -29,6 +93,7 @@ export class FakeSocial {
   ) {
     climbs.isFriend = (a, b) => this.state(a, b) === 'FRIENDS' && this.active(b) !== undefined
     climbs.inRankings = (id) => this.active(id)?.appearsInRankings === true
+    climbs.authorBadges = (id) => this.shown(id)
     climbs.memberRef = (id) => {
       const member = this.members().find((candidate) => candidate.id === id)
       return {
@@ -49,6 +114,59 @@ export class FakeSocial {
       createdAt: at,
       ...(accepted ? { acceptedAt: at } : {}),
     })
+  }
+
+  /** `member` earned `code` `count` times, the first on `firstEarnedOn` and the last on `lastEarnedOn`. */
+  award(
+    member: FakeMember,
+    code: BadgeCode,
+    firstEarnedOn: string,
+    count = 1,
+    lastEarnedOn = firstEarnedOn,
+  ): void {
+    const mine = this.badges.get(member.id) ?? new Map<BadgeCode, FakeAward>()
+    mine.set(code, { count, firstEarnedOn, lastEarnedOn })
+    this.badges.set(member.id, mine)
+  }
+
+  /** The level of a badge: tiers earned, or times earned for a repeatable badge. */
+  private level(memberId: string, badge: Badge): number {
+    const mine = this.badges.get(memberId)
+    const prefix = TIER_PREFIXES[badge]
+    if (prefix !== undefined) {
+      return BADGE_CODES.filter((code) => code.startsWith(prefix) && mine?.has(code) === true)
+        .length
+    }
+    return mine?.get(badge as BadgeCode)?.count ?? 0
+  }
+
+  private shown(memberId: string): Schemas['ShownBadge'][] {
+    return (this.favorites.get(memberId) ?? [])
+      .map((badge) => ({ badge, level: this.level(memberId, badge) }))
+      .filter((shown) => shown.level > 0)
+  }
+
+  private library(memberId: string, mine = false): Schemas['BadgeLibrary'] {
+    const earned = this.badges.get(memberId)
+    return {
+      favorites: this.shown(memberId).map((shown) => shown.badge),
+      ...(mine
+        ? { progress: this.progress.get(memberId) ?? { topped: 0, lead: 0, climbingDays: 0 } }
+        : {}),
+      badges: BADGE_CODES.map((code) => {
+        const family = BADGE_FAMILIES[code.slice(0, code.indexOf('_'))] ?? 'REPEATABLE'
+        const award = earned?.get(code)
+        return {
+          code,
+          family,
+          repeatable: family === 'REPEATABLE',
+          count: award?.count ?? 0,
+          ...(award === undefined
+            ? {}
+            : { firstEarnedOn: award.firstEarnedOn, lastEarnedOn: award.lastEarnedOn }),
+        }
+      }),
+    }
   }
 
   private between(a: string, b: string): FakeFriendship | undefined {
@@ -79,11 +197,16 @@ export class FakeSocial {
       lastName: member.lastName,
       role: member.role,
       ...(member.avatarUrl === undefined ? {} : { avatarUrl: member.avatarUrl }),
-      ...(member.clubArrivalYear === undefined ? {} : { clubArrivalYear: member.clubArrivalYear }),
+      ...(member.clubArrivalYear === undefined
+        ? {}
+        : {
+            clubArrivalYear: member.clubArrivalYear,
+            seniority: seniorityOf(member.clubArrivalYear, this.clock()),
+          }),
     }
   }
 
-  handle(me: FakeMember, method: string, path: string): TopoAnswer | undefined {
+  handle(me: FakeMember, method: string, path: string, body?: unknown): TopoAnswer | undefined {
     const json = (data: unknown, status?: number): TopoAnswer => ({ kind: 'json', data, status })
     const notFound: TopoAnswer = { kind: 'problem', status: 404, code: 'NOT_FOUND' }
 
@@ -100,6 +223,19 @@ export class FakeSocial {
             friendship: this.state(me.id, member.id),
           })),
       } satisfies Schemas['Directory'])
+    }
+    if (path === '/me/badges' && method === 'GET') return json(this.library(me.id, true))
+    if (path === '/me/badges/favorites' && method === 'PUT') {
+      const chosen = (body as Schemas['FavoriteBadgesRequest']).badges
+      if (chosen.length > 3 || chosen.some((badge) => this.level(me.id, badge) === 0)) {
+        return { kind: 'problem', status: 400, code: 'VALIDATION_FAILED' }
+      }
+      this.favorites.set(me.id, [...chosen])
+      return json(this.library(me.id, true))
+    }
+    const badges = /^\/members\/([^/]+)\/badges$/.exec(path)
+    if (badges !== null && method === 'GET') {
+      return this.active(badges[1]) === undefined ? notFound : json(this.library(badges[1]))
     }
     const profile = /^\/members\/([^/]+)$/.exec(path)
     if (profile !== null && method === 'GET') {

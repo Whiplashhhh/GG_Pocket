@@ -1,6 +1,7 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
 import fr.gravelinesgrimp.pocket.badge.domain.BadgeCode;
+import fr.gravelinesgrimp.pocket.badge.domain.ShownBadge;
 import fr.gravelinesgrimp.pocket.session.domain.ReactionKind;
 import fr.gravelinesgrimp.pocket.session.domain.SessionVisibility;
 import fr.gravelinesgrimp.pocket.topo.application.MemberRefView;
@@ -16,7 +17,8 @@ import java.util.UUID;
 
 /**
  * A session as its reader sees it. {@code editable}: the reader owns it and its month is not frozen
- * yet. {@code commentCount} leaves out the deleted comments.
+ * yet. {@code commentCount} leaves out the deleted comments. {@code authorBadges}: the favourite
+ * badges of the climber, shown next to their name (D-106).
  */
 public record SessionView(
         UUID id,
@@ -34,7 +36,8 @@ public record SessionView(
         ReactionsView reactions,
         long commentCount,
         List<BadgeCode> badges,
-        List<BadgeCode> unlockedBadges) {
+        List<BadgeCode> unlockedBadges,
+        List<ShownBadge> authorBadges) {
 
     /** The same view, right after a save that unlocked {@code unlocked}. */
     public SessionView withUnlocked(List<BadgeCode> unlocked) {
@@ -54,7 +57,8 @@ public record SessionView(
                 reactions,
                 commentCount,
                 badges,
-                List.copyOf(unlocked));
+                List.copyOf(unlocked),
+                authorBadges);
     }
 
     /** The figures of the card; {@code maxGrade} is the hardest topped one. */

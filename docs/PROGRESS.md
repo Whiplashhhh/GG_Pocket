@@ -4,6 +4,39 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-31 — Phase 7, PR 7.2 : badges à niveaux, favoris et ancienneté
+
+**Branche** : `feature/badges-library-0.8.0` (depuis `main` 0.8.0 + #42). PR #43.
+
+### Fait
+
+- Icônes dessinées `components/icons/BadgeIcon.vue` (grille Lucide) et médaille `BadgeMedal` (la prise de `HoldSwatch`).
+- Refonte après retour de Willem (D-106) : 17 badges (`Badge` côté serveur, `badgeStates` côté appli), couleur = niveau
+  sur une échelle de rareté (marron → or), répétables colorés selon ×N ; profil replié (« X sur 17 », 3 derniers, grille
+  dépliable sans noms) ; fenêtre d'un badge (`BadgeDialog` : niveau / niveau max / ×N, description, prochain niveau,
+  barre cumulée pour moi seulement) ; favoris (3 max) à côté du nom sur les profils et dans le fil.
+- Backend : `Badge`, `ShownBadge`, `BadgeProgress`, `FavoriteBadge` (V16), `BadgeShowcase`, `PUT /me/badges/favorites`,
+  `progress` et `favorites` dans la bibliothèque, `Session.authorBadges` ; tests unitaires + `BadgeIT` + matrice.
+- Ancienneté (`SeniorityBadge`) sur les profils, dans l'annuaire à la place de l'année d'arrivée.
+- Fakes e2e (bibliothèques, favoris, progression posés par les tests), Vitest `lib/badges.spec.ts`, e2e `badges.spec.ts`,
+  captures `galerie`, `profil-badges(-tous)`, `badge-detail`, `actu-fil` relues en clair et sombre à 360 px.
+
+### Reste
+
+- PR 7.3 (front) : badges débloqués dans la carte du fil (« a débloqué : … », `Session.badges`), moment de déblocage
+  après enregistrement (`unlockedBadges`, un par un, `prefers-reduced-motion`), cocher la ROADMAP.
+
+### Prochaine action
+
+Après fusion de la PR 7.2 : branche `feature/badges-unlock-0.8.0`, lire `components/session/SessionCard.vue` et le
+flux d'enregistrement ; réutiliser `BadgeToken` (taille 96, `badgeOf` + niveau du palier) et `useBadgeText`.
+
+### Points bloquants
+
+- Aucun. D-105 à valider par le club, D-106 (couleurs, paliers des répétables) par Willem.
+
+---
+
 ## 2026-10-30 — Phase 7, PR 7.1 : le moteur de badges (backend)
 
 **Branche** : `feature/badges-0.8.0` (depuis `main` 0.8.0 + #39, #40, #41).

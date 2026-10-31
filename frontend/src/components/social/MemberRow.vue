@@ -6,7 +6,10 @@ import UserAvatar from '@/components/ui/UserAvatar.vue'
 
 import FriendshipActions from './FriendshipActions.vue'
 
-/** One member in a list: who they are (link to their profile) and where I stand with them. */
+/**
+ * One member in a list: who they are (link to their profile, with their seniority at the club)
+ * and where I stand with them.
+ */
 defineProps<{ member: MemberCard; friendship: FriendshipState; detail?: string }>()
 
 const { t } = useI18n()
@@ -30,8 +33,8 @@ const { t } = useI18n()
         <span class="truncate text-sm text-ink-muted">
           @{{ member.nickname }}
           <template v-if="detail"> · {{ detail }}</template>
-          <template v-else-if="member.clubArrivalYear">
-            · {{ t('directory.clubSince', { year: member.clubArrivalYear }) }}
+          <template v-else-if="member.seniority">
+            · {{ t(`seniority.${member.seniority}`) }}
           </template>
         </span>
       </span>

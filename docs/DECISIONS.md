@@ -44,6 +44,7 @@ direction) ou **Willem**.
 | D-093 | Série du planning : semaines d'affilée à 2 séances ou plus ? | club | Oui, la semaine en cours ne casse pas la série |
 | D-094 | Le carnet : chiffres, pyramide par cotation, toutes mes voies ? | Willem | Oui, depuis le Profil ; celui des amis en phase 5 |
 | D-105 | Badges : un 6a- ne donne pas « 6a » ; « retour » à 30 jours d'écart ; un flash par voie ? | club | Oui (détails dans D-105) |
+| D-106 | Badges à niveaux : couleur = niveau (échelle de rareté), couleur des répétables selon ×N, 3 favoris | Willem | Oui (détails dans D-106) |
 
 ---
 
@@ -1004,3 +1005,24 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     membre » sans badge.
 - **Statut** : à valider (6a-, décompte des 30 jours, flash une fois par voie).
 
+### D-106 — PR 7.2 : badges à niveaux, rareté et favoris
+- **Contexte** : retour de Willem sur la première bibliothèque (paliers alignés 1, 5, 10…, noms et conditions partout) :
+  trop de place sur le profil, réglages trop loin. Demandé : profil replié (compteur, 3 derniers, tout le reste
+  dépliable), chaque badge une seule fois, détails dans une fenêtre au toucher, « Niveau N » / « Niveau max » sans dire
+  combien il y en a, barre de progression cumulée (6/10, pas de remise à zéro), couleur = niveau identique pour tous les
+  badges, « ×N » pour les répétables, 2 ou 3 badges favoris à côté du nom (fil et profil).
+- **Choix** :
+  - **17 badges** (`Badge`) : les quatre familles à paliers (un badge, son niveau = paliers obtenus) et les treize
+    répétables (niveau = nombre d'obtentions). « X sur 17 débloqués ». Les codes de palier (`BadgeCode`) ne changent pas.
+  - **Échelle de rareté** en couleurs de prises du club : 1 marron (bronze), 2 vert clair, 3 vert, 4 bleu clair, 5 bleu,
+    6 violet, 7 rose, 8 rouge, 9 orange, 10 or (avec un reflet). Le gris reste réservé aux badges pas encore obtenus.
+    Un niveau 3 a la même couleur partout, que la famille ait 8 ou 10 niveaux.
+  - **Répétables** : même échelle selon le nombre d'obtentions (×1, ×2, ×3, ×5, ×10, ×15, ×25, ×50, ×75, ×100) ;
+    au-delà de ×100 la couleur reste or et seul « ×N » grimpe (réponse à « que faire après la dernière couleur ? »).
+  - **Barre de progression** : voies topées, en tête et jours de grimpe, comptés depuis zéro sur tout l'historique
+    (`progress` de `GET /me/badges`, absent de la bibliothèque des autres : leurs totaux ne regardent qu'eux et leurs amis).
+    « Première cotation » n'a pas de barre (pas de compte, juste « prochain niveau : une voie en 6b ou plus dure »).
+  - **Favoris** : 3 au maximum, obtenus, dans l'ordre choisi (`PUT /me/badges/favorites`, table `favorite_badge`, V16),
+    choisis depuis la fenêtre d'un badge. Affichés au niveau actuel à côté du nom (profils, `Session.authorBadges` dans
+    le fil) ; un favori perdu depuis (séance supprimée) n'est plus affiché mais reste choisi s'il revient.
+- **À valider** : l'échelle de couleurs et les paliers des répétables (Willem), coût faible à changer (`lib/badges.ts`).

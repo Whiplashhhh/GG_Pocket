@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 
 import { useCurrentMember } from '@/api/auth'
 import type { Session } from '@/api/sessions'
+import FavoriteBadges from '@/components/badge/FavoriteBadges.vue'
 import SessionReactions from '@/components/session/SessionReactions.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
@@ -75,21 +76,24 @@ const belayers = computed(() =>
         />
       </RouterLink>
       <div class="min-w-0 flex-1">
-        <component :is="`h${headingLevel}`" :id="titleId" class="text-lg font-title break-words">
-          <RouterLink
-            v-if="linked"
-            :to="`/seances/${session.id}`"
-            class="after:absolute after:inset-0 hover:underline"
-            ><span aria-hidden="true">{{ author.nickname }}</span
-            ><span class="sr-only">{{
-              t('feed.cardTitle', {
-                title: t('session.cardTitle', { day }),
-                nickname: author.nickname,
-              })
-            }}</span></RouterLink
-          >
-          <template v-else>{{ author.nickname }}</template>
-        </component>
+        <div class="flex flex-wrap items-center gap-x-1.5">
+          <component :is="`h${headingLevel}`" :id="titleId" class="text-lg font-title break-words">
+            <RouterLink
+              v-if="linked"
+              :to="`/seances/${session.id}`"
+              class="after:absolute after:inset-0 hover:underline"
+              ><span aria-hidden="true">{{ author.nickname }}</span
+              ><span class="sr-only">{{
+                t('feed.cardTitle', {
+                  title: t('session.cardTitle', { day }),
+                  nickname: author.nickname,
+                })
+              }}</span></RouterLink
+            >
+            <template v-else>{{ author.nickname }}</template>
+          </component>
+          <FavoriteBadges :badges="session.authorBadges" :size="22" />
+        </div>
         <p class="text-sm text-ink-muted" :aria-hidden="linked ? true : undefined">
           {{ t('session.cardTitle', { day }) }}
         </p>

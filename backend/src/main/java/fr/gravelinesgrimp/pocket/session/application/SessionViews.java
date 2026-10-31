@@ -1,7 +1,9 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
+import fr.gravelinesgrimp.pocket.badge.application.BadgeShowcase;
 import fr.gravelinesgrimp.pocket.badge.domain.BadgeAward;
 import fr.gravelinesgrimp.pocket.badge.domain.BadgeCode;
+import fr.gravelinesgrimp.pocket.badge.domain.ShownBadge;
 import fr.gravelinesgrimp.pocket.badge.infra.BadgeAwardRepository;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
@@ -53,6 +55,7 @@ public class SessionViews {
     private final SessionReactionRepository reactions;
     private final SessionCommentRepository comments;
     private final BadgeAwardRepository badges;
+    private final BadgeShowcase showcase;
     private final Clock clock;
 
     public SessionViews(
@@ -62,6 +65,7 @@ public class SessionViews {
             SessionReactionRepository reactions,
             SessionCommentRepository comments,
             BadgeAwardRepository badges,
+            BadgeShowcase showcase,
             Clock clock) {
         this.routes = routes;
         this.routeViews = routeViews;
@@ -69,6 +73,7 @@ public class SessionViews {
         this.reactions = reactions;
         this.comments = comments;
         this.badges = badges;
+        this.showcase = showcase;
         this.clock = clock;
     }
 
@@ -132,6 +137,7 @@ public class SessionViews {
                                 Collectors.groupingBy(
                                         BadgeAward::sessionId,
                                         Collectors.mapping(BadgeAward::code, Collectors.toList())));
+        var authorBadges = showcase.of(authorIds);
         var now = clock.instant();
         var noReaction = SessionView.ReactionsView.of(Map.of(), null);
         return sessions.stream()
@@ -146,6 +152,7 @@ public class SessionViews {
                                         reactionsBySession.getOrDefault(session.id(), noReaction),
                                         commentCounts.getOrDefault(session.id(), 0L),
                                         badgesBySession.getOrDefault(session.id(), List.of()),
+                                        authorBadges.getOrDefault(session.memberId(), List.of()),
                                         readerId,
                                         now))
                 .toList();
@@ -188,6 +195,7 @@ public class SessionViews {
             SessionView.ReactionsView reactions,
             long commentCount,
             List<BadgeCode> badges,
+            List<ShownBadge> authorBadges,
             UUID readerId,
             Instant now) {
         // The foreign key guarantees that every route exists.
@@ -225,7 +233,8 @@ public class SessionViews {
                 reactions,
                 commentCount,
                 badges,
-                List.of());
+                List.of(),
+                authorBadges);
     }
 
     private static SessionView.SummaryView summary(List<SessionView.AscentView> ascents) {

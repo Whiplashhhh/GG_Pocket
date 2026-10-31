@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.session.api;
 
+import fr.gravelinesgrimp.pocket.badge.api.ShownBadgeResponse;
 import fr.gravelinesgrimp.pocket.badge.domain.BadgeCode;
 import fr.gravelinesgrimp.pocket.member.api.MediaUrls;
 import fr.gravelinesgrimp.pocket.session.application.SessionView;
@@ -48,7 +49,11 @@ public record SessionResponse(
                         description =
                                 "Right after saving it: the badges just unlocked, wherever they"
                                         + " landed; empty otherwise")
-                List<BadgeCode> unlockedBadges) {
+                List<BadgeCode> unlockedBadges,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description = "The favourite badges of the climber, next to their name")
+                List<ShownBadgeResponse> authorBadges) {
 
     @Schema(name = "SessionSummary", description = "maxGrade: the hardest topped grade.")
     public record Summary(
@@ -109,6 +114,7 @@ public record SessionResponse(
                 SessionReactionsResponse.from(view.reactions()),
                 view.commentCount(),
                 view.badges(),
-                view.unlockedBadges());
+                view.unlockedBadges(),
+                view.authorBadges().stream().map(ShownBadgeResponse::from).toList());
     }
 }

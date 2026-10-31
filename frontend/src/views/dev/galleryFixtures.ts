@@ -1,3 +1,4 @@
+import type { Seniority } from '@/lib/badges'
 import type { HoldColor } from '@/lib/route'
 
 /** Default hold colours of the club configuration seed (docs/DESIGN.md §2). Dev gallery only. */
@@ -42,3 +43,12 @@ export const SAMPLE_ROUTES = [
     status: 'ACTIVE',
   },
 ] as const
+
+export const SENIORITIES: readonly Seniority[] = [
+  'FRESH',
+  'BABY_CARABINER',
+  'PRO_BEGINNER',
+  'FORCER',
+  'RESIDENT',
+  'FOSSIL',
+]

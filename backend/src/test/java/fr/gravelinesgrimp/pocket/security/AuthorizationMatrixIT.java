@@ -315,6 +315,7 @@ class AuthorizationMatrixIT {
                     new Endpoint(HttpMethod.GET, "/api/v1/stats/attendance", null, Role.SETTER),
                     new Endpoint(HttpMethod.GET, "/api/v1/stats/routes", null, Role.SETTER),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/badges", null, Role.CLIMBER),
+                    new Endpoint(HttpMethod.PUT, "/api/v1/me/badges/favorites", "{}", Role.CLIMBER),
                     new Endpoint(
                             HttpMethod.GET,
                             "/api/v1/members/" + SOME_ID + "/badges",

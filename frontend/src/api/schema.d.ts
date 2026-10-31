@@ -466,6 +466,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/badges/favorites': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Choose the badges shown next to my name (up to 3, earned ones) */
+    put: operations['chooseFavoriteBadges']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/belays': {
     parameters: {
       query?: never
@@ -1480,6 +1497,28 @@ export interface components {
     BadgeLibrary: {
       /** @description Every badge of the catalogue, in its order, earned or not */
       badges: components['schemas']['BadgeLibraryEntry'][]
+      /** @description The badges shown next to the name, in order (earned ones) */
+      favorites: (
+        | 'TOPPED'
+        | 'LEAD'
+        | 'FIRST_GRADE'
+        | 'CLIMBING_DAYS'
+        | 'WEEK_2'
+        | 'WEEK_3'
+        | 'WEEK_4'
+        | 'MONTH_COMPLETE'
+        | 'MONTH_12'
+        | 'STREAK_3W'
+        | 'MONTH_NO_MISS'
+        | 'FULL_LEAD'
+        | 'PERFECT'
+        | 'ZERO_REST'
+        | 'COMEBACK'
+        | 'FLASH'
+        | 'RECORD'
+      )[]
+      /** @description Where I stand on the counted tiers: in my own library only */
+      progress?: components['schemas']['BadgeProgress']
     }
     BadgeLibraryEntry: {
       /** @enum {string} */
@@ -1546,6 +1585,20 @@ export interface components {
       lastEarnedOn?: string
       /** @description Earned again each time: shown ×N */
       repeatable: boolean
+    }
+    BadgeProgress: {
+      /** Format: int64 */
+      climbingDays: number
+      /**
+       * Format: int64
+       * @description Topped in lead
+       */
+      lead: number
+      /**
+       * Format: int64
+       * @description Topped ascents
+       */
+      topped: number
     }
     /** @description A session where I held the rope; readable says whether I may open it. */
     Belay: {
@@ -1754,6 +1807,28 @@ export interface components {
       mode?: string
       route?: components['schemas']['ExportedRoute']
       source?: string
+    }
+    FavoriteBadgesRequest: {
+      /** @description In display order, earned ones, empty to show none */
+      badges: (
+        | 'TOPPED'
+        | 'LEAD'
+        | 'FIRST_GRADE'
+        | 'CLIMBING_DAYS'
+        | 'WEEK_2'
+        | 'WEEK_3'
+        | 'WEEK_4'
+        | 'MONTH_COMPLETE'
+        | 'MONTH_12'
+        | 'STREAK_3W'
+        | 'MONTH_NO_MISS'
+        | 'FULL_LEAD'
+        | 'PERFECT'
+        | 'ZERO_REST'
+        | 'COMEBACK'
+        | 'FLASH'
+        | 'RECORD'
+      )[]
     }
     FavoriteRequest: {
       /**
@@ -2427,6 +2502,8 @@ export interface components {
       ascents: components['schemas']['Ascent'][]
       /** @description The climber */
       author: components['schemas']['MemberRef']
+      /** @description The favourite badges of the climber, next to their name */
+      authorBadges: components['schemas']['ShownBadge'][]
       /** @description The badges this session earned, in the catalogue order (a code twice when earned twice) */
       badges: (
         | 'TOPPED_1'
@@ -2622,6 +2699,32 @@ export interface components {
       maxGradeRank?: number
       /** Format: int32 */
       toppedCount: number
+    }
+    ShownBadge: {
+      /** @enum {string} */
+      badge:
+        | 'TOPPED'
+        | 'LEAD'
+        | 'FIRST_GRADE'
+        | 'CLIMBING_DAYS'
+        | 'WEEK_2'
+        | 'WEEK_3'
+        | 'WEEK_4'
+        | 'MONTH_COMPLETE'
+        | 'MONTH_12'
+        | 'STREAK_3W'
+        | 'MONTH_NO_MISS'
+        | 'FULL_LEAD'
+        | 'PERFECT'
+        | 'ZERO_REST'
+        | 'COMEBACK'
+        | 'FLASH'
+        | 'RECORD'
+      /**
+       * Format: int64
+       * @description Tiers earned, or times earned for a repeatable badge
+       */
+      level: number
     }
     StatusChange: {
       /** @enum {string} */
@@ -3346,6 +3449,30 @@ export interface operations {
       cookie?: never
     }
     requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BadgeLibrary']
+        }
+      }
+    }
+  }
+  chooseFavoriteBadges: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FavoriteBadgesRequest']
+      }
+    }
     responses: {
       /** @description OK */
       200: {

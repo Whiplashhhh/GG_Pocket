@@ -41,7 +41,7 @@ test.describe('friends', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Annuaire du club' })).toBeVisible()
     await page.getByRole('searchbox', { name: 'Chercher un grimpeur' }).fill('marti')
     await expect(page.getByRole('status')).toHaveText('1 grimpeur')
-    await expect(page.getByText('@jules · Au club depuis 2019')).toBeVisible()
+    await expect(page.getByText('@jules · Le forceur')).toBeVisible()
     await page.getByRole('button', { name: 'Demander jules en ami' }).click()
     await expect(page.getByText('En attente', { exact: true })).toBeVisible()
 

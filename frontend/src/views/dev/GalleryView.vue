@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import BadgeToken from '@/components/badge/BadgeToken.vue'
+import FavoriteBadges from '@/components/badge/FavoriteBadges.vue'
 import PageTitle from '@/components/layout/PageTitle.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import GgButton from '@/components/ui/GgButton.vue'
@@ -9,10 +11,13 @@ import HoldSwatch from '@/components/ui/HoldSwatch.vue'
 import RoleBadge from '@/components/ui/RoleBadge.vue'
 import RouteLabel from '@/components/ui/RouteLabel.vue'
 import SegmentedControl from '@/components/ui/SegmentedControl.vue'
+import SeniorityBadge from '@/components/ui/SeniorityBadge.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
 
-import { HOLD_COLORS, SAMPLE_ROUTES } from './galleryFixtures'
+import { BADGES } from '@/lib/badges'
+
+import { HOLD_COLORS, SAMPLE_ROUTES, SENIORITIES } from './galleryFixtures'
 
 const { t } = useI18n()
 
@@ -90,6 +95,37 @@ const topped = ref<'yes' | 'no'>('yes')
         {{ hold.label }}
       </li>
     </ul>
+  </section>
+
+  <section class="space-y-3 border-t border-rule px-4 py-6">
+    <h2 class="text-lg font-title">{{ t('gallery.badges') }}</h2>
+    <ul class="flex flex-wrap gap-2">
+      <li v-for="badge in BADGES" :key="badge" class="flex w-20 flex-col items-center gap-1">
+        <BadgeToken :badge="badge" :level="badge === 'FLASH' ? 12 : 1" />
+        <BadgeToken :badge="badge" :level="0" />
+        <span class="text-center text-micro break-all text-ink-muted">{{ badge }}</span>
+      </li>
+    </ul>
+    <ul class="flex flex-wrap gap-2" :aria-label="t('gallery.rarity')">
+      <li v-for="level in 10" :key="level" class="flex w-14 flex-col items-center text-micro">
+        <BadgeToken badge="TOPPED" :level="level" />
+        {{ level }}
+      </li>
+    </ul>
+    <div class="flex items-center gap-2">
+      <BadgeToken badge="FIRST_GRADE" :level="8" :size="88" />
+      <BadgeToken badge="RECORD" :level="3" :size="88" />
+      <FavoriteBadges
+        :badges="[
+          { badge: 'TOPPED', level: 4 },
+          { badge: 'FLASH', level: 7 },
+          { badge: 'LEAD', level: 9 },
+        ]"
+      />
+    </div>
+    <div class="flex flex-wrap gap-1.5">
+      <SeniorityBadge v-for="seniority in SENIORITIES" :key="seniority" :seniority="seniority" />
+    </div>
   </section>
 
   <section class="space-y-3 border-t border-rule px-4 py-6">

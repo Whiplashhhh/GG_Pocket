@@ -194,7 +194,92 @@ class BadgeIT {
                 .andExpect(jsonPath("$.member.seniority").doesNotExist());
     }
 
+    @Test
+    void myLibraryTellsWhereIStandOnTheCountedTiers() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var route = routes.create(members.create(Role.SETTER));
+        create(me, UUID.randomUUID(), today(), ascent(route, "LEAD", true, false))
+                .andExpect(status().isCreated());
+        create(me, UUID.randomUUID(), today(), ascent(route, "TOP_ROPE", true, false))
+                .andExpect(status().isCreated());
+        var reader = members.create(Role.CLIMBER);
+
+        mockMvc.perform(get("/api/v1/me/badges").with(as(me)))
+                .andExpect(jsonPath("$.progress.topped").value(2))
+                .andExpect(jsonPath("$.progress.lead").value(1))
+                .andExpect(jsonPath("$.progress.climbingDays").value(1));
+        mockMvc.perform(get("/api/v1/members/" + me.id() + "/badges").with(as(reader)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.progress").doesNotExist());
+    }
+
+    @Test
+    void myFavouriteBadgesShowNextToMyNameAtTheirLevel() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var route = routes.create(members.create(Role.SETTER), "6a");
+        var id = idOf(create(me, UUID.randomUUID(), today(), ascent(route, "LEAD", true, true)));
+
+        chooseFavorites(me, "[\"FIRST_GRADE\", \"FLASH\"]")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.favorites", contains("FIRST_GRADE", "FLASH")));
+
+        mockMvc.perform(get("/api/v1/sessions/" + id).with(as(me)))
+                .andExpect(jsonPath("$.authorBadges[0].badge").value("FIRST_GRADE"))
+                .andExpect(jsonPath("$.authorBadges[0].level").value(3))
+                .andExpect(jsonPath("$.authorBadges[1].badge").value("FLASH"))
+                .andExpect(jsonPath("$.authorBadges[1].level").value(1));
+        mockMvc.perform(get("/api/v1/members/" + me.id() + "/badges").with(as(me)))
+                .andExpect(jsonPath("$.favorites", contains("FIRST_GRADE", "FLASH")));
+
+        chooseFavorites(me, "[]").andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/sessions/" + id).with(as(me)))
+                .andExpect(jsonPath("$.authorBadges", empty()));
+    }
+
+    @Test
+    void aFavouriteMustBeEarnedAndThreeAtMost() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var route = routes.create(members.create(Role.SETTER), "6a");
+        create(me, UUID.randomUUID(), today(), ascent(route, "LEAD", true, true))
+                .andExpect(status().isCreated());
+
+        chooseFavorites(me, "[\"COMEBACK\"]")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+        chooseFavorites(me, "[\"TOPPED\", \"TOPPED\"]")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+        chooseFavorites(me, "[\"TOPPED\", \"LEAD\", \"FLASH\", \"FIRST_GRADE\"]")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+        mockMvc.perform(get("/api/v1/me/badges").with(as(me)))
+                .andExpect(jsonPath("$.favorites", empty()));
+    }
+
+    @Test
+    void aFavouriteLostWithItsSessionIsNoLongerShown() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var route = routes.create(members.create(Role.SETTER));
+        var id = idOf(create(me, UUID.randomUUID(), today(), ascent(route, "LEAD", true, false)));
+        chooseFavorites(me, "[\"LEAD\"]").andExpect(status().isOk());
+
+        mockMvc.perform(delete("/api/v1/sessions/" + id).with(as(me)).with(xsrf()))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/v1/me/badges").with(as(me)))
+                .andExpect(jsonPath("$.favorites", empty()));
+    }
+
     // --- helpers ---
+
+    private ResultActions chooseFavorites(Member me, String badges) throws Exception {
+        return mockMvc.perform(
+                put("/api/v1/me/badges/favorites")
+                        .with(as(me))
+                        .with(xsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"badges\": " + badges + "}"));
+    }
 
     private LocalDate today() {
         return ClubTime.today(clock);
