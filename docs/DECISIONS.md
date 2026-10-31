@@ -1042,6 +1042,15 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     car un touriste validé et un nouveau venu n'ont pas le même statut). Les codes d'inscription du club donnent
     Touriste au lieu de Grimpeur. Le profil affiche un message : la direction doit valider le compte. Les comptes
     existant avant la migration sont considérés comme validés.
+  - **Déclaration à l'inscription** : la personne choisit « Je suis licencié·e au club » ou « Je ne suis pas
+    licencié·e ». Dans le second cas, une zone de texte **obligatoire** apparaît : qui elle est par rapport au club
+    (ex. « copain de Julie, je viens deux fois par an »), 10 à 300 caractères, contrôlés côté serveur. C'est une simple
+    déclaration, pas une preuve : le compte reste en attente dans les deux cas. La direction voit la déclaration et le
+    texte dans la liste des comptes en attente ; le rôle proposé par défaut à la validation suit la déclaration
+    (licencié·e → Grimpeur, sinon Touriste), mais la direction choisit librement.
+  - **Le texte de présentation** n'est visible que de la direction et du président, et il est **effacé une fois la
+    décision prise** (validation ou suppression) : il ne sert qu'à décider (minimisation des données). La décision
+    reste dans le journal d'audit.
   - **Compte en attente = carnet personnel seulement** : topo, séances, à faire ; invisible des autres (pas de fil, pas
     d'amis, pas de recherche, pas de podium) tant qu'il n'est pas validé. Protège les membres, dont des mineurs, d'un
     inconnu qui aurait le code affiché à la salle.
@@ -1053,4 +1062,5 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - Toute la logique est vérifiée côté serveur (en attente ⇒ refus des endpoints sociaux, IDOR testés).
 - **Par défaut, à revoir si besoin** : pas de purge automatique des comptes en attente en v1 ; les rôles Responsable
   et au-dessus restent réservés aux licenciés de fait (pas de contrôle technique de la licence).
-- **Statut** : validée par Willem ; à présenter au club (libellé « Touriste », message d'attente).
+- **Statut** : validée par Willem (déclaration et texte ajoutés le 2026-10-31) ; à présenter au club (libellé « Touriste »,
+  message d'attente) ; l'effacement du texte après décision est un choix par défaut, à valider.

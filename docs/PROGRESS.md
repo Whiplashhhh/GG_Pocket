@@ -18,7 +18,8 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 ### Reste
 
 - Implémenter D-107 (`feature/comptes-touristes-0.9.0`) : migration Flyway (rôle, indicateur de validation, comptes
-  existants validés), codes d'inscription → Touriste, règles serveur des comptes en attente, liste « en attente » en
+  existants validés), déclaration licencié·e ou non à l'inscription (texte obligatoire si non, effacé après décision),
+  codes d'inscription → Touriste, règles serveur des comptes en attente, liste « en attente » en
   Gestion, message de profil, i18n, tests (unitaires, IT par rôle, e2e).
 - Hors code : passation de l'admin en prod (le président crée son compte, Willem le passe Admin, le président passe
   Willem Grimpeur puis Touriste).
