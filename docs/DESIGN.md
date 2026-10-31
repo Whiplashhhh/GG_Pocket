@@ -264,6 +264,10 @@ groupe de boutons), habillés par nos tokens.
 - Icônes génériques d'interface : [Lucide](https://lucide.dev) (trait 2 px, grille 24 px), importées une par une.
 - Icônes métier (onglets Topo, À faire, Podium ; prise ; badges en phase 7) : dessinées pour l'appli dans la même grille et le même trait,
   dans `frontend/src/components/icons/`.
+- Badges (`BadgeIcon`, `BadgeMedal`) : des objets de la salle (relais, dégaine, sac à pof, corde clippée…) posés sur la
+  prise de `HoldSwatch` agrandie en médaille. Couleur de prise par famille, assez claire pour l'encre dessus en clair
+  comme en sombre (voies topées jaune, en tête orange, première cotation rose, jours de grimpe vert clair, répétables
+  bleu clair). Non obtenu : prise nue en pointillés, dessin estompé ; le texte à côté dit toujours lequel et comment.
 - Pas d'emoji comme icône d'interface. Les seuls emoji sont les quatre réactions du fil (🔥 💪 👏 🦍), parce que c'est leur nature.
 
 ## 8. Mouvement

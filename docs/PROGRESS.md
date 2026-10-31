@@ -4,6 +4,39 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-31 — Phase 7, PR 7.2 : bibliothèque de badges et ancienneté (front)
+
+**Branche** : `feature/badges-library-0.8.0` (depuis `main` 0.8.0 + #42).
+
+### Fait
+
+- Icônes dessinées `components/icons/BadgeIcon.vue` (grille Lucide : relais, dégaine, marches, sac à pof, semaine,
+  mois, flèches, mois coché, corde clippée, gemme, éclair, retour, prise neuve, coupe) et `BadgeMedal.vue` (la prise de
+  `HoldSwatch` en médaille, couleur de prise par famille, pointillés si non obtenu). DESIGN §7 complété.
+- `api/badges.ts` (`useBadgeLibrary`, invalidé par `sessionsChanged`), `lib/badges.ts` (famille, dessin, marque,
+  sections), `useBadgeText` (noms et conditions en i18n, paliers au pluriel).
+- `BadgeLibrary` / `BadgeLibrarySection` sur mon profil et sur celui d'un membre ; `SeniorityBadge` à côté du badge
+  de rôle ; l'annuaire affiche l'ancienneté au lieu de l'année d'arrivée.
+- Fakes e2e : bibliothèques posées à la main (`club.social.award`), `seniority` dans profil et cartes.
+  Vitest (`lib/badges.spec.ts`, `BadgeLibrary.spec.ts`), e2e `badges.spec.ts`, captures `galerie` (de retour dans la
+  liste) et `profil-badges` relues en clair et sombre à 360 px. CHANGELOG.
+
+### Reste
+
+- PR 7.3 (front) : badges dans la carte du fil (« a débloqué : … », `Session.badges`), moment de déblocage après
+  enregistrement (`unlockedBadges`, un par un, `prefers-reduced-motion`), cocher la ROADMAP.
+
+### Prochaine action
+
+Après fusion de la PR 7.2 : branche `feature/badges-unlock-0.8.0`, lire `components/session/SessionCard.vue` et le
+flux d'enregistrement (`useSaveSession`, vue de saisie), réutiliser `BadgeMedal` (taille 96) et `useBadgeText`.
+
+### Points bloquants
+
+- Aucun. D-105 toujours à valider par le club.
+
+---
+
 ## 2026-10-30 — Phase 7, PR 7.1 : le moteur de badges (backend)
 
 **Branche** : `feature/badges-0.8.0` (depuis `main` 0.8.0 + #39, #40, #41).

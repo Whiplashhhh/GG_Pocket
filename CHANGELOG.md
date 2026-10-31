@@ -22,6 +22,13 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   - **Bilan du topo** : le mur d’un coup d’œil. Les cotations qui manquent, les secteurs bien garnis, les cordes
     libres, les voies qui cartonnent, celles qui prennent la poussière, les plus anciennes (de quoi savoir quoi
     démonter) et les coups de cœur.
+- Les badges débarquent sur ton profil : 49 trophées dessinés comme des prises de résine. Voies topées, voies en
+  tête, première cotation, jours de grimpe, et treize badges à répéter sans modération (semaines à 2, 3 ou 4 séances,
+  mois complet, séance parfaite, le flash, le retour en force…). Ceux que tu as sont en couleur, avec « ×N » pour
+  ceux que tu as gagnés plusieurs fois ; les autres attendent en pointillés, avec ce qu’il faut faire pour les
+  décrocher. Ils se calculent sur tout ton historique, séances passées comprises.
+- Va voir les badges des autres sur leur profil, et leur ancienneté au club : du « Tout frais » au « GG fossile »,
+  en passant par « Le bébé mousqueton » et « Le forceur ». Elle s’affiche aussi dans l’annuaire.
 
 ### Modifié
 
