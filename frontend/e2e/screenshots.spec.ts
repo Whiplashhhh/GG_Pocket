@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test'
 import type { FakeClub, FakeMember } from './fakeClub'
 import { expect, test } from './fixtures'
 
-type Role = 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
+type Role = 'TOURIST' | 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN'
 
 interface Capture {
   name: string
