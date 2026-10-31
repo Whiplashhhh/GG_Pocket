@@ -254,107 +254,76 @@
     "mine": "Mes badges",
     "theirs": "Ses badges",
     "earnedCount": "{earned} sur {total} débloqués",
+    "recent": "Derniers débloqués",
+    "noneYet": "Pas encore de badge. Ta première voie topée t’en donne un, promis.",
+    "theirNoneYet": "Pas encore de badge par ici.",
+    "showAll": "Voir tous les badges",
+    "hideAll": "Replier les badges",
     "loadError": "Impossible de charger les badges.",
     "times": "×{n}",
-    "earnedOn": "Débloqué le {date}",
-    "lastEarnedOn": "Dernière fois le {date}",
-    "notYet": "Pas encore",
-    "srEarned": "débloqué le {date}",
-    "srRepeated": "obtenu {n} fois, la dernière le {date}",
-    "srNotYet": "pas encore débloqué",
-    "families": {
-      "TOPPED": {
-        "title": "Voies topées",
-        "hint": "Chaque ascension topée compte, en tête comme en moulinette, même la dixième sur la même voie."
-      },
-      "LEAD": {
-        "title": "Voies en tête",
-        "hint": "Seules les voies topées en tête comptent."
-      },
-      "FIRST_GRADE": {
-        "title": "Première cotation",
-        "hint": "Ta première voie topée à cette cotation ou plus dure. Un 7a d’emblée, et c’est la pluie de badges."
-      },
-      "CLIMBING_DAYS": {
-        "title": "Jours de grimpe",
-        "hint": "Deux séances le même jour comptent pour un seul jour."
-      },
-      "REPEATABLE": {
-        "title": "À répéter sans modération",
-        "hint": "Ceux-là se gagnent encore et encore."
-      }
+    "level": "Niveau {n}",
+    "levelMax": "Niveau max",
+    "notYet": "Pas encore débloqué",
+    "srLevel": "{name}, niveau {n}",
+    "srLevelMax": "{name}, niveau max",
+    "srTimes": "{name}, obtenu une fois | {name}, obtenu {n} fois",
+    "srNotYet": "{name}, pas encore débloqué",
+    "srFavorites": "Badges favoris : {list}",
+    "earnedOnce": "Débloqué le {date}.",
+    "earnedMany": "Obtenu {n} fois, la première le {first}, la dernière le {last}.",
+    "next": "Prochain niveau : {condition}",
+    "progressLabel": "Vers le niveau suivant",
+    "progress": "{value} sur {target}",
+    "maxReached": "Tout est débloqué. Respect.",
+    "favorite": "Mettre en avant",
+    "unfavorite": "Ne plus mettre en avant",
+    "favoriteFull": "Tu as déjà 3 badges en avant : retires-en un d’abord.",
+    "favoriteHint": "Tes badges mis en avant s’affichent à côté de ton nom, dans le fil et sur ton profil.",
+    "favoriteError": "Impossible de changer tes badges mis en avant.",
+    "close": "Fermer",
+    "names": {
+      "TOPPED": "Voies topées",
+      "LEAD": "Voies en tête",
+      "FIRST_GRADE": "Première cotation",
+      "CLIMBING_DAYS": "Jours de grimpe",
+      "WEEK_2": "2 séances dans la semaine",
+      "WEEK_3": "3 séances dans la semaine",
+      "WEEK_4": "4 séances dans la semaine",
+      "MONTH_COMPLETE": "Mois complet",
+      "MONTH_12": "12 séances dans le mois",
+      "STREAK_3W": "3 semaines d’affilée",
+      "MONTH_NO_MISS": "Un mois sans rater une semaine",
+      "FULL_LEAD": "Séance full tête",
+      "PERFECT": "Séance parfaite",
+      "ZERO_REST": "Séance zéro repos",
+      "COMEBACK": "Le retour en force",
+      "FLASH": "Le flash",
+      "RECORD": "La séance record"
+    },
+    "descriptions": {
+      "TOPPED": "Chaque ascension topée compte, en tête comme en moulinette, même la dixième sur la même voie.",
+      "LEAD": "Seules les voies topées en tête comptent.",
+      "FIRST_GRADE": "Ta première voie topée à cette cotation ou plus dure. Un 7a d’emblée, et c’est la pluie de badges.",
+      "CLIMBING_DAYS": "Deux séances le même jour comptent pour un seul jour.",
+      "WEEK_2": "Grimper 2 jours différents dans la même semaine, du lundi au dimanche.",
+      "WEEK_3": "Grimper 3 jours différents dans la même semaine, du lundi au dimanche.",
+      "WEEK_4": "Grimper 4 jours différents dans la même semaine. Le canapé t’oublie.",
+      "MONTH_COMPLETE": "Grimper 10 jours différents dans le même mois.",
+      "MONTH_12": "Grimper 12 jours différents dans le même mois. Tu dors à la salle ?",
+      "STREAK_3W": "Trois semaines de suite avec au moins 2 jours de grimpe chacune.",
+      "MONTH_NO_MISS": "Grimper au moins une fois chaque semaine qui commence dans le mois.",
+      "FULL_LEAD": "Une séance d’au moins 3 voies, toutes en tête.",
+      "PERFECT": "Une séance d’au moins 3 voies, toutes enchaînées.",
+      "ZERO_REST": "Toper au moins 10 voies dans la même séance.",
+      "COMEBACK": "Revenir grimper après au moins 30 jours sans. On t’attendait.",
+      "FLASH": "Enchaîner du premier coup une voie ouverte depuis 14 jours au plus.",
+      "RECORD": "Battre ton record de voies topées en une séance, à partir de ta 4e séance."
     },
     "tiers": {
-      "TOPPED": {
-        "name": "{n} voie topée | {n} voies topées",
-        "condition": "Toper ta première voie. | Toper {n} voies, tous modes confondus."
-      },
-      "LEAD": {
-        "name": "{n} voie en tête | {n} voies en tête",
-        "condition": "Toper ta première voie en tête. | Toper {n} voies en tête."
-      },
-      "FIRST_GRADE": {
-        "name": "Premier {grade}",
-        "condition": "Toper une voie en {grade} ou plus dure."
-      },
-      "CLIMBING_DAYS": {
-        "name": "{n} jours de grimpe",
-        "condition": "Grimper {n} jours différents."
-      }
-    },
-    "repeatable": {
-      "WEEK_2": {
-        "name": "2 séances dans la semaine",
-        "condition": "Grimper 2 jours différents dans la même semaine, du lundi au dimanche."
-      },
-      "WEEK_3": {
-        "name": "3 séances dans la semaine",
-        "condition": "Grimper 3 jours différents dans la même semaine, du lundi au dimanche."
-      },
-      "WEEK_4": {
-        "name": "4 séances dans la semaine",
-        "condition": "Grimper 4 jours différents dans la même semaine. Le canapé t’oublie."
-      },
-      "MONTH_COMPLETE": {
-        "name": "Mois complet",
-        "condition": "Grimper 10 jours différents dans le même mois."
-      },
-      "MONTH_12": {
-        "name": "12 séances dans le mois",
-        "condition": "Grimper 12 jours différents dans le même mois. Tu dors à la salle ?"
-      },
-      "STREAK_3W": {
-        "name": "3 semaines d’affilée",
-        "condition": "Trois semaines de suite avec au moins 2 jours de grimpe chacune."
-      },
-      "MONTH_NO_MISS": {
-        "name": "Un mois sans rater une semaine",
-        "condition": "Grimper au moins une fois chaque semaine qui commence dans le mois."
-      },
-      "FULL_LEAD": {
-        "name": "Séance full tête",
-        "condition": "Une séance d’au moins 3 voies, toutes en tête."
-      },
-      "PERFECT": {
-        "name": "Séance parfaite",
-        "condition": "Une séance d’au moins 3 voies, toutes enchaînées."
-      },
-      "ZERO_REST": {
-        "name": "Séance zéro repos",
-        "condition": "Toper au moins 10 voies dans la même séance."
-      },
-      "COMEBACK": {
-        "name": "Le retour en force",
-        "condition": "Revenir grimper après au moins 30 jours sans. On t’attendait."
-      },
-      "FLASH": {
-        "name": "Le flash",
-        "condition": "Enchaîner du premier coup une voie ouverte depuis 14 jours au plus."
-      },
-      "RECORD": {
-        "name": "La séance record",
-        "condition": "Battre ton record de voies topées en une séance, à partir de ta 4e séance."
-      }
+      "TOPPED": "toper ta première voie. | toper {n} voies, tous modes confondus.",
+      "LEAD": "toper ta première voie en tête. | toper {n} voies en tête.",
+      "FIRST_GRADE": "toper une voie en {grade} ou plus dure.",
+      "CLIMBING_DAYS": "grimper {n} jours différents."
     }
   },
   "seniority": {
@@ -790,6 +759,7 @@
     "intro": "Page de travail, absente des builds de prod. Bascule le thème dans ton profil ou ton système pour vérifier les deux rendus.",
     "palette": "Palette",
     "badges": "Badges et ancienneté",
+    "rarity": "Échelle de rareté",
     "type": "Typographie",
     "typeSample": "Le grimpeur topa la voie, puis l’enchaîna.",
     "buttons": "Boutons",

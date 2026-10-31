@@ -417,7 +417,7 @@ export class FakeClub {
     if (climbs?.kind === 'empty') return route.fulfill({ status: 204 })
     if (climbs?.kind === 'problem') return fail(climbs.status, climbs.code)
 
-    const social = this.social.handle(me, method, path)
+    const social = this.social.handle(me, method, path, method === 'GET' ? undefined : body())
     if (social?.kind === 'json') return json(social.data, social.status)
     if (social?.kind === 'empty') return route.fulfill({ status: 204 })
     if (social?.kind === 'problem') return fail(social.status, social.code)

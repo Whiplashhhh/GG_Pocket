@@ -5,11 +5,13 @@ import { computed, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import { useBadgeLibrary } from '@/api/badges'
 import { ApiError, errorMessageKey } from '@/api/errors'
 import { useMemberProfile, useMemberSessions } from '@/api/social'
 import { useRouteDetail } from '@/api/topo'
 import SubPageHeader from '@/components/layout/SubPageHeader.vue'
 import BadgeLibrarySection from '@/components/badge/BadgeLibrarySection.vue'
+import FavoriteBadges from '@/components/badge/FavoriteBadges.vue'
 import SessionCard from '@/components/session/SessionCard.vue'
 import FriendshipActions from '@/components/social/FriendshipActions.vue'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
@@ -20,6 +22,7 @@ import RoleBadge from '@/components/ui/RoleBadge.vue'
 import SeniorityBadge from '@/components/ui/SeniorityBadge.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
+import { shownFavorites } from '@/lib/badges'
 
 /**
  * Another member's profile (spec §8.8): the public part for every member; their sessions and
@@ -34,6 +37,10 @@ const data = computed(() => profile.data.value)
 const isFriend = computed(() => data.value?.friendship === 'FRIENDS')
 const sessions = useMemberSessions(id, isFriend)
 const favoriteRoute = useRouteDetail(() => data.value?.favoriteRouteId)
+const badges = useBadgeLibrary(id)
+const favoriteBadges = computed(() =>
+  badges.data.value === undefined ? [] : shownFavorites(badges.data.value),
+)
 
 const notFound = computed(
   () => profile.error.value instanceof ApiError && profile.error.value.code === 'NOT_FOUND',
@@ -119,9 +126,12 @@ useIntersectionObserver(sentinel, ([entry]) => {
           :size="96"
         />
         <div class="flex min-w-0 flex-col items-start gap-1">
-          <h2 id="son-identite" class="max-w-full text-xl font-title wrap-anywhere">
-            {{ data.member.firstName }} {{ data.member.lastName }}
-          </h2>
+          <div class="flex max-w-full flex-wrap items-center gap-x-2 gap-y-1">
+            <h2 id="son-identite" class="max-w-full text-xl font-title wrap-anywhere">
+              {{ data.member.firstName }} {{ data.member.lastName }}
+            </h2>
+            <FavoriteBadges :badges="favoriteBadges" :size="28" />
+          </div>
           <p class="max-w-full wrap-anywhere text-ink-muted">@{{ data.member.nickname }}</p>
           <div class="flex flex-wrap gap-1.5">
             <RoleBadge :role="data.member.role" />

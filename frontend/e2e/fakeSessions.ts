@@ -51,6 +51,8 @@ export class FakeSessions implements AscentSource {
   inRankings: (id: string) => boolean = () => true
   /** Nickname and photo of a member (FakeSocial knows them). */
   memberRef: (id: string) => Schemas['MemberRef'] = (id) => ({ id, nickname: id })
+  /** Favourite badges of a member at their level (FakeSocial knows them). */
+  authorBadges: (id: string) => Schemas['ShownBadge'][] = () => []
 
   constructor(
     private readonly nextId: () => string,
@@ -550,7 +552,7 @@ export class FakeSessions implements AscentSource {
       commentCount: session.comments.filter((comment) => !comment.deleted).length,
       badges: [],
       unlockedBadges: [],
-      authorBadges: [],
+      authorBadges: this.authorBadges(session.memberId),
     }
   }
 

@@ -1,21 +1,30 @@
 import { useI18n } from 'vue-i18n'
 
-import { badgeFamily, badgeMark, type BadgeCode } from '@/lib/badges'
+import { badgeOf, isMaxLevel, isTiered, tierMark, type Badge, type BadgeCode } from '@/lib/badges'
 
-/** The name and the condition of a badge, from the i18n (tiers share one text per family). */
+/** The names, descriptions and tier conditions of the badges, from the i18n. */
 export function useBadgeText() {
   const { t } = useI18n()
 
-  function text(code: BadgeCode, part: 'name' | 'condition'): string {
-    const family = badgeFamily(code)
-    if (family === 'REPEATABLE') return t(`badges.repeatable.${code}.${part}`)
-    const mark = badgeMark(code) ?? ''
-    if (family === 'FIRST_GRADE') return t(`badges.tiers.FIRST_GRADE.${part}`, { grade: mark })
-    return t(`badges.tiers.${family}.${part}`, Number(mark))
-  }
-
   return {
-    name: (code: BadgeCode) => text(code, 'name'),
-    condition: (code: BadgeCode) => text(code, 'condition'),
+    name: (badge: Badge) => t(`badges.names.${badge}`),
+    description: (badge: Badge) => t(`badges.descriptions.${badge}`),
+    /** What a screen reader hears for a medal: the badge and its level. */
+    label(badge: Badge, level: number): string {
+      const name = t(`badges.names.${badge}`)
+      if (level <= 0) return t('badges.srNotYet', { name })
+      if (!isTiered(badge)) return t('badges.srTimes', { name, n: level }, level)
+      return isMaxLevel(badge, level)
+        ? t('badges.srLevelMax', { name })
+        : t('badges.srLevel', { name, n: level })
+    },
+    /** What a tier asks: "toper 10 voies, tous modes confondus." */
+    tierCondition(code: BadgeCode): string {
+      const badge = badgeOf(code)
+      const mark = tierMark(code)
+      return badge === 'FIRST_GRADE'
+        ? t('badges.tiers.FIRST_GRADE', { grade: mark })
+        : t(`badges.tiers.${badge}`, Number(mark))
+    },
   }
 }

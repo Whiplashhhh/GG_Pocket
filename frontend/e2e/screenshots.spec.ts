@@ -51,6 +51,7 @@ const tomBadges = (club: FakeClub, tom: FakeMember) => {
   club.social.award(tom, 'DAYS_25', '2024-09-14')
   club.social.award(tom, 'WEEK_2', '2024-03-18', 14, '2026-10-13')
   club.social.award(tom, 'FLASH', '2025-01-08', 3, '2026-10-17')
+  club.social.favorites.set(tom.id, ['FLASH', 'TOPPED'])
 }
 
 /** Marie's badges: a good start, one repeatable earned many times, plenty left to go for. */
@@ -68,6 +69,8 @@ const marieBadges = (club: FakeClub) => {
   club.social.award(marie, 'WEEK_3', '2026-10-13')
   club.social.award(marie, 'PERFECT', '2026-03-04', 2, '2026-09-30')
   club.social.award(marie, 'COMEBACK', '2026-09-01')
+  club.social.favorites.set(marie.id, ['FIRST_GRADE', 'WEEK_2'])
+  club.social.progress.set(marie.id, { topped: 14, lead: 6, climbingDays: 13 })
 }
 
 /** Marie's friends: Tom and Léa, a request from Jules, one sent to Sam, and strangers. */
@@ -334,8 +337,27 @@ const CAPTURES: Capture[] = [
     as: 'CLIMBER',
     prepare: marieBadges,
     act: async (page) => {
-      await page.getByRole('heading', { name: 'Mes badges' }).scrollIntoViewIfNeeded()
-      await page.getByText('14 sur 49 débloqués').waitFor()
+      await page.getByText('8 sur 17 débloqués').waitFor()
+    },
+  },
+  {
+    name: 'profil-badges-tous',
+    path: '/profil',
+    as: 'CLIMBER',
+    prepare: marieBadges,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Voir tous les badges' }).click()
+    },
+  },
+  {
+    name: 'badge-detail',
+    path: '/profil',
+    as: 'CLIMBER',
+    prepare: marieBadges,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Voir tous les badges' }).click()
+      await page.getByRole('button', { name: 'Voies topées, niveau 3' }).click()
+      await page.getByRole('dialog', { name: 'Voies topées' }).waitFor()
     },
   },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },

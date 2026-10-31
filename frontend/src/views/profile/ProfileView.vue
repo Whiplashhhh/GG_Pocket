@@ -16,6 +16,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useLogout } from '@/api/auth'
+import { useBadgeLibrary } from '@/api/badges'
 import { useMyProfile } from '@/api/me'
 import { useMetaQuery } from '@/api/meta'
 import { useMyFavorites, useRouteDetail } from '@/api/topo'
@@ -33,7 +34,9 @@ import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
 import AppUpdateCheck from '@/components/profile/AppUpdateCheck.vue'
 import BadgeLibrarySection from '@/components/badge/BadgeLibrarySection.vue'
+import FavoriteBadges from '@/components/badge/FavoriteBadges.vue'
 import { errorMessageKey } from '@/api/errors'
+import { shownFavorites } from '@/lib/badges'
 import { formatDate } from '@/lib/format'
 import { isAtLeast } from '@/lib/roles'
 import { useThemeStore, type ThemePreference } from '@/stores/theme'
@@ -45,6 +48,10 @@ const { data: meta } = useMetaQuery()
 const { preference } = storeToRefs(useThemeStore())
 const logout = useLogout()
 const favoriteRoute = useRouteDetail(() => profile.value?.favoriteRouteId)
+const badges = useBadgeLibrary(undefined)
+const favoriteBadges = computed(() =>
+  badges.data.value === undefined ? [] : shownFavorites(badges.data.value),
+)
 const favorites = useMyFavorites()
 const activeFavorites = computed(() =>
   (favorites.data.value ?? []).filter((route) => route.status !== 'DISMOUNTED'),
@@ -100,9 +107,12 @@ const facts = computed(() => {
         :size="96"
       />
       <div class="flex min-w-0 flex-col items-start gap-1">
-        <h2 id="mon-identite" class="text-xl font-title break-words">
-          {{ profile.firstName }} {{ profile.lastName }}
-        </h2>
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <h2 id="mon-identite" class="text-xl font-title break-words">
+            {{ profile.firstName }} {{ profile.lastName }}
+          </h2>
+          <FavoriteBadges :badges="favoriteBadges" :size="28" />
+        </div>
         <p class="text-ink-muted">@{{ profile.nickname }}</p>
         <div class="flex flex-wrap gap-1.5">
           <RoleBadge :role="profile.role" />
