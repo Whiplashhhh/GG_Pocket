@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 0.9.0 — 2026-10-31
+
 ### Ajouté
 
 - Le podium ouvre ! Deux classements du mois, en direct : **Séances** (tes jours de grimpe, deux séances le même
