@@ -162,8 +162,8 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 
 - [x] Moteur pur et recalculable, catalogue complet, un test par badge (PR 7.1, D-105)
 - [x] Icônes de badges dessinées (PR 7.2)
-- [ ] Bibliothèque de badges, badges dans le fil, ancienneté (bibliothèque et ancienneté : PR 7.2 ; fil : PR 7.3)
-- [ ] Moment de déblocage
+- [x] Bibliothèque de badges, badges dans le fil, ancienneté (bibliothèque, favoris et ancienneté : PR 7.2, D-106 ; fil : PR 7.3)
+- [x] Moment de déblocage (PR 7.3)
 
 ## Phase 8 — Finitions et lancement
 

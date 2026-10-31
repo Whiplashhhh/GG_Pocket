@@ -273,7 +273,10 @@ groupe de boutons), habillés par nos tokens.
 
 ## 8. Mouvement
 
-- **Un seul moment orchestré** : l'enregistrement d'une séance (validation, puis badges débloqués un par un). Conçu en phase 4 et 7.
+- **Un seul moment orchestré** : l'enregistrement d'une séance (validation, puis badges débloqués un par un). Conçu en phase 4 et 7 :
+  le tampon (1,1 s), puis chaque badge en grand, qui « saute » sur l'écran (rebond 520 ms), avec son nom, son niveau (ou ×N) et
+  sa description ; le grimpeur avance à son rythme (« Badge suivant », puis « Continuer »). Les paliers d'une même famille
+  ne font qu'un écran (le plus haut). Sans badge, le tampon s'en va seul ; hors ligne, pas de badge (ils viendront avec la carte).
 - Partout ailleurs : transitions courtes (150–200 ms, `ease-out`) qui expliquent un changement d'état (feuille qui monte, ligne qui disparaît).
 - Pas d'animation d'entrée sur chaque bloc.
 - `prefers-reduced-motion: reduce` : toutes les transitions passent en fondu instantané, le moment de validation devient statique.

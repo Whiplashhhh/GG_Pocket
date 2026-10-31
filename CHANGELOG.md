@@ -28,6 +28,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   parfaite, le flash, le retour en force…) et affichent « ×N ». Ton profil montre les trois derniers, déplie le reste
   d'un geste. Touche un badge pour lire ce qu'il faut faire et voir où tu en es pour le prochain niveau.
   Tout est calculé sur ton historique complet, séances passées comprises.
+- Enregistre une séance qui débloque quelque chose et savoure : chaque nouveau badge débarque en grand, un par un,
+  avant le retour au fil. Et la carte de la séance garde la trace (« tom.bloc a débloqué : Le flash »), pour que
+  les copains puissent râler.
 - Mets jusqu'à trois badges en avant : ils s'affichent à côté de ton nom, sur ton profil et dans le fil.
 - Va voir les badges des autres sur leur profil, et leur ancienneté au club : du « Tout frais » au « GG fossile »,
   en passant par « Le bébé mousqueton » et « Le forceur ». Elle s’affiche aussi dans l’annuaire.
