@@ -93,6 +93,14 @@ test.describe('joining the club', () => {
     await page.getByLabel('Mot de passe', { exact: true }).fill('azertyuiop')
     await page.getByRole('checkbox', { name: /J’ai lu la page/ }).check()
     await page.getByRole('button', { name: 'Créer mon compte' }).click()
+    await expect(page.getByText('Dis-nous si tu as ta licence au club.')).toBeVisible()
+    // Not licensed: a few words for the board, then the server has its say on the password.
+    await page.getByRole('radio', { name: /Non, je passe de temps en temps/ }).check()
+    await page.getByLabel('Qui es-tu pour le club ?').fill('Une amie')
+    await page.getByRole('button', { name: 'Créer mon compte' }).click()
+    await expect(page.getByText('Quelques mots de plus : 10 caractères minimum.')).toBeVisible()
+    await page.getByLabel('Qui es-tu pour le club ?').fill('Copine de Julie, je viens l’été.')
+    await page.getByRole('button', { name: 'Créer mon compte' }).click()
     await expect(
       page.getByText('Ce mot de passe fait partie des plus courants', { exact: false }),
     ).toBeVisible()
@@ -118,6 +126,16 @@ test.describe('joining the club', () => {
     await page.getByRole('button', { name: 'C’est parti !' }).click()
     await expect(page).toHaveURL(/\/actu$/)
     await expect(page.getByRole('link', { name: 'Mon profil' })).toContainText('lea.d')
+    // A tourist awaiting the board, with what she declared (D-107).
+    await expect(
+      page.getByRole('heading', { name: 'Ton compte attend le feu vert de la direction' }),
+    ).toBeVisible()
+    expect(club.members.find((member) => member.nickname === 'lea.d')).toMatchObject({
+      role: 'TOURIST',
+      validated: false,
+      declaredLicensed: false,
+      joinNote: 'Copine de Julie, je viens l’été.',
+    })
 
     // 30 days later: no sign-in, and the postponed invitation comes back.
     club.advance(30)

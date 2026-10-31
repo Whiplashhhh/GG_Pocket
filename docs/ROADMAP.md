@@ -167,7 +167,7 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 
 ## Phase 8 — Finitions et lancement
 
-- [ ] Comptes « Touriste » et validation des nouveaux comptes par la direction (D-107)
+- [x] Comptes « Touriste » et validation des nouveaux comptes par la direction (D-107, `feature/comptes-touristes-0.9.0`)
 - [ ] Logo téléversable (clair/sombre) et ses emplacements ; icônes PWA ; captures d'écran du manifeste (D-055)
 - [ ] « Quoi de neuf ? » (CHANGELOG embarqué, fenêtre une fois par version)
 - [ ] Audits accessibilité et Lighthouse ≥ 90

@@ -262,6 +262,22 @@ const someMembers = (club: FakeClub) => {
     email: 'lea@example.org',
     lastSeenAt: '2026-10-20T07:30:00Z',
   })
+  club.addMember({
+    nickname: 'alix',
+    firstName: 'Alix',
+    lastName: 'Moreau',
+    role: 'TOURIST',
+    validated: false,
+    declaredLicensed: false,
+    joinNote: 'Collègue de Lou au boulot, je viens grimper un jeudi sur deux avec elle.',
+    registeredAt: '2026-10-19T20:15:00Z',
+  })
+}
+
+/** Marie has just joined: her account awaits the board (D-107). */
+const marieAwaits = (club: FakeClub) => {
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  if (marie) marie.validated = false
 }
 
 /** Openers with an account, Sam credited on Bye Bye Morice; a cord and a colour put away. */
@@ -319,6 +335,24 @@ const CAPTURES: Capture[] = [
       await page.getByRole('button', { name: 'Créer mon compte' }).click()
     },
   },
+  {
+    name: 'inscription-touriste',
+    path: '/inscription?code=K7XM-P2QA',
+    as: null,
+    prepare: (club) => {
+      club.addCode('K7XM-P2QA')
+    },
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Vérifier le code' }).click()
+      await page.getByRole('radio', { name: /Non, je passe de temps en temps/ }).check()
+      await page
+        .getByLabel('Qui es-tu pour le club ?')
+        .fill('Copine de Julie, je viens deux fois par an quand je passe dans le Nord.')
+      await page.getByLabel('Qui es-tu pour le club ?').scrollIntoViewIfNeeded()
+    },
+  },
+  { name: 'profil-en-attente', path: '/profil', as: 'TOURIST', prepare: marieAwaits },
+  { name: 'podium-en-attente', path: '/podium', as: 'TOURIST', prepare: marieAwaits },
   { name: 'tes-donnees', path: '/tes-donnees', as: null },
   {
     name: 'nouveau-mot-de-passe',
@@ -629,6 +663,20 @@ const CAPTURES: Capture[] = [
     act: async (page) => {
       await page.getByRole('link', { name: /Talon/ }).first().click()
       await page.getByRole('button', { name: 'Créer un lien de réinitialisation' }).click()
+    },
+  },
+  {
+    name: 'membre-a-valider',
+    path: '/gestion/membres',
+    as: 'BOARD',
+    desktop: true,
+    prepare: someMembers,
+    act: async (page) => {
+      await page
+        .getByRole('region', { name: /En attente de validation/ })
+        .getByRole('link', { name: /Alix Moreau/ })
+        .click()
+      await page.getByRole('heading', { name: 'Nouveau compte à valider' }).waitFor()
     },
   },
   {

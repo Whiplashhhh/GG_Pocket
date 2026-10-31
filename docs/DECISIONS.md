@@ -1062,5 +1062,18 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - Toute la logique est vérifiée côté serveur (en attente ⇒ refus des endpoints sociaux, IDOR testés).
 - **Par défaut, à revoir si besoin** : pas de purge automatique des comptes en attente en v1 ; les rôles Responsable
   et au-dessus restent réservés aux licenciés de fait (pas de contrôle technique de la licence).
+- **Mise en œuvre** (choix par défaut, faciles à revoir) :
+  - Rôle `TOURIST` sous `CLIMBER` dans la hiérarchie ; toutes les méthodes « membre » passent de `hasRole('CLIMBER')`
+    à `hasRole('TOURIST')`. La validation est une autorité à part (`VALIDATED`, ajoutée par `CurrentMemberFilter`),
+    exigée par `@ValidatedMember` : annuaire, profils et badges des autres, demande d'ami, podium, ajout d'un
+    commentaire de voie. Colonnes `validated_at`, `declared_licensed`, `join_note` (V17).
+  - Un compte en attente garde son fil (il n'y voit que ses séances : il n'a pas d'amis), lit les commentaires des
+    voies sans en écrire, et ne peut ni nommer un assureur ni être nommé (ça le rendrait visible).
+  - Les autres ne le voient nulle part : absent de l'annuaire, profil et badges en 404, demande d'ami refusée,
+    exclu des scores du podium (ses séances comptent dès la validation, pour les mois pas encore figés).
+  - Pas de changement de rôle avant validation (`MEMBER_AWAITING_VALIDATION`) : on valide d'abord, on promeut
+    ensuite. Audit : `MEMBER_VALIDATED` (après = rôle choisi) et `MEMBER_REFUSED`.
+  - Le code de premier démarrage crée toujours un admin validé d'office. Seed : comptes `touriste` (validé) et
+    `nouveau` (en attente, non licencié).
 - **Statut** : validée par Willem (déclaration et texte ajoutés le 2026-10-31) ; à présenter au club (libellé « Touriste »,
   message d'attente) ; l'effacement du texte après décision est un choix par défaut, à valider.

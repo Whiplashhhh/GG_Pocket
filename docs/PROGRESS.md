@@ -4,6 +4,41 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-10-31 — Comptes « Touriste » et validation par la direction (D-107)
+
+**Branche** : `feature/comptes-touristes-0.9.0` (depuis `chore/comptes-touristes-decision`, PR #47 ; #46 y est incluse).
+
+### Fait
+
+- Backend : rôle `TOURIST`, V17 (`validated_at`, `declared_licensed`, `join_note`, codes du club → `TOURIST`),
+  `LicenceDeclaration`, `Member.awaitingValidation` / `validate`, autorité `VALIDATED` + `@ValidatedMember`
+  (annuaire, profils, badges des autres, demande d'ami, podium, commentaire de voie), comptes en attente exclus de
+  l'annuaire, du podium et des assureurs, `PUT /admin/members/{id}/validation`, refus = `DELETE` par la direction
+  d'un compte jamais validé (`MEMBER_REFUSED`). Seed : `touriste`, `nouveau`.
+- Tests : unitaires (déclaration, validation, gouvernance), IT (inscription, gestion, matrice d'autorisations avec
+  compte en attente, annuaire, podium, assureurs, seed). CI backend verte sur le premier commit.
+- Front : question de licence + petit mot à l'inscription (`LicenceQuestion`), encart d'attente (profil, fil,
+  podium, assureur, commentaires de voie), garde `meta.validated`, section « En attente de validation » et bloc de
+  validation dans la gestion, i18n, faux backend, e2e `validation.spec.ts`, captures relues (clair, sombre, 360 et
+  1280 px).
+- Contrat OpenAPI écrit à la main : le test de contrat de la CI l'a confirmé identique.
+
+### Reste
+
+- Relecture et fusion de #47 (Willem), qui ferme #46.
+- Hors code : passation de l'admin en prod (le président crée son compte, Willem le passe Admin, le président passe
+  Willem Touriste).
+
+### Prochaine action
+
+Vérifier la CI du dernier commit de #47, puis reprendre la phase 8 (logo téléversable).
+
+### Points bloquants
+
+Aucun.
+
+---
+
 ## 2026-10-31 — Décision : comptes « Touriste » et validation par la direction
 
 **Branche** : `chore/comptes-touristes-decision` (depuis `main` en 0.9.0, docs seulement).

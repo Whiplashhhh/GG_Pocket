@@ -111,6 +111,7 @@ function fullName(member: MemberSummary): string {
               <span v-else-if="member.declaredLicensed === false">{{
                 t('members.declaredVisitor')
               }}</span>
+              <span v-if="member.declaredLicensed !== undefined" aria-hidden="true">·</span>
               <span>{{ formatRelative(member.registeredAt) }}</span>
             </span>
           </span>
@@ -194,7 +195,7 @@ function fullName(member: MemberSummary): string {
               >
               <span
                 v-else-if="!member.validated"
-                class="rounded-control border border-ink px-1.5 text-micro font-semibold text-ink"
+                class="rounded-control border border-ink px-1.5 text-micro font-semibold whitespace-nowrap text-ink"
                 >{{ t('members.pendingChip') }}</span
               >
             </span>
@@ -253,7 +254,7 @@ function fullName(member: MemberSummary): string {
             {{ t(`roleNames.${member.role}`) }}
             <span
               v-if="!member.validated"
-              class="ml-1 rounded-control border border-ink px-1.5 text-micro font-semibold text-ink"
+              class="ml-1 inline-block rounded-control border border-ink px-1.5 text-micro font-semibold whitespace-nowrap text-ink"
               >{{ t('members.pendingChip') }}</span
             >
           </td>
