@@ -182,6 +182,6 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 
 ## Maintenance (hors phases)
 
-- [ ] Passer à Node 26 LTS après le 2026-10-28 (D-020)
+- [x] Passer à Node 26 LTS après le 2026-10-28 (D-020, fait le 2026-11-01)
 - [ ] Passer à TypeScript 7 quand typescript-eslint et openapi-typescript le supportent (D-020)
 - [ ] Obtenir du club un logo vectoriel ou haute définition et sa version fond noir (D-039)

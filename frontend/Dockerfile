@@ -2,11 +2,11 @@
 # GG Pocket web: the built PWA served by Caddy, which also forwards /api to the API container.
 # Build from the repository root: docker build -f frontend/Dockerfile .
 
-FROM node:24-alpine AS build
-ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable
+FROM node:26-alpine AS build
 WORKDIR /src/frontend
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
+# Node 25+ no longer ships corepack: npm installs the pnpm pinned by packageManager (pnpm@X.Y.Z).
+RUN npm install --global --no-audit --no-fund "$(node -p "require('./package.json').packageManager")"
 RUN pnpm install --frozen-lockfile
 COPY VERSION /src/VERSION
 COPY frontend/ ./

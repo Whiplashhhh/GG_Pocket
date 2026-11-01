@@ -48,7 +48,7 @@ dès qu'elles existent. Tiens cette section à jour.
   - tout vérifier : `./mvnw verify` (Spotless, unitaires `*Test`, intégration `*IT` Testcontainers, ArchUnit, contrat OpenAPI) ;
   - formater : `./mvnw spotless:apply` (google-java-format AOSP ; binaire natif possible : `google-java-format --aosp --skip-reflowing-long-strings --replace`, sans quoi il recoupe les longues chaînes autrement que Spotless) ;
   - mettre à jour le contrat : `./mvnw verify -Dgg.openapi.write=true` (écrit `frontend/src/api/openapi.json`).
-- Frontend (`frontend/`, Node 24, pnpm 12) :
+- Frontend (`frontend/`, Node 26, pnpm 12) :
   - `pnpm install`, `pnpm dev` (port 5173, `/api` → 8080), galerie sur `/dev/galerie` ;
   - `pnpm lint`, `pnpm format:check` (ou `pnpm format`), `pnpm typecheck`, `pnpm test` ;
   - `pnpm api:types` après tout changement du contrat (la CI vérifie la synchro) ;
