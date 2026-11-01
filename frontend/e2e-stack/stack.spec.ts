@@ -59,6 +59,15 @@ test('a demo climber signs in, browses and signs out without any CSP violation',
       JSON.stringify({ dismissals: 3, lastDismissedAt: Date.now() }),
     )
   })
+  // « Quoi de neuf ? » too: the demo climber has seen the news of any version.
+  await page.addInitScript(() => {
+    // eslint-disable-next-line @typescript-eslint/unbound-method -- called on its storage below
+    const getItem = Storage.prototype.getItem
+    Storage.prototype.getItem = function (this: Storage, key: string) {
+      const value = getItem.call(this, key)
+      return value === null && key.startsWith('gg-pocket:release-notes:') ? '999.0.0' : value
+    }
+  })
   const violations = cspViolations(page)
   const calls: string[] = []
   page.on('response', (response) => {

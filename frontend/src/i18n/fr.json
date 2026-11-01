@@ -675,6 +675,7 @@
     "devices": "Mes appareils",
     "belays": "Mes assurages",
     "install": "Installer l’appli",
+    "releaseNotes": "Quoi de neuf ?",
     "privacy": "Tes données",
     "account": "Mes données et mon compte",
     "logout": "Se déconnecter",
@@ -955,6 +956,23 @@
     "showAge": "Afficher mon âge sur mon profil",
     "appearsInRankings": "Apparaître dans les classements du podium",
     "appearsInRankingsHint": "Décoché, tu grimpes incognito : tes séances ne comptent pas au podium."
+  },
+  "releaseNotes": {
+    "title": "Quoi de neuf ?",
+    "intro": "Tu grimpes sur GG Pocket {version}. Voici ce qui a bougé, du plus frais au plus ancien.",
+    "popupIntro": "GG Pocket passe en {version}. Avant de remettre les chaussons, voici ce qui a changé.",
+    "ok": "C’est noté, on grimpe !",
+    "all": "Toutes les nouveautés",
+    "older": "Voir la version d’avant | Voir les {n} versions d’avant",
+    "version": "Version {version}",
+    "releasedOn": "Sortie le {date}",
+    "groups": {
+      "Ajouté": "Nouveau",
+      "Modifié": "Ça change",
+      "Corrigé": "Réparé",
+      "Supprimé": "Retiré",
+      "Sécurité": "Sécurité"
+    }
   },
   "install": {
     "title": "Installe GG Pocket",

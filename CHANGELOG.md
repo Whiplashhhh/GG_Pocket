@@ -19,6 +19,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   ont déclaré, puis « Grimpeur GG », « Touriste », ou « Refuser » si personne ne les connaît (le compte est alors
   supprimé). Tout est noté dans le journal.
 
+- **Quoi de neuf ?** Après chaque mise à jour, au premier lancement, une fenêtre te raconte ce qui a changé depuis
+  ta dernière visite (une fois par version, promis). Tu as raté un épisode ? Tout l’historique t’attend dans ton
+  profil, rubrique « Quoi de neuf ? ».
+
 ## 0.9.0 — 2026-10-31
 
 ### Ajouté

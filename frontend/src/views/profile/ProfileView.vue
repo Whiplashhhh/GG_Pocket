@@ -8,6 +8,7 @@ import {
   Link2,
   ShieldCheck,
   Smartphone,
+  Sparkles,
   Users,
   Wrench,
 } from 'lucide-vue-next'
@@ -234,6 +235,10 @@ const facts = computed(() => {
       <SettingsLink to="/profil/compte">
         <template #icon><FileDown :size="20" /></template>
         {{ t('profile.account') }}
+      </SettingsLink>
+      <SettingsLink to="/profil/nouveautes">
+        <template #icon><Sparkles :size="20" /></template>
+        {{ t('profile.releaseNotes') }}
       </SettingsLink>
       <SettingsLink to="/tes-donnees">
         <template #icon><ShieldCheck :size="20" /></template>

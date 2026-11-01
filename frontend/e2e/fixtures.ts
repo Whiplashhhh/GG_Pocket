@@ -24,6 +24,8 @@ export const test = base.extend<{
   installInvite: boolean
   /** The last chance pop-up shows up by itself; most tests keep it quiet. */
   lastChancePopup: boolean
+  /** « Quoi de neuf ? » pops up after an update; most tests keep it quiet. */
+  releaseNotesPopup: boolean
   club: FakeClub
   me: FakeMember | null
 }>({
@@ -31,6 +33,7 @@ export const test = base.extend<{
   signedInAs: ['CLIMBER', { option: true }],
   installInvite: [false, { option: true }],
   lastChancePopup: [false, { option: true }],
+  releaseNotesPopup: [false, { option: true }],
   club: async ({ signedInAs, lastChancePopup }, use) => {
     const club = new FakeClub()
     club.topo.quietLastChance = !lastChancePopup
@@ -42,7 +45,7 @@ export const test = base.extend<{
   me: async ({ club }, use) => {
     await use(club.members.find((member) => member.nickname === 'marie') ?? null)
   },
-  page: async ({ page, meta, club, installInvite }, use) => {
+  page: async ({ page, meta, club, installInvite, releaseNotesPopup }, use) => {
     await club.install(page)
     if (Object.keys(meta).length > 0) {
       await page.route('**/api/v1/meta', (route) =>
@@ -64,8 +67,24 @@ export const test = base.extend<{
         )
       })
     }
+    if (!releaseNotesPopup) {
+      await page.addInitScript(quietReleaseNotes)
+    }
     await use(page)
   },
 })
+
+/**
+ * Every member, whatever their id, has already seen the news of any version: the app finds
+ * « gg-pocket:release-notes:<member id> » set to a version far ahead.
+ */
+export function quietReleaseNotes() {
+  // eslint-disable-next-line @typescript-eslint/unbound-method -- called on its storage below
+  const getItem = Storage.prototype.getItem
+  Storage.prototype.getItem = function (this: Storage, key: string) {
+    const value = getItem.call(this, key)
+    return value === null && key.startsWith('gg-pocket:release-notes:') ? '999.0.0' : value
+  }
+}
 
 export { expect } from '@playwright/test'
