@@ -4,6 +4,40 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-01 — Node 26 LTS et « Quoi de neuf ? » (D-108)
+
+**Branches** : `chore/node-26` (PR #48) puis `feature/quoi-de-neuf-0.9.0` (depuis `main`, indépendante de #48).
+
+### Fait
+
+- Node 26.13.0 « Lithium » (LTS depuis le 2026-10-28) : `.nvmrc`, `node:26-alpine`, `engines`, `@types/node` 26,
+  D-020. Lint, format, types, tests et build verts en local sous Node 26 ; Node 26 installé dans `~/.local/node26`
+  (tarball npm `node-linux-x64`, intégrité vérifiée), le lien `~/.local/bin/node` pointe dessus.
+- « Quoi de neuf ? » (spec §8.12, D-108) : parseur du CHANGELOG (`src/lib/changelog.ts`) exécuté au build par un
+  plugin Vite (`virtual:changelog`), fenêtre après mise à jour dans `AppShell` (une fois par version et par membre,
+  mémorisée dans le navigateur, nouveaux comptes épargnés, jamais pendant une saisie ni avec l'invitation à
+  installer), écran `/profil/nouveautes` (3 dernières versions, les autres sur demande), lien dans le profil.
+  Dockerfile web et `.dockerignore` : `CHANGELOG.md` copié.
+- Tests : Vitest (parseur, comparaison de versions, sélection, lecture du vrai CHANGELOG), e2e `release-notes.spec.ts`,
+  option de fixture `releaseNotesPopup` (fenêtre discrète par défaut, aussi dans `e2e-stack`), captures
+  `actu-nouveautes` et `nouveautes` relues en clair et en sombre à 360 px. Suite e2e Desktop Chrome complète : 88 verts.
+
+### Reste
+
+- Relecture et fusion de #48 et de la PR « Quoi de neuf ? » (Willem).
+- Phase 8 : logo téléversable (en attente de Willem, il prendra aussi place sur l'écran de notes), guide du club,
+  puis revue de sécurité, audits, seed final.
+
+### Prochaine action
+
+Vérifier la CI des deux PR. Ensuite, si le logo n'est toujours pas prêt : rédiger `docs/GUIDE_CLUB.md`.
+
+### Points bloquants
+
+Aucun (le logo attend Willem).
+
+---
+
 ## 2026-10-31 — Comptes « Touriste » et validation par la direction (D-107)
 
 **Branche** : `feature/comptes-touristes-0.9.0` (depuis `chore/comptes-touristes-decision`, PR #47 ; #46 y est incluse).

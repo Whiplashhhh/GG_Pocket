@@ -4,9 +4,10 @@ import { fileURLToPath, URL } from 'node:url'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
-import { defineConfig, type UserConfig } from 'vite'
+import { defineConfig, type Plugin, type UserConfig } from 'vite'
 import { VitePWA, type VitePWAOptions } from 'vite-plugin-pwa'
 
+import { parseChangelog } from './src/lib/changelog.ts'
 import { OFFLINE_READS, OFFLINE_READS_CACHE } from './src/lib/offlineReads.ts'
 
 /** Single source of truth for the version: the repository's VERSION file (docs/DECISIONS.md D-032). */
@@ -64,6 +65,24 @@ const pwaOptions = {
 } satisfies Partial<VitePWAOptions>
 
 /**
+ * Release notes (spec §8.12): the repository's CHANGELOG.md, parsed at build time into
+ * `virtual:changelog` (default export: the published releases). The app never sees Markdown.
+ */
+function changelog(): Plugin {
+  const id = 'virtual:changelog'
+  const file = fileURLToPath(new URL('../CHANGELOG.md', import.meta.url))
+  return {
+    name: 'gg-changelog',
+    resolveId: (source) => (source === id ? `\0${id}` : undefined),
+    load(source) {
+      if (source !== `\0${id}`) return undefined
+      this.addWatchFile(file)
+      return `export default ${JSON.stringify(parseChangelog(readFileSync(file, 'utf8')))}`
+    },
+  }
+}
+
+/**
  * Shared by the app and the unit tests. Unit tests skip the i18n precompilation (its virtual
  * modules do not load in Vitest, and the runtime compiler is fine there) and the service worker.
  */
@@ -77,6 +96,7 @@ export function createViteConfig({
   return {
     plugins: [
       vue(),
+      changelog(),
       tailwindcss(),
       // Precompiles messages at build time: no runtime message compiler, so no eval (strict CSP).
       precompileMessages &&

@@ -9,6 +9,7 @@ COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml 
 RUN npm install --global --no-audit --no-fund "$(node -p "require('./package.json').packageManager")"
 RUN pnpm install --frozen-lockfile
 COPY VERSION /src/VERSION
+COPY CHANGELOG.md /src/CHANGELOG.md
 COPY frontend/ ./
 RUN pnpm build \
     && if grep -Eq '<script>|<script [^>]*>[^<]' dist/index.html; then \

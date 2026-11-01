@@ -11,6 +11,7 @@ import { api } from './client'
 import { request, requestNoContent } from './request'
 import type { components } from './schema'
 import { forgetOfflineReads } from '@/lib/offlineReads'
+import { markReleaseNotesSeen } from '@/lib/releaseNotes'
 
 export type AuthState = components['schemas']['AuthState']
 export type CurrentMember = components['schemas']['CurrentMember']
@@ -123,7 +124,11 @@ export function useRegister() {
   const signedIn = useSignedIn()
   return useMutation({
     mutationFn: (body: RegisterRequest) => request(api.POST('/api/v1/auth/register', { body })),
-    onSuccess: signedIn,
+    onSuccess: (member: CurrentMember) => {
+      // A brand-new member has nothing to catch up on: no « Quoi de neuf ? » at first launch.
+      markReleaseNotesSeen(member.id)
+      signedIn(member)
+    },
   })
 }
 

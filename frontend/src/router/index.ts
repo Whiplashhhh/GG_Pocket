@@ -159,6 +159,11 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'devices.title' },
   },
   {
+    path: '/profil/nouveautes',
+    component: () => import('@/views/profile/ReleaseNotesView.vue'),
+    meta: { titleKey: 'releaseNotes.title' },
+  },
+  {
     path: '/profil/installer',
     component: () => import('@/views/profile/InstallView.vue'),
     meta: { titleKey: 'install.title' },

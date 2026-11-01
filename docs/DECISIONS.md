@@ -44,6 +44,7 @@ direction) ou **Willem**.
 | D-094 | Le carnet : chiffres, pyramide par cotation, toutes mes voies ? | Willem | Oui, depuis le Profil ; celui des amis en phase 5 |
 | D-105 | Badges : un 6a- ne donne pas « 6a » ; « retour » à 30 jours d'écart ; un flash par voie ? | club | Oui (détails dans D-105) |
 | D-106 | Badges à niveaux : couleur = niveau (échelle de rareté), couleur des répétables selon ×N, 3 favoris | Willem | Oui (détails dans D-106) |
+| D-108 | « Quoi de neuf ? » mémorisé par membre dans le navigateur (pas sur le serveur) | Willem | Oui : une fois par version, par membre et par appareil ; nouveaux comptes épargnés |
 
 ---
 
@@ -1077,3 +1078,28 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     `nouveau` (en attente, non licencié).
 - **Statut** : validée par Willem (déclaration et texte ajoutés le 2026-10-31) ; à présenter au club (libellé « Touriste »,
   message d'attente) ; l'effacement du texte après décision est un choix par défaut, à valider.
+
+### D-108 — « Quoi de neuf ? » : notes de version embarquées et fenêtre après mise à jour
+- **Contexte** : spec §8.12. `CHANGELOG.md` est la seule source, embarquée au build ; une fenêtre présente les
+  nouveautés « une seule fois par version et par utilisateur ».
+- **Choix** :
+  - **Build** : un petit plugin Vite (`vite.config.ts`) lit `../CHANGELOG.md` et le transforme en données
+    (`virtual:changelog`, parseur `src/lib/changelog.ts`), chargées dans un morceau à part. L'appli n'affiche jamais de
+    Markdown brut (pas de `v-html`) : seuls les titres de version, les groupes, les listes imbriquées, le gras et les
+    liens `https` sont compris. « Non publié » n'est jamais montré. Le Dockerfile du web copie `CHANGELOG.md`.
+  - **Mémoire** : la dernière version vue est gardée **dans le navigateur, par membre**
+    (`localStorage`, clé `gg-pocket:release-notes:<id du membre>`). Pas de colonne ni d'endpoint côté serveur :
+    rien de sensible, et un changement d'appareil ne coûte qu'une fenêtre de plus. Stockage bloqué (navigation
+    privée) : au plus une fois par visite.
+  - **Contenu** : les versions publiées depuis la dernière vue, jusqu'à celle qui tourne, trois au plus ; jamais rien
+    vu sur cet appareil : seulement la version en cours. Une version sans note ou un retour en arrière : rien.
+  - **Nouveaux comptes** : l'inscription marque la version en cours comme vue (rien à rattraper).
+  - **Une fenêtre à la fois** : pas pendant la saisie d'une séance (`/seance…`), pas dans la même visite que
+    l'invitation à installer (elle attend le lancement suivant), et la fenêtre « dernière chance » attend sa fermeture.
+  - **Écran** « Quoi de neuf ? » dans le profil (`/profil/nouveautes`) : les trois dernières versions, les plus
+    anciennes sur demande. Les groupes Keep a Changelog sont renommés pour les grimpeurs : Ajouté → « Nouveau »,
+    Modifié → « Ça change », Corrigé → « Réparé », Supprimé → « Retiré ».
+- **Alternative écartée pour l'instant** : mémoriser la version vue côté serveur (colonne sur le membre, `PUT /me/…`),
+  pour ne la montrer qu'une fois tous appareils confondus. À reprendre si les grimpeurs s'en plaignent.
+- **Reste pour la phase « logo »** : le logo téléversé dans l'en-tête de l'écran de notes (spec §8.11).
+- **Statut** : à valider (Willem), appliqué par défaut.

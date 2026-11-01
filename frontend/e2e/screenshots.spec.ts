@@ -13,6 +13,7 @@ interface Capture {
   desktop?: boolean
   installInvite?: boolean
   lastChancePopup?: boolean
+  releaseNotesPopup?: boolean
   prepare?: (club: FakeClub) => void
   act?: (page: Page, club: FakeClub) => Promise<void>
 }
@@ -368,6 +369,16 @@ const CAPTURES: Capture[] = [
   { name: 'premiers-pas-voie', path: '/premiers-pas/voie', as: 'CLIMBER' },
   { name: 'premiers-pas-installer', path: '/premiers-pas/installer', as: 'CLIMBER' },
   { name: 'actu-invitation', path: '/actu', as: 'CLIMBER', installInvite: true },
+  {
+    name: 'actu-nouveautes',
+    path: '/actu',
+    as: 'CLIMBER',
+    releaseNotesPopup: true,
+    act: async (page) => {
+      await expect(page.getByRole('dialog', { name: 'Quoi de neuf ?' })).toBeVisible()
+    },
+  },
+  { name: 'nouveautes', path: '/profil/nouveautes', as: 'CLIMBER' },
   { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
   {
     name: 'seance-deblocage',
@@ -859,6 +870,7 @@ for (const capture of CAPTURES) {
       signedInAs: capture.as,
       installInvite: capture.installInvite ?? false,
       lastChancePopup: capture.lastChancePopup ?? false,
+      releaseNotesPopup: capture.releaseNotesPopup ?? false,
     })
 
     test(`capture ${capture.name}`, async ({ page, club, isMobile }, testInfo) => {
