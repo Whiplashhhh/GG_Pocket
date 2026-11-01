@@ -2,7 +2,7 @@
 # GG Pocket web: the built PWA served by Caddy, which also forwards /api to the API container.
 # Build from the repository root: docker build -f frontend/Dockerfile .
 
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 WORKDIR /src/frontend

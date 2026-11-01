@@ -136,7 +136,7 @@ direction) ou **Willem**.
 | Spotless / google-java-format | 3.10.4 / 1.36.1 | gjf 1.37 a changé une API (`Style` devenu un record) que Spotless 3.10.4 utilise : on reste sur 1.36.1 tant que Spotless n'a pas suivi |
 | ArchUnit | 1.5.1 | Artefact `archunit-junit6` (Boot 4.1 embarque JUnit Jupiter 6) |
 | PostgreSQL | 18 (image `postgres:18-alpine`) | Dernière majeure stable |
-| Node.js | 24 LTS (24.22) | Node 26 passe LTS le 2026-10-28 : montée de version prévue dans la roadmap |
+| Node.js | 26 LTS (26.13, depuis le 2026-11-01) | Node 24 jusqu'au 2026-10-31 ; 26.13.0 « Lithium » est la première 26 LTS (2026-10-28). `@types/node` suit la majeure (26.6) |
 | pnpm | 12.14.0 | |
 | Vue | 3.5.44 | |
 | Vite | 8.3 | |
