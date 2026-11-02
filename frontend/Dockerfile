@@ -10,6 +10,7 @@ RUN npm install --global --no-audit --no-fund "$(node -p "require('./package.jso
 RUN pnpm install --frozen-lockfile
 COPY VERSION /src/VERSION
 COPY CHANGELOG.md /src/CHANGELOG.md
+COPY docs/GUIDE_CLUB.md /src/docs/GUIDE_CLUB.md
 COPY frontend/ ./
 RUN pnpm build \
     && if grep -Eq '<script>|<script [^>]*>[^<]' dist/index.html; then \

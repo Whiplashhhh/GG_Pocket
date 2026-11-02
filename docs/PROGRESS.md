@@ -4,22 +4,26 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
-## 2026-11-02 — Guide du club (D-109)
+## 2026-11-02 — Guide du club, dans le dépôt et dans l'appli (D-109, D-110)
 
-**Branche** : `chore/guide-club` (depuis `main`, après la fusion de #48 à #52).
+**Branches** : `chore/guide-club` (PR #53), puis `feature/guide-club-0.9.0` (depuis `chore/guide-club`, inclut #53).
 
 ### Fait
 
 - #48 (Node 26) et #49 (« Quoi de neuf ? ») fusionnées et déployées en dev par Willem (le jeton `gh` d'ici ne peut pas
   lancer `deploy-dev.yml` : 403). PR Dependabot #50 à #52 fusionnées par Willem.
-- `docs/GUIDE_CLUB.md` : rôles, codes d'inscription, validation des comptes, gestion des membres, voies, configuration
-  du mur, modération et journal, mises à jour, démarrage et passation, pépins. Libellés vérifiés dans `fr.json`,
-  droits vérifiés dans `MemberGovernance`.
-- D-109 : pas de MkDocs pour l'instant (choix de Willem), le guide reste un fichier Markdown.
+- `docs/GUIDE_CLUB.md` : rôles, codes, validation des comptes, membres, voies, configuration du mur, modération et
+  journal, mises à jour, démarrage et passation, pépins. Libellés vérifiés dans `fr.json`, droits dans
+  `MemberGovernance`. D-109 : pas de MkDocs.
+- D-110 : écran « Guide du club » (`/gestion/guide`, Ouvreur·se et plus), rendu au build par markdown-it
+  (`src/lib/guide.ts`, plugin Vite `documentModule` partagé avec le CHANGELOG), sommaire avec ancres, typographie
+  française. Flèches « → » remplacées par « › » (absentes de la police). Tests Vitest et e2e `club-guide.spec.ts`,
+  captures `gestion-guide` relues (360 et 1280 px, clair et sombre). Suite e2e Desktop Chrome : 90 verts.
+- Correctif : le journal affichait « TOURIST » au lieu de « Touriste » (`AuditView`, e2e ajouté dans `validation.spec.ts`).
 
 ### Reste
 
-- Relecture et fusion de la PR du guide (Willem).
+- Relecture et fusion de la PR du guide intégré (Willem), qui ferme #53.
 - Phase 8 : logo téléversable (attend Willem ; ajouter ses emplacements au guide), revue de sécurité, seed final et
   démarrage d'une prod vide, audits accessibilité et Lighthouse, release 1.0.0.
 

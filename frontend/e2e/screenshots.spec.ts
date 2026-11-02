@@ -379,6 +379,7 @@ const CAPTURES: Capture[] = [
     },
   },
   { name: 'nouveautes', path: '/profil/nouveautes', as: 'CLIMBER' },
+  { name: 'gestion-guide', path: '/gestion/guide', as: 'SETTER', desktop: true },
   { name: 'profil', path: '/profil', as: 'BOARD', prepare: marieOnTheWall },
   {
     name: 'seance-deblocage',

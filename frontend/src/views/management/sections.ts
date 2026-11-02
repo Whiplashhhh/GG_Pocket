@@ -1,4 +1,5 @@
 import {
+  BookOpen,
   ChartColumn,
   ClipboardList,
   Grid3x3,
@@ -26,6 +27,7 @@ export interface ManagementSection {
     | 'management.audit'
     | 'management.codes'
     | 'management.club'
+    | 'management.guide'
   icon: Component
   minRole: Role
   /** Not built yet: shown as coming soon. */
@@ -62,4 +64,5 @@ export const SECTIONS: readonly ManagementSection[] = [
   { to: '/gestion/journal', labelKey: 'management.audit', icon: ClipboardList, minRole: 'BOARD' },
   { to: '/gestion/codes', labelKey: 'management.codes', icon: Ticket, minRole: 'ADMIN' },
   { to: '/gestion/club', labelKey: 'management.club', icon: Settings2, minRole: 'ADMIN' },
+  { to: '/gestion/guide', labelKey: 'management.guide', icon: BookOpen, minRole: 'SETTER' },
 ]

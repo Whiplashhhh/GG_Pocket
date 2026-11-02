@@ -1065,7 +1065,13 @@
     "lastChance": "Dernière chance",
     "club": "Club",
     "attendance": "Fréquentation",
-    "topoReview": "Bilan du topo"
+    "topoReview": "Bilan du topo",
+    "guide": "Guide du club"
+  },
+  "clubGuide": {
+    "title": "Guide du club",
+    "intro": "Le mode d’emploi de l’espace gestion, pour les ouvreurs, la direction et la présidence. Il décrit la version de l’appli que tu as sous les yeux.",
+    "contents": "Sommaire"
   },
   "moderation": {
     "title": "Modération",

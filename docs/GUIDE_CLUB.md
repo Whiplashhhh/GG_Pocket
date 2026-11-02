@@ -33,7 +33,7 @@ Trois règles que l'appli fait respecter toute seule :
 
 ### Les codes d'inscription (présidence)
 
-On ne s'inscrit pas sans le code du club. **Espace gestion → Codes d'inscription → Nouveau code** :
+On ne s'inscrit pas sans le code du club. **Espace gestion › Codes d'inscription › Nouveau code** :
 
 - **Libellé** : pour t'y retrouver (« Affiche de la salle », « Forum des assos »).
 - **Expire le** (facultatif) : le code marche jusqu'au soir de cette date.
@@ -52,7 +52,7 @@ Un nouveau compte attend le feu vert de la direction. En attendant, la personne 
 à faire, planning), mais elle est **invisible des autres** : pas d'annuaire, pas de profil visible, pas de podium,
 pas de commentaire sur les voies. Ça protège le club, et ses plus jeunes, de quelqu'un qui aurait juste photographié l'affiche.
 
-**Espace gestion → Membres** : les comptes à valider sont en tête de liste, sous **En attente de validation**.
+**Espace gestion › Membres** : les comptes à valider sont en tête de liste, sous **En attente de validation**.
 Touche un nom pour lire ce que la personne a déclaré, puis choisis :
 
 - **Valider : Grimpeur GG (licencié·e)** ;
@@ -67,7 +67,7 @@ journal.
 
 ## 3. Gérer les membres (direction)
 
-**Espace gestion → Membres** : la liste se cherche par nom, prénom ou pseudo, et se trie (rôle, inscription, dernière
+**Espace gestion › Membres** : la liste se cherche par nom, prénom ou pseudo, et se trie (rôle, inscription, dernière
 activité, nombre de séances…). Touche un nom pour ouvrir sa fiche.
 
 - **Changer le rôle** : la direction passe quelqu'un de Touriste à Grimpeur GG (et inversement), ou lui donne ou retire
@@ -87,7 +87,7 @@ Chaque membre peut aussi télécharger ses données ou supprimer lui-même son c
 
 ## 4. Les voies (ouvreurs)
 
-**Espace gestion → Voies.** Tout ce que tu fais ici apparaît tout de suite dans le topo des grimpeurs.
+**Espace gestion › Voies.** Tout ce que tu fais ici apparaît tout de suite dans le topo des grimpeurs.
 
 - **Nouvelle voie** : corde, couleur des prises (et une deuxième couleur si besoin), cotation, nom, date d'ouverture,
   ouvreurs (ceux du club, ou le nom d'un invité), styles, conseil de l'ouvreur et photo. L'aperçu de l'étiquette se
@@ -111,7 +111,7 @@ Pour décider quoi ouvrir ou démonter :
 
 ## 5. Configurer le mur (présidence)
 
-**Espace gestion → Club** : les secteurs, les cordes et les couleurs de prises.
+**Espace gestion › Club** : les secteurs, les cordes et les couleurs de prises.
 
 - **Secteurs** : dans l'ordre du mur, de gauche à droite (flèches pour les déplacer), avec une courte description.
 - **Cordes** : un numéro de 1 à 99, unique sur tout le mur, rangé dans un secteur. Déplacer une corde d'un secteur à un
