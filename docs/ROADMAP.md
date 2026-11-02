@@ -173,7 +173,7 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [ ] Audits accessibilité et Lighthouse ≥ 90
 - [ ] Revue de sécurité complète
 - [ ] Seed final, démarrage d'une prod vide vérifié
-- [ ] `docs/GUIDE_CLUB.md`
+- [x] `docs/GUIDE_CLUB.md` (à compléter avec le logo quand il sera téléversable)
 - [ ] Release `1.0.0` (déclenchée par Willem)
 
 ## Phase 9 — Après lancement (pas sans feu vert)

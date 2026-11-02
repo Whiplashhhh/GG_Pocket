@@ -1103,3 +1103,12 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   pour ne la montrer qu'une fois tous appareils confondus. À reprendre si les grimpeurs s'en plaignent.
 - **Reste pour la phase « logo »** : le logo téléversé dans l'en-tête de l'écran de notes (spec §8.11).
 - **Statut** : à valider (Willem), appliqué par défaut.
+
+### D-109 — Guide du club : un fichier Markdown, pas de site de documentation
+- **Contexte** : spec §1 et §4, un court `docs/GUIDE_CLUB.md` sans jargon pour la direction. Un site (MkDocs ou son
+  successeur Zensical) a été envisagé : recherche, lecture confortable sur téléphone, captures Playwright réutilisables.
+- **Choix** (Willem, 2026-11-02) : on reste sur le fichier prévu par la spec. Le dépôt est public : le guide se lit
+  sur GitHub sans compte.
+- **À reprendre plus tard** si le guide grossit ou s'il faut une aide pour les grimpeurs : un site généré depuis le
+  même Markdown, publié sur GitHub Pages ou servi par Caddy sous `/guide/`, sans réécrire le contenu.
+- **Statut** : validée.
