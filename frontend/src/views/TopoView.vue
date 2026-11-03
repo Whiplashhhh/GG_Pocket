@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { Archive, ArrowDownWideNarrow, ArrowUpNarrowWide, SlidersHorizontal } from 'lucide-vue-next'
+import {
+  Archive,
+  ArrowDownWideNarrow,
+  ArrowUpNarrowWide,
+  Shuffle,
+  SlidersHorizontal,
+} from 'lucide-vue-next'
 import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import { errorMessageKey } from '@/api/errors'
 import { useRoutes, useTopoConfig, type RouteSummary } from '@/api/topo'
+import RandomRouteDialog from '@/components/topo/RandomRouteDialog.vue'
 import RouteRow from '@/components/topo/RouteRow.vue'
 import TopoFilterSheet from '@/components/topo/TopoFilterSheet.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
@@ -38,6 +45,7 @@ const config = useTopoConfig()
 const routes = useRoutes()
 const sortId = useId()
 const filtering = ref(false)
+const shuffling = ref(false)
 
 const view = computed(() => parseTopoQuery(route.query))
 const all = computed(() => routes.data.value ?? [])
@@ -127,6 +135,17 @@ function sheetLink(item: RouteSummary) {
         >{{ filterCount }}</span
       >
     </button>
+    <button
+      type="button"
+      class="inline-flex size-11 shrink-0 items-center justify-center rounded-control border-2 border-rule text-ink hover:border-ink disabled:opacity-50"
+      :aria-label="t('topo.shuffle')"
+      :title="t('topo.shuffle')"
+      :disabled="shown.length === 0"
+      data-testid="topo-shuffle"
+      @click="shuffling = true"
+    >
+      <Shuffle :size="22" aria-hidden="true" />
+    </button>
   </div>
 
   <div v-if="routes.isPending.value">
@@ -201,6 +220,8 @@ function sheetLink(item: RouteSummary) {
     :routes="all"
     :result-count="shown.length"
   />
+
+  <RandomRouteDialog v-model:open="shuffling" :routes="shown" :link-for="sheetLink" />
 
   <RouterView />
 </template>
