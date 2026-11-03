@@ -276,6 +276,18 @@
     "progressLabel": "Vers le niveau suivant",
     "progress": "{value} sur {target}",
     "maxReached": "Tout est débloqué. Respect.",
+    "maxReachedButGaps": "Niveau max ! Il reste quelques cotations d’en dessous à cocher, pour la collection.",
+    "levels": "Les niveaux",
+    "tierShort": {
+      "TOPPED": "Ta première voie topée | {n} voies topées",
+      "LEAD": "Ta première voie en tête | {n} voies en tête",
+      "FIRST_GRADE": "Une voie en {grade}",
+      "CLIMBING_DAYS": "{n} jours de grimpe"
+    },
+    "tierEarned": "Débloqué le {date}",
+    "tierNext": "C’est la prochaine",
+    "tierAhead": "À venir",
+    "tierMissing": "Pas encore, celle-là",
     "favorite": "Mettre en avant",
     "unfavorite": "Ne plus mettre en avant",
     "favoriteFull": "Tu as déjà 3 badges en avant : retires-en un d’abord.",
@@ -304,7 +316,7 @@
     "descriptions": {
       "TOPPED": "Chaque ascension topée compte, en tête comme en moulinette, même la dixième sur la même voie.",
       "LEAD": "Seules les voies topées en tête comptent.",
-      "FIRST_GRADE": "Ta première voie topée à cette cotation ou plus dure. Un 7a d’emblée, et c’est la pluie de badges.",
+      "FIRST_GRADE": "Ta première voie topée dans chaque cotation, de la 5b à la 7c. Chacune se gagne à la loyale : un 7a d’emblée ne t’offre pas les 6, faudra aller les chercher.",
       "CLIMBING_DAYS": "Deux séances le même jour comptent pour un seul jour.",
       "WEEK_2": "Grimper 2 jours différents dans la même semaine, du lundi au dimanche.",
       "WEEK_3": "Grimper 3 jours différents dans la même semaine, du lundi au dimanche.",
@@ -323,7 +335,7 @@
     "tiers": {
       "TOPPED": "toper ta première voie. | toper {n} voies, tous modes confondus.",
       "LEAD": "toper ta première voie en tête. | toper {n} voies en tête.",
-      "FIRST_GRADE": "toper une voie en {grade} ou plus dure.",
+      "FIRST_GRADE": "toper une voie en {grade} (le - et le + comptent).",
       "CLIMBING_DAYS": "grimper {n} jours différents."
     },
     "unlockedBy": "{nickname} a débloqué",
@@ -365,6 +377,11 @@
     "directionDesc": "Ordre décroissant, toucher pour inverser",
     "filters": "Filtres",
     "filtersActive": "Filtres, {count} actif | Filtres, {count} actif | Filtres, {count} actifs",
+    "shuffle": "Une voie au hasard",
+    "shuffleTitle": "Et pourquoi pas celle-là ?",
+    "shuffleFrom": "Aucune voie à tirer au sort. | C’est la seule voie affichée : le suspense était limité. | Tirée au sort parmi les {n} voies affichées. Pas convaincu·e ? On retire.",
+    "shuffleAgain": "Une autre !",
+    "shuffleGo": "Voir la voie",
     "filtersTitle": "Filtrer le topo",
     "filtersDescription": "Les filtres se combinent : seules les voies qui passent tout restent affichées.",
     "filterSectors": "Secteurs",

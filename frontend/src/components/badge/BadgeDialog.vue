@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Star } from 'lucide-vue-next'
+import { Check, Star } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -17,14 +17,17 @@ import {
   type Badge,
   type BadgeProgress,
   type BadgeState,
+  type TierState,
 } from '@/lib/badges'
 import { formatDate } from '@/lib/format'
 
+import BadgeMedal from './BadgeMedal.vue'
 import BadgeToken from './BadgeToken.vue'
 
 /**
  * One badge up close (D-106): its level, what it takes, the way to the next level (counted from
- * zero, my own library only), and in my library the switch to show it next to my name.
+ * zero, my own library only), every level of a tier family with the ones already behind (club
+ * feedback, D-111), and in my library the switch to show it next to my name.
  */
 const props = defineProps<{
   state: BadgeState
@@ -51,13 +54,22 @@ const levelLabel = computed(() => {
 })
 const earnedLine = computed(() => {
   const { level, firstEarnedOn, lastEarnedOn } = props.state
-  if (level <= 0 || lastEarnedOn === undefined) return undefined
+  // A tier family dates each level in its list.
+  if (tiered.value || level <= 0 || lastEarnedOn === undefined) return undefined
   const last = formatDate(lastEarnedOn)
-  return tiered.value || level === 1
+  return level === 1
     ? t('badges.earnedOnce', { date: last })
     : t('badges.earnedMany', { n: level, first: formatDate(firstEarnedOn ?? lastEarnedOn), last })
 })
 const next = computed(() => nextTier(props.state))
+const complete = computed(() => props.state.tiers.every((tier) => tier.earnedOn !== undefined))
+
+function tierStatus(tier: TierState): string {
+  if (tier.earnedOn !== undefined)
+    return t('badges.tierEarned', { date: formatDate(tier.earnedOn) })
+  if (tier.code === next.value) return t('badges.tierNext')
+  return tier.level < props.state.level ? t('badges.tierMissing') : t('badges.tierAhead')
+}
 const bar = computed(() => (props.mine ? nextProgress(props.state, props.progress) : undefined))
 const percent = computed(() =>
   bar.value === undefined ? 0 : Math.min(100, (100 * bar.value.value) / bar.value.target),
@@ -92,7 +104,9 @@ function toggleFavorite() {
       <p v-if="next" class="mt-3 font-semibold">
         {{ t('badges.next', { condition: text.tierCondition(next) }) }}
       </p>
-      <p v-else class="mt-3 font-semibold">{{ t('badges.maxReached') }}</p>
+      <p v-else class="mt-3 font-semibold">
+        {{ complete ? t('badges.maxReached') : t('badges.maxReachedButGaps') }}
+      </p>
       <div v-if="bar" class="mt-2 flex items-center gap-3">
         <div
           class="h-3 flex-1 overflow-hidden rounded-full bg-surface-sunken"
@@ -109,6 +123,43 @@ function toggleFavorite() {
           {{ bar.value }}/{{ bar.target }}
         </span>
       </div>
+
+      <h3 class="mt-5 text-sm font-semibold tracking-wide text-ink-muted uppercase">
+        {{ t('badges.levels') }}
+      </h3>
+      <ol class="mt-1" data-testid="badge-tiers">
+        <li
+          v-for="tier in state.tiers"
+          :key="tier.code"
+          class="flex items-center gap-3 rounded-control px-2 py-1.5"
+          :class="tier.code === next ? 'bg-surface-sunken' : ''"
+          :aria-current="tier.code === next ? 'step' : undefined"
+        >
+          <BadgeMedal
+            :badge="state.badge"
+            :level="tier.earnedOn === undefined ? 0 : tier.level"
+            :size="32"
+          />
+          <div class="min-w-0 flex-1">
+            <p
+              :class="
+                tier.earnedOn === undefined && tier.code !== next
+                  ? 'text-ink-muted'
+                  : 'font-semibold'
+              "
+            >
+              {{ text.tierShort(tier.code) }}
+            </p>
+            <p class="text-sm text-ink-muted">{{ tierStatus(tier) }}</p>
+          </div>
+          <Check
+            v-if="tier.earnedOn !== undefined"
+            :size="20"
+            class="shrink-0 text-brand-ink"
+            aria-hidden="true"
+          />
+        </li>
+      </ol>
     </template>
 
     <div v-if="mine && state.level > 0" class="mt-5 border-t border-rule pt-4">

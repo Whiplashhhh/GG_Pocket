@@ -47,6 +47,15 @@ test.describe('badges', () => {
     const bar = dialog.getByRole('progressbar', { name: 'Vers le niveau suivant' })
     await expect(bar).toHaveAttribute('aria-valuenow', '6')
     await expect(bar).toHaveAttribute('aria-valuemax', '10')
+    // Every level, the ones behind dated, the next one marked (club feedback, D-111).
+    const levels = dialog.getByTestId('badge-tiers').getByRole('listitem')
+    await expect(levels).toHaveCount(10)
+    await expect(levels.nth(0)).toContainText('Ta première voie topée')
+    await expect(levels.nth(0)).toContainText('Débloqué le')
+    await expect(levels.nth(2)).toContainText('10 voies topées')
+    await expect(levels.nth(2)).toHaveAttribute('aria-current', 'step')
+    await expect(levels.nth(9)).toContainText('1000 voies topées')
+    await expect(levels.nth(9)).toContainText('À venir')
 
     await dialog.getByRole('button', { name: 'Mettre en avant' }).click()
     await expect(dialog.getByRole('button', { name: 'Ne plus mettre en avant' })).toHaveAttribute(
@@ -98,7 +107,7 @@ test.describe('badges', () => {
     club,
   }) => {
     await page.clock.setSystemTime(new Date(club.now))
-    club.climbs.nextUnlocks = ['TOPPED_1', 'LEAD_1', 'GRADE_5B', 'GRADE_5C', 'GRADE_6A', 'FLASH']
+    club.climbs.nextUnlocks = ['TOPPED_1', 'LEAD_1', 'GRADE_5C', 'GRADE_6A', 'FLASH']
 
     await page.goto('/seance/nouvelle')
     await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('12')
@@ -115,7 +124,8 @@ test.describe('badges', () => {
     await expect(moment.getByText('Voies en tête')).toBeVisible()
     await page.getByRole('button', { name: 'Badge suivant' }).click()
     await expect(moment.getByText('Première cotation')).toBeVisible()
-    await expect(moment.getByText('Niveau 3')).toBeVisible()
+    // Each grade is earned on its own (D-111): the grades, not a level.
+    await expect(moment.getByText('5c, 6a')).toBeVisible()
     await page.getByRole('button', { name: 'Badge suivant' }).click()
     await expect(moment.getByText('Le flash')).toBeVisible()
     await page.getByRole('button', { name: 'Continuer' }).click()
@@ -125,7 +135,7 @@ test.describe('badges', () => {
     await expect(unlocked.getByRole('listitem')).toHaveText([
       'Voies topées · Niveau 1',
       'Voies en tête · Niveau 1',
-      'Première cotation · Niveau 3',
+      'Première cotation · 5c, 6a',
       'Le flash',
     ])
   })

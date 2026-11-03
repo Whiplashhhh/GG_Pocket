@@ -169,11 +169,14 @@ export interface Unlock {
   level: number
   /** Times a repeatable badge was earned by the session; 1 for the tiers. */
   times: number
+  /** The grades unlocked, easiest first (FIRST_GRADE only, earned one by one: D-111). */
+  grades: string[]
 }
 
 /**
  * The badges unlocked by a session, in the catalogue's order: the tiers of a family fold into the
- * highest one (a first 7a unlocks five grades at once), a repeatable badge earned twice shows ×2.
+ * highest one (50 and 100 topped in one go), a repeatable badge earned twice shows ×2. The grades
+ * are listed, since each is earned on its own (a 5c after a 6b says « 5c », not a level).
  */
 export function unlocks(codes: readonly BadgeCode[]): Unlock[] {
   const found = new Map<Badge, Unlock>()
@@ -182,21 +185,38 @@ export function unlocks(codes: readonly BadgeCode[]): Unlock[] {
     const known = found.get(badge)
     if (isTiered(badge)) {
       const level = levelOfCode(code)
-      found.set(badge, { badge, level: Math.max(level, known?.level ?? 0), times: 1 })
+      const grades = badge === 'FIRST_GRADE' ? [...(known?.grades ?? []), tierMark(code)] : []
+      found.set(badge, {
+        badge,
+        level: Math.max(level, known?.level ?? 0),
+        times: 1,
+        grades: grades.sort(),
+      })
     } else {
-      found.set(badge, { badge, level: 1, times: (known?.times ?? 0) + 1 })
+      found.set(badge, { badge, level: 1, times: (known?.times ?? 0) + 1, grades: [] })
     }
   }
   return BADGES.flatMap((badge) => found.get(badge) ?? [])
 }
 
-/** A badge of a library: its level (tiers earned, or times earned) and its dates. */
+/** One level of a tier family, earned or still ahead. */
+export interface TierState {
+  code: BadgeCode
+  /** 1 for the first tier. */
+  level: number
+  /** When it was earned; absent while it is still ahead. */
+  earnedOn?: string
+}
+
+/** A badge of a library: its level (highest tier earned, or times earned) and its dates. */
 export interface BadgeState {
   badge: Badge
   level: number
   /** The tiers, lowest first; the single code of a repeatable badge. */
   codes: BadgeCode[]
-  /** When the current level (or the last time) was earned. */
+  /** Every level of a tier family, lowest first; empty for a repeatable badge. */
+  tiers: TierState[]
+  /** The last time a level (or the badge) was earned. */
   lastEarnedOn?: string
   firstEarnedOn?: string
 }
@@ -206,7 +226,21 @@ export function badgeStates(entries: readonly BadgeLibraryEntry[]): BadgeState[]
   return BADGES.map((badge) => {
     const mine = entries.filter((entry) => badgeOf(entry.code) === badge)
     const earned = mine.filter((entry) => entry.count > 0)
-    const level = isTiered(badge) ? earned.length : (earned[0]?.count ?? 0)
+    const tiered = isTiered(badge)
+    // The highest tier, not the number earned: the grades come one by one (D-111), a 7a without
+    // a 5b on record is level 6.
+    const level = tiered
+      ? mine.reduce((top, entry, index) => (entry.count > 0 ? index + 1 : top), 0)
+      : (earned[0]?.count ?? 0)
+    const tiers: TierState[] = tiered
+      ? mine.map((entry, index) => ({
+          code: entry.code,
+          level: index + 1,
+          ...(entry.count > 0 && entry.firstEarnedOn !== undefined
+            ? { earnedOn: entry.firstEarnedOn }
+            : {}),
+        }))
+      : []
     const last = earned
       .map((entry) => entry.lastEarnedOn)
       .sort()
@@ -219,6 +253,7 @@ export function badgeStates(entries: readonly BadgeLibraryEntry[]): BadgeState[]
       badge,
       level,
       codes: mine.map((entry) => entry.code),
+      tiers,
       ...(last === undefined ? {} : { lastEarnedOn: last }),
       ...(first === undefined ? {} : { firstEarnedOn: first }),
     }
