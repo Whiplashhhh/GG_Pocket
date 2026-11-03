@@ -81,15 +81,18 @@ useIntersectionObserver(sentinel, ([entry]) => {
   </EmptyState>
   <template v-else>
     <h2 class="sr-only">{{ t('actu.feed') }}</h2>
-    <SessionCard
-      v-for="session in items"
-      :key="session.id"
-      :session="session"
-      linked
-      show-author
-      :max-lines="5"
-      :heading-level="3"
-    />
+    <div class="flex flex-col gap-3 px-3 pt-3 sm:px-4">
+      <SessionCard
+        v-for="session in items"
+        :key="session.id"
+        :session="session"
+        linked
+        show-author
+        framed
+        :max-lines="5"
+        :heading-level="3"
+      />
+    </div>
     <div ref="sentinel" class="flex justify-center px-4 py-4">
       <GgButton
         v-if="sessions.hasNextPage.value"
