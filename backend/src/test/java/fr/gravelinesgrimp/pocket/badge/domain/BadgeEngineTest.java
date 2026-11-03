@@ -99,15 +99,8 @@ class BadgeEngineTest {
     class FirstGrade {
 
         @Test
-        void aMinusIsBelowItsGrade() {
+        void aMinusOrAPlusCountsAsItsGrade() {
             session("2025-03-03", top("6a-"));
-
-            assertThat(codes()).contains(BadgeCode.GRADE_5C).doesNotContain(BadgeCode.GRADE_6A);
-        }
-
-        @Test
-        void theGradeOrAPlusEarnsIt() {
-            session("2025-03-03", top("6a"));
             session("2025-03-04", top("6b+"));
 
             assertThat(only(BadgeCode.GRADE_6A).earnedOn())
@@ -117,18 +110,35 @@ class BadgeEngineTest {
         }
 
         @Test
-        void aHardRouteStraightAwayEarnsEveryLowerTier() {
+        void aHardRouteEarnsItsOwnGradeOnly() {
             session("2025-03-03", top("7a"));
 
             assertThat(codes())
-                    .contains(
+                    .contains(BadgeCode.GRADE_7A)
+                    .doesNotContain(
                             BadgeCode.GRADE_5B,
                             BadgeCode.GRADE_5C,
                             BadgeCode.GRADE_6A,
                             BadgeCode.GRADE_6B,
                             BadgeCode.GRADE_6C,
-                            BadgeCode.GRADE_7A)
-                    .doesNotContain(BadgeCode.GRADE_7B, BadgeCode.GRADE_7C);
+                            BadgeCode.GRADE_7B);
+        }
+
+        @Test
+        void aLowerGradeClimbedLaterIsStillEarned() {
+            session("2025-03-03", top("6b"));
+            session("2025-03-10", top("5c"));
+
+            assertThat(only(BadgeCode.GRADE_5C).earnedOn())
+                    .isEqualTo(LocalDate.parse("2025-03-10"));
+            assertThat(codes()).doesNotContain(BadgeCode.GRADE_5B, BadgeCode.GRADE_6A);
+        }
+
+        @Test
+        void theEasiestGradesHaveNoTier() {
+            session("2025-03-03", top("4c+"), top("5a"));
+
+            assertThat(codes()).doesNotContain(BadgeCode.GRADE_5B);
         }
 
         @Test

@@ -19,6 +19,7 @@ import com.jayway.jsonpath.JsonPath;
 import fr.gravelinesgrimp.pocket.IntegrationTest;
 import fr.gravelinesgrimp.pocket.MemberFixtures;
 import fr.gravelinesgrimp.pocket.RouteFixtures;
+import fr.gravelinesgrimp.pocket.badge.application.BadgeRecount;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
@@ -44,6 +45,7 @@ class BadgeIT {
     @Autowired private RouteFixtures routes;
     @Autowired private JdbcTemplate jdbc;
     @Autowired private Clock clock;
+    @Autowired private BadgeRecount recount;
 
     @Test
     void aFirstSessionUnlocksItsBadgesAndKeepsThem() throws Exception {
@@ -57,12 +59,7 @@ class BadgeIT {
                                         jsonPath(
                                                 "$.unlockedBadges",
                                                 contains(
-                                                        "TOPPED_1",
-                                                        "LEAD_1",
-                                                        "GRADE_5B",
-                                                        "GRADE_5C",
-                                                        "GRADE_6A",
-                                                        "FLASH")))
+                                                        "TOPPED_1", "LEAD_1", "GRADE_6A", "FLASH")))
                                 .andExpect(jsonPath("$.badges", hasItem("TOPPED_1"))));
 
         mockMvc.perform(get("/api/v1/sessions/" + id).with(as(me)))
@@ -268,6 +265,28 @@ class BadgeIT {
 
         mockMvc.perform(get("/api/v1/me/badges").with(as(me)))
                 .andExpect(jsonPath("$.favorites", empty()));
+    }
+
+    @Test
+    void theStartUpRecountTakesBackAGradeTierStoredUnderTheOldRule() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var route = routes.create(members.create(Role.SETTER), "6b");
+        var id = idOf(create(me, UUID.randomUUID(), today(), ascent(route, "LEAD", true, false)));
+        // Before D-111, a first 6b also gave the 5b, 5c and 6a below it.
+        jdbc.update(
+                "insert into badge_award (id, member_id, code, award_key, session_id, earned_on,"
+                        + " created_at, updated_at, version)"
+                        + " values (?, ?, 'GRADE_5B', '', ?, ?, now(), now(), 0)",
+                UUID.randomUUID(),
+                me.id(),
+                UUID.fromString(id),
+                today());
+
+        recount.run(null);
+
+        mockMvc.perform(get("/api/v1/me/badges").with(as(me)))
+                .andExpect(jsonPath("$.badges[?(@.code == 'GRADE_5B')].count").value(contains(0)))
+                .andExpect(jsonPath("$.badges[?(@.code == 'GRADE_6B')].count").value(contains(1)));
     }
 
     // --- helpers ---
