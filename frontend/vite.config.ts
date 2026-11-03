@@ -8,6 +8,7 @@ import { defineConfig, type Plugin, type UserConfig } from 'vite'
 import { VitePWA, type VitePWAOptions } from 'vite-plugin-pwa'
 
 import { parseChangelog } from './src/lib/changelog.ts'
+import { renderGuide } from './src/lib/guide.ts'
 import { OFFLINE_READS, OFFLINE_READS_CACHE } from './src/lib/offlineReads.ts'
 
 /** Single source of truth for the version: the repository's VERSION file (docs/DECISIONS.md D-032). */
@@ -65,19 +66,19 @@ const pwaOptions = {
 } satisfies Partial<VitePWAOptions>
 
 /**
- * Release notes (spec §8.12): the repository's CHANGELOG.md, parsed at build time into
- * `virtual:changelog` (default export: the published releases). The app never sees Markdown.
+ * A repository document turned into data at build time, served as a virtual module: the release
+ * notes (spec §8.12, CHANGELOG.md → `virtual:changelog`) and the club guide (D-110,
+ * docs/GUIDE_CLUB.md → `virtual:club-guide`). The app never parses Markdown itself.
  */
-function changelog(): Plugin {
-  const id = 'virtual:changelog'
-  const file = fileURLToPath(new URL('../CHANGELOG.md', import.meta.url))
+function documentModule(id: string, path: string, transform: (text: string) => unknown): Plugin {
+  const file = fileURLToPath(new URL(path, import.meta.url))
   return {
-    name: 'gg-changelog',
+    name: `gg-document:${id}`,
     resolveId: (source) => (source === id ? `\0${id}` : undefined),
     load(source) {
       if (source !== `\0${id}`) return undefined
       this.addWatchFile(file)
-      return `export default ${JSON.stringify(parseChangelog(readFileSync(file, 'utf8')))}`
+      return `export default ${JSON.stringify(transform(readFileSync(file, 'utf8')))}`
     },
   }
 }
@@ -96,7 +97,8 @@ export function createViteConfig({
   return {
     plugins: [
       vue(),
-      changelog(),
+      documentModule('virtual:changelog', '../CHANGELOG.md', parseChangelog),
+      documentModule('virtual:club-guide', '../docs/GUIDE_CLUB.md', renderGuide),
       tailwindcss(),
       // Precompiles messages at build time: no runtime message compiler, so no eval (strict CSP).
       precompileMessages &&

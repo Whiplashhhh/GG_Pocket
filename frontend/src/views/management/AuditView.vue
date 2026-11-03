@@ -18,7 +18,7 @@ const { t } = useI18n()
 const audit = useAuditLog()
 const entries = computed(() => audit.data.value?.pages.flatMap((page) => page.entries) ?? [])
 
-const ROLE_VALUES = new Set(['CLIMBER', 'SETTER', 'BOARD', 'ADMIN'])
+const ROLE_VALUES = new Set(['TOURIST', 'CLIMBER', 'SETTER', 'BOARD', 'ADMIN'])
 
 /** Role changes store role codes: shown with their names. */
 function value(raw: string | undefined): string {

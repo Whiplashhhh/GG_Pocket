@@ -272,6 +272,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/management/ClubConfigView.vue'),
         meta: { titleKey: 'clubConfig.title', minRole: 'ADMIN', wide: true },
       },
+      {
+        path: 'guide',
+        component: () => import('@/views/management/ClubGuideView.vue'),
+        meta: { titleKey: 'clubGuide.title', minRole: 'SETTER', wide: true },
+      },
     ],
   },
 

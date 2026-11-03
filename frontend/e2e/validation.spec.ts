@@ -70,6 +70,10 @@ test.describe('the board', () => {
       joinNote: undefined,
     })
 
+    // The journal names the role, never its code.
+    await page.goto('/gestion/journal')
+    await expect(page.getByText('marie a validé le compte de alix (Touriste)')).toBeVisible()
+
     await page.goto('/gestion/membres')
     await expect(page.getByRole('link', { name: /Alix Moreau/ })).toBeVisible()
     await expect(page.getByRole('region', { name: /En attente de validation/ })).toHaveCount(0)

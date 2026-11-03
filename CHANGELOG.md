@@ -23,6 +23,14 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   ta dernière visite (une fois par version, promis). Tu as raté un épisode ? Tout l’historique t’attend dans ton
   profil, rubrique « Quoi de neuf ? ».
 
+- Pour les ouvreurs, la direction et la présidence : le **Guide du club** s’installe dans l’espace gestion. Qui peut
+  faire quoi, comment valider un nouveau compte, ouvrir ou démonter une voie, configurer le mur… Tout le mode
+  d’emploi, avec un sommaire, et toujours à jour avec la version de l’appli que tu as sous les yeux.
+
+### Corrigé
+
+- Le journal de la direction écrit enfin « Touriste » en toutes lettres quand un compte est validé comme tel.
+
 ## 0.9.0 — 2026-10-31
 
 ### Ajouté
@@ -169,7 +177,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   son mois n'est pas clos.
 - Une voie enchaînée en séance se coche toute seule en « Je sais la faire ».
 - L'appli installée cherche ses mises à jour quand tu reviens dessus, plus seulement au démarrage. Et si elle traîne,
-  Profil → « Chercher une mise à jour » te dit où ça coince.
+  Profil › « Chercher une mise à jour » te dit où ça coince.
 - La fiche voie affiche ses chiffres (ascensions, topées, grimpeur·ses, part en tête) et ton historique sur la voie ;
   le topo se trie par réalisations.
 

@@ -1103,3 +1103,26 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   pour ne la montrer qu'une fois tous appareils confondus. À reprendre si les grimpeurs s'en plaignent.
 - **Reste pour la phase « logo »** : le logo téléversé dans l'en-tête de l'écran de notes (spec §8.11).
 - **Statut** : à valider (Willem), appliqué par défaut.
+
+### D-109 — Guide du club : un fichier Markdown, pas de site de documentation
+- **Contexte** : spec §1 et §4, un court `docs/GUIDE_CLUB.md` sans jargon pour la direction. Un site (MkDocs ou son
+  successeur Zensical) a été envisagé : recherche, lecture confortable sur téléphone, captures Playwright réutilisables.
+- **Choix** (Willem, 2026-11-02) : on reste sur le fichier prévu par la spec. Le dépôt est public : le guide se lit
+  sur GitHub sans compte.
+- **À reprendre plus tard** si le guide grossit ou s'il faut une aide pour les grimpeurs : un site généré depuis le
+  même Markdown, publié sur GitHub Pages ou servi par Caddy sous `/guide/`, sans réécrire le contenu.
+- **Statut** : validée ; complétée par D-110 (le même fichier, lisible dans l'appli).
+
+### D-110 — Le guide du club dans l'espace gestion
+- **Contexte** : Willem (2026-11-02) veut que la direction lise le guide sans quitter l'appli. Un lien vers GitHub a
+  été écarté : on sort de l'appli, l'interface de GitHub déroute, et il faut du réseau.
+- **Choix** : `docs/GUIDE_CLUB.md` reste la seule source. Au build, markdown-it (dépendance de développement,
+  absente de l'appli) le change en HTML dans le module `virtual:club-guide` (`src/lib/guide.ts`, même plugin Vite que
+  le CHANGELOG) : HTML brut refusé (`html: false`), titre du document retiré (l'écran a le sien), ancres sur les
+  titres pour un sommaire, tableaux qui défilent s'ils débordent, typographie française (apostrophes courbes, espaces
+  insécables). L'écran `/gestion/guide` (« Guide du club ») est ouvert dès Ouvreur·se, comme l'espace gestion ; il
+  affiche ce HTML tel quel (`v-html`), sûr puisqu'il vient du dépôt et jamais des membres.
+- **Conséquences** : le guide décrit toujours la version installée et se lit hors connexion. Le Dockerfile du web
+  copie `docs/GUIDE_CLUB.md`. La police de l'appli n'a pas de flèches : « › » à la place de « → » (un test le vérifie
+  dans le guide et le CHANGELOG).
+- **Statut** : validée par Willem (version intégrée choisie) ; détails de mise en œuvre par défaut.
