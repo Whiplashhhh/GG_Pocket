@@ -145,6 +145,11 @@ Pour l'enlever : supprimer `basic-auth.caddy` et relancer le frontal.
 5. Le job « Deploy to prod » attend l'approbation de Willem (Actions → la release → *Review deployments*).
    Il sauvegarde la base, déploie, vérifie que `/api/v1/meta` annonce `X.Y.Z`, et remet la version précédente sinon.
 
+Chaque release met aussi à jour le **proxy d'entrée** : il tourne sur l'image web de la version (son Caddy est recompilé
+avec un Go corrigé et scanné par la CI, D-112), et non plus sur l'image `caddy` officielle, qu'aucun déploiement ne
+renouvelait. Chaque déploiement (dev et prod) retélécharge aussi les images PostgreSQL (`postgres:18-alpine`) pour
+suivre leurs correctifs de sécurité ; sans accès à Docker Hub, il garde les images locales et continue.
+
 La première mise en service du club sera `1.0.0` ; d'ici là, des `0.x.y`.
 
 ### Premier démarrage de la prod : le code admin
@@ -178,6 +183,8 @@ revenir en arrière ne touche pas aux données.
 - Le service `backup` de la prod fait chaque nuit à 3 h 30 un fichier `gg-pocket-<date>.tar` (base au format `pg_dump`
   + photos téléversées) dans `/opt/gg-pocket/prod/backups/daily/`. Rétention : 14 jours ; celle du dimanche est copiée
   dans `weekly/` et gardée 8 semaines. Chaque déploiement prod en fait une avant de commencer (`pre-deploy/`, 10 gardées).
+- Les photos sont écrites en `rw-r-----` (groupe de l'API, 10001) et le conteneur `backup` fait partie de ce groupe :
+  c'est ce qui lui permet de les archiver (D-112). Le service `media-owner` remet les droits en ordre à chaque démarrage.
 - **Surveillance** : le conteneur `backup` passe à l'état `unhealthy` si la dernière sauvegarde quotidienne a plus de
   26 heures (disque plein, base injoignable…). À regarder de temps en temps : `sudo docker ps --filter name=backup`.
 - **Copie hors du serveur, recommandée** : si le VPS disparaît, ses sauvegardes aussi. Le plus simple : l'option

@@ -34,6 +34,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   topo, tire une voie au sort parmi celles affichées (tes filtres comptent, « Pas encore faite par moi »
   compris). Elle ne te dit rien ? « Une autre ! », autant de fois que tu veux.
 
+- **Mois clos, mais toujours à toi** : une séance d’un mois clos ne change plus ses voies, mais tu peux encore la
+  garder pour toi, effacer ton mot ou retirer la photo, directement depuis la séance.
+
 ### Modifié
 
 - **Première cotation** : chaque cotation se gagne pour de vrai. Une 6b ne t’offre plus la 5b, la 5c et la 6a
@@ -43,6 +46,14 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 - **Fil d’actu** : chaque séance a maintenant son cadre, on voit mieux où s’arrête l’une et où commence la suivante.
 
 ### Corrigé
+
+- Les sauvegardes du serveur passaient à côté des photos (et échouaient du coup) : réparé, tout est bien rangé
+  chaque nuit.
+- Un commentaire supprimé est vraiment effacé, texte compris. Et si tu supprimes ton compte, le journal de la
+  direction oublie aussi ce que disaient tes commentaires modérés.
+- Les commentaires d’un compte désactivé ne s’affichent plus, et « Tes assurages » ne le nomme plus.
+- Sur le profil d’un autre grimpeur, ses badges sont datés au mois près, plus au jour près.
+- Session expirée : l’appli oublie aussi ce qu’elle gardait pour le hors-ligne, comme à la déconnexion.
 
 - Le journal de la direction écrit enfin « Touriste » en toutes lettres quand un compte est validé comme tel.
 - « Quoi de neuf ? » sur iPhone (appli installée) : les boutons collent enfin au bas de l’écran, plus de bout de

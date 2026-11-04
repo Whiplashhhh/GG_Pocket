@@ -4,6 +4,41 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-04 — Revue de sécurité complète (D-112)
+
+**Branche** : `fix/revue-securite-0.9.0` (depuis `main` après la PR #56). PR avec le label `deploy:dev` (demande de Willem).
+
+### Fait
+
+- Revue en quatre axes par sous-agents (auth, autorisations/IDOR, fichiers et RGPD, infra/CI/front), constats
+  revérifiés : aucun critique, 2 hauts, 6 moyens, une quinzaine de bas. Détail et statut de chacun dans D-112.
+- Corrigés : sauvegardes en échec dès la première photo (droits des fichiers), proxy d'entrée sur l'image web de la
+  release, mois figé (visibilité, mot, photo : endpoint `PUT /sessions/{id}/privacy` + boutons), texte des commentaires
+  supprimés (V18) et oubli dans le journal à la suppression du compte, rétention du journal 3 ans, images PostgreSQL
+  rafraîchies au déploiement, actions GitHub épinglées par SHA, gitleaks vérifié, limites de débit (profil, mot de passe
+  actuel), membres désactivés masqués (commentaires, assurages), dates des badges des autres au mois, cache des photos
+  de séance à un jour, 404 sur fichier manquant, cache hors ligne vidé sur 401.
+- Contrat OpenAPI repris du journal de la CI (job Backend), types régénérés.
+- Front : lint, typecheck, Vitest verts ; e2e Desktop Chrome ciblés verts (séances, badges) ; capture `seance-figee`
+  relue (clair et sombre).
+
+### Reste
+
+- Willem : trancher les trois points de D-112 (comptes inactifs 3 ans, jeton `gh`, âge des sauvegardes).
+- Suivi : export sans badges ni photos, vignettes, nettoyage des fichiers orphelins.
+- Phase 8 : logo, seed final et prod vide, audits accessibilité et Lighthouse, release 1.0.0.
+
+### Prochaine action
+
+Vérifier la CI de la PR (pile Docker : `media-owner` corrigé, proxy d'entrée sur l'image web) puis le déploiement dev
+(sauvegarde manuelle avec une photo pour confirmer le correctif).
+
+### Points bloquants
+
+Les trois décisions de D-112 (aucune ne bloque la PR).
+
+---
+
 ## 2026-11-03 — Retours du club : badges, fil, voie au hasard (D-111)
 
 **Branche** : `feature/retours-club-0.9.0` (depuis `main`, prod en 0.9.0).
