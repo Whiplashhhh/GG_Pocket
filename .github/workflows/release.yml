@@ -131,10 +131,13 @@ jobs:
           DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
           VERSION: ${{ steps.version.outputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY: ${{ steps.version.outputs.registry }}
         run: |
           install -d -m 700 ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          # The edge proxy runs this release's web image (rebuilt Caddy, scanned by the CI, D-112).
+          deploy/scripts/pin-edge-image.sh "$REGISTRY/gg-pocket-web:$VERSION"
           tar -czf "$RUNNER_TEMP/bundle.tgz" -C deploy .
           remote() {
             ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes "deploy@$DEPLOY_HOST" "$@" < "$RUNNER_TEMP/bundle.tgz"

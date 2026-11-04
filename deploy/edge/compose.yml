@@ -4,7 +4,12 @@ name: gg-pocket-edge
 
 services:
   caddy:
+    # The stock image for local checks; a release points it at its own web image, whose Caddy is
+    # rebuilt with a fixed Go and scanned (scripts/pin-edge-image.sh, D-112).
     image: caddy:2.11-alpine
+    # Root without any capability but binding 80 and 443: the rebuilt binary carries no file
+    # capability, so a non-root user could not bind them.
+    user: "0:0"
     restart: unless-stopped
     network_mode: host
     env_file: .env

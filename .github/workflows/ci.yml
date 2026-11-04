@@ -262,6 +262,8 @@ jobs:
       - name: Put the edge proxy in front, as on the server (https://prod.localhost, Caddy's own CA)
         working-directory: deploy/edge
         run: |
+          # As a release does: the edge runs the web image's rebuilt Caddy (D-112).
+          ../scripts/pin-edge-image.sh gg-pocket/gg-pocket-web:ci
           mkdir -p dev.d && echo '# empty' > dev.d/README.caddy
           printf 'GG_PROD_DOMAIN=prod.localhost\nGG_DEV_DOMAIN=dev.localhost\n' > .env
           docker compose up -d --wait --wait-timeout 60
