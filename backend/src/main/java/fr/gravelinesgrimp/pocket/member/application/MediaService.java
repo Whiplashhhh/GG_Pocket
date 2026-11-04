@@ -8,12 +8,16 @@ import fr.gravelinesgrimp.pocket.member.infra.MediaStorage;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.io.UncheckedIOException;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -27,8 +31,11 @@ import java.util.stream.Collectors;
 @Service
 public class MediaService {
 
+    private static final Logger log = LoggerFactory.getLogger(MediaService.class);
+
     /** Bytes and type of a file the caller is allowed to see. */
-    public record MediaContent(byte[] bytes, String contentType) {}
+    /** {@code everyMember}: an avatar or a route photo, not a file behind a private access rule. */
+    public record MediaContent(byte[] bytes, String contentType, boolean everyMember) {}
 
     private static final String JPEG = "image/jpeg";
 
@@ -60,7 +67,19 @@ public class MediaService {
                         .findById(mediaId)
                         .filter(file -> visible(file, readerId))
                         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No media"));
-        return new MediaContent(storage.read(media.storageKey()), media.contentType());
+        try {
+            return new MediaContent(
+                    storage.read(media.storageKey()),
+                    media.contentType(),
+                    media.usage().visibleToEveryMember());
+        } catch (UncheckedIOException e) {
+            if (e.getCause() instanceof NoSuchFileException) {
+                // A row without its file (lost volume, failed restore): "not found", not a 500.
+                log.warn("Media file {} missing from the volume", media.id());
+                throw new BusinessException(ErrorCode.NOT_FOUND, "No media");
+            }
+            throw e;
+        }
     }
 
     private boolean visible(MediaFile file, UUID readerId) {
