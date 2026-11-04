@@ -33,8 +33,10 @@ public class MediaService {
 
     private static final Logger log = LoggerFactory.getLogger(MediaService.class);
 
-    /** Bytes and type of a file the caller is allowed to see. */
-    /** {@code everyMember}: an avatar or a route photo, not a file behind a private access rule. */
+    /**
+     * Bytes and type of a file the caller is allowed to see; {@code everyMember}: an avatar or a
+     * route photo, not a file behind a private access rule.
+     */
     public record MediaContent(byte[] bytes, String contentType, boolean everyMember) {}
 
     private static final String JPEG = "image/jpeg";
