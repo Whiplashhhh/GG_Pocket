@@ -13,9 +13,14 @@ import java.util.UUID;
 
 public interface RouteCommentRepository extends JpaRepository<RouteComment, UUID> {
 
-    /** Oldest first, deleted ones left out. */
+    /**
+     * Oldest first, deleted ones left out, and those of a disabled author, who drops out of sight
+     * like everywhere else (security review, D-112).
+     */
     @Query(
             "select c from RouteComment c where c.routeId = :routeId and c.deletedAt is null"
+                    + " and exists (select m.id from Member m where m.id = c.authorId"
+                    + " and m.status = fr.gravelinesgrimp.pocket.member.domain.MemberStatus.ACTIVE)"
                     + " order by c.createdAt, c.id")
     List<RouteComment> findVisibleByRouteId(UUID routeId);
 
@@ -23,6 +28,8 @@ public interface RouteCommentRepository extends JpaRepository<RouteComment, UUID
     @Query(
             "select new fr.gravelinesgrimp.pocket.topo.domain.RouteCount(c.routeId, count(c))"
                     + " from RouteComment c where c.routeId in :routeIds and c.deletedAt is null"
+                    + " and exists (select m.id from Member m where m.id = c.authorId"
+                    + " and m.status = fr.gravelinesgrimp.pocket.member.domain.MemberStatus.ACTIVE)"
                     + " group by c.routeId")
     List<RouteCount> countVisiblePerRoute(Collection<UUID> routeIds);
 

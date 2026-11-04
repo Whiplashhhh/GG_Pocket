@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -151,6 +152,27 @@ class RouteCommentIT {
                 .andExpect(jsonPath("$.entries[0].targetType").value("ROUTE_COMMENT"))
                 .andExpect(jsonPath("$.entries[0].targetId").value(id))
                 .andExpect(jsonPath("$.entries[0].before").value("Message pas tres sympa."));
+    }
+
+    /** A disabled author drops out of sight, comment count included (security review, D-112). */
+    @Test
+    void theCommentsOfADisabledAuthorAreHidden() throws Exception {
+        var route = routes.create(members.create(Role.SETTER));
+        var author = members.create(Role.CLIMBER);
+        var reader = members.create(Role.CLIMBER);
+        var admin = members.create(Role.ADMIN);
+        comment(author, route, "Je vais etre desactive.").andExpect(status().isCreated());
+
+        mockMvc.perform(
+                        put("/api/v1/admin/members/" + author.id() + "/status")
+                                .with(as(admin))
+                                .with(xsrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"status\": \"DISABLED\"}"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get("/api/v1/routes/" + route.id() + "/comments").with(as(reader)))
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     /** Security review (D-112): no text kept for a deleted comment, nor for a member gone. */

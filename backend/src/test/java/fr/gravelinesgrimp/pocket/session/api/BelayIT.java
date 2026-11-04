@@ -20,6 +20,7 @@ import fr.gravelinesgrimp.pocket.IntegrationTest;
 import fr.gravelinesgrimp.pocket.MemberFixtures;
 import fr.gravelinesgrimp.pocket.RouteFixtures;
 import fr.gravelinesgrimp.pocket.SessionFixtures;
+import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
@@ -130,6 +131,22 @@ class BelayIT {
         mockMvc.perform(get("/api/v1/sessions/" + session.id()).with(as(me)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ascents[0].belayer").doesNotExist());
+    }
+
+    /** A disabled climber drops out of sight in my belays too (security review, D-112). */
+    @Test
+    void aDisabledClimberIsNoLongerNamedInMyBelays() throws Exception {
+        var belayer = members.create(Role.CLIMBER);
+        var climber = members.create(Role.CLIMBER);
+        sessions.log(climber, today(), 7, belayed(route(), ClimbMode.LEAD, belayer));
+        climber.disable();
+        memberRepository.saveAndFlush(climber);
+
+        mockMvc.perform(get("/api/v1/me/belays").with(as(belayer)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].climber.id").value(FormerMember.ID.toString()))
+                .andExpect(jsonPath("$.items[0].climber.avatarUrl").doesNotExist())
+                .andExpect(jsonPath("$.items[0].readable").value(false));
     }
 
     @Test

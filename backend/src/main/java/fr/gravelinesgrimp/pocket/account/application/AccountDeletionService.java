@@ -106,10 +106,15 @@ public class AccountDeletionService {
     @Transactional
     public void deleteOwnAccount(UUID memberId, String password, String clientAddress) {
         var member = lock(memberId);
-        var failureKey = Nickname.key(member.nickname()) + "@" + clientAddress;
+        // Counted like failed logins, address pair and nickname alike: a borrowed session must not
+        // turn into unlimited guessing of the current password from many addresses (D-112).
+        var nicknameKey = Nickname.key(member.nickname());
+        var failureKey = nicknameKey + "@" + clientAddress;
         rateLimiter.ensureAllowed(RateLimiter.LOGIN_FAILURES_PER_NICKNAME_AND_ADDRESS, failureKey);
+        rateLimiter.ensureAllowed(RateLimiter.LOGIN_FAILURES_PER_NICKNAME, nicknameKey);
         if (!passwordEncoder.matches(password, member.passwordHash())) {
             rateLimiter.record(RateLimiter.LOGIN_FAILURES_PER_NICKNAME_AND_ADDRESS, failureKey);
+            rateLimiter.record(RateLimiter.LOGIN_FAILURES_PER_NICKNAME, nicknameKey);
             throw new BusinessException(ErrorCode.CURRENT_PASSWORD_WRONG, "Wrong password");
         }
         erase(member, member);
