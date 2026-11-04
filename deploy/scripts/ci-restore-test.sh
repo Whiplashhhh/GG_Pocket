@@ -13,7 +13,10 @@ sql() {
 
 log "Probes"
 sql "CREATE TABLE restore_probe (note text); INSERT INTO restore_probe VALUES ('avant la sauvegarde');"
-compose exec -T api bash -c 'echo "prise de test" > /data/media/restore-probe.txt'
+# Written like MediaStorage does (owner read-write, group read, nothing for others): a probe readable
+# by all hid that the backup user could not read the real photos (D-112).
+compose exec -T api bash -c 'umask 027; echo "prise de test" > /data/media/restore-probe.txt'
+[[ $(compose exec -T api stat -c %a /data/media/restore-probe.txt) == 640 ]] || die "probe not written as rw-r-----"
 members=$(sql "SELECT count(*) FROM member;")
 
 log "Backup"
