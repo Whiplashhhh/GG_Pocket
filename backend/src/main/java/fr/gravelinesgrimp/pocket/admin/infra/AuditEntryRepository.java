@@ -35,4 +35,9 @@ public interface AuditEntryRepository extends JpaRepository<AuditEntry, UUID> {
             "update AuditEntry e set e.targetLabel = :label, e.beforeValue = null"
                     + " where e.targetId in :targetIds")
     int forgetTargets(Collection<UUID> targetIds, String label);
+
+    /** The retention promised on « Tes données »: 3 years (D-112). */
+    @Modifying
+    @Query("delete from AuditEntry e where e.occurredAt < :before")
+    int deleteOlderThan(Instant before);
 }
