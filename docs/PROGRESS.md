@@ -18,19 +18,22 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
   retirer ceux de l'ancienne règle. Déblocages : « Première cotation · 5c, 6a ».
 - Actu : séances encadrées (`SessionCard framed`), exception notée dans DESIGN §4.
 - Topo : bouton « Une voie au hasard » (`RandomRouteDialog`, `pickRandomRoute`), filtres respectés.
+- Correctif signalé par Willem (2026-11-04, PWA iPhone) : dans « Quoi de neuf ? », la barre de boutons collante
+  s'arrêtait au-dessus de la marge basse de la feuille (`safe-area-inset-bottom` de `GgDialog`), le texte défilait
+  dessous. Elle descend maintenant jusqu'au bord (bottom et marge négatifs) ; e2e qui mesure l'écart (20 px avant).
+- CI de la PR #56 verte (backend compris) avant ce correctif.
 - Tests : unitaires backend (moteur, `ShownBadge`, `GradeScale`), IT du recalcul (`BadgeIT`), Vitest (320 verts),
   e2e Desktop Chrome (91 verts, dont tirage au sort et liste des niveaux). Captures relues : `badge-detail`,
   `badge-cotation`, `actu-fil`, `topo-hasard`, `seance-deblocage` (mobile clair et sombre).
 
 ### Reste
 
-- CI : le backend (Java) n'est validé que par la CI, à surveiller sur la PR.
 - Valider avec le club les choix par défaut de D-111 (6b- compté pour 6b, niveau = plus dure, encadré limité à Actu).
 - Phase 8 inchangée (logo, revue de sécurité, seed final, audits, release 1.0.0).
 
 ### Prochaine action
 
-Vérifier la CI de la PR des retours du club ; corriger si le backend casse. Ensuite, Phase 8 au choix de Willem.
+Relecture et fusion de la PR #56 par Willem (CI à revérifier après le correctif « Quoi de neuf ? »). Ensuite, Phase 8 au choix de Willem.
 
 ### Points bloquants
 

@@ -45,6 +45,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 ### Corrigé
 
 - Le journal de la direction écrit enfin « Touriste » en toutes lettres quand un compte est validé comme tel.
+- « Quoi de neuf ? » sur iPhone (appli installée) : les boutons collent enfin au bas de l’écran, plus de bout de
+  texte qui dépasse en dessous.
 
 ## 0.9.0 — 2026-10-31
 
