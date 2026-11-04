@@ -16,8 +16,10 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./dev.d:/etc/caddy/dev.d:ro
-      - caddy-data:/data
-      - caddy-config:/config
+      # nocopy: a new volume stays root's, not the web image's user (10001), whose /data and
+      # /config root without DAC_OVERRIDE could not write (D-112).
+      - { type: volume, source: caddy-data, target: /data, volume: { nocopy: true } }
+      - { type: volume, source: caddy-config, target: /config, volume: { nocopy: true } }
     cap_drop: [ALL]
     cap_add: [NET_BIND_SERVICE]
     security_opt: ["no-new-privileges:true"]

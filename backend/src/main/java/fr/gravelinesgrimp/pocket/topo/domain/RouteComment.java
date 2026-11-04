@@ -25,7 +25,8 @@ public class RouteComment extends TimestampedEntity {
     @Column(name = "author_id", nullable = false, updatable = false)
     private UUID authorId;
 
-    @Column(nullable = false, updatable = false, length = 500)
+    /** Written once; erased on deletion (D-112). */
+    @Column(nullable = false, length = 500)
     private String body;
 
     @Column(name = "deleted_at")
