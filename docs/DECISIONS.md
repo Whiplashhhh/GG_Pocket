@@ -1158,3 +1158,10 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     compris), jamais deux fois la même d'affilée quand il y a le choix (`pickRandomRoute`). Fenêtre « Et pourquoi
     pas celle-là ? » avec « Une autre ! » et « Voir la voie » (fiche de la voie, le filtre du topo conservé).
 - **Statut** : à valider (6b- compté pour 6b, niveau = cotation la plus dure, encadré du fil limité à Actu).
+
+### D-112 — Licence MIT
+- **Contexte** : le dépôt n'avait pas de licence, donc aucun droit de réutilisation explicite.
+- **Choix** : licence MIT, au nom de Willem Vanbaelinghem (`LICENSE` à la racine), déclarée aussi dans
+  `frontend/package.json` (`"license": "MIT"`) et `backend/pom.xml` (`<licenses>`). La licence couvre le code, pas les
+  données des membres ni les photos qu'ils envoient.
+- **Statut** : validée par Willem (2026-11-04).
