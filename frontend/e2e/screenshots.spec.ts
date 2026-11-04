@@ -63,9 +63,11 @@ const marieBadges = (club: FakeClub) => {
   for (const code of ['TOPPED_1', 'TOPPED_5', 'TOPPED_10', 'LEAD_1', 'LEAD_5'] as const) {
     club.social.award(marie, code, '2025-10-02')
   }
-  for (const code of ['GRADE_5B', 'GRADE_5C', 'GRADE_6A', 'GRADE_6B', 'DAYS_10'] as const) {
+  // The grades come one by one (D-111): no 5b on record, a 6b straight after the 6a.
+  for (const code of ['GRADE_5C', 'GRADE_6A', 'DAYS_10'] as const) {
     club.social.award(marie, code, '2026-02-11')
   }
+  club.social.award(marie, 'GRADE_6B', '2026-05-20')
   club.social.award(marie, 'WEEK_2', '2025-10-06', 6, '2026-10-13')
   club.social.award(marie, 'WEEK_3', '2026-10-13')
   club.social.award(marie, 'PERFECT', '2026-03-04', 2, '2026-09-30')
@@ -386,7 +388,7 @@ const CAPTURES: Capture[] = [
     path: '/seance/nouvelle',
     as: 'CLIMBER',
     prepare: (club) => {
-      club.climbs.nextUnlocks = ['GRADE_5B', 'GRADE_5C', 'GRADE_6A', 'FLASH']
+      club.climbs.nextUnlocks = ['GRADE_6A', 'FLASH']
     },
     act: async (page) => {
       await addToSession(page, '12', 'Bye Bye Morice')
@@ -421,6 +423,17 @@ const CAPTURES: Capture[] = [
       await page.getByRole('button', { name: 'Voir tous les badges' }).click()
       await page.getByRole('button', { name: 'Voies topées, niveau 3' }).click()
       await page.getByRole('dialog', { name: 'Voies topées' }).waitFor()
+    },
+  },
+  {
+    name: 'badge-cotation',
+    path: '/profil',
+    as: 'CLIMBER',
+    prepare: marieBadges,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Voir tous les badges' }).click()
+      await page.getByRole('button', { name: 'Première cotation, niveau 4' }).click()
+      await page.getByRole('dialog', { name: 'Première cotation' }).waitFor()
     },
   },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
@@ -576,6 +589,15 @@ const CAPTURES: Capture[] = [
     },
   },
   { name: 'topo', path: '/topo', as: 'CLIMBER', prepare: marieOnTheWall },
+  {
+    name: 'topo-hasard',
+    path: '/topo',
+    as: 'CLIMBER',
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Une voie au hasard' }).click()
+      await page.getByRole('dialog', { name: 'Et pourquoi pas celle-là ?' }).waitFor()
+    },
+  },
   { name: 'topo-secteurs', path: '/topo?tri=secteur', as: 'CLIMBER', prepare: marieOnTheWall },
   {
     name: 'topo-filtres',

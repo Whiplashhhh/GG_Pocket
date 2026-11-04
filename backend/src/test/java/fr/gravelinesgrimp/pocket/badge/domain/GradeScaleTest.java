@@ -20,8 +20,15 @@ class GradeScaleTest {
     }
 
     @Test
+    void theBaseDropsTheModifier() {
+        assertThat(List.of("6a-", "6a", "6a+").stream().map(GradeScale::base).distinct())
+                .containsExactly("6a");
+    }
+
+    @Test
     void refusesWhatIsNotAGrade() {
         assertThatIllegalArgumentException().isThrownBy(() -> GradeScale.rank("6d"));
         assertThatIllegalArgumentException().isThrownBy(() -> GradeScale.rank("6A"));
+        assertThatIllegalArgumentException().isThrownBy(() -> GradeScale.base("6d"));
     }
 }

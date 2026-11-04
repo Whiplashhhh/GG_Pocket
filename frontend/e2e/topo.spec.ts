@@ -51,6 +51,41 @@ test.describe('the topo', () => {
     await expect(page.getByLabel('Trier par')).toHaveValue('opened')
   })
 
+  test('draws a route at random among the ones shown, again and again', async ({ page }) => {
+    await page.goto('/topo')
+    await page.getByRole('button', { name: 'Filtres' }).click()
+    const filters = page.getByRole('dialog', { name: 'Filtrer le topo' })
+    await filters.getByRole('button', { name: 'Négatif et ses 2 dièdres' }).click()
+    await filters.getByRole('button', { name: 'Voir la voie' }).click()
+    await expect(rows(page)).toHaveCount(1)
+    const only = (await rows(page).first().textContent()) ?? ''
+
+    // The filters apply: one route shown, one route drawn, no « Une autre ! ».
+    await page.getByRole('button', { name: 'Une voie au hasard' }).click()
+    const dialog = page.getByRole('dialog', { name: 'Et pourquoi pas celle-là ?' })
+    await expect(dialog.getByText(/le suspense était limité/)).toBeVisible()
+    await expect(dialog.getByRole('link')).toHaveText(only)
+    await expect(dialog.getByRole('button', { name: 'Une autre !' })).toHaveCount(0)
+    await dialog.getByRole('button', { name: 'Fermer' }).click()
+
+    await page.getByRole('button', { name: 'Filtres, 1 actif' }).click()
+    await filters.getByRole('button', { name: 'Tout effacer' }).click()
+    await filters.getByRole('button', { name: 'Voir les 11 voies' }).click()
+
+    await page.getByRole('button', { name: 'Une voie au hasard' }).click()
+    await expect(
+      dialog.getByText('Tirée au sort parmi les 11 voies affichées.', { exact: false }),
+    ).toBeVisible()
+    const first = (await dialog.getByRole('link').textContent()) ?? ''
+    await dialog.getByRole('button', { name: 'Une autre !' }).click()
+    // Never the same one twice in a row.
+    await expect(dialog.getByRole('link')).not.toHaveText(first)
+
+    await dialog.getByRole('button', { name: 'Voir la voie' }).click()
+    await expect(dialog).toBeHidden()
+    await expect(page).toHaveURL(/\/topo\/voies\//)
+  })
+
   test('groups the routes by sector when sorted by sector', async ({ page }) => {
     await page.goto('/topo?tri=secteur')
     await expect(page.getByRole('heading', { level: 2 }).first()).toHaveText('Neutre 8 m')

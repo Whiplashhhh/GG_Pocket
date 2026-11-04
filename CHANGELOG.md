@@ -27,9 +27,26 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   faire quoi, comment valider un nouveau compte, ouvrir ou démonter une voie, configurer le mur… Tout le mode
   d’emploi, avec un sommaire, et toujours à jour avec la version de l’appli que tu as sous les yeux.
 
+- **Les niveaux des badges** : touche un badge à niveaux et tu vois toute l’échelle, de la première marche à la
+  dernière. Ce qui est déjà dans la poche (avec la date), la prochaine marche surlignée, et ce qui t’attend
+  ensuite. La barre de progression, elle, ne bouge pas : on ne touche pas à ce qui marche.
+- **Une voie au hasard** : tu tournes en rond devant le mur ? Le bouton aux deux flèches croisées, en haut du
+  topo, tire une voie au sort parmi celles affichées (tes filtres comptent, « Pas encore faite par moi »
+  compris). Elle ne te dit rien ? « Une autre ! », autant de fois que tu veux.
+
+### Modifié
+
+- **Première cotation** : chaque cotation se gagne pour de vrai. Une 6b ne t’offre plus la 5b, la 5c et la 6a
+  au passage, il faudra les grimper (une 6b- ou une 6b+ comptent pour la 6b). Les badges déjà gagnés sont
+  recomptés avec cette règle : si une cotation disparaît de ta collection, c’est qu’elle n’est pas encore dans
+  ton carnet.
+- **Fil d’actu** : chaque séance a maintenant son cadre, on voit mieux où s’arrête l’une et où commence la suivante.
+
 ### Corrigé
 
 - Le journal de la direction écrit enfin « Touriste » en toutes lettres quand un compte est validé comme tel.
+- « Quoi de neuf ? » sur iPhone (appli installée) : les boutons collent enfin au bas de l’écran, plus de bout de
+  texte qui dépasse en dessous.
 
 ## 0.9.0 — 2026-10-31
 

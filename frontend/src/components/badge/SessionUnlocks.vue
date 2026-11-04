@@ -19,6 +19,7 @@ const titleId = useId()
 const items = computed(() => unlocks(props.codes))
 
 function detail(unlock: Unlock): string | undefined {
+  if (unlock.grades.length > 0) return unlock.grades.join(', ')
   if (isTiered(unlock.badge)) {
     return isMaxLevel(unlock.badge, unlock.level)
       ? t('badges.levelMax')

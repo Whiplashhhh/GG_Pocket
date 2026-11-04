@@ -251,3 +251,18 @@ export function filterManagedRoutes(
       (sectorId === '' || route.sectorId === sectorId) && matchesRouteSearch(route, search),
   )
 }
+
+/**
+ * A route at random for the climber who does not know what to climb (club feedback, D-111), among
+ * the ones the list shows (its filters apply). Never the same one twice in a row when there is a
+ * choice: a new tap is a new suggestion.
+ */
+export function pickRandomRoute(
+  routes: readonly RouteSummary[],
+  previousId?: string,
+  random: () => number = Math.random,
+): RouteSummary | undefined {
+  const choices =
+    routes.length > 1 ? routes.filter((candidate) => candidate.id !== previousId) : routes
+  return choices[Math.floor(random() * choices.length)]
+}

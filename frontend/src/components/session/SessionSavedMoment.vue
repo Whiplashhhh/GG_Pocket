@@ -43,6 +43,8 @@ const detail = computed(() => {
   const unlock = current.value
   if (unlock === undefined) return ''
   if (!isTiered(unlock.badge)) return t('badges.times', { n: level.value })
+  // A grade is earned on its own (D-111): « 5c » after a 6b, not a level going down.
+  if (unlock.grades.length > 0) return unlock.grades.join(', ')
   return isMaxLevel(unlock.badge, unlock.level)
     ? t('badges.levelMax')
     : t('badges.level', { n: unlock.level })

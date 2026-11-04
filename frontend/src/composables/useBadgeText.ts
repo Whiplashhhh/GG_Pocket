@@ -26,5 +26,13 @@ export function useBadgeText() {
         ? t('badges.tiers.FIRST_GRADE', { grade: mark })
         : t(`badges.tiers.${badge}`, Number(mark))
     },
+    /** A tier in the list of levels: « 10 voies topées », « Une voie en 6b ». */
+    tierShort(code: BadgeCode): string {
+      const badge = badgeOf(code)
+      const mark = tierMark(code)
+      return badge === 'FIRST_GRADE'
+        ? t('badges.tierShort.FIRST_GRADE', { grade: mark })
+        : t(`badges.tierShort.${badge}`, Number(mark))
+    },
   }
 }

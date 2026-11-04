@@ -22,4 +22,8 @@ public interface BadgeHistoryRepository extends Repository<ClimbingSession, UUID
                     + " where s.memberId = :memberId"
                     + " order by s.climbedOn, s.createdAt, s.id, a.position")
     List<HistoryRow> historyOf(UUID memberId);
+
+    /** The members with at least one session (the sessions of a deleted account have none). */
+    @Query("select distinct s.memberId from ClimbingSession s where s.memberId is not null")
+    List<UUID> climbers();
 }

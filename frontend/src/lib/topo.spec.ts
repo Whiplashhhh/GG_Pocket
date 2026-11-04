@@ -10,6 +10,7 @@ import {
   groupBySector,
   NO_FILTERS,
   parseTopoQuery,
+  pickRandomRoute,
   searchRoutes,
   sortRoutes,
   toTopoQuery,
@@ -321,5 +322,29 @@ describe('filterManagedRoutes', () => {
       'Tonton Talon',
       'Réglisse',
     ])
+  })
+})
+
+describe('pickRandomRoute', () => {
+  const routes = [
+    route({ id: 'a', name: 'Bye Bye Morice' }),
+    route({ id: 'b', name: 'Iron Man' }),
+    route({ id: 'c', name: 'La Dalle' }),
+  ]
+
+  it('picks among the routes shown', () => {
+    expect(pickRandomRoute(routes, undefined, () => 0)?.id).toBe('a')
+    expect(pickRandomRoute(routes, undefined, () => 0.99)?.id).toBe('c')
+  })
+
+  it('never suggests the same route twice in a row when there is a choice', () => {
+    for (const draw of [0, 0.4, 0.99]) {
+      expect(pickRandomRoute(routes, 'b', () => draw)?.id).not.toBe('b')
+    }
+  })
+
+  it('keeps the only route there is, and has none to give from an empty list', () => {
+    expect(pickRandomRoute(routes.slice(0, 1), 'a', () => 0.5)?.id).toBe('a')
+    expect(pickRandomRoute([], undefined, () => 0.5)).toBeUndefined()
   })
 })

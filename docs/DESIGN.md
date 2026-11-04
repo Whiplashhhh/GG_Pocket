@@ -112,6 +112,8 @@ Chiffres : `font-variant-numeric: tabular-nums` partout où des nombres s'aligne
 - **Pas de cartes partout.** Les listes vont d'un bord à l'autre, séparées par des filets fins. Une surface « papier » n'apparaît que pour ce
   qui est posé au-dessus du reste (feuilles, champs, étiquettes). Pas d'ombre grise générique : une seule ombre (`--shadow-sheet`, teintée
   encre) pour les feuilles et menus, et l'ombre « papier » propre à l'étiquette.
+  Exception (D-111, demande du club) : dans Actu, chaque séance est encadrée (filet, fond surface, rayon 4 px, 12 px
+  d'écart) pour qu'on voie où finit un « post ».
 - **Rayons.** 4 px pour les champs et boutons, 2 px pour l'étiquette (papier découpé), 20 px pour le haut des feuilles, cercle pour les avatars.
   Pas de gros arrondis génériques.
 - **Barre d'onglets à l'encre** en bas, dans les deux thèmes : elle rappelle le noir du logo et ancre l'écran. Onglet actif : icône et libellé

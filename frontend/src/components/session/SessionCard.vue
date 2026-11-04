@@ -28,8 +28,13 @@ const props = withDefaults(
     headingLevel?: 2 | 3
     /** The climber's avatar and name on top (the feed, a friend's session). */
     showAuthor?: boolean
+    /**
+     * A framed block with space around it (the feed, club feedback D-111): one post clearly ends
+     * where the next begins. Otherwise a full-width block above a hairline (DESIGN §4).
+     */
+    framed?: boolean
   }>(),
-  { linked: false, maxLines: undefined, headingLevel: 2, showAuthor: false },
+  { linked: false, maxLines: undefined, headingLevel: 2, showAuthor: false, framed: false },
 )
 
 const { t } = useI18n()
@@ -59,7 +64,8 @@ const belayers = computed(() =>
 
 <template>
   <article
-    class="relative flex flex-col gap-3 border-b border-rule px-4 py-4"
+    class="relative flex flex-col gap-3 px-4 py-4"
+    :class="framed ? 'rounded-control border border-rule bg-surface' : 'border-b border-rule'"
     :aria-labelledby="titleId"
   >
     <header v-if="showAuthor" class="flex items-center gap-3">

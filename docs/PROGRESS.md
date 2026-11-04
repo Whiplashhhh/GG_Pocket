@@ -4,6 +4,43 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-03 — Retours du club : badges, fil, voie au hasard (D-111)
+
+**Branche** : `feature/retours-club-0.9.0` (depuis `main`, prod en 0.9.0).
+
+### Fait
+
+- PR #54 (guide intégré) fusionnée par Willem avant cette session.
+- Badges à niveaux : la fenêtre d'un badge liste tous ses niveaux (obtenus et datés, prochain surligné, à venir),
+  barre de progression conservée.
+- Première cotation : chaque palier ne vient que de sa cotation (6b-, 6b, 6b+ → « 6b »). Niveau d'un badge à paliers
+  = palier le plus haut (serveur et front). `BadgeRecount` rejoue les badges de tous les grimpeurs au démarrage pour
+  retirer ceux de l'ancienne règle. Déblocages : « Première cotation · 5c, 6a ».
+- Actu : séances encadrées (`SessionCard framed`), exception notée dans DESIGN §4.
+- Topo : bouton « Une voie au hasard » (`RandomRouteDialog`, `pickRandomRoute`), filtres respectés.
+- Correctif signalé par Willem (2026-11-04, PWA iPhone) : dans « Quoi de neuf ? », la barre de boutons collante
+  s'arrêtait au-dessus de la marge basse de la feuille (`safe-area-inset-bottom` de `GgDialog`), le texte défilait
+  dessous. Elle descend maintenant jusqu'au bord (bottom et marge négatifs) ; e2e qui mesure l'écart (20 px avant).
+- CI de la PR #56 verte (backend compris) avant ce correctif.
+- Tests : unitaires backend (moteur, `ShownBadge`, `GradeScale`), IT du recalcul (`BadgeIT`), Vitest (320 verts),
+  e2e Desktop Chrome (91 verts, dont tirage au sort et liste des niveaux). Captures relues : `badge-detail`,
+  `badge-cotation`, `actu-fil`, `topo-hasard`, `seance-deblocage` (mobile clair et sombre).
+
+### Reste
+
+- Valider avec le club les choix par défaut de D-111 (6b- compté pour 6b, niveau = plus dure, encadré limité à Actu).
+- Phase 8 inchangée (logo, revue de sécurité, seed final, audits, release 1.0.0).
+
+### Prochaine action
+
+Relecture et fusion de la PR #56 par Willem (CI à revérifier après le correctif « Quoi de neuf ? »). Ensuite, Phase 8 au choix de Willem.
+
+### Points bloquants
+
+Aucun.
+
+---
+
 ## 2026-11-02 — Guide du club, dans le dépôt et dans l'appli (D-109, D-110)
 
 **Branches** : `chore/guide-club` (PR #53), puis `feature/guide-club-0.9.0` (depuis `chore/guide-club`, inclut #53).

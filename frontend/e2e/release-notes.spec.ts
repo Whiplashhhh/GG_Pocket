@@ -19,6 +19,12 @@ test.describe('after an update', () => {
     const dialog = page.getByRole('dialog', { name: 'Quoi de neuf ?' })
     await expect(dialog).toBeVisible()
     await expect(dialog.getByRole('heading', { name: `Version ${VERSION}` })).toBeVisible()
+    // The buttons sit on the very bottom edge of the sheet: no notes peeking out below them.
+    const sheet = await dialog.boundingBox()
+    const actions = await dialog.getByTestId('release-notes-actions').boundingBox()
+    expect(
+      Math.abs((sheet?.y ?? 0) + (sheet?.height ?? 0) - (actions?.y ?? 0) - (actions?.height ?? 0)),
+    ).toBeLessThan(1)
     await dialog.getByRole('button', { name: 'C’est noté, on grimpe !' }).click()
     await expect(dialog).toBeHidden()
 

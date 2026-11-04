@@ -120,11 +120,37 @@ describe('badgeStates', () => {
     ])
   })
 
-  it('counts the tiers earned as the level, the times earned for a repeatable badge', () => {
+  it('takes the highest tier as the level, the times earned for a repeatable badge', () => {
     expect(of('TOPPED')?.level).toBe(2)
     expect(of('FIRST_GRADE')?.level).toBe(3)
     expect(of('FLASH')?.level).toBe(3)
     expect(of('COMEBACK')?.level).toBe(0)
+  })
+
+  it('levels the grades on the hardest one, the easier ones earned or not (D-111)', () => {
+    const gaps = badgeStates([
+      ...GRADES.map((code) =>
+        code === 'GRADE_6A' || code === 'GRADE_6C' ? entry(code, 1, '2026-10-02') : entry(code),
+      ),
+    ])
+    const grade = gaps.find((state) => state.badge === 'FIRST_GRADE')
+    expect(grade?.level).toBe(5)
+    expect(
+      grade?.tiers.filter((tier) => tier.earnedOn !== undefined).map((tier) => tier.code),
+    ).toEqual(['GRADE_6A', 'GRADE_6C'])
+    if (grade === undefined) throw new Error('No FIRST_GRADE')
+    expect(nextTier(grade)).toBe('GRADE_7A')
+  })
+
+  it('lists every level of a tier family, dated once earned', () => {
+    const tiers = of('TOPPED')?.tiers ?? []
+    expect(tiers).toHaveLength(10)
+    expect(tiers.slice(0, 3)).toEqual([
+      { code: 'TOPPED_1', level: 1, earnedOn: '2026-09-01' },
+      { code: 'TOPPED_5', level: 2, earnedOn: '2026-09-02' },
+      { code: 'TOPPED_10', level: 3 },
+    ])
+    expect(of('FLASH')?.tiers).toEqual([])
   })
 
   it('dates a badge by its latest level', () => {
@@ -183,17 +209,23 @@ describe('unlocks', () => {
     expect(levelOfCode('FLASH')).toBe(1)
   })
 
-  it('folds the tiers of a family into the highest, a first 7a included', () => {
-    expect(
-      unlocks(['GRADE_5B', 'GRADE_5C', 'GRADE_6A', 'GRADE_6B', 'GRADE_6C', 'GRADE_7A']),
-    ).toEqual([{ badge: 'FIRST_GRADE', level: 6, times: 1 }])
+  it('folds the tiers of a family into the highest', () => {
+    expect(unlocks(['TOPPED_1', 'TOPPED_5'])).toEqual([
+      { badge: 'TOPPED', level: 2, times: 1, grades: [] },
+    ])
+  })
+
+  it('names the grades unlocked, each earned on its own (D-111)', () => {
+    expect(unlocks(['GRADE_6B', 'GRADE_5C'])).toEqual([
+      { badge: 'FIRST_GRADE', level: 4, times: 1, grades: ['5c', '6b'] },
+    ])
   })
 
   it('counts a repeatable badge earned twice by the same session', () => {
     expect(unlocks(['FLASH', 'TOPPED_5', 'FLASH', 'COMEBACK'])).toEqual([
-      { badge: 'TOPPED', level: 2, times: 1 },
-      { badge: 'COMEBACK', level: 1, times: 1 },
-      { badge: 'FLASH', level: 1, times: 2 },
+      { badge: 'TOPPED', level: 2, times: 1, grades: [] },
+      { badge: 'COMEBACK', level: 1, times: 1, grades: [] },
+      { badge: 'FLASH', level: 1, times: 2, grades: [] },
     ])
   })
 })

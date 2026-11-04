@@ -141,7 +141,7 @@ public final class BadgeEngine {
                     tiers(BadgeFamily.LEAD, lead, session);
                 }
                 if (line.grade() != null) {
-                    tiers(BadgeFamily.FIRST_GRADE, GradeScale.rank(line.grade()), session);
+                    firstGrade(line.grade(), session);
                 }
             }
             if (isFlash(session.climbedOn(), line) && flashedRoutes.add(line.routeId())) {
@@ -174,6 +174,19 @@ public final class BadgeEngine {
         private void tiers(BadgeFamily family, int value, ClimbRecord session) {
             for (var code : BadgeCode.tiers(family)) {
                 if (value >= code.threshold() && tiersEarned.add(code)) {
+                    award(code, "", session);
+                }
+            }
+        }
+
+        /**
+         * The tier of this very grade only (club feedback, D-111): a first 6b earns « 6b », not the
+         * 5b, 5c and 6a below it. A 6b- and a 6b+ count as a 6b.
+         */
+        private void firstGrade(String grade, ClimbRecord session) {
+            var base = GradeScale.base(grade);
+            for (var code : BadgeCode.tiers(BadgeFamily.FIRST_GRADE)) {
+                if (code.grade().equals(base) && tiersEarned.add(code)) {
                     award(code, "", session);
                 }
             }

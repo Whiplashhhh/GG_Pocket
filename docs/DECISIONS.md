@@ -45,6 +45,7 @@ direction) ou **Willem**.
 | D-105 | Badges : un 6a- ne donne pas « 6a » ; « retour » à 30 jours d'écart ; un flash par voie ? | club | Oui (détails dans D-105) |
 | D-106 | Badges à niveaux : couleur = niveau (échelle de rareté), couleur des répétables selon ×N, 3 favoris | Willem | Oui (détails dans D-106) |
 | D-108 | « Quoi de neuf ? » mémorisé par membre dans le navigateur (pas sur le serveur) | Willem | Oui : une fois par version, par membre et par appareil ; nouveaux comptes épargnés |
+| D-111 | Retours du club : cotations gagnées une à une (6b- et 6b+ comptent pour 6b), niveau = cotation la plus dure | club | À valider (détails dans D-111) |
 
 ---
 
@@ -1126,3 +1127,34 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   copie `docs/GUIDE_CLUB.md`. La police de l'appli n'a pas de flèches : « › » à la place de « → » (un test le vérifie
   dans le guide et le CHANGELOG).
 - **Statut** : validée par Willem (version intégrée choisie) ; détails de mise en œuvre par défaut.
+
+### D-111 — Retours du club (2026-11-03) : niveaux des badges, cotations, fil, voie au hasard
+- **Contexte** : quatre retours du club relayés par Willem. (1) Voir la liste des niveaux d'un badge, ceux franchis et
+  ceux à venir, dans la fenêtre du badge, en gardant la barre de progression. (2) Les badges « Première cotation »
+  doivent être indépendants : une 6b ne doit plus donner tout ce qu'il y a en dessous (D-105 lisait « ≥ X »).
+  (3) Mieux séparer les séances dans Actu (un encadré par séance). (4) Un bouton « au hasard » dans le topo.
+- **Choix** :
+  - **Liste des niveaux** dans la fenêtre d'un badge à niveaux (`BadgeDialog`) : chaque niveau avec sa médaille, sa
+    condition courte, sa date une fois obtenu, le prochain surligné (`aria-current="step"`). La barre et « Prochain
+    niveau » restent au-dessus. Remplace le « sans dire combien il y en a » de D-106 pour la fenêtre (la vignette
+    garde « Niveau N » / « Niveau max »).
+  - **Cotations une à une** (`BadgeEngine.firstGrade`) : le palier « 6b » ne vient que d'une voie en **6b-, 6b ou
+    6b+** (le « - » compte maintenant, contrairement à D-105 : sinon une 6b- ne donnerait plus rien). En dessous de
+    5b, rien ; une 7c+ donne « 7c ».
+  - **Niveau d'un badge à paliers = palier le plus haut obtenu**, pas le nombre de paliers (serveur `ShownBadge`,
+    front `badgeStates`) : identique pour les voies et les jours (paliers toujours consécutifs) ; pour les
+    cotations, la couleur suit la plus dure. Une 7a sans 5b au carnet = niveau 6. Les cotations plus faciles
+    manquantes s'affichent « Pas encore, celle-là » ; au niveau max avec des trous, un message dédié.
+  - **Moment de déblocage et carte de séance** : pour les cotations, on affiche les cotations gagnées (« 5c, 6a »)
+    au lieu d'un niveau (une 5c après une 6b ne fait pas « baisser » le niveau).
+  - **Recalcul au démarrage** (`BadgeRecount`, après le seed) : tous les grimpeurs ayant une séance sont rejoués,
+    chacun dans sa transaction, ligne membre verrouillée. Retire les paliers donnés par l'ancienne règle sans
+    attendre une nouvelle séance ; sans changement de règle, la différence est vide et rien n'est écrit. Un échec
+    est journalisé et n'empêche pas le démarrage.
+  - **Fil d'actu** : séances encadrées (filet, fond « surface », coins de 4 px, 12 px entre elles) dans Actu
+    uniquement (`SessionCard framed`). Exception assumée à DESIGN §4 « pas de cartes », à la demande du club ; le
+    profil et le carnet gardent les blocs pleine largeur.
+  - **Voie au hasard** : bouton dans la barre d'outils du topo, tirage parmi les voies **affichées** (filtres
+    compris), jamais deux fois la même d'affilée quand il y a le choix (`pickRandomRoute`). Fenêtre « Et pourquoi
+    pas celle-là ? » avec « Une autre ! » et « Voir la voie » (fiche de la voie, le filtre du topo conservé).
+- **Statut** : à valider (6b- compté pour 6b, niveau = cotation la plus dure, encadré du fil limité à Actu).

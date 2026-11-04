@@ -14,13 +14,14 @@ class ShownBadgeTest {
                     BadgeCode.TOPPED_1, 1L,
                     BadgeCode.TOPPED_5, 1L,
                     BadgeCode.TOPPED_10, 1L,
-                    BadgeCode.GRADE_5B, 1L,
+                    BadgeCode.GRADE_6A, 1L,
                     BadgeCode.FLASH, 4L);
 
     @Test
-    void theLevelOfATierFamilyIsItsEarnedTiers() {
+    void theLevelOfATierFamilyIsItsHighestTier() {
         assertThat(ShownBadge.of(Badge.TOPPED, COUNTS)).isEqualTo(new ShownBadge(Badge.TOPPED, 3));
-        assertThat(ShownBadge.of(Badge.FIRST_GRADE, COUNTS).level()).isEqualTo(1);
+        // A 6a without the 5b and 5c below it (D-111): level 3 all the same.
+        assertThat(ShownBadge.of(Badge.FIRST_GRADE, COUNTS).level()).isEqualTo(3);
     }
 
     @Test
