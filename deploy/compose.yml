@@ -53,8 +53,12 @@ services:
     image: postgres:18-alpine
     restart: "no"
     user: "0:0"
-    # Owner the API, group-readable for the backup (files written before D-112 were owner-only).
-    entrypoint: ["sh", "-c", "chown -R 10001:10001 /media && chmod -R g+rX,o-rwx /media"]
+    # Owner the API; files group-readable for the backup (those written before D-112 were
+    # owner-only). Files only: root here has no right to read a directory it took away from others.
+    entrypoint:
+      - sh
+      - -c
+      - chown -R 10001:10001 /media && find /media -type f ! -perm -040 -exec chmod g+r,o-rwx {} +
     volumes:
       - media:/media
     network_mode: none
