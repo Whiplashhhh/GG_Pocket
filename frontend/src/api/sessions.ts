@@ -175,6 +175,38 @@ export function useDeleteSession() {
   })
 }
 
+/**
+ * Even in a frozen month (D-112): who sees the session, its comment, its photo. None of them counts
+ * in the figures, so taking back what was shared never waits.
+ */
+export function useChangeSessionPrivacy() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: { id: string; visibility: SessionVisibility; removeComment: boolean }) =>
+      request(
+        api.PUT('/api/v1/sessions/{id}/privacy', {
+          params: { path: { id: input.id } },
+          body: { visibility: input.visibility, removeComment: input.removeComment },
+        }),
+      ),
+    onSuccess: (saved) => {
+      sessionsChanged(queryClient, saved)
+    },
+  })
+}
+
+export function useRemoveSessionPhoto() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) =>
+      requestNoContent(api.DELETE('/api/v1/sessions/{id}/photo', { params: { path: { id } } })),
+    onSuccess: (_, id) => {
+      void queryClient.invalidateQueries({ queryKey: sessionKey(id) })
+      sessionsChanged(queryClient)
+    },
+  })
+}
+
 /** One month of my planning (spec §8.6); the previous month stays on screen while the next loads. */
 export function useMyPlanning(month: MaybeRefOrGetter<string>) {
   return useQuery({

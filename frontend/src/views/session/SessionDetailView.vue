@@ -8,6 +8,7 @@ import { useCurrentMember } from '@/api/auth'
 import { ApiError, errorMessageKey } from '@/api/errors'
 import { useDeleteSession, useSession } from '@/api/sessions'
 import SubPageHeader from '@/components/layout/SubPageHeader.vue'
+import FrozenSessionPrivacy from '@/components/session/FrozenSessionPrivacy.vue'
 import SessionCard from '@/components/session/SessionCard.vue'
 import CommentThread from '@/components/social/CommentThread.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
@@ -80,7 +81,7 @@ function confirmDelete() {
         <Trash2 :size="18" aria-hidden="true" />{{ t('session.delete') }}
       </GgButton>
     </div>
-    <p v-else-if="isMine" class="px-4 py-4 text-ink-muted">{{ t('session.frozen') }}</p>
+    <FrozenSessionPrivacy v-else-if="isMine" :session="session.data.value" />
     <FormAlert v-if="removeError" class="mx-4">{{ removeError }}</FormAlert>
     <CommentThread
       :key="session.data.value.id"
