@@ -250,6 +250,35 @@ class SessionIT {
                 .andExpect(jsonPath("$.code").value("MONTH_FROZEN"));
     }
 
+    /** Who sees it, its comment and its photo count in no figure (security review, D-112). */
+    @Test
+    void aFrozenMonthStillLetsTheClimberTakeBackWhatTheyShared() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var friend = members.create(Role.CLIMBER);
+        var route = routes.create(members.create(Role.SETTER));
+        var old = oldSession(me, route, "Le jour où j'ai pleuré dans le dévers");
+
+        mockMvc.perform(
+                        put("/api/v1/sessions/" + old.id() + "/privacy")
+                                .with(as(friend))
+                                .with(xsrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"visibility\": \"FRIENDS\", \"removeComment\": true}"))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(
+                        put("/api/v1/sessions/" + old.id() + "/privacy")
+                                .with(as(me))
+                                .with(xsrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"visibility\": \"PRIVATE\", \"removeComment\": true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.visibility").value("PRIVATE"))
+                .andExpect(jsonPath("$.comment").doesNotExist())
+                .andExpect(jsonPath("$.editable").value(false));
+        mockMvc.perform(delete("/api/v1/sessions/" + old.id() + "/photo").with(as(me)).with(xsrf()))
+                .andExpect(status().isNoContent());
+    }
+
     @Test
     void changingTheDateFollowsTheRulesOfANewSession() throws Exception {
         var me = members.create(Role.CLIMBER);
@@ -417,11 +446,15 @@ class SessionIT {
 
     /** A session three months back: its month is frozen, whatever the day of the run. */
     private ClimbingSession oldSession(Member me, Route route) {
+        return oldSession(me, route, null);
+    }
+
+    private ClimbingSession oldSession(Member me, Route route, String comment) {
         var draft =
                 new SessionDraft(
                         today().minusMonths(3),
                         null,
-                        null,
+                        comment,
                         SessionVisibility.FRIENDS,
                         List.of(
                                 new AscentDraft(

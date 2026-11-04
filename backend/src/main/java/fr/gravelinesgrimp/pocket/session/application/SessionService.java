@@ -17,6 +17,7 @@ import fr.gravelinesgrimp.pocket.session.domain.ClimbingSession;
 import fr.gravelinesgrimp.pocket.session.domain.RouteMode;
 import fr.gravelinesgrimp.pocket.session.domain.SessionCalendar;
 import fr.gravelinesgrimp.pocket.session.domain.SessionDraft;
+import fr.gravelinesgrimp.pocket.session.domain.SessionVisibility;
 import fr.gravelinesgrimp.pocket.session.infra.AscentRepository;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
 import fr.gravelinesgrimp.pocket.social.application.Friendships;
@@ -161,6 +162,23 @@ public class SessionService {
         autoChecks.refresh(memberId, touched);
         var unlocked = badges.refresh(memberId);
         return views.of(session, memberId).withUnlocked(codes(unlocked));
+    }
+
+    /**
+     * Who sees the session, and its comment: neither counts in the figures, so a frozen month does
+     * not stop a climber from taking back what they shared (security review, D-112).
+     *
+     * @throws BusinessException {@code NOT_FOUND}, {@code RATE_LIMITED}
+     */
+    @PreAuthorize("hasRole('TOURIST')")
+    @Transactional
+    public SessionView changePrivacy(
+            UUID memberId, UUID sessionId, SessionVisibility visibility, boolean removeComment) {
+        lockMember(memberId);
+        var session = owned.load(memberId, sessionId);
+        rateLimiter.consume(RateLimiter.SESSION_WRITE_PER_MEMBER, memberId.toString());
+        session.changePrivacy(visibility, removeComment);
+        return views.of(session, memberId);
     }
 
     /**

@@ -67,12 +67,14 @@ public class SessionPhotoService {
         return views.of(session, memberId);
     }
 
-    /** Idempotent. */
+    /**
+     * Idempotent. Allowed in a frozen month: a photo counts in no figure, and taking it back must
+     * not wait for an account deletion (security review, D-112).
+     */
     @PreAuthorize("hasRole('TOURIST')")
     @Transactional
     public void remove(UUID memberId, UUID sessionId) {
         var session = sessions.load(memberId, sessionId);
-        SessionCalendar.checkNotFrozen(session.climbedOn(), clock.instant());
         var previous = session.photoId();
         session.changePhoto(null);
         if (previous != null) {
