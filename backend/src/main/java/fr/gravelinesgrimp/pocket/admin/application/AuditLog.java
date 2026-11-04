@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -21,6 +22,10 @@ import java.util.UUID;
 public class AuditLog {
 
     static final int LABEL_LENGTH = 100;
+
+    /** What a forgotten target is called in the journal. */
+    static final String FORGOTTEN_LABEL = "Ancien·ne membre";
+
     static final int VALUE_LENGTH = 200;
 
     private final AuditEntryRepository entries;
@@ -51,6 +56,17 @@ public class AuditLog {
                         shorten(targetLabel, LABEL_LENGTH),
                         shorten(before, VALUE_LENGTH),
                         shorten(after, VALUE_LENGTH)));
+    }
+
+    /**
+     * The entries about these targets keep the moderation, not the person: label and text go
+     * (comments of a member who deleted their account, D-112).
+     */
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void forgetTargets(Collection<UUID> targetIds) {
+        if (!targetIds.isEmpty()) {
+            entries.forgetTargets(targetIds, FORGOTTEN_LABEL);
+        }
     }
 
     static String shorten(String text, int length) {

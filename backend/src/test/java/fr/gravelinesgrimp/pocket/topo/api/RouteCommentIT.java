@@ -3,6 +3,7 @@ package fr.gravelinesgrimp.pocket.topo.api;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.as;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -24,6 +25,7 @@ import fr.gravelinesgrimp.pocket.topo.domain.RouteStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -36,6 +38,7 @@ class RouteCommentIT {
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;
     @Autowired private RouteFixtures routes;
+    @Autowired private JdbcTemplate jdbc;
 
     @Test
     void membersCommentAndReadOldestFirst() throws Exception {
@@ -148,6 +151,33 @@ class RouteCommentIT {
                 .andExpect(jsonPath("$.entries[0].targetType").value("ROUTE_COMMENT"))
                 .andExpect(jsonPath("$.entries[0].targetId").value(id))
                 .andExpect(jsonPath("$.entries[0].before").value("Message pas tres sympa."));
+    }
+
+    /** Security review (D-112): no text kept for a deleted comment, nor for a member gone. */
+    @Test
+    void aDeletedCommentLeavesNoTextAndTheJournalForgetsAMemberGone() throws Exception {
+        var route = routes.create(members.create(Role.SETTER));
+        var author = members.create(Role.CLIMBER);
+        var board = members.create(Role.BOARD);
+        var admin = members.create(Role.ADMIN);
+        var id = idOf(comment(author, route, "Message pas tres sympa."));
+        remove(board, id).andExpect(status().isNoContent());
+
+        assertThat(
+                        jdbc.queryForObject(
+                                "select body from route_comment where id = ?::uuid",
+                                String.class,
+                                id))
+                .isEmpty();
+
+        mockMvc.perform(delete("/api/v1/admin/members/" + author.id()).with(as(admin)).with(xsrf()))
+                .andExpect(status().isNoContent());
+        var entry =
+                jdbc.queryForMap(
+                        "select target_label, before_value from audit_entry where target_id = ?::uuid",
+                        id);
+        assertThat(entry.get("target_label")).isEqualTo("Ancien·ne membre");
+        assertThat(entry.get("before_value")).isNull();
     }
 
     private ResultActions comment(Member author, Route route, String body) throws Exception {

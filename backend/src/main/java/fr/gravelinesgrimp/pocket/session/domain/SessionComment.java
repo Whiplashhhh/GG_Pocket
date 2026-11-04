@@ -45,7 +45,12 @@ public class SessionComment extends TimestampedEntity {
         this.body = body;
     }
 
+    /**
+     * Gone for everyone: the text is erased (shown nowhere once deleted, it has no reason to stay
+     * in the database and the backups, D-112); who deleted it and when remain.
+     */
     public void delete(UUID by, Instant at) {
+        this.body = "";
         this.deletedBy = by;
         this.deletedAt = at;
     }
