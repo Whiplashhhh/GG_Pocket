@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatDate, formatDateTime, formatRelative, formatShortDate } from './format'
+import { formatDate, formatDateTime, formatMonth, formatRelative, formatShortDate } from './format'
 
 describe('formatDate', () => {
   it('writes dates the French way', () => {
@@ -32,5 +32,12 @@ describe('formatRelative', () => {
     expect(formatRelative('2026-10-17T12:00:00Z', now)).toBe('il y a 3 jours')
     expect(formatRelative('2026-10-20T11:00:00Z', now)).toBe('il y a 1 heure')
     expect(formatRelative('2026-10-20T11:59:50Z', now)).toBe('maintenant')
+  })
+})
+
+describe('formatMonth', () => {
+  it('writes the month and the year only', () => {
+    expect(formatMonth('2026-10-01')).toBe('octobre 2026')
+    expect(formatMonth('2026-01-31')).toBe('janvier 2026')
   })
 })
