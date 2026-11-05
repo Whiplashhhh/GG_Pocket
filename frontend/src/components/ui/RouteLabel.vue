@@ -121,13 +121,13 @@ const dismounted = computed(() => props.status === 'DISMOUNTED')
     </span>
     <span
       class="min-w-0 flex-1 self-center px-2 pt-0.5 font-hand leading-tight font-bold"
-      :class="[sizing.name, { 'text-label-ink/60': dismounted }]"
+      :class="[sizing.name, { 'text-label-ink/70': dismounted }]"
       aria-hidden="true"
       >{{ name }}</span
     >
     <span
       class="flex shrink-0 flex-col items-center justify-center"
-      :class="[sizing.cord, dismounted ? 'text-label-ink/60' : 'text-label-ink/75']"
+      :class="[sizing.cord, dismounted ? 'text-label-ink/70' : 'text-label-ink/75']"
       aria-hidden="true"
     >
       <span class="leading-none font-semibold" :class="sizing.cordCaption">{{

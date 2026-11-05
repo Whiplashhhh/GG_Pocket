@@ -37,7 +37,7 @@ const { t } = useI18n()
         :width="large ? 168 : 88"
         :height="large ? 166 : 87"
         class="dark:hidden"
-        :class="large ? 'size-42' : 'size-22'"
+        :class="large ? 'h-auto w-42' : 'h-auto w-22'"
       />
       <img
         :src="logoDark"
@@ -45,7 +45,7 @@ const { t } = useI18n()
         :width="large ? 168 : 88"
         :height="large ? 166 : 87"
         class="hidden dark:block"
-        :class="large ? 'size-42' : 'size-22'"
+        :class="large ? 'h-auto w-42' : 'h-auto w-22'"
       />
       <h1 class="font-title text-balance" :class="large ? 'text-3xl' : 'text-2xl'">{{ title }}</h1>
       <p v-if="intro" class="max-w-prose text-ink-muted">{{ intro }}</p>

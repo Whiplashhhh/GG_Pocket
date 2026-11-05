@@ -34,7 +34,8 @@ test.describe('friends', () => {
     await expect(requests.getByText('Léa Dupont')).toBeVisible()
     await requests.getByRole('button', { name: 'Accepter la demande de lea.dyno' }).click()
     await expect(requests).toBeHidden()
-    await expect(page.getByRole('link', { name: 'Mon profil', exact: true })).toBeVisible()
+    // No request left: the link says so no more (named « Mon profil » then what it shows).
+    await expect(page.getByRole('link', { name: /^Mon profil marie/ })).toBeVisible()
     await page.goto('/actu')
 
     await page.getByRole('link', { name: /4 grimpeurs accrochés à l’appli/ }).click()
@@ -42,7 +43,7 @@ test.describe('friends', () => {
     await page.getByRole('searchbox', { name: 'Chercher un grimpeur' }).fill('marti')
     await expect(page.getByRole('status')).toHaveText('1 grimpeur')
     await expect(page.getByText('@jules · Le forceur')).toBeVisible()
-    await page.getByRole('button', { name: 'Demander jules en ami' }).click()
+    await page.getByRole('button', { name: 'Demander en ami : jules' }).click()
     await expect(page.getByText('En attente', { exact: true })).toBeVisible()
 
     await page.getByRole('searchbox', { name: 'Chercher un grimpeur' }).fill('')
@@ -83,13 +84,13 @@ test.describe('friends', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Carnet de tom' })).toBeVisible()
     await page.getByRole('link', { name: 'Retour', exact: true }).click()
 
-    await page.getByRole('button', { name: 'Retirer tom de mes amis' }).click()
+    await page.getByRole('button', { name: 'Retirer de mes amis : tom' }).click()
     const dialog = page.getByRole('alertdialog', { name: 'On se désencorde ?' })
     await dialog.getByRole('button', { name: 'Retirer de mes amis' }).click()
     await expect(
       page.getByText('Ses séances et son carnet sont réservés à ses amis.'),
     ).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Demander tom en ami' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Demander en ami : tom' })).toBeVisible()
   })
 
   test('a stranger’s sessions stay closed, and a friend’s session is read-only', async ({

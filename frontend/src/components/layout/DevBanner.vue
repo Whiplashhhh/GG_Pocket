@@ -20,12 +20,14 @@ const text = computed(() =>
 </script>
 
 <template>
-  <p
-    v-if="visible"
-    class="truncate bg-brand px-4 pt-[max(0.25rem,env(safe-area-inset-top))] pb-1 text-center text-micro font-semibold text-on-brand"
-    role="note"
-    :title="text"
-  >
-    {{ text }}
-  </p>
+  <!-- A landmark of its own: everything on the page sits in one (screen readers, axe « region »). -->
+  <aside v-if="visible" :aria-label="t('devBanner.label')">
+    <p
+      class="truncate bg-brand px-4 pt-[max(0.25rem,env(safe-area-inset-top))] pb-1 text-center text-micro font-semibold text-on-brand"
+      role="note"
+      :title="text"
+    >
+      {{ text }}
+    </p>
+  </aside>
 </template>

@@ -84,6 +84,39 @@ function documentModule(id: string, path: string, transform: (text: string) => u
 }
 
 /**
+ * Preloads the text font (latin, upright): it arrives with the stylesheet instead of after the
+ * first paint, so the text does not reflow under the reader (layout shift, Lighthouse CLS). The
+ * handwritten font of the route labels is not needed by every screen and stays lazy.
+ */
+function preloadTextFont(): Plugin {
+  const FACE = /archivo-latin-standard-normal\.woff2$/
+  return {
+    name: 'gg-preload-text-font',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler: (_html, context) =>
+        Object.values(context.bundle ?? {})
+          .filter(
+            (output) =>
+              output.type === 'asset' && output.originalFileNames.some((name) => FACE.test(name)),
+          )
+          .map((font) => ({
+            tag: 'link',
+            attrs: {
+              rel: 'preload',
+              href: `/${font.fileName}`,
+              as: 'font',
+              type: 'font/woff2',
+              crossorigin: '',
+            },
+            injectTo: 'head',
+          })),
+    },
+  }
+}
+
+/**
  * Shared by the app and the unit tests. Unit tests skip the i18n precompilation (its virtual
  * modules do not load in Vitest, and the runtime compiler is fine there) and the service worker.
  */
@@ -100,6 +133,7 @@ export function createViteConfig({
       documentModule('virtual:changelog', '../CHANGELOG.md', parseChangelog),
       documentModule('virtual:club-guide', '../docs/GUIDE_CLUB.md', renderGuide),
       tailwindcss(),
+      preloadTextFont(),
       // Precompiles messages at build time: no runtime message compiler, so no eval (strict CSP).
       precompileMessages &&
         VueI18nPlugin({

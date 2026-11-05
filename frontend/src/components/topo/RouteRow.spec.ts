@@ -38,8 +38,12 @@ describe('RouteRow', () => {
   it('is a link named by the route label and described by the rest', () => {
     const wrapper = mountRow(tonton)
     const link = wrapper.get('a')
-    const name = wrapper.get(`#${link.attributes('aria-labelledby') ?? ''}`)
-    expect(name.text()).toBe('6a+, Tonton Talon, couleur orange, corde 15, dernière chance')
+    // Named by its content (label in name, WCAG 2.5.3): the label's spoken name, the rest hidden.
+    expect(link.attributes('aria-labelledby')).toBeUndefined()
+    expect(link.get('.sr-only').text()).toBe(
+      '6a+, Tonton Talon, couleur orange, corde 15, dernière chance',
+    )
+    expect(link.text()).not.toContain('Grand dévers')
     const description = wrapper.get(`#${link.attributes('aria-describedby') ?? ''}`).text()
     expect(description).toContain('Grand dévers')
     expect(description).toContain('Physique Dévers')

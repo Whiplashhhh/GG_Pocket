@@ -149,11 +149,13 @@ function select(date: string) {
               ]"
               :aria-label="dayLabel(cell.date)"
               :aria-pressed="selected === cell.date"
-              :aria-controls="dayTitleId"
+              :aria-controls="selected ? dayTitleId : undefined"
               :disabled="cell.date > today"
               @click="select(cell.date)"
             >
-              <span aria-hidden="true">{{ cell.day }}</span>
+              <span aria-hidden="true">{{
+                cell.day === 1 ? t('planning.firstOfMonth') : cell.day
+              }}</span>
               <Check
                 v-if="byDate.has(cell.date)"
                 :size="14"

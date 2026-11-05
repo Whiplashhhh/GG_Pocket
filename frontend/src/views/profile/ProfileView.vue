@@ -46,7 +46,7 @@ import { useThemeStore, type ThemePreference } from '@/stores/theme'
 /** Spec §8.8: my profile, my badges and my settings. Key figures come with a later phase. */
 const { t } = useI18n()
 const awaiting = useAwaitingValidation()
-const { data: profile, isPending, isError, error, refetch } = useMyProfile()
+const { data: profile, isPending, isLoading, isError, error, refetch } = useMyProfile()
 const { data: meta } = useMetaQuery()
 const { preference } = storeToRefs(useThemeStore())
 const logout = useLogout()
@@ -56,6 +56,18 @@ const favoriteBadges = computed(() =>
   badges.data.value === undefined ? [] : shownFavorites(badges.data.value),
 )
 const favorites = useMyFavorites()
+/**
+ * The page shows up in one piece: blocks arriving one after the other pushed the settings down
+ * under the reader's thumb (layout shift, Lighthouse CLS). Loading only, not waiting offline:
+ * a paused query must not hide the settings (theme, sign-out).
+ */
+const settling = computed(
+  () =>
+    isLoading.value ||
+    favorites.isLoading.value ||
+    badges.isLoading.value ||
+    favoriteRoute.isLoading.value,
+)
 const activeFavorites = computed(() =>
   (favorites.data.value ?? []).filter((route) => route.status !== 'DISMOUNTED'),
 )
@@ -94,7 +106,7 @@ const facts = computed(() => {
   </div>
   <FriendRequests />
 
-  <div v-if="isPending" class="flex items-center gap-4 px-4 py-6" aria-hidden="true">
+  <div v-if="isPending || settling" class="flex items-center gap-4 px-4 py-6" aria-hidden="true">
     <SkeletonBlock class="size-24 rounded-full" />
     <div class="flex flex-1 flex-col gap-2">
       <SkeletonBlock class="h-6 w-2/3" />
@@ -137,139 +149,135 @@ const facts = computed(() => {
     </GgButton>
   </section>
 
-  <section
-    v-if="profile?.favoriteRouteId && favoriteRoute.data.value"
-    class="border-t border-rule px-4 pt-5 pb-6"
-    aria-labelledby="voie-preferee"
-  >
-    <h2 id="voie-preferee" class="text-lg font-title">{{ t('profile.favoriteRoute') }}</h2>
-    <RouterLink
-      :to="`/topo/voies/${favoriteRoute.data.value.route.id}`"
-      aria-labelledby="voie-preferee-nom"
-      class="mt-3 flex max-w-full pt-2"
+  <template v-if="!settling">
+    <section
+      v-if="profile?.favoriteRouteId && favoriteRoute.data.value"
+      class="border-t border-rule px-4 pt-5 pb-6"
+      aria-labelledby="voie-preferee"
     >
-      <RouteSummaryLabel :route="favoriteRoute.data.value.route" label-id="voie-preferee-nom" />
-    </RouterLink>
-  </section>
+      <h2 id="voie-preferee" class="text-lg font-title">{{ t('profile.favoriteRoute') }}</h2>
+      <RouterLink
+        :to="`/topo/voies/${favoriteRoute.data.value.route.id}`"
+        class="mt-3 flex max-w-full pt-2"
+      >
+        <RouteSummaryLabel :route="favoriteRoute.data.value.route" />
+      </RouterLink>
+    </section>
 
-  <section v-if="profile" class="border-t border-rule pt-5 pb-6" aria-labelledby="coups-de-coeur">
-    <h2 id="coups-de-coeur" class="px-4 text-lg font-title">{{ t('profile.favorites') }}</h2>
-    <div v-if="favorites.isPending.value" class="px-4 pt-3" aria-hidden="true">
-      <SkeletonBlock class="h-11 w-full max-w-72" />
-    </div>
-    <p v-else-if="favorites.data.value?.length === 0" class="max-w-prose px-4 pt-2 text-ink-muted">
-      {{ t('profile.favoritesEmpty') }}
-    </p>
-    <template v-else-if="favorites.data.value">
-      <ul class="mt-2 flex flex-col">
-        <li v-for="route in activeFavorites" :key="route.id">
-          <RouterLink
-            :to="`/topo/voies/${route.id}`"
-            :aria-labelledby="`coeur-${route.id}`"
-            class="flex px-4 pt-4 pb-1"
-          >
-            <RouteSummaryLabel :route="route" :label-id="`coeur-${route.id}`" />
-          </RouterLink>
-        </li>
-      </ul>
-      <template v-if="pastFavorites.length > 0">
-        <h3 class="px-4 pt-5 text-sm font-semibold text-ink-muted">
-          {{ t('profile.pastFavorites') }}
-        </h3>
-        <ul class="flex flex-col">
-          <li v-for="route in pastFavorites" :key="route.id">
-            <RouterLink
-              :to="`/topo/voies/${route.id}`"
-              :aria-labelledby="`coeur-${route.id}`"
-              class="flex px-4 pt-3 pb-1"
-            >
-              <RouteSummaryLabel :route="route" size="sm" :label-id="`coeur-${route.id}`" />
+    <section v-if="profile" class="border-t border-rule pt-5 pb-6" aria-labelledby="coups-de-coeur">
+      <h2 id="coups-de-coeur" class="px-4 text-lg font-title">{{ t('profile.favorites') }}</h2>
+      <div v-if="favorites.isPending.value" class="px-4 pt-3" aria-hidden="true">
+        <SkeletonBlock class="h-11 w-full max-w-72" />
+      </div>
+      <p
+        v-else-if="favorites.data.value?.length === 0"
+        class="max-w-prose px-4 pt-2 text-ink-muted"
+      >
+        {{ t('profile.favoritesEmpty') }}
+      </p>
+      <template v-else-if="favorites.data.value">
+        <ul class="mt-2 flex flex-col">
+          <li v-for="route in activeFavorites" :key="route.id">
+            <RouterLink :to="`/topo/voies/${route.id}`" class="flex px-4 pt-4 pb-1">
+              <RouteSummaryLabel :route="route" />
             </RouterLink>
           </li>
         </ul>
+        <template v-if="pastFavorites.length > 0">
+          <h3 class="px-4 pt-5 text-sm font-semibold text-ink-muted">
+            {{ t('profile.pastFavorites') }}
+          </h3>
+          <ul class="flex flex-col">
+            <li v-for="route in pastFavorites" :key="route.id">
+              <RouterLink :to="`/topo/voies/${route.id}`" class="flex px-4 pt-3 pb-1">
+                <RouteSummaryLabel :route="route" size="sm" />
+              </RouterLink>
+            </li>
+          </ul>
+        </template>
       </template>
-    </template>
-    <RouterLink
-      to="/carnet"
-      class="mx-4 mt-6 flex min-h-14 items-center gap-3 rounded-control border-2 border-ink px-3 py-2 hover:bg-surface-sunken"
-    >
-      <BookOpen :size="24" class="shrink-0 text-brand-ink" aria-hidden="true" />
-      <span class="flex min-w-0 flex-1 flex-col">
-        <span class="font-semibold">{{ t('profile.logbook') }}</span>
-        <span class="text-sm text-ink-muted">{{ t('profile.logbookHint') }}</span>
-      </span>
-      <ChevronRight :size="20" class="shrink-0" aria-hidden="true" />
-    </RouterLink>
-    <p class="mt-4 px-4 text-sm text-ink-muted">{{ t('profile.comingSoon') }}</p>
-  </section>
-
-  <BadgeLibrarySection v-if="profile" :title="t('badges.mine')" heading-id="mes-badges" />
-
-  <section class="border-t border-rule" aria-labelledby="reglages">
-    <h2 id="reglages" class="px-4 pt-6 pb-2 text-lg font-title">{{ t('profile.settings') }}</h2>
-    <div class="border-t border-rule">
-      <SettingsLink v-if="profile && isAtLeast(profile.role, 'SETTER')" to="/gestion">
-        <template #icon><Wrench :size="20" /></template>
-        {{ t('profile.management') }}
-      </SettingsLink>
-      <SettingsLink v-if="!awaiting" to="/annuaire?amis">
-        <template #icon><Users :size="20" /></template>
-        {{ t('profile.friends') }}
-      </SettingsLink>
-      <SettingsLink to="/profil/assurages">
-        <template #icon><Link2 :size="20" /></template>
-        {{ t('profile.belays') }}
-      </SettingsLink>
-      <SettingsLink to="/profil/mot-de-passe">
-        <template #icon><KeyRound :size="20" /></template>
-        {{ t('profile.password') }}
-      </SettingsLink>
-      <SettingsLink to="/profil/appareils">
-        <template #icon><Smartphone :size="20" /></template>
-        {{ t('profile.devices') }}
-      </SettingsLink>
-      <SettingsLink to="/profil/installer">
-        <template #icon><Download :size="20" /></template>
-        {{ t('profile.install') }}
-      </SettingsLink>
-      <SettingsLink to="/profil/compte">
-        <template #icon><FileDown :size="20" /></template>
-        {{ t('profile.account') }}
-      </SettingsLink>
-      <SettingsLink to="/profil/nouveautes">
-        <template #icon><Sparkles :size="20" /></template>
-        {{ t('profile.releaseNotes') }}
-      </SettingsLink>
-      <SettingsLink to="/tes-donnees">
-        <template #icon><ShieldCheck :size="20" /></template>
-        {{ t('profile.privacy') }}
-      </SettingsLink>
-    </div>
-    <div class="px-4 py-6">
-      <p class="mb-2 font-semibold" aria-hidden="true">{{ t('theme.label') }}</p>
-      <SegmentedControl v-model="preference" :label="t('theme.label')" :options="themeOptions" />
-      <p v-if="preference === 'auto'" class="mt-2 text-sm text-ink-muted">
-        {{ t('theme.autoHint') }}
-      </p>
-    </div>
-    <div class="border-t border-rule px-4 py-6">
-      <GgButton
-        variant="secondary"
-        :disabled="logout.isPending.value"
-        @click="confirmingLogout = true"
+      <RouterLink
+        to="/carnet"
+        class="mx-4 mt-6 flex min-h-14 items-center gap-3 rounded-control border-2 border-ink px-3 py-2 hover:bg-surface-sunken"
       >
-        {{ t('profile.logout') }}
-      </GgButton>
-    </div>
-  </section>
+        <BookOpen :size="24" class="shrink-0 text-brand-ink" aria-hidden="true" />
+        <span class="flex min-w-0 flex-1 flex-col">
+          <span class="font-semibold">{{ t('profile.logbook') }}</span>
+          <span class="text-sm text-ink-muted">{{ t('profile.logbookHint') }}</span>
+        </span>
+        <ChevronRight :size="20" class="shrink-0" aria-hidden="true" />
+      </RouterLink>
+      <p class="mt-4 px-4 text-sm text-ink-muted">{{ t('profile.comingSoon') }}</p>
+    </section>
 
-  <footer class="border-t border-rule px-4 py-6 text-sm text-ink-muted">
-    <p>{{ t('app.versionFooter', { version: appVersion }) }}</p>
-    <p v-if="meta && profile && isAtLeast(profile.role, 'BOARD')">
-      {{ t('app.serverVersion', { version: meta.version }) }}
-    </p>
-    <AppUpdateCheck class="mt-3" />
-  </footer>
+    <BadgeLibrarySection v-if="profile" :title="t('badges.mine')" heading-id="mes-badges" />
+
+    <section class="border-t border-rule" aria-labelledby="reglages">
+      <h2 id="reglages" class="px-4 pt-6 pb-2 text-lg font-title">{{ t('profile.settings') }}</h2>
+      <div class="border-t border-rule">
+        <SettingsLink v-if="profile && isAtLeast(profile.role, 'SETTER')" to="/gestion">
+          <template #icon><Wrench :size="20" /></template>
+          {{ t('profile.management') }}
+        </SettingsLink>
+        <SettingsLink v-if="!awaiting" to="/annuaire?amis">
+          <template #icon><Users :size="20" /></template>
+          {{ t('profile.friends') }}
+        </SettingsLink>
+        <SettingsLink to="/profil/assurages">
+          <template #icon><Link2 :size="20" /></template>
+          {{ t('profile.belays') }}
+        </SettingsLink>
+        <SettingsLink to="/profil/mot-de-passe">
+          <template #icon><KeyRound :size="20" /></template>
+          {{ t('profile.password') }}
+        </SettingsLink>
+        <SettingsLink to="/profil/appareils">
+          <template #icon><Smartphone :size="20" /></template>
+          {{ t('profile.devices') }}
+        </SettingsLink>
+        <SettingsLink to="/profil/installer">
+          <template #icon><Download :size="20" /></template>
+          {{ t('profile.install') }}
+        </SettingsLink>
+        <SettingsLink to="/profil/compte">
+          <template #icon><FileDown :size="20" /></template>
+          {{ t('profile.account') }}
+        </SettingsLink>
+        <SettingsLink to="/profil/nouveautes">
+          <template #icon><Sparkles :size="20" /></template>
+          {{ t('profile.releaseNotes') }}
+        </SettingsLink>
+        <SettingsLink to="/tes-donnees">
+          <template #icon><ShieldCheck :size="20" /></template>
+          {{ t('profile.privacy') }}
+        </SettingsLink>
+      </div>
+      <div class="px-4 py-6">
+        <p class="mb-2 font-semibold" aria-hidden="true">{{ t('theme.label') }}</p>
+        <SegmentedControl v-model="preference" :label="t('theme.label')" :options="themeOptions" />
+        <p v-if="preference === 'auto'" class="mt-2 text-sm text-ink-muted">
+          {{ t('theme.autoHint') }}
+        </p>
+      </div>
+      <div class="border-t border-rule px-4 py-6">
+        <GgButton
+          variant="secondary"
+          :disabled="logout.isPending.value"
+          @click="confirmingLogout = true"
+        >
+          {{ t('profile.logout') }}
+        </GgButton>
+      </div>
+    </section>
+
+    <footer class="border-t border-rule px-4 py-6 text-sm text-ink-muted">
+      <p>{{ t('app.versionFooter', { version: appVersion }) }}</p>
+      <p v-if="meta && profile && isAtLeast(profile.role, 'BOARD')">
+        {{ t('app.serverVersion', { version: meta.version }) }}
+      </p>
+      <AppUpdateCheck class="mt-3" />
+    </footer>
+  </template>
 
   <ConfirmDialog
     v-model:open="confirmingLogout"

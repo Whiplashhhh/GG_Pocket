@@ -47,8 +47,9 @@ const profileLabel = computed(() =>
         v-if="member"
         to="/profil"
         class="group flex min-h-11 min-w-0 items-center gap-2 rounded-control"
-        :aria-label="profileLabel"
       >
+        <!-- Named by what it shows too (label in name, WCAG 2.5.3): « Mon profil marie… ». -->
+        <span class="sr-only">{{ profileLabel }}</span>
         <span class="flex min-w-0 flex-col items-end gap-0.5">
           <span class="max-w-[9rem] truncate leading-tight font-semibold">{{
             member.nickname

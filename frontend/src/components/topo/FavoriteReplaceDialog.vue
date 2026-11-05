@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { RouteSummary } from '@/api/topo'
@@ -19,7 +18,6 @@ const emit = defineEmits<{ release: [routeId: string] }>()
 const open = defineModel<boolean>('open', { required: true })
 
 const { t } = useI18n()
-const baseId = useId()
 </script>
 
 <template>
@@ -33,13 +31,12 @@ const baseId = useId()
         <button
           type="button"
           class="flex min-h-16 w-full items-center gap-3 rounded-control border-2 border-rule px-3 pt-3 pb-2 text-left hover:border-ink"
-          :aria-labelledby="`${baseId}-${favorite.id}-release ${baseId}-${favorite.id}-label`"
           @click="emit('release', favorite.id)"
         >
           <span class="flex min-w-0 flex-1">
-            <RouteSummaryLabel :route="favorite" :label-id="`${baseId}-${favorite.id}-label`" />
+            <RouteSummaryLabel :route="favorite" />
           </span>
-          <span :id="`${baseId}-${favorite.id}-release`" class="shrink-0 font-semibold text-danger">
+          <span class="shrink-0 font-semibold text-danger">
             {{ t('routeSheet.heartFullRelease') }}
           </span>
         </button>

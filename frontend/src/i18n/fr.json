@@ -28,6 +28,7 @@
     "ADMIN": "Le Président·e"
   },
   "devBanner": {
+    "label": "Version de test",
     "text": "Environnement de dev — branche {branch} {'@'} {commit}"
   },
   "newSession": {
@@ -214,11 +215,11 @@
     "remove": "Retirer de mes amis",
     "requested": "En attente",
     "friends": "Amis",
-    "askLabel": "Demander {name} en ami",
+    "askLabel": "Demander en ami : {name}",
     "acceptLabel": "Accepter la demande de {name}",
     "declineLabel": "Refuser la demande de {name}",
     "cancelLabel": "Annuler ma demande à {name}",
-    "removeLabel": "Retirer {name} de mes amis",
+    "removeLabel": "Retirer de mes amis : {name}",
     "removeTitle": "On se désencorde ?",
     "removeBody": "{name} ne verra plus tes séances, et toi plus les siennes. Rien ne lui est envoyé ; pour redevenir amis, il faudra redemander.",
     "requestsTitle": "1 demande d’ami | 1 demande d’ami | {n} demandes d’ami",
@@ -586,6 +587,7 @@
     "presences": "Aucune présence | 1 présence | {n} présences",
     "calendar": "Calendrier de {month}",
     "dayClimbed": "{date}, grimpé",
+    "firstOfMonth": "1er",
     "dayToday": "{date}, aujourd’hui",
     "totalsTitle": "Bilan du mois",
     "totals": {
