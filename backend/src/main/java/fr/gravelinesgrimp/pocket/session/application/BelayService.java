@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
+import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
@@ -87,6 +88,12 @@ public class BelayService {
                         .stream()
                         .collect(Collectors.toMap(Member::id, Function.identity()));
         var friends = new HashSet<>(friendships.friendIdsOf(me));
+        // A disabled climber drops out of sight, like everywhere else: "Ancien·ne membre" here
+        // (security review, D-112).
+        var former =
+                climbers.values().stream().allMatch(Member::isActive)
+                        ? null
+                        : MemberRefView.of(members.findById(FormerMember.ID).orElseThrow());
         var items =
                 page.stream()
                         .map(
@@ -94,7 +101,7 @@ public class BelayService {
                                     var climber = climbers.get(session.memberId());
                                     return new BelayView(
                                             session.id(),
-                                            MemberRefView.of(climber),
+                                            climber.isActive() ? MemberRefView.of(climber) : former,
                                             session.climbedOn(),
                                             routeCounts.getOrDefault(session.id(), 0L).intValue(),
                                             // What SessionAudience says, without a query per line.

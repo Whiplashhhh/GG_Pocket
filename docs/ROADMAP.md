@@ -171,7 +171,7 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [ ] Logo téléversable (clair/sombre) et ses emplacements ; icônes PWA ; captures d'écran du manifeste (D-055)
 - [x] « Quoi de neuf ? » (CHANGELOG embarqué, fenêtre une fois par version) — D-108
 - [ ] Audits accessibilité et Lighthouse ≥ 90
-- [ ] Revue de sécurité complète
+- [x] Revue de sécurité complète (D-112 ; trois points à trancher par Willem)
 - [ ] Seed final, démarrage d'une prod vide vérifié
 - [x] `docs/GUIDE_CLUB.md` (à compléter avec le logo quand il sera téléversable)
 - [ ] Release `1.0.0` (déclenchée par Willem)

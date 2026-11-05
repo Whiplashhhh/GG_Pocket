@@ -88,6 +88,18 @@ class SessionController {
         sessions.delete(me.memberId(), id);
     }
 
+    @PutMapping("/sessions/{id}/privacy")
+    @Operation(
+            operationId = "changeSessionPrivacy",
+            summary = "Change who sees one of my sessions, or erase its comment (any month)")
+    SessionResponse changePrivacy(
+            @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
+            @PathVariable UUID id,
+            @Valid @RequestBody SessionPrivacyRequest body) {
+        return SessionResponse.from(
+                sessions.changePrivacy(me.memberId(), id, body.visibility(), body.removeComment()));
+    }
+
     @PutMapping(path = "/sessions/{id}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             operationId = "replaceSessionPhoto",
@@ -102,7 +114,7 @@ class SessionController {
 
     @DeleteMapping("/sessions/{id}/photo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(operationId = "deleteSessionPhoto", summary = "Remove the session photo")
+    @Operation(operationId = "deleteSessionPhoto", summary = "Remove the session photo (any month)")
     void deletePhoto(
             @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
             @PathVariable UUID id) {

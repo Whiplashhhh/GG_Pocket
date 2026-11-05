@@ -25,7 +25,8 @@ public class RouteComment extends TimestampedEntity {
     @Column(name = "author_id", nullable = false, updatable = false)
     private UUID authorId;
 
-    @Column(nullable = false, updatable = false, length = 500)
+    /** Written once; erased on deletion (D-112). */
+    @Column(nullable = false, length = 500)
     private String body;
 
     @Column(name = "deleted_at")
@@ -45,7 +46,12 @@ public class RouteComment extends TimestampedEntity {
         this.body = body;
     }
 
+    /**
+     * Gone for everyone: the text is erased (shown nowhere once deleted, it has no reason to stay
+     * in the database and the backups, D-112); who deleted it and when remain.
+     */
     public void delete(UUID by, Instant at) {
+        this.body = "";
         this.deletedBy = by;
         this.deletedAt = at;
     }

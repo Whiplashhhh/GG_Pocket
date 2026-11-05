@@ -9,6 +9,10 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 
 /**
  * Stores uploaded files on the media volume ({@code gg.media.root}). Keys come from {@code
@@ -23,6 +27,14 @@ public class MediaStorage {
         this.root = properties.media().root().toAbsolutePath().normalize();
     }
 
+    /**
+     * Owner read-write, group read: the backup container reads the files through the API's group
+     * (compose {@code group_add}); a temporary file is owner-only by default, and the move keeps
+     * that, which failed every backup once a photo was stored (security review 2026-11, D-112).
+     */
+    static final Set<PosixFilePermission> FILE_PERMISSIONS =
+            PosixFilePermissions.fromString("rw-r-----");
+
     /** Writes the whole file or nothing (temporary file, then atomic move). */
     public void write(String key, byte[] content) {
         var target = resolve(key);
@@ -31,6 +43,9 @@ public class MediaStorage {
             var temporary = Files.createTempFile(target.getParent(), ".upload-", ".tmp");
             try {
                 Files.write(temporary, content);
+                if (Files.getFileAttributeView(temporary, PosixFileAttributeView.class) != null) {
+                    Files.setPosixFilePermissions(temporary, FILE_PERMISSIONS);
+                }
                 Files.move(
                         temporary,
                         target,

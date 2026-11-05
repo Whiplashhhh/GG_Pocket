@@ -67,6 +67,13 @@ public class RateLimiter {
     public static final Rule SESSION_PHOTO_UPLOAD_PER_MEMBER =
             new Rule("session-photo-upload-per-member", 20, Duration.ofHours(1));
 
+    /**
+     * Changing one's profile: a few tries at a nickname, not a way to test which e-mails or
+     * nicknames belong to members, a pending account included (security review, D-112).
+     */
+    public static final Rule PROFILE_UPDATE_PER_MEMBER =
+            new Rule("profile-update-per-member", 20, Duration.ofHours(1));
+
     /** Asking members to be friends: the whole club in a day, not in an hour. */
     public static final Rule FRIEND_REQUEST_PER_MEMBER =
             new Rule("friend-request-per-member", 30, Duration.ofHours(1));

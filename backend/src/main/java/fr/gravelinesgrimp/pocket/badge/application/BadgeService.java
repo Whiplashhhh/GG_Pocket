@@ -63,7 +63,8 @@ public class BadgeService {
         members.findById(memberId)
                 .filter(Member::isVisibleInClub)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No member"));
-        return BadgeLibraryView.of(awards.countPerCode(memberId), favoritesOf(memberId), null);
+        return BadgeLibraryView.of(awards.countPerCode(memberId), favoritesOf(memberId), null)
+                .toMonths();
     }
 
     /**

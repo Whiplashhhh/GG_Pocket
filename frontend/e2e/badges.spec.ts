@@ -97,7 +97,8 @@ test.describe('badges', () => {
     await expect(badges.getByText('1 sur 17 débloqués')).toBeVisible()
     await badges.getByRole('button', { name: 'Le flash, obtenu une fois' }).click()
     const dialog = page.getByRole('dialog', { name: 'Le flash' })
-    await expect(dialog.getByText('Débloqué le 14 octobre 2026.')).toBeVisible()
+    // Another member's badges come to the month only (D-112).
+    await expect(dialog.getByText('Débloqué en octobre 2026.')).toBeVisible()
     await expect(dialog.getByRole('button', { name: 'Mettre en avant' })).toHaveCount(0)
     await expect(dialog.getByRole('progressbar')).toHaveCount(0)
   })

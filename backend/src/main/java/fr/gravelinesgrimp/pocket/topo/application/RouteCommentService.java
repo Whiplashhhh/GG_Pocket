@@ -121,9 +121,9 @@ public class RouteCommentService {
             throw new BusinessException(
                     ErrorCode.ACCESS_DENIED, "Only the board deletes someone else's comment");
         }
-        comment.delete(actorId, clock.instant());
         var route = loadRoute(comment.routeId());
         var author = members.findById(comment.authorId()).map(Member::nickname).orElse("?");
+        // Recorded before the deletion, which erases the text (D-112).
         auditLog.record(
                 actor,
                 AuditAction.ROUTE_COMMENT_DELETED,
@@ -132,6 +132,7 @@ public class RouteCommentService {
                 route.name() + " (" + author + ")",
                 comment.body(),
                 null);
+        comment.delete(actorId, clock.instant());
     }
 
     private static RouteCommentView toView(RouteComment comment, Member author, Member reader) {
