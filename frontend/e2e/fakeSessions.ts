@@ -785,7 +785,7 @@ export class FakeSessions implements AscentSource {
       return empty
     }
 
-    const match = /^\/sessions\/([^/]+)(\/photo|\/reaction|\/comments)?$/.exec(pathname)
+    const match = /^\/sessions\/([^/]+)(\/photo|\/privacy|\/reaction|\/comments)?$/.exec(pathname)
     if (match === null) return undefined
     const [, id, part] = match as (string | undefined)[]
     const found = this.sessions.find((candidate) => candidate.id === id)
@@ -823,6 +823,17 @@ export class FakeSessions implements AscentSource {
     if (method === 'GET' && photo === undefined) return json(this.view(me, found))
     if (found.memberId !== me.id) return problem(404, 'NOT_FOUND')
     const session = found
+    // Who sees it, its comment, its photo removed: allowed in a frozen month too (D-112).
+    if (part === '/privacy' && method === 'PUT') {
+      const sent = body as Schemas['SessionPrivacyRequest']
+      session.visibility = sent.visibility
+      if (sent.removeComment) delete session.comment
+      return json(this.view(me, session))
+    }
+    if (part === '/photo' && method === 'DELETE') {
+      session.photo = false
+      return empty
+    }
     if (session.frozen) return problem(409, 'MONTH_FROZEN')
     if (photo !== undefined) {
       session.photo = method === 'PUT'

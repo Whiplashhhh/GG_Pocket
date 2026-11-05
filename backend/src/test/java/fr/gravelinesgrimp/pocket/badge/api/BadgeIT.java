@@ -164,7 +164,11 @@ class BadgeIT {
 
         mockMvc.perform(get("/api/v1/members/" + anna.id() + "/badges").with(as(stranger)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.badges[0].count").value(1));
+                .andExpect(jsonPath("$.badges[0].count").value(1))
+                // To the month only: badges count private sessions too (D-112).
+                .andExpect(
+                        jsonPath("$.badges[0].firstEarnedOn")
+                                .value(today().withDayOfMonth(1).toString()));
         mockMvc.perform(get("/api/v1/members/" + UUID.randomUUID() + "/badges").with(as(stranger)))
                 .andExpect(status().isNotFound());
     }

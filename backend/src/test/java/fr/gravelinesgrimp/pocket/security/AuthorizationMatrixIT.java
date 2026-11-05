@@ -244,6 +244,11 @@ class AuthorizationMatrixIT {
                             "/api/v1/sessions/" + SOME_ID + "/photo",
                             null,
                             Role.TOURIST),
+                    new Endpoint(
+                            HttpMethod.PUT,
+                            "/api/v1/sessions/" + SOME_ID + "/privacy",
+                            "{\"visibility\": \"PRIVATE\", \"removeComment\": true}",
+                            Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/sessions", null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/climbed-routes", null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/todo", null, Role.TOURIST),

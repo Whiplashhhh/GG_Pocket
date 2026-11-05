@@ -46,6 +46,7 @@ direction) ou **Willem**.
 | D-106 | Badges à niveaux : couleur = niveau (échelle de rareté), couleur des répétables selon ×N, 3 favoris | Willem | Oui (détails dans D-106) |
 | D-108 | « Quoi de neuf ? » mémorisé par membre dans le navigateur (pas sur le serveur) | Willem | Oui : une fois par version, par membre et par appareil ; nouveaux comptes épargnés |
 | D-111 | Retours du club : cotations gagnées une à une (6b- et 6b+ comptent pour 6b), niveau = cotation la plus dure | club | À valider (détails dans D-111) |
+| D-112 | Revue de sécurité : suppression auto des comptes inactifs 3 ans, jeton `gh` de l'agent, rétention des sauvegardes | Willem | À trancher (détails dans D-112) |
 
 ---
 
@@ -1158,3 +1159,51 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     compris), jamais deux fois la même d'affilée quand il y a le choix (`pickRandomRoute`). Fenêtre « Et pourquoi
     pas celle-là ? » avec « Une autre ! » et « Voir la voie » (fiche de la voie, le filtre du topo conservé).
 - **Statut** : à valider (6b- compté pour 6b, niveau = cotation la plus dure, encadré du fil limité à Actu).
+
+### D-112 — Revue de sécurité complète (phase 8, 2026-11-04)
+- **Méthode** : quatre relectures indépendantes par sous-agents (authentification et sessions ; autorisations et IDOR sur
+  tous les endpoints ; fichiers et données personnelles ; infra, CI, chaîne d'approvisionnement et front), chaque constat
+  revérifié dans le code avant correction ; `pnpm audit`. Aucun point critique.
+- **Corrigé** :
+  - *Haut* — **Sauvegardes en échec dès la première photo** : Java écrit ses fichiers temporaires en `rw-------`, le
+    conteneur `backup` (uid 70) ne pouvait pas les lire, `tar` échouait et toute la sauvegarde avec (base comprise), y
+    compris celle d'avant déploiement prod. Photos écrites en `rw-r-----`, `backup` dans le groupe 10001, `media-owner`
+    remet les fichiers existants en ordre ; la CI écrit sa sonde avec ces droits.
+  - *Haut* — **Proxy d'entrée sur un Caddy vulnérable, jamais renouvelé** (D-102) : il tourne désormais sur l'image web de
+    la release (Caddy recompilé, scanné par Trivy), épinglée par `scripts/pin-edge-image.sh` dans `release.yml` ; la CI
+    démarre le proxy avec cette image.
+  - *Moyen* — **Mois figé** : on ne pouvait plus retirer une photo, passer une séance en « juste moi » ni effacer son mot.
+    Nouvel endpoint `PUT /sessions/{id}/privacy` et suppression de photo permis en tout mois (rien de cela ne compte dans
+    les chiffres) ; boutons sous une séance figée.
+  - *Moyen* — **Texte des commentaires supprimés conservé** (base et sauvegardes) : effacé à la suppression (V18 pour
+    l'existant). Le journal garde le texte modéré pour la direction, mais l'oublie (libellé « Ancien·ne membre », texte
+    effacé) quand l'auteur supprime son compte.
+  - *Moyen* — **Rétention du journal** promise (3 ans) : tâche quotidienne `AuditRetentionJob`.
+  - *Moyen* — **Images PostgreSQL jamais mises à jour** : `deploy.sh` les retélécharge à chaque déploiement.
+  - *Moyen* — **Actions GitHub épinglées par étiquette** dans des workflows qui publient les images : épinglées par
+    empreinte de commit (Dependabot suit) ; téléchargement de gitleaks vérifié par somme de contrôle.
+  - *Bas* — profil modifiable sans limite (un compte en attente pouvait tester quels e-mails ou pseudos sont au club) :
+    20 par heure. Mauvais mot de passe actuel (changement, suppression de compte) compté aussi dans la limite globale du
+    pseudo. Commentaires et « Tes assurages » d'un membre désactivé : masqués / « Ancien·ne membre ». Dates des badges
+    d'un autre membre ramenées au mois (les badges comptent les séances « juste moi »). Photos de séance gardées un jour
+    au plus dans le cache du navigateur (un an pour avatars et photos de voies). Fichier manquant : 404 au lieu de 500.
+    401 : le cache hors ligne du membre est vidé comme à la déconnexion. Commentaire trompeur de `gg-deploy`.
+- **Assumé, sans changement** : session non renouvelée au changement de mot de passe (cookie `__Host-`, `HttpOnly`) ;
+  verrouillage global d'un pseudo atteignable avec beaucoup d'adresses IPv6 (D-050, les sessions ouvertes ne sont pas
+  touchées) ; `deploy-dev` envoie les scripts de la branche déployée (nécessaire pour tester un changement de
+  déploiement en dev ; l'approbation de l'environnement reste la barrière, D-062) ; alertes `pnpm audit` limitées aux
+  outils de build et de test (rien dans l'appli livrée).
+- **Reste à faire (suivi)** : export « Mes données » sans les badges ni les fichiers photo ; pas de vignettes (la spec en
+  prévoit) ; fichiers orphelins jamais nettoyés si la suppression échoue après validation ; empreinte `sha512` pour
+  `packageManager`.
+- **À trancher par Willem** :
+  1. *Comptes inactifs depuis 3 ans* : « Tes données » promet leur suppression, rien ne la fait. Aucun compte ne peut
+     l'atteindre avant 2029, mais c'est irréversible : faut-il l'automatiser (et à partir de quelle « dernière
+     connexion ») ou retirer la promesse ?
+  2. *Jeton `gh` de Claude Code* : c'est celui de Willem ; s'il peut approuver un déploiement en attente, la barrière
+     de D-062 tient à ce jeton. Recommandé : un jeton à portée fine sans droit Actions/Deployments en écriture, et
+     `prevent_self_review` sur les environnements. L'environnement `production` accepte aussi les étiquettes `v*` :
+     garder `main` seul si elles ne servent pas.
+  3. *Sauvegardes* : celles d'avant déploiement (10 gardées quel que soit leur âge) et les manuelles (jamais effacées)
+     peuvent garder des comptes supprimés pendant des mois ; plafonner leur âge et le dire dans « Tes données » ?
+- **Statut** : corrections faites ; trois points à trancher.

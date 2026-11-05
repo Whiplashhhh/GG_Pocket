@@ -23,6 +23,7 @@ import fr.gravelinesgrimp.pocket.session.infra.AscentRepository;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
 import fr.gravelinesgrimp.pocket.session.infra.SessionCommentRepository;
 import fr.gravelinesgrimp.pocket.session.infra.SessionReactionRepository;
+import fr.gravelinesgrimp.pocket.topo.infra.RouteCommentRepository;
 import fr.gravelinesgrimp.pocket.topo.infra.RouteRepository;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.UUID;
 
@@ -55,6 +57,7 @@ public class AccountDeletionService {
     private final AscentRepository ascents;
     private final SessionReactionRepository sessionReactions;
     private final SessionCommentRepository sessionComments;
+    private final RouteCommentRepository routeComments;
     private final RouteRepository routes;
     private final MonthlyRankingRepository rankings;
     private final MemberSessionStore devices;
@@ -71,6 +74,7 @@ public class AccountDeletionService {
             AscentRepository ascents,
             SessionReactionRepository sessionReactions,
             SessionCommentRepository sessionComments,
+            RouteCommentRepository routeComments,
             RouteRepository routes,
             MonthlyRankingRepository rankings,
             MemberSessionStore devices,
@@ -85,6 +89,7 @@ public class AccountDeletionService {
         this.ascents = ascents;
         this.sessionReactions = sessionReactions;
         this.sessionComments = sessionComments;
+        this.routeComments = routeComments;
         this.routes = routes;
         this.rankings = rankings;
         this.devices = devices;
@@ -101,10 +106,15 @@ public class AccountDeletionService {
     @Transactional
     public void deleteOwnAccount(UUID memberId, String password, String clientAddress) {
         var member = lock(memberId);
-        var failureKey = Nickname.key(member.nickname()) + "@" + clientAddress;
+        // Counted like failed logins, address pair and nickname alike: a borrowed session must not
+        // turn into unlimited guessing of the current password from many addresses (D-112).
+        var nicknameKey = Nickname.key(member.nickname());
+        var failureKey = nicknameKey + "@" + clientAddress;
         rateLimiter.ensureAllowed(RateLimiter.LOGIN_FAILURES_PER_NICKNAME_AND_ADDRESS, failureKey);
+        rateLimiter.ensureAllowed(RateLimiter.LOGIN_FAILURES_PER_NICKNAME, nicknameKey);
         if (!passwordEncoder.matches(password, member.passwordHash())) {
             rateLimiter.record(RateLimiter.LOGIN_FAILURES_PER_NICKNAME_AND_ADDRESS, failureKey);
+            rateLimiter.record(RateLimiter.LOGIN_FAILURES_PER_NICKNAME, nicknameKey);
             throw new BusinessException(ErrorCode.CURRENT_PASSWORD_WRONG, "Wrong password");
         }
         erase(member, member);
@@ -143,6 +153,15 @@ public class AccountDeletionService {
         // Written first: the entry keeps the names once the account is gone (actor_id goes null).
         auditLog.record(
                 actor, action, AuditTargetType.MEMBER, member.id(), member.nickname(), null, null);
+        // My comments go with the account (foreign key): so does what the journal says of them.
+        var myComments = new ArrayList<UUID>();
+        sessionComments
+                .findAllByAuthorIdOrderByCreatedAt(member.id())
+                .forEach(comment -> myComments.add(comment.id()));
+        routeComments
+                .findAllByAuthorIdOrderByCreatedAt(member.id())
+                .forEach(comment -> myComments.add(comment.id()));
+        auditLog.forgetTargets(myComments);
         var now = clock.instant();
         // Before the hand-over, while the sessions are still mine.
         sessionReactions.deleteAllOnSessionsOf(member.id());

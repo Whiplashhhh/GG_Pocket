@@ -1305,8 +1305,25 @@ export interface paths {
     /** Upload the session photo (JPEG, PNG or WebP, 10 MB max) */
     put: operations['replaceSessionPhoto']
     post?: never
-    /** Remove the session photo */
+    /** Remove the session photo (any month) */
     delete: operations['deleteSessionPhoto']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/sessions/{id}/privacy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Change who sees one of my sessions, or erase its comment (any month) */
+    put: operations['changeSessionPrivacy']
+    post?: never
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -2688,6 +2705,12 @@ export interface components {
     SessionPage: {
       items: components['schemas']['Session'][]
       nextCursor?: string
+    }
+    SessionPrivacyRequest: {
+      /** @description Erase the session's comment */
+      removeComment: boolean
+      /** @enum {string} */
+      visibility: 'FRIENDS' | 'PRIVATE'
     }
     SessionReactionRequest: {
       /** @enum {string} */
@@ -4861,6 +4884,32 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  changeSessionPrivacy: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SessionPrivacyRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Session']
+        }
       }
     }
   }

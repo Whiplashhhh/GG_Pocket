@@ -37,6 +37,13 @@ export function formatDate(value: string): string {
   return firstOfMonth(DAY.format(date))
 }
 
+const MONTH = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' })
+
+/** "octobre 2026", from a calendar date (YYYY-MM-DD): another member's badges (D-112). */
+export function formatMonth(value: string): string {
+  return MONTH.format(new Date(`${value.slice(0, 10)}T12:00:00Z`))
+}
+
 /** "1er sept. 2026", for tables where a long month would wrap. Same inputs as {@link formatDate}. */
 export function formatShortDate(value: string): string {
   const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T12:00:00Z`) : new Date(value)

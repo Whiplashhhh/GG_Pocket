@@ -74,6 +74,14 @@ public class ClimbingSession extends TimestampedEntity {
         apply(draft);
     }
 
+    /** Narrows or widens who sees it, and may erase the comment; the figures stay as they are. */
+    public void changePrivacy(SessionVisibility visibility, boolean removeComment) {
+        this.visibility = visibility;
+        if (removeComment) {
+            this.comment = null;
+        }
+    }
+
     public void changePhoto(UUID photoId) {
         this.photoId = photoId;
     }

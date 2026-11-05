@@ -19,7 +19,7 @@ import {
   type BadgeState,
   type TierState,
 } from '@/lib/badges'
-import { formatDate } from '@/lib/format'
+import { formatDate, formatMonth } from '@/lib/format'
 
 import BadgeMedal from './BadgeMedal.vue'
 import BadgeToken from './BadgeToken.vue'
@@ -56,17 +56,22 @@ const earnedLine = computed(() => {
   const { level, firstEarnedOn, lastEarnedOn } = props.state
   // A tier family dates each level in its list.
   if (tiered.value || level <= 0 || lastEarnedOn === undefined) return undefined
-  const last = formatDate(lastEarnedOn)
+  // Another member's dates come to the month only (D-112).
+  const when = props.mine ? formatDate : formatMonth
+  const key = props.mine ? '' : 'Month'
+  const last = when(lastEarnedOn)
   return level === 1
-    ? t('badges.earnedOnce', { date: last })
-    : t('badges.earnedMany', { n: level, first: formatDate(firstEarnedOn ?? lastEarnedOn), last })
+    ? t(`badges.earnedOnce${key}`, { date: last })
+    : t(`badges.earnedMany${key}`, { n: level, first: when(firstEarnedOn ?? lastEarnedOn), last })
 })
 const next = computed(() => nextTier(props.state))
 const complete = computed(() => props.state.tiers.every((tier) => tier.earnedOn !== undefined))
 
 function tierStatus(tier: TierState): string {
   if (tier.earnedOn !== undefined)
-    return t('badges.tierEarned', { date: formatDate(tier.earnedOn) })
+    return props.mine
+      ? t('badges.tierEarned', { date: formatDate(tier.earnedOn) })
+      : t('badges.tierEarnedMonth', { date: formatMonth(tier.earnedOn) })
   if (tier.code === next.value) return t('badges.tierNext')
   return tier.level < props.state.level ? t('badges.tierMissing') : t('badges.tierAhead')
 }

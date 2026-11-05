@@ -2742,7 +2742,7 @@
             "description": "No Content"
           }
         },
-        "summary": "Remove the session photo",
+        "summary": "Remove the session photo (any month)",
         "tags": [
           "Sessions"
         ]
@@ -2791,6 +2791,48 @@
           }
         },
         "summary": "Upload the session photo (JPEG, PNG or WebP, 10 MB max)",
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/api/v1/sessions/{id}/privacy": {
+      "put": {
+        "operationId": "changeSessionPrivacy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionPrivacyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Change who sees one of my sessions, or erase its comment (any month)",
         "tags": [
           "Sessions"
         ]
@@ -6286,6 +6328,26 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "SessionPrivacyRequest": {
+        "type": "object",
+        "properties": {
+          "removeComment": {
+            "type": "boolean",
+            "description": "Erase the session's comment"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "FRIENDS",
+              "PRIVATE"
+            ]
+          }
+        },
+        "required": [
+          "removeComment",
+          "visibility"
         ]
       },
       "SessionReactionRequest": {

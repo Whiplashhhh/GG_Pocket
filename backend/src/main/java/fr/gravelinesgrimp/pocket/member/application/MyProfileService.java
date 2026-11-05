@@ -3,6 +3,7 @@ package fr.gravelinesgrimp.pocket.member.application;
 import fr.gravelinesgrimp.pocket.member.domain.Age;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
@@ -20,12 +21,17 @@ public class MyProfileService {
 
     private final MemberRepository members;
     private final UniqueMemberFields uniqueFields;
+    private final RateLimiter rateLimiter;
     private final Clock clock;
 
     public MyProfileService(
-            MemberRepository members, UniqueMemberFields uniqueFields, Clock clock) {
+            MemberRepository members,
+            UniqueMemberFields uniqueFields,
+            RateLimiter rateLimiter,
+            Clock clock) {
         this.members = members;
         this.uniqueFields = uniqueFields;
+        this.rateLimiter = rateLimiter;
         this.clock = clock;
     }
 
@@ -42,6 +48,7 @@ public class MyProfileService {
     @Transactional
     public MyProfileView update(UUID memberId, ProfileChange change) {
         var member = load(memberId);
+        rateLimiter.consume(RateLimiter.PROFILE_UPDATE_PER_MEMBER, memberId.toString());
         var today = ClubTime.today(clock);
         checkYearNotInFuture(change.details().clubArrivalYear(), today.getYear());
         checkYearNotInFuture(change.details().climbingSinceYear(), today.getYear());

@@ -194,10 +194,31 @@ test.describe('my sessions', () => {
 
   test('of a frozen month stay as they are', async ({ page, club, me }) => {
     await sameDay(page, club)
-    const old = club.climbs.add(signedIn(me), 40, [{ route: 'Réglisse' }], { frozen: true })
+    const old = club.climbs.add(signedIn(me), 40, [{ route: 'Réglisse' }], {
+      frozen: true,
+      comment: 'Le jour du grand plat.',
+    })
+    old.photo = true
     await page.goto(`/seances/${old.id}`)
     await expect(page.getByText('Ce mois est clos')).toBeVisible()
     await expect(page.getByRole('link', { name: 'Modifier' })).toHaveCount(0)
+
+    // What I shared stays mine to take back (D-112).
+    await page.getByRole('button', { name: 'Garder pour moi' }).click()
+    await expect(page.getByRole('button', { name: 'Montrer à mes amis' })).toBeVisible()
+    await page.getByRole('button', { name: 'Effacer mon mot' }).click()
+    await page
+      .getByRole('alertdialog', { name: 'Effacer ton mot ?' })
+      .getByRole('button', { name: 'Effacer' })
+      .click()
+    await expect(page.getByText('Le jour du grand plat.')).toHaveCount(0)
+    await page.getByRole('button', { name: 'Retirer la photo' }).click()
+    await page
+      .getByRole('alertdialog', { name: 'Retirer la photo ?' })
+      .getByRole('button', { name: 'Effacer' })
+      .click()
+    await expect(page.getByRole('img', { name: 'Photo de la séance' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Retirer la photo' })).toHaveCount(0)
   })
 
   test('of someone else are nowhere to be found', async ({ page, club }) => {

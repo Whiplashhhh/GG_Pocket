@@ -19,6 +19,9 @@ interface Capture {
 }
 
 /** Marie's last sessions: one yesterday with a comment, one last week in top rope only. */
+/** Set by the « seance-figee » scenario's preparation, read by its action. */
+let frozenSessionId = ''
+
 const marieClimbs = (club: FakeClub) => {
   const marie = club.members.find((member) => member.nickname === 'marie')
   if (marie === undefined) return
@@ -575,6 +578,26 @@ const CAPTURES: Capture[] = [
     act: async (page) => {
       await page.getByRole('link', { name: /Séance d’hier/ }).click()
       await page.getByRole('heading', { level: 1, name: 'Ma séance' }).waitFor()
+    },
+  },
+  {
+    // A frozen month: the routes stay, what was shared can still be taken back (D-112).
+    name: 'seance-figee',
+    path: '/actu',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      const marie = club.members.find((member) => member.nickname === 'marie')
+      if (marie === undefined) return
+      const old = club.climbs.add(marie, 40, [{ route: 'Schtroumpfs', mode: 'LEAD' }], {
+        frozen: true,
+        comment: 'Le jour du grand plat.',
+      })
+      old.photo = true
+      frozenSessionId = old.id
+    },
+    act: async (page) => {
+      await page.goto(`/seances/${frozenSessionId}`)
+      await page.getByRole('button', { name: 'Garder pour moi' }).waitFor()
     },
   },
   {

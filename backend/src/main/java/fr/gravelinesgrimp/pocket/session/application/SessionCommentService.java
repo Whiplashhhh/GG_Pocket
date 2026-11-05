@@ -130,15 +130,17 @@ public class SessionCommentService {
             // it did not exist (the session may be one I cannot read).
             throw new BusinessException(ErrorCode.NOT_FOUND, "No comment");
         }
-        comment.delete(actorId, clock.instant());
+        // Read before the deletion, which erases the text (D-112).
+        var text = comment.body();
         auditLog.record(
                 actor,
                 AuditAction.SESSION_COMMENT_DELETED,
                 AuditTargetType.SESSION_COMMENT,
                 comment.id(),
                 label(comment),
-                comment.body(),
+                text,
                 null);
+        comment.delete(actorId, clock.instant());
     }
 
     /** "Julie, 2026-10-12 (Marco)": whose session, which day, whose comment. */

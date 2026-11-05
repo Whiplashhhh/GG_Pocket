@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -179,7 +180,10 @@ class FriendSessionsIT {
         var uploaded = mockMvc.perform(upload).andExpect(status().isOk()).andReturn();
         String photoUrl = JsonPath.read(uploaded.getResponse().getContentAsString(), "$.photoUrl");
 
-        mockMvc.perform(get(photoUrl).with(as(friend))).andExpect(status().isOk());
+        // A day at most in a browser: the audience may shrink (security review, D-112).
+        mockMvc.perform(get(photoUrl).with(as(friend)))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", "max-age=86400, private"));
         mockMvc.perform(get(photoUrl).with(as(stranger))).andExpect(status().isNotFound());
     }
 

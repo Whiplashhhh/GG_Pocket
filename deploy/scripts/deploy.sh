@@ -60,6 +60,15 @@ if [[ -z ${GG_SKIP_PULL:-} && $missing == 1 ]]; then
     compose pull --quiet web api || roll_back
 fi
 
+# Public images (PostgreSQL for db, backup and media-owner) follow their tag's security releases:
+# compose would otherwise keep the first one pulled forever (security review, D-112). Best effort:
+# without Docker Hub, the local copy is kept.
+if [[ -z ${GG_SKIP_PULL:-} ]]; then
+    log "Refreshing the PostgreSQL images"
+    compose --profile backup pull --quiet db backup media-owner \
+        || log "PostgreSQL images not refreshed, keeping the local ones"
+fi
+
 log "Starting $tag"
 compose up -d --remove-orphans --wait --wait-timeout 300 || roll_back
 

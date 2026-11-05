@@ -14,9 +14,14 @@ import java.util.UUID;
 
 public interface SessionCommentRepository extends JpaRepository<SessionComment, UUID> {
 
-    /** Oldest first, deleted ones left out. */
+    /**
+     * Oldest first, deleted ones left out, and those of a disabled author, who drops out of sight
+     * like everywhere else (security review, D-112).
+     */
     @Query(
             "select c from SessionComment c where c.sessionId = :sessionId and c.deletedAt is null"
+                    + " and exists (select m.id from Member m where m.id = c.authorId"
+                    + " and m.status = fr.gravelinesgrimp.pocket.member.domain.MemberStatus.ACTIVE)"
                     + " order by c.createdAt, c.id")
     List<SessionComment> findVisibleBySessionId(UUID sessionId);
 
@@ -24,7 +29,10 @@ public interface SessionCommentRepository extends JpaRepository<SessionComment, 
     @Query(
             "select new fr.gravelinesgrimp.pocket.session.domain.SessionCount(c.sessionId, count(c))"
                     + " from SessionComment c where c.sessionId in :sessionIds"
-                    + " and c.deletedAt is null group by c.sessionId")
+                    + " and c.deletedAt is null"
+                    + " and exists (select m.id from Member m where m.id = c.authorId"
+                    + " and m.status = fr.gravelinesgrimp.pocket.member.domain.MemberStatus.ACTIVE)"
+                    + " group by c.sessionId")
     List<SessionCount> countVisiblePerSession(Collection<UUID> sessionIds);
 
     /** The latest visible comments (moderation), index {@code session_comment_latest_idx}. */

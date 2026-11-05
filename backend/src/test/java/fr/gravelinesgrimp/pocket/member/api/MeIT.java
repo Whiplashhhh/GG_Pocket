@@ -149,6 +149,18 @@ class MeIT {
                 .andExpect(jsonPath("$.code").value("IMAGE_UNSUPPORTED"));
     }
 
+    /** Not a way to test which nicknames or e-mails belong to members (D-112). */
+    @Test
+    void profileChangesAreSlowedDownAfter20AnHour() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        for (var i = 1; i <= 20; i++) {
+            update(me, me.nickname(), null, false, null, null).andExpect(status().isOk());
+        }
+        update(me, me.nickname(), null, false, null, null)
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.code").value("RATE_LIMITED"));
+    }
+
     @Test
     void iRemoveMyPhoto() throws Exception {
         var me = members.create(Role.CLIMBER);

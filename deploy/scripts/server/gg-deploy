@@ -2,7 +2,10 @@
 # SSH gate of the "deploy" user (DECISIONS D-062), installed as /usr/local/bin/gg-deploy by
 # bootstrap.sh. Each key of /home/deploy/.ssh/authorized_keys is pinned to one environment:
 #   restrict,command="/usr/local/bin/gg-deploy dev" ssh-ed25519 AAAA... gg-pocket-dev
-# so the dev key can never touch prod. The requested command arrives in SSH_ORIGINAL_COMMAND:
+# so the dev key never runs a prod command. It is no wall between them, though: a deployment runs
+# the scripts of the bundle it receives, as a member of the docker group (root-equivalent), so the
+# real protection is the approval each GitHub environment requires (D-062, D-112). The requested
+# command arrives in SSH_ORIGINAL_COMMAND:
 #   deploy <tag> [--reset]   bundle of the repository's deploy/ directory (tar.gz) on stdin
 #   rollback                 previous version back
 #   status                   deployed versions and containers

@@ -53,12 +53,17 @@ services:
     image: postgres:18-alpine
     restart: "no"
     user: "0:0"
-    entrypoint: ["chown", "10001:10001", "/media"]
+    # Owner the API; files group-readable for the backup (those written before D-112 were
+    # owner-only). Files only: root here has no right to read a directory it took away from others.
+    entrypoint:
+      - sh
+      - -c
+      - chown -R 10001:10001 /media && find /media -type f ! -perm -040 -exec chmod g+r,o-rwx {} +
     volumes:
       - media:/media
     network_mode: none
     cap_drop: [ALL]
-    cap_add: [CHOWN]
+    cap_add: [CHOWN, FOWNER]
     security_opt: ["no-new-privileges:true"]
 
   db:
@@ -92,6 +97,8 @@ services:
     image: postgres:18-alpine
     profiles: [backup]
     user: "70:70"
+    # Reads the uploaded files through the API's group (rw-r-----, D-112).
+    group_add: ["10001"]
     init: true
     # Only effective when restore.sh runs it as root (to give the files back to the API's user).
     cap_add: [CHOWN, DAC_OVERRIDE, FOWNER]
