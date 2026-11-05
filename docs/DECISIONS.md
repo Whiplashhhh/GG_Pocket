@@ -1214,3 +1214,41 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   `frontend/package.json` (`"license": "MIT"`) et `backend/pom.xml` (`<licenses>`). La licence couvre le code, pas les
   données des membres ni les photos qu'ils envoient.
 - **Statut** : validée par Willem (2026-11-04).
+
+### D-114 — Audits accessibilité et Lighthouse (phase 8, 2026-11-05)
+- **Contexte** : spec §13, « navigation clavier, ARIA, contraste AA dans les deux thèmes, cibles ≥ 44 px » et « Lighthouse
+  ≥ 90 en performance, accessibilité, bonnes pratiques (mobile) sur les écrans principaux », à vérifier en fin de phase 8.
+- **Outillage, gardé dans la CI** (job E2E) :
+  - `e2e/a11y.spec.ts` passe axe-core (`@axe-core/playwright`, règles WCAG 2.2 A et AA + bonnes pratiques d'axe) sur
+    chaque écran de la revue visuelle, en clair et en sombre (scénarios partagés avec les captures : `e2e/scenarios.ts`),
+    écrans de téléphone sur l'iPhone 13, écrans de gestion aussi sur Chrome bureau ; plus un parcours clavier du topo.
+  - `pnpm lighthouse` (`e2e/lighthouse.spec.ts`) : Lighthouse 13 en mobile (throttling simulé) sur 9 écrans
+    (accueil, connexion, actu, topo, à faire, planning, carnet, podium, profil), seuil 90 par catégorie. Le build est
+    servi comme par Caddy (gzip, assets en cache un an) et l'API par la fausse API des e2e (`FakeClub.handle`, rendue
+    publique). La pile Docker réelle n'est pas mesurée (pas de compte de démo connecté côté Lighthouse).
+- **Constats et corrections** :
+  - *Repères* : le bandeau d'environnement passe dans un `<aside>` nommé, le bouton « Nouvelle séance » dans `<main>`.
+  - *Nom visible dans le nom accessible* (WCAG 2.5.3, RGAA 6.1.5) : axe compare le texte affiché, découpé en morceaux
+    collés dans les étiquettes de voie (« 6aBye Bye Moricecorde12 »), au nom donné par `aria-label`/`aria-labelledby` ;
+    il n'y a jamais accord. Règle retenue : un lien ou un bouton qui contient une étiquette de voie, un badge ou un
+    avatar est **nommé par son contenu** (le texte `sr-only` de l'étiquette, les visuels en `aria-hidden`), sans
+    `aria-label` ni `aria-labelledby`. La ligne du topo devient une carte dont seul le lien de l'étiquette est focusable,
+    étendu à toute la ligne par un `::after` qui porte aussi l'anneau de focus ; le reste reste sa description. Lien du
+    profil dans l'en-tête : « Mon profil marie Grimpeur GG ». Boutons d'amis : « Demander en ami : jules », « Retirer de
+    mes amis : tom ». Le 1er du mois s'affiche « 1er » dans le calendrier.
+  - *ARIA* : `aria-controls` du calendrier seulement quand le panneau du jour existe ; un `h2` caché dans le sélecteur
+    de voies de la saisie (ordre des titres) ; la zone défilante de la fiche voie est focusable (voie démontée, rien
+    d'autre à atteindre au clavier).
+  - *Contraste* (sombre) : nom et corde d'une voie démontée à 70 % d'encre au lieu de 60 % (4,4:1 → 6,0:1 sur le papier
+    sombre). Toujours délavés à côté des 100 % / 75 % d'une voie au mur.
+  - *Décalages de mise en page* (CLS) : la police de texte (Archivo, latin) est préchargée dans `index.html` (petit
+    plugin Vite) ; le profil attend ses blocs (voie préférée, coups de cœur, badges) derrière le squelette au lieu de
+    les empiler un à un — en chargement seulement, une requête en pause hors ligne ne cache pas les réglages ; logo de
+    la porte d'entrée à son vrai ratio.
+- **Résultats** (2026-11-05, local) : axe sans violation sur les 80 scénarios × 2 thèmes ; Lighthouse 99 à 100 dans les trois
+  catégories sur les 9 écrans (avant : connexion 88 et profil 76 en performance, 96 en bonnes pratiques sur trois
+  écrans à cause d'un ratio d'image et d'erreurs propres au banc).
+- **Hors axe, déjà en place** : cibles ≥ 44 px (axe `target-size` vérifie 24 px, la règle du projet reste 44),
+  `prefers-reduced-motion`, tailles en `rem` (réglages de taille du système). Le lecteur d'écran réel (VoiceOver, TalkBack)
+  n'a pas été testé : à faire sur téléphone avant la 1.0.0.
+- **Statut** : appliquée.

@@ -53,7 +53,9 @@ dès qu'elles existent. Tiens cette section à jour.
   - `pnpm lint`, `pnpm format:check` (ou `pnpm format`), `pnpm typecheck`, `pnpm test` ;
   - `pnpm api:types` après tout changement du contrat (la CI vérifie la synchro) ;
   - `pnpm build && pnpm e2e` (Playwright iPhone 13 + Desktop Chrome) ;
-  - `pnpm screenshots` → `frontend/screenshots/{mobile,desktop}-{light,dark}/` (à regarder avant de dire « fini »).
+  - `pnpm screenshots` → `frontend/screenshots/{mobile,desktop}-{light,dark}/` (à regarder avant de dire « fini ») ;
+    scénarios dans `e2e/scenarios.ts`, partagés avec l'audit axe `e2e/a11y.spec.ts` (inclus dans `pnpm e2e`) ;
+  - `pnpm build && pnpm lighthouse` → Lighthouse mobile ≥ 90 sur les écrans principaux, rapports dans `frontend/lighthouse/` (D-114).
 - Déploiement (`deploy/`, pas à pas dans `docs/DEPLOYMENT.md`) :
   - stack complète en local (avec Docker) : construire `gg-pocket/gg-pocket-{api,web}:ci` depuis la racine
     (`docker build -f backend/Dockerfile .`, idem `frontend/Dockerfile`), puis
