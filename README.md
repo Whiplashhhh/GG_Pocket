@@ -106,3 +106,7 @@ GG_ALLOW_DEMO_SEED=true ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 Une base sans aucun membre reçoit un **code d'inscription admin** à usage unique, valable 24 heures, affiché une seule fois
 dans les logs du backend (`Single-use admin registration code…`). Il sert à créer le premier compte admin depuis l'écran
 « J'ai un code du club ». Tant que personne ne s'est inscrit, chaque redémarrage en affiche un nouveau.
+
+## Licence
+
+Code publié sous licence [MIT](LICENSE) © 2026 Willem Vanbaelinghem.

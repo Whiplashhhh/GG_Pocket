@@ -17,6 +17,12 @@
   <version>0-SNAPSHOT</version>
   <name>GG Pocket API</name>
   <description>API of GG Pocket, the Gravelines Grimp climbing club app</description>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/license/mit</url>
+    </license>
+  </licenses>
 
   <properties>
     <java.version>25</java.version>

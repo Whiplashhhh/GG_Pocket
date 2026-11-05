@@ -1207,3 +1207,10 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   3. *Sauvegardes* : celles d'avant déploiement (10 gardées quel que soit leur âge) et les manuelles (jamais effacées)
      peuvent garder des comptes supprimés pendant des mois ; plafonner leur âge et le dire dans « Tes données » ?
 - **Statut** : corrections faites ; trois points à trancher.
+
+### D-113 — Licence MIT
+- **Contexte** : le dépôt n'avait pas de licence, donc aucun droit de réutilisation explicite.
+- **Choix** : licence MIT, au nom de Willem Vanbaelinghem (`LICENSE` à la racine), déclarée aussi dans
+  `frontend/package.json` (`"license": "MIT"`) et `backend/pom.xml` (`<licenses>`). La licence couvre le code, pas les
+  données des membres ni les photos qu'ils envoient.
+- **Statut** : validée par Willem (2026-11-04).
