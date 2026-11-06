@@ -4,6 +4,35 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-06 — Questionnaire de validation pour le club
+
+**Branche** : `chore/questionnaire-club` (depuis `main` après la PR #59).
+
+### Fait
+
+- `docs/QUESTIONNAIRE_CLUB_PROMPT.md` : prompt à donner à claude.ai pour produire un document Word que le bureau
+  remplit. 33 questions (Q01 à Q33, chacune liée à sa décision D-xxx) sur tous les choix « à valider » côté club,
+  plus la partie logo (fichiers vectoriels, versions clair/sombre/carrée, codes couleur) et une page d'idées libres.
+  En bas du fichier : marche à suivre pour Claude Code quand le document rempli revient.
+- Laissés de côté (techniques, à Willem) : D-059, D-063, D-087, D-094, D-102, D-108, D-112 point 2.
+
+### Reste
+
+- Willem : générer le document sur claude.ai, compléter date limite et adresse de retour, l'envoyer au club.
+- Facturation GitHub toujours bloquée (CI de `main` après #59 non lancée) : attendre.
+- Seed final et démarrage d'une prod vide ; release 1.0.0 (Willem).
+
+### Prochaine action
+
+Au retour du questionnaire : suivre « Pour Claude Code » en bas de `docs/QUESTIONNAIRE_CLUB_PROMPT.md`.
+Sinon, attaquer le seed final et la prod vide.
+
+### Points bloquants
+
+- Compte GitHub verrouillé (facturation) : ni CI ni déploiement.
+
+---
+
 ## 2026-11-05 — Audits accessibilité et Lighthouse (D-114)
 
 **Branche** : `fix/audits-accessibilite-0.9.0` (depuis `main` après les PR #57 et #58).
