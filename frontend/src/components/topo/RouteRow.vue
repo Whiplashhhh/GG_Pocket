@@ -22,7 +22,6 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const labelId = useId()
 const metaId = useId()
 
 const styles = computed(() =>
@@ -34,15 +33,20 @@ const done = computed(() =>
 </script>
 
 <template>
-  <RouterLink
-    :to="to"
-    :aria-labelledby="labelId"
-    :aria-describedby="metaId"
-    class="flex gap-3 px-4 pt-4 pb-3 outline-offset-[-3px] transition-colors duration-150 hover:bg-surface-sunken/60"
+  <div
+    class="relative flex gap-3 px-4 pt-4 pb-3 transition-colors duration-150 hover:bg-surface-sunken/60"
   >
     <RouteThumbnail :route="route" />
     <div class="flex min-w-0 flex-1 flex-col items-start gap-1.5">
-      <RouteSummaryLabel :route="route" :label-id="labelId" />
+      <!-- The link holds the label only, so its name is what it shows (WCAG 2.5.3); its overlay
+           makes the whole line clickable and carries the focus ring. -->
+      <RouterLink
+        :to="to"
+        :aria-describedby="metaId"
+        class="flex max-w-full after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-[3px] focus-visible:after:-outline-offset-[3px] focus-visible:after:outline-(--gg-focus) focus-visible:after:outline-solid"
+      >
+        <RouteSummaryLabel :route="route" />
+      </RouterLink>
       <p :id="metaId" class="dot-list gap-y-0.5 text-sm text-ink-muted">
         <span v-if="!hideSector">{{ route.sectorName }}</span>
         <span v-if="styles">{{ styles }}</span>
@@ -85,5 +89,5 @@ const done = computed(() =>
         </span>
       </p>
     </div>
-  </RouterLink>
+  </div>
 </template>

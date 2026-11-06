@@ -206,7 +206,14 @@ const toggleClasses = (pressed: boolean, tone: 'brand' | 'success') => [
           </DialogClose>
         </div>
 
-        <div class="flex-1 overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        <!-- Reachable from the keyboard, to scroll a sheet with nothing to focus inside (a
+             dismounted route). -->
+        <div
+          class="flex-1 overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          role="region"
+          :aria-label="t('routeSheet.title')"
+          tabindex="0"
+        >
           <template v-if="detail.isPending.value">
             <DialogTitle class="sr-only">{{ t('routeSheet.title') }}</DialogTitle>
             <DialogDescription class="sr-only" role="status">

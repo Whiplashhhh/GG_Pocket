@@ -163,13 +163,9 @@ useIntersectionObserver(sentinel, ([entry]) => {
       <h2 id="sa-voie-preferee" class="text-lg font-title">{{ t('profile.favoriteRoute') }}</h2>
       <RouterLink
         :to="`/topo/voies/${favoriteRoute.data.value.route.id}`"
-        aria-labelledby="sa-voie-preferee-nom"
         class="mt-3 flex max-w-full pt-2"
       >
-        <RouteSummaryLabel
-          :route="favoriteRoute.data.value.route"
-          label-id="sa-voie-preferee-nom"
-        />
+        <RouteSummaryLabel :route="favoriteRoute.data.value.route" />
       </RouterLink>
     </section>
 
@@ -182,12 +178,8 @@ useIntersectionObserver(sentinel, ([entry]) => {
       </p>
       <ul v-else class="mt-2 flex flex-col">
         <li v-for="favorite in activeFavorites" :key="favorite.id">
-          <RouterLink
-            :to="`/topo/voies/${favorite.id}`"
-            :aria-labelledby="`son-coeur-${favorite.id}`"
-            class="flex px-4 pt-4 pb-1"
-          >
-            <RouteSummaryLabel :route="favorite" :label-id="`son-coeur-${favorite.id}`" />
+          <RouterLink :to="`/topo/voies/${favorite.id}`" class="flex px-4 pt-4 pb-1">
+            <RouteSummaryLabel :route="favorite" />
           </RouterLink>
         </li>
       </ul>

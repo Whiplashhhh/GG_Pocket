@@ -4,6 +4,41 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-05 — Audits accessibilité et Lighthouse (D-114)
+
+**Branche** : `fix/audits-accessibilite-0.9.0` (depuis `main` après les PR #57 et #58).
+
+### Fait
+
+- Audit axe-core (`e2e/a11y.spec.ts`) sur tous les scénarios de captures (`e2e/scenarios.ts`, extraits de
+  `screenshots.spec.ts`), clair et sombre, dans `pnpm e2e` ; un parcours clavier du topo.
+- Banc Lighthouse (`pnpm lighthouse`, `e2e/lighthouse.spec.ts`) : build servi comme par Caddy, fausse API des e2e,
+  9 écrans en mobile, seuil 90. Ajouté au job E2E de la CI (délai porté à 25 min).
+- Corrigé : repères (bandeau dev, bouton flottant), nom visible dans le nom accessible (étiquettes de voie, profil,
+  badges, podium, amis ; ligne du topo en carte à lien étendu), ARIA du calendrier, ordre des titres de la saisie,
+  zone défilante de la fiche voie, contraste des voies démontées en sombre, CLS (police préchargée, profil d'un bloc,
+  ratio du logo).
+- Résultats locaux : axe vert partout (Chromium bureau et téléphone 360 px) ; Lighthouse 99–100 sur les 9 écrans.
+  E2E Desktop Chrome verts ; en émulation téléphone Chromium, seul le test propre à iOS échoue (attendu hors WebKit).
+
+### Reste
+
+- La CI GitHub est bloquée (« account is locked due to a billing issue ») : rien n'a tourné depuis le 4 novembre,
+  ni la CI de `main`, ni le déploiement dev de la PR #58. À débloquer par Willem.
+- Tester au lecteur d'écran réel (VoiceOver, TalkBack) avant la 1.0.0.
+- Phase 8 : logo, seed final et prod vide, release 1.0.0. Les trois points de D-112.
+
+### Prochaine action
+
+Une fois la facturation réglée : vérifier la CI de la PR (l'axe sur WebKit iPhone 13 n'a jamais tourné, Lighthouse sur
+le runner), puis attaquer le seed final et le démarrage d'une prod vide.
+
+### Points bloquants
+
+Facturation GitHub (CI et déploiements à l'arrêt).
+
+---
+
 ## 2026-11-04 — Revue de sécurité complète (D-112)
 
 **Branche** : `fix/revue-securite-0.9.0` (depuis `main` après la PR #56). PR avec le label `deploy:dev` (demande de Willem).

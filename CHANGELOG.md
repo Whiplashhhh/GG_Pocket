@@ -44,6 +44,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   recomptés avec cette règle : si une cotation disparaît de ta collection, c’est qu’elle n’est pas encore dans
   ton carnet.
 - **Fil d’actu** : chaque séance a maintenant son cadre, on voit mieux où s’arrête l’une et où commence la suivante.
+- **Accessibilité** : l’appli est passée au contrôle technique, chaque écran en clair et en sombre. Les lecteurs
+  d’écran et la commande vocale entendent maintenant ce qui est écrit sur les boutons (« Demander en ami : jules »),
+  les voies démontées se lisent mieux en mode sombre, et le 1er du mois s’affiche « 1er » dans le planning.
+- **Plus de saut au chargement** : ton profil s’affiche d’un bloc au lieu de pousser les réglages sous ton pouce,
+  et le texte ne change plus de police sous tes yeux à l’ouverture.
 
 ### Corrigé
 

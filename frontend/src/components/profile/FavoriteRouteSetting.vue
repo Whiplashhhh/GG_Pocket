@@ -16,7 +16,6 @@ const { t } = useI18n()
 const profile = useMyProfile()
 const setFavoriteRoute = useSetFavoriteRoute()
 const headingId = useId()
-const labelId = useId()
 
 const currentId = computed(() => profile.data.value?.favoriteRouteId)
 const current = useRouteDetail(currentId)
@@ -56,10 +55,9 @@ function clear() {
       <RouterLink
         v-else-if="current.data.value"
         :to="`/topo/voies/${currentId}`"
-        :aria-labelledby="labelId"
         class="flex max-w-full pt-2"
       >
-        <RouteSummaryLabel :route="current.data.value.route" :label-id="labelId" />
+        <RouteSummaryLabel :route="current.data.value.route" />
       </RouterLink>
       <p v-if="current.data.value?.route.status === 'DISMOUNTED'" class="text-sm text-ink-muted">
         {{ t('favoriteRoute.dismounted') }}

@@ -65,9 +65,9 @@ const dialogOpen = computed({
             <button
               type="button"
               class="flex min-h-11 min-w-11 rounded-control p-1"
-              :aria-label="text.label(state.badge, state.level)"
               @click="selected = state.badge"
             >
+              <span class="sr-only">{{ text.label(state.badge, state.level) }}</span>
               <BadgeToken :badge="state.badge" :level="state.level" />
             </button>
           </li>
@@ -102,9 +102,9 @@ const dialogOpen = computed({
           <button
             type="button"
             class="flex min-h-11 min-w-11 rounded-control p-1"
-            :aria-label="text.label(state.badge, state.level)"
             @click="selected = state.badge"
           >
+            <span class="sr-only">{{ text.label(state.badge, state.level) }}</span>
             <BadgeToken :badge="state.badge" :level="state.level" />
           </button>
         </li>

@@ -23,6 +23,7 @@ frontend/test-results/
 frontend/playwright-report/
 frontend/blob-report/
 frontend/screenshots/
+frontend/lighthouse/
 *.tsbuildinfo
 
 # Logs

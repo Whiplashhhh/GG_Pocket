@@ -237,7 +237,10 @@ Chiffres : `font-variant-numeric: tabular-nums` partout où des nombres s'aligne
 - **Support** : papier (`--gg-label-paper`), rayon 2 px, ombre papier fine. En taille `lg` (fiche voie) : inclinaison de −0,8°, un bout de scotch,
   et le nom passe à la ligne au lieu d'être tronqué. Pas de scotch dans les listes : répété sur chaque ligne, il devenait du bruit.
 - **Statuts** : dernière chance = ruban orange « Dernière chance » qui déborde en haut, juste à gauche de la corde ; démontée = étiquette
-  délavée, prises en gris et tampon « Démontée » au même endroit, pour laisser le nom et la corde lisibles.
+  délavée (nom et corde à 70 % d'encre, contraste AA dans les deux thèmes), prises en gris et tampon « Démontée » au même
+  endroit, pour laisser le nom et la corde lisibles.
+- **Dans un lien ou un bouton** : l'élément est nommé par son contenu (texte `sr-only` de l'étiquette), jamais par
+  `aria-label` ou `aria-labelledby` : le nom visible doit se retrouver dans le nom accessible (WCAG 2.5.3, D-114).
 - **Tailles** : `sm` (32 px de haut, prises 18 px, fil et listes compactes), `md` (44 px, prises 24 px, topo, À faire, saisie), `lg` (64 px
   minimum, prises 32 px, fiche voie).
 - **Accessibilité** : un seul libellé lisible, par exemple « 6b, Bye Bye Morice, couleur jaune et bleu, corde 12, dernière chance »

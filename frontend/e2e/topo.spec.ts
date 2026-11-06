@@ -133,7 +133,7 @@ test.describe('the topo', () => {
     await heart.click()
     const full = page.getByRole('dialog', { name: 'Ton cœur est plein. Lequel tu lâches ?' })
     await expect(full).toBeVisible()
-    await full.getByRole('button', { name: /^Lâcher \S+, Réglisse, .*, corde 27$/ }).click()
+    await full.getByRole('button', { name: /^\S+, Réglisse, .*, corde 27 Lâcher$/ }).click()
     await expect(full).toBeHidden()
     await expect(heart).toHaveAttribute('aria-pressed', 'true')
     await expect(

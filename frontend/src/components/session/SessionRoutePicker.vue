@@ -56,7 +56,9 @@ function remove(id: string) {
 </script>
 
 <template>
-  <section class="flex flex-col gap-3 px-4 py-4" :aria-label="t('session.pickerTitle')">
+  <section class="flex flex-col gap-3 px-4 py-4" :aria-labelledby="`${baseId}-title`">
+    <!-- The level under the page title, so « Récemment grimpées » below is a level 3. -->
+    <h2 :id="`${baseId}-title`" class="sr-only">{{ t('session.pickerTitle') }}</h2>
     <TextField
       v-model="search"
       type="search"

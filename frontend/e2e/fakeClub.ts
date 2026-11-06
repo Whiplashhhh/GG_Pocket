@@ -304,7 +304,8 @@ export class FakeClub {
     })
   }
 
-  private async handle(route: Route): Promise<void> {
+  /** Answers one API call; public for the Lighthouse server, which plays the browser's part. */
+  async handle(route: Route): Promise<void> {
     const request = route.request()
     const headers = await request.allHeaders()
     const method = request.method()

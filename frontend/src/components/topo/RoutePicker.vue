@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Check } from 'lucide-vue-next'
-import { computed, ref, useId } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { errorMessageKey } from '@/api/errors'
@@ -22,7 +22,6 @@ const selected = defineModel<string | undefined>({ required: true })
 
 const { t } = useI18n()
 const routes = useRoutes()
-const baseId = useId()
 const search = ref('')
 
 const results = computed(() => searchRoutes(routes.data.value ?? [], search.value))
@@ -58,13 +57,12 @@ const shown = computed(() => results.value.slice(0, props.limit))
           <button
             type="button"
             :aria-pressed="selected === item.id"
-            :aria-labelledby="`${baseId}-${item.id}`"
             class="flex min-h-14 w-full items-center gap-3 px-2 pt-3 pb-2 text-left transition-colors duration-150"
             :class="selected === item.id ? 'bg-surface-sunken' : 'hover:bg-surface-sunken/60'"
             @click="selected = item.id"
           >
             <span class="flex min-w-0 flex-1">
-              <RouteSummaryLabel :route="item" :label-id="`${baseId}-${item.id}`" />
+              <RouteSummaryLabel :route="item" />
             </span>
             <Check
               :size="22"

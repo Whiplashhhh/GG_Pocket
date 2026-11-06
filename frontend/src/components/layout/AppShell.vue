@@ -101,8 +101,9 @@ const lastChanceEnabled = computed(
     <OutboxBanner />
     <OfflineState v-if="unreachable" @retry="refetch()" />
     <RouterView v-else />
+    <!-- Fixed above the tab bar, but inside the main landmark like the rest of the page. -->
+    <NewSessionFab v-if="showFab" />
   </main>
-  <NewSessionFab v-if="showFab" />
   <!-- Large management screens have their own navigation; the brand link leads back to the app. -->
   <TabBar :class="{ 'lg:hidden': route.meta.wide }" />
   <InstallDialog v-model:open="inviting" />

@@ -226,12 +226,11 @@ const columnClass: Record<number, string> = {
               :is="profileLink(step.line, member?.id) ? RouterLink : 'span'"
               :to="profileLink(step.line, member?.id)"
               class="flex min-h-11 max-w-full min-w-0 flex-col items-center gap-1 rounded-control"
-              :aria-label="
-                profileLink(step.line, member?.id)
-                  ? t('podium.profileOf', { nickname: step.line.member.nickname })
-                  : undefined
-              "
             >
+              <!-- Named by its content, which shows the nickname (label in name, WCAG 2.5.3). -->
+              <span v-if="profileLink(step.line, member?.id)" class="sr-only">{{
+                t('podium.profileOf', { nickname: step.line.member.nickname })
+              }}</span>
               <UserAvatar
                 :first-name="step.line.member.nickname"
                 last-name=""
@@ -242,7 +241,10 @@ const columnClass: Record<number, string> = {
                   isMine(step.line) ? 'ring-2 ring-brand-ink ring-offset-2 ring-offset-bg' : ''
                 "
               />
-              <span class="max-w-full truncate text-base font-semibold">
+              <span
+                class="max-w-full truncate text-base font-semibold"
+                :aria-hidden="profileLink(step.line, member?.id) ? 'true' : undefined"
+              >
                 {{ step.line.member.nickname }}
               </span>
             </component>

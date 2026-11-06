@@ -12,7 +12,7 @@ const PORT = 4173
 
 export default defineConfig({
   testDir: './e2e',
-  testIgnore: '**/screenshots.spec.ts',
+  testIgnore: ['**/screenshots.spec.ts', '**/lighthouse.spec.ts'],
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
