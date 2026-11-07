@@ -12,7 +12,7 @@ public record AttendanceResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) int cleanCount,
         @Schema(requiredMode = RequiredMode.REQUIRED, description = "Distinct climbers")
                 int climberCount,
-        @Schema(description = "Rounded share of topped ascents; absent without any ascent")
+        @Schema(description = "Rounded share of clean ascents; absent without any ascent")
                 Integer successPercent) {
 
     static AttendanceResponse from(Attendance attendance) {

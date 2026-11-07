@@ -135,13 +135,14 @@ export class FakeSessions implements AscentSource {
   private attendance(
     on: { session: FakeSession; ascent: FakeSession['ascents'][number] }[],
   ): Schemas['Attendance'] {
-    const topped = on.filter(({ ascent }) => ascent.topped).length
+    const clean = on.filter(({ ascent }) => ascent.clean).length
     return {
       ascentCount: on.length,
-      toppedCount: topped,
-      cleanCount: on.filter(({ ascent }) => ascent.clean).length,
+      toppedCount: on.filter(({ ascent }) => ascent.topped).length,
+      cleanCount: clean,
       climberCount: new Set(on.map(({ session }) => session.memberId)).size,
-      ...(on.length === 0 ? {} : { successPercent: Math.round((100 * topped) / on.length) }),
+      // D-117: only the clean ascents are a success.
+      ...(on.length === 0 ? {} : { successPercent: Math.round((100 * clean) / on.length) }),
     }
   }
 

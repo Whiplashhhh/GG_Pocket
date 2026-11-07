@@ -1460,7 +1460,7 @@ export interface components {
       climberCount: number
       /**
        * Format: int32
-       * @description Rounded share of topped ascents; absent without any ascent
+       * @description Rounded share of clean ascents; absent without any ascent
        */
       successPercent?: number
       /** Format: int32 */

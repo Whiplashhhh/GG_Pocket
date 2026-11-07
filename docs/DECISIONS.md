@@ -1260,6 +1260,11 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
   (Willem).
 - **Choix** : taux de réussite = tentatives enchaînées (sans chute) / tentatives. L'histogramme des voies au mur a une
   barre par cotation (plus de regroupement 6a-/6a/6a+).
+- **Détail d'implémentation** : `Attendance.successPercent()` divise `cleanCount` (ascensions `clean`, déjà
+  comptées par `AttendanceRepository`) par le nombre de tentatives ; contrat inchangé hormis la description de
+  `successPercent`. Écran Fréquentation : aide et ligne mobile parlent d'« enchaînées ». `gradeDistribution`
+  (`src/lib/stats.ts`) fait une barre par cotation servie par la config (25 au plus), toujours bornée de la plus
+  facile à la plus dure au mur ; les barres horizontales restent lisibles à 360 px et 1280 px.
 - **Statut** : validée (club et Willem).
 
 ### D-118 — Assureur·se : un champ pour la séance, voie par voie sur demande (complète D-101)

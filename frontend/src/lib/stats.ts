@@ -105,30 +105,22 @@ function bars<T>(counts: readonly { item: T; count: number }[]): Bar<T>[] {
   }))
 }
 
-/** "6a" for 6a-, 6a and 6a+: the steps of the grade histogram. */
-export function baseGrade(code: string): string {
-  return code.replace(/[+-]$/, '')
-}
-
 /**
- * Routes per grade, easiest first, the "-" and "+" counted with their grade (6a-, 6a, 6a+ make
- * "6a"). Every grade between the easiest and the hardest route on the wall is shown, even without
- * any route: the gaps are what a setter looks for.
+ * Routes per grade, easiest first, one bar per grade: 6b-, 6b and 6b+ each have theirs (D-117).
+ * Every grade between the easiest and the hardest route on the wall is shown, even without any
+ * route: the gaps are what a setter looks for.
  */
 export function gradeDistribution(
   routes: readonly RouteSummary[],
   grades: readonly Grade[],
 ): Bar<string>[] {
   if (routes.length === 0) return []
-  const steps = new Map<string, number[]>()
-  for (const grade of [...grades].sort((a, b) => a.rank - b.rank)) {
-    const step = baseGrade(grade.code)
-    steps.set(step, [...(steps.get(step) ?? []), grade.rank])
-  }
-  const counts = [...steps.entries()].map(([step, ranks]) => ({
-    item: step,
-    count: routes.filter((route) => ranks.includes(route.gradeRank)).length,
-  }))
+  const counts = [...grades]
+    .sort((a, b) => a.rank - b.rank)
+    .map((grade) => ({
+      item: grade.code,
+      count: routes.filter((route) => route.gradeRank === grade.rank).length,
+    }))
   const first = counts.findIndex((entry) => entry.count > 0)
   const last = counts.length - 1 - [...counts].reverse().findIndex((entry) => entry.count > 0)
   return bars(first === -1 ? [] : counts.slice(first, last + 1))

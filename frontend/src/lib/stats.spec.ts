@@ -181,27 +181,28 @@ describe('distributions', () => {
     route({ id: 'd', gradeRank: 9, cordNumber: 4 }),
   ]
 
-  it('counts the routes per grade, its "-" and "+" included, gaps included', () => {
+  it('counts the routes of each grade, one bar per grade, gaps included', () => {
     const grades = [
-      grade('5a', 7),
-      grade('5a+', 8),
-      grade('5b', 9),
-      grade('5c-', 10),
-      grade('5c', 11),
-      grade('6a', 12),
+      grade('6b', 23),
+      grade('5c', 17),
+      grade('6a', 20),
+      grade('6a+', 21),
+      grade('6b-', 22),
+      grade('6b+', 24),
     ]
     const routes = [
-      route({ id: 'a', gradeRank: 8 }),
-      route({ id: 'b', gradeRank: 10 }),
-      route({ id: 'c', gradeRank: 10 }),
-      route({ id: 'd', gradeRank: 11 }),
+      route({ id: 'a', gradeRank: 20 }),
+      route({ id: 'b', gradeRank: 22 }),
+      route({ id: 'c', gradeRank: 22 }),
+      route({ id: 'd', gradeRank: 23 }),
     ]
     expect(
       gradeDistribution(routes, grades).map((bar) => [bar.item, bar.count, bar.percent]),
     ).toEqual([
-      ['5a', 1, 33],
-      ['5b', 0, 0],
-      ['5c', 3, 100],
+      ['6a', 1, 50],
+      ['6a+', 0, 0],
+      ['6b-', 2, 100],
+      ['6b', 1, 50],
     ])
     expect(gradeDistribution([], grades)).toEqual([])
   })
