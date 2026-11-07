@@ -1312,8 +1312,15 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
 
 ### D-123 — Logo du club (remplace D-039)
 - **Contexte** (partie H) : logo pour fond clair (PNG 801 px sur fond blanc) et pour fond noir (PNG 2048 px) collés dans
-  le document ; `docs/Logo_GravelinesGrimp_3-couleurs.svg` est en fait une image PNG de 3775 × 3719 px enveloppée dans du
-  SVG, pas un vrai vectoriel. Pas de version carrée ni de charte. Utilisation dans l'appli autorisée.
-- **Choix** : sources rangées dans `docs/references/club/` ; logos de l'appli et icônes PWA régénérés depuis la version
-  haute définition ; icône carrée découpée (grimpeur et montagne) faute de version fournie ; couleurs relevées dans l'image.
-- **Statut** : appliquée en attendant une vraie source vectorielle (à redemander au club).
+  le document ; le fichier `Logo_GravelinesGrimp_3-couleurs.svg` est en fait une image PNG de 3775 × 3719 px (plus son
+  masque de transparence) enveloppée dans du SVG, pas un vrai vectoriel. Pas de version carrée ni de charte. Utilisation
+  dans l'appli autorisée.
+- **Choix** :
+  - sources rangées dans `docs/references/club/` (le SVG et les deux images du questionnaire) ;
+  - `logo-light.webp` et `logo-dark.webp` (512 px) régénérés depuis le SVG : la version sombre remplace l'encre du texte
+    (`#231F20`) par le papier du thème sombre, comme la version fond noir du club ;
+  - icônes PWA, Apple et favicon : le logo complet sur le fond magnésie (zone sûre respectée pour l'icône « maskable »),
+    faute de version carrée simplifiée ;
+  - couleurs officielles relevées dans l'image : orange `#F26522` et vert `#C8DC5D` remplacent `#F9561A` et `#C3C04C`
+    (`tokens.css`, `DESIGN.md`) ; contrastes AA conservés (encre sur orange 5,8:1, sur vert 12,1:1).
+- **Statut** : appliquée en attendant une vraie source vectorielle et une version carrée (à redemander au club).

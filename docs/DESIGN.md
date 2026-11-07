@@ -42,9 +42,9 @@ Trois systèmes qui ne se mélangent pas :
 | `--color-ink` · résine noire | `#17140F` | Texte principal, barre d'onglets | 16,3:1 sur magnésie |
 | `--color-ink-muted` · corde usée | `#5E574C` | Texte secondaire | 6,3:1 sur magnésie |
 | `--color-rule` · trait de craie | `#D9D1C1` | Filets, séparateurs (décoratifs) | — |
-| `--color-brand` · orange GG | `#F9561A` | Surfaces de marque, bouton principal, FAB | encre dessus : 5,6:1 |
+| `--color-brand` · orange GG | `#F26522` | Surfaces de marque, bouton principal, FAB (orange officiel du logo, D-123) | encre dessus : 5,8:1 |
 | `--color-brand-ink` · orange brique | `#B23E0B` | Texte et icônes orange sur fond clair, anneau de focus | 5,2:1 sur magnésie |
-| `--color-olive` · sommet | `#C3C04C` | Fond du badge de rôle, décor | encre dessus : 9,6:1 |
+| `--color-olive` · sommet | `#C8DC5D` | Fond du badge de rôle, décor (vert officiel du logo, D-123) | encre dessus : 12,1:1 |
 | `--color-success` · vert relais | `#4A5A0C` | Réussite, présence, « topée » | 6,8:1 sur magnésie |
 | `--color-danger` · sang de doigt | `#A3261B` | Erreurs, actions destructives | 6,6:1 sur magnésie |
 
@@ -62,9 +62,9 @@ Le club utilise beaucoup son logo sur fond noir : le thème sombre est un citoye
 | `--color-ink` · magnésie | `#F3EFE6` | Texte principal | 16,5:1 |
 | `--color-ink-muted` | `#ADA594` | Texte secondaire | 7,7:1 sur fond, 7,0:1 sur tapis |
 | `--color-rule` | `#3A352D` | Filets | — |
-| `--color-brand` · orange GG | `#F9561A` | Surfaces de marque | — |
+| `--color-brand` · orange GG | `#F26522` | Surfaces de marque | — |
 | `--color-brand-ink` | `#FF7340` | Texte orange | 7,0:1 |
-| `--color-olive` | `#C3C04C` | Décor, badge | — |
+| `--color-olive` | `#C8DC5D` | Décor, badge | — |
 | `--color-success` · vert relais | `#C9C653` | Réussite (l'olive du logo, lisible sur noir) | 10,5:1 |
 | `--color-danger` | `#FF8A7A` | Erreurs | 8,4:1 |
 

@@ -28,7 +28,7 @@ describe('contrast', () => {
     ['ink on magnésie', '#17140f', '#f4f1ea'],
     ['muted on magnésie', '#5e574c', '#f4f1ea'],
     ['brique on magnésie', '#b23e0b', '#f4f1ea'],
-    ['ink on orange GG', '#17140f', '#f9561a'],
+    ['ink on orange GG', '#17140f', '#f26522'],
     ['vert relais on magnésie', '#4a5a0c', '#f4f1ea'],
     ['danger on magnésie', '#a3261b', '#f4f1ea'],
     ['magnésie on night', '#f3efe6', '#12110e'],
