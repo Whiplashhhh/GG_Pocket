@@ -58,10 +58,10 @@ public enum BadgeCode {
     STREAK_3W(BadgeFamily.REPEATABLE, 3),
     /** A month whose every ISO week starting in it has a climbing day. */
     MONTH_NO_MISS(BadgeFamily.REPEATABLE, 1),
-    /** A session of at least 3 ascents, all in lead. */
-    FULL_LEAD(BadgeFamily.REPEATABLE, 3),
-    /** A session of at least 3 ascents, all clean. */
-    PERFECT(BadgeFamily.REPEATABLE, 3),
+    /** A session of at least 5 ascents, all in lead (D-116). */
+    FULL_LEAD(BadgeFamily.REPEATABLE, 5),
+    /** A session of at least 5 ascents, all clean (D-116). */
+    PERFECT(BadgeFamily.REPEATABLE, 5),
     /** A session with at least 10 topped ascents. */
     ZERO_REST(BadgeFamily.REPEATABLE, 10),
     /** A climbing day at least 30 days after the previous one (not the very first). */

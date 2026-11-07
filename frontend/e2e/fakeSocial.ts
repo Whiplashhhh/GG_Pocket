@@ -229,7 +229,7 @@ export class FakeSocial {
     if (path === '/me/badges' && method === 'GET') return json(this.library(me.id, true))
     if (path === '/me/badges/favorites' && method === 'PUT') {
       const chosen = (body as Schemas['FavoriteBadgesRequest']).badges
-      if (chosen.length > 3 || chosen.some((badge) => this.level(me.id, badge) === 0)) {
+      if (chosen.length > 2 || chosen.some((badge) => this.level(me.id, badge) === 0)) {
         return { kind: 'problem', status: 400, code: 'VALIDATION_FAILED' }
       }
       this.favorites.set(me.id, [...chosen])

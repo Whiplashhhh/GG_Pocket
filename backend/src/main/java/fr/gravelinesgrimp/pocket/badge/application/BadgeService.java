@@ -78,7 +78,7 @@ public class BadgeService {
     public BadgeLibraryView chooseFavorites(UUID memberId, List<Badge> chosen) {
         if (chosen.size() > FavoriteBadge.MAX || new HashSet<>(chosen).size() != chosen.size()) {
             throw new BusinessException(
-                    ErrorCode.VALIDATION_FAILED, "At most 3 different favourite badges");
+                    ErrorCode.VALIDATION_FAILED, "At most 2 different favourite badges");
         }
         var earned = awards.countPerCode(memberId);
         Set<BadgeCode> earnedCodes =

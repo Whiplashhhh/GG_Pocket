@@ -434,22 +434,22 @@ class BadgeEngineTest {
     class FullLead {
 
         @Test
-        void threeLeadsEarnIt() {
-            var full = session("2025-03-03", leads(3));
+        void fiveLeadsEarnIt() {
+            var full = session("2025-03-03", leads(5));
 
             assertThat(only(BadgeCode.FULL_LEAD).sessionId()).isEqualTo(full.sessionId());
         }
 
         @Test
-        void twoAreNotEnough() {
-            session("2025-03-03", leads(2));
+        void fourAreNotEnough() {
+            session("2025-03-03", leads(4));
 
             assertThat(count(BadgeCode.FULL_LEAD)).isZero();
         }
 
         @Test
         void oneTopRopeSpoilsIt() {
-            var lines = new ArrayList<>(leads(3));
+            var lines = new ArrayList<>(leads(5));
             lines.add(top("4a"));
             session("2025-03-03", lines);
 
@@ -460,15 +460,15 @@ class BadgeEngineTest {
         void fallsInLeadStillCount() {
             session(
                     "2025-03-03",
-                    Collections.nCopies(3, line(UUID.randomUUID(), ClimbMode.LEAD, false)));
+                    Collections.nCopies(5, line(UUID.randomUUID(), ClimbMode.LEAD, false)));
 
             assertThat(count(BadgeCode.FULL_LEAD)).isOne();
         }
 
         @Test
         void comesOncePerSession() {
-            session("2025-03-03", leads(3));
-            session("2025-03-03", leads(4));
+            session("2025-03-03", leads(5));
+            session("2025-03-03", leads(6));
 
             assertThat(count(BadgeCode.FULL_LEAD)).isEqualTo(2);
         }
@@ -478,22 +478,22 @@ class BadgeEngineTest {
     class Perfect {
 
         @Test
-        void threeCleanAscentsEarnIt() {
-            session("2025-03-03", cleans(3));
+        void fiveCleanAscentsEarnIt() {
+            session("2025-03-03", cleans(5));
 
             assertThat(count(BadgeCode.PERFECT)).isOne();
         }
 
         @Test
-        void twoAreNotEnough() {
-            session("2025-03-03", cleans(2));
+        void fourAreNotEnough() {
+            session("2025-03-03", cleans(4));
 
             assertThat(count(BadgeCode.PERFECT)).isZero();
         }
 
         @Test
         void oneFallSpoilsIt() {
-            var lines = new ArrayList<>(cleans(3));
+            var lines = new ArrayList<>(cleans(5));
             lines.add(top("4a"));
             session("2025-03-03", lines);
 
@@ -686,8 +686,8 @@ class BadgeEngineTest {
         @Test
         void theOrderOfTheHistoryDoesNotMatter() {
             session("2025-03-03", tops(3));
-            session("2025-03-05", leads(4));
-            session("2025-03-04", cleans(3));
+            session("2025-03-05", leads(5));
+            session("2025-03-04", cleans(5));
             var inOrder = awards();
 
             Collections.reverse(history);
@@ -707,7 +707,7 @@ class BadgeEngineTest {
         @Test
         void aLaterSessionNeverMovesEarlierAwards() {
             session("2025-03-03", tops(6));
-            session("2025-03-04", leads(3));
+            session("2025-03-04", leads(5));
             var before = awards();
 
             session("2025-03-10", tops(30));

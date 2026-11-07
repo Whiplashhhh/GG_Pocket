@@ -4022,7 +4022,7 @@
                 "RECORD"
               ]
             },
-            "maxItems": 3,
+            "maxItems": 2,
             "minItems": 0
           }
         },

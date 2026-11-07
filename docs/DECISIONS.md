@@ -1253,6 +1253,10 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
     de séance libre ne donne pas le badge.
   - *Séance full tête* et *Séance parfaite* : au moins **5 voies** dans la séance (au lieu de 3).
   - *Favoris* : **2** au maximum (au lieu de 3). Un membre qui en avait 3 garde les 2 premiers.
+- **Détail d'implémentation** (5 voies et favoris faits ; « Mois complet » et jours de fermeture à part) : seuils
+  de `BadgeCode.FULL_LEAD` et `PERFECT` à 5 (les badges déjà gagnés sont recomptés au démarrage par `BadgeRecount`) ;
+  `FavoriteBadge.MAX` = 2 (d'où `@Size(max = 2)` et `maxItems: 2` dans le contrat), `MAX_FAVORITES` = 2 dans
+  `BadgeDialog.vue` ; `V20__keep_two_favorite_badges.sql` supprime le 3e favori selon `slot`.
 - **Statut** : validée (club) ; jours de fermeture validés par Willem.
 
 ### D-117 — Statistiques de gestion : taux de réussite sans chute, une barre par cotation (remplace D-104 en partie)

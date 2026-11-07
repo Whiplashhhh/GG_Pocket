@@ -44,6 +44,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   sans signe (une 4a+ devient une 4a, une 6a- une 6a), ton carnet et tes « À faire » suivent.
 - Pour les ouvreurs et la direction, **Fréquentation** : le taux de réussite ne compte plus que les voies
   enchaînées, du sol au relais sans une chute. Un repos sur la corde, c’est topé, pas réussi.
+- **Badges** : « Séance full tête » et « Séance parfaite » se méritent sur au moins 5 voies (au lieu de 3),
+  les badges déjà gagnés sont recomptés avec cette règle.
+  Et 2 badges en avant à côté de ton pseudo, pas un de plus : si tu en avais 3, tu gardes les 2 premiers.
 - **Bilan du topo** : une barre par cotation, la 6b- n’est plus noyée avec la 6b et la 6b+. Les trous dans
   l’offre sautent aux yeux.
 

@@ -238,7 +238,7 @@ class BadgeIT {
     }
 
     @Test
-    void aFavouriteMustBeEarnedAndThreeAtMost() throws Exception {
+    void aFavouriteMustBeEarnedAndTwoAtMost() throws Exception {
         var me = members.create(Role.CLIMBER);
         var route = routes.create(members.create(Role.SETTER), "6a");
         create(me, UUID.randomUUID(), today(), ascent(route, "LEAD", true, true))
@@ -250,7 +250,7 @@ class BadgeIT {
         chooseFavorites(me, "[\"TOPPED\", \"TOPPED\"]")
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
-        chooseFavorites(me, "[\"TOPPED\", \"LEAD\", \"FLASH\", \"FIRST_GRADE\"]")
+        chooseFavorites(me, "[\"TOPPED\", \"LEAD\", \"FIRST_GRADE\"]")
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
         mockMvc.perform(get("/api/v1/me/badges").with(as(me)))
