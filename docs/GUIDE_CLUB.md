@@ -79,6 +79,13 @@ activité, nombre de séances…). Touche un nom pour ouvrir sa fiche.
   effacé : **Réactiver le compte** remet tout comme avant.
 - **Supprimer définitivement le compte** (présidence) : profil, photos et commentaires sont effacés. Ses séances restent
   dans les statistiques des voies, au nom d'« Ancien·ne membre ».
+- **Mineur·e** : la fiche et la file des comptes en attente l'indiquent pour un membre de moins de 18 ans, avec
+  « accord parental déclaré » avant 15 ans. La date de naissance, elle, n'est jamais montrée, et les autres membres ne
+  voient pas la mention.
+- **Comptes endormis** : sans aucune visite depuis un an, un compte s'endort tout seul (la liste et la fiche disent
+  « Endormi », avec la date). À la connexion, la personne apprend qu'il faut te demander de le réactiver : **Réactiver
+  le compte** lui redonne une année complète. Sans visite depuis deux ans, le compte est supprimé, comme une
+  suppression définitive. Les comptes de la présidence ne sont jamais concernés. Le journal note tout.
 
 Chaque membre peut aussi télécharger ses données ou supprimer lui-même son compte, depuis son profil :
 **Mes données et mon compte**. La page **Tes données** explique en clair ce que l'appli garde et pourquoi.

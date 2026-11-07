@@ -1328,6 +1328,30 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
     mineur l'option n'apparaît pas et son âge n'est jamais montré, quel que soit le réglage enregistré (la règle est
     appliquée par le serveur au moment de servir le profil).
 - **Statut** : validée (club et Willem).
+- **Détail d'implémentation** :
+  - *Contact* : en dur dans `privacy.email` (fr.json), lien `mailto:` dans « Qui s'en occupe » et « Tes droits » ;
+    D-043 prévoyait une adresse saisie par l'admin, inutile tant qu'il n'y en a qu'une. Page relue entière : badges
+    ajoutés à « Ce qu'on garde », date de dernière visite, rôle de la date de naissance, section « Les mineur·es ».
+  - *Comptes inactifs* : migration V22 (`member.dormant_since`, `member.reactivated_at`). « Dernière visite » =
+    le plus récent de `last_seen_at` (mis à jour à chaque requête, à l'heure près), de la réactivation par la
+    direction et, à défaut, de l'inscription : réactiver ne touche pas `last_seen_at` (la fiche reste vraie) mais
+    relance une année complète. « 1 an » = même jour et même heure un an plus tôt à Gravelines ; pile un an : gardé
+    (`Inactivity`, `InactivityTest`). Tâche `InactiveAccountJob`, tous les jours à 03:15 Europe/Paris, une
+    transaction par compte, revérifiée sous verrou (`InactiveAccountService.putToSleepIfInactive`,
+    `AccountDeletionService.deleteIfInactive`, la suppression de D-096 telle quelle). Endormi = `DISABLED` +
+    `dormant_since` : invisible des autres comme tout compte désactivé, sessions et liens de réinitialisation
+    supprimés, connexion refusée par `ACCOUNT_DORMANT` (au lieu de `ACCOUNT_DISABLED`), `dormantSince` dans la ligne
+    du tableau des membres. Un compte désactivé par la direction n'est pas « endormi », mais il est supprimé lui aussi
+    après deux ans sans visite (minimisation). Admins exclus (« il en reste toujours un ») ; « Ancien·ne membre »
+    aussi. Journal : `MEMBER_PUT_TO_SLEEP` et `MEMBER_DELETED_INACTIVE`, sans acteur (`AuditLog.recordBySystem`,
+    `actor_id` et `actor_nickname` déjà facultatifs).
+  - *Date de naissance* : `@NotNull` à l'inscription et dans `PUT /api/v1/me/profile` (corrigeable, plus effaçable) ;
+    `CurrentMember.birthDateMissing` ; écran `/date-de-naissance` imposé par la garde de route (pages publiques
+    exceptées) et `PUT /api/v1/me/birth-date` (même règle d'accord parental, même limite de débit que le profil).
+    L'API n'est pas bloquée pour autant.
+  - *Mineur* : `Age.isMinor` (moins de 18 ans ; date inconnue = pas mineur) → `MemberSummary.minor`, donc fiche et
+    file des comptes en attente ; `Age.shownToOthers` pour l'âge d'un profil vu par un autre ; une case « Afficher mon
+    âge » cochée par un mineur est enregistrée décochée.
 
 ### D-120 — Fil « tout le club », à double sens (remplace D-011)
 - **Contexte** (Q21) : « On peut rajouter un fil “tout le club” en plus du “amis”, mais il est flouté : si quelqu'un veut

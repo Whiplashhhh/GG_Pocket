@@ -90,6 +90,10 @@ test.describe('a visitor', () => {
     await page.goto('/tes-donnees')
     await expect(page.getByRole('heading', { level: 1, name: 'Tes données' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Combien de temps' })).toBeVisible()
+    await expect(page.getByText('tient lieu', { exact: false })).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'contact@gravelinesgrimp.org' }).first(),
+    ).toHaveAttribute('href', 'mailto:contact@gravelinesgrimp.org')
   })
 
   test('cannot join with a wrong code', async ({ page }) => {

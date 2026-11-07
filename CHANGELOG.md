@@ -39,6 +39,14 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 - **Mois clos, mais toujours à toi** : une séance d’un mois clos ne change plus ses voies, mais tu peux encore la
   garder pour toi, effacer ton mot ou retirer la photo, directement depuis la séance.
+- **Comptes inactifs** : un compte sans aucune visite depuis **un an** s’endort (il disparaît pour les autres et
+  la connexion te dit de demander à la direction de le réactiver, rien n’est perdu). Sans visite depuis
+  **deux ans**, il est **supprimé pour de bon**, exactement comme si tu le supprimais toi-même : profil, photos et
+  commentaires effacés, séances gardées au nom d’« Ancien·ne membre ». Pour la direction : la fiche dit quand un
+  compte s’est endormi, et le réactiver relance une année complète. Les comptes admin ne sont jamais concernés.
+- **Tes données**, relue de fond en comble : le club y écrit noir sur blanc qui s’occupe de tes données et comment
+  le joindre (contact@gravelinesgrimp.org, un clic pour écrire). Cette page tient lieu de politique de
+  confidentialité du club, et dit maintenant tout sur les comptes inactifs, la date de naissance et les mineur·es.
 
 ### Modifié
 
