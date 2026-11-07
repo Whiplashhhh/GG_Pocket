@@ -305,11 +305,18 @@ function select(date: string) {
 
     <section v-if="streak" class="px-4 pt-5 pb-28" :aria-labelledby="`${titleId}-streak`">
       <h2 :id="`${titleId}-streak`" class="text-lg font-title">{{ t('planning.streakTitle') }}</h2>
-      <p class="mt-1 flex items-baseline gap-2">
-        <span v-if="streak.weeks > 0" class="text-3xl font-title text-brand-ink tabular-nums">{{
-          streak.weeks
-        }}</span>
-        <span class="font-semibold">{{ t('planning.streakWeeks', streak.weeks) }}</span>
+      <!-- "5 🔥" on screen (D-122); screen readers get the whole sentence, not "5 fire". -->
+      <p class="mt-1">
+        <span class="flex items-baseline gap-2" aria-hidden="true">
+          <span
+            v-if="streak.weeks > 0"
+            class="text-3xl font-title whitespace-nowrap text-brand-ink tabular-nums"
+            data-testid="streak-flames"
+            >{{ t('planning.streakFlames', { n: streak.weeks }) }}</span
+          >
+          <span class="font-semibold">{{ t('planning.streakWeeks', streak.weeks) }}</span>
+        </span>
+        <span class="sr-only">{{ t('planning.streakLabel', streak.weeks) }}</span>
       </p>
       <p class="mt-1 text-sm text-ink-muted">
         {{

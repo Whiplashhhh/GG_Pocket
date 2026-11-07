@@ -95,8 +95,14 @@ test.describe('planning', () => {
     await expect(page.getByText('3 présences')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Mois suivant' })).toBeDisabled()
     const streak = page.getByRole('region', { name: 'Série en cours' })
-    await expect(streak.getByText('1', { exact: true })).toBeVisible()
-    await expect(streak.getByText('semaine d’affilée à 2 séances ou plus')).toBeVisible()
+    await expect(streak.getByTestId('streak-flames')).toHaveText('1 🔥')
+    await expect(
+      streak.getByText('semaine d’affilée à 2 séances ou plus', { exact: true }),
+    ).toBeVisible()
+    // The flame is for the eyes: screen readers hear the whole sentence.
+    await expect(
+      streak.getByText('Série de 1 semaine d’affilée à 2 séances ou plus'),
+    ).toBeAttached()
     await expect(page.getByText('Cette semaine : 1 séance sur 2, encore une !')).toBeVisible()
 
     await page.getByRole('button', { name: '19 octobre 2026, grimpé' }).click()

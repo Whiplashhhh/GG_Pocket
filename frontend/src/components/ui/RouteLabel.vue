@@ -111,13 +111,7 @@ const dismounted = computed(() => props.status === 'DISMOUNTED')
       :class="{ 'opacity-60 grayscale': dismounted }"
       aria-hidden="true"
     >
-      <HoldSwatch
-        v-for="(hold, index) in holds"
-        :key="hold.label"
-        :color="hold"
-        :size="sizing.hold"
-        :class="{ '-ml-1.5': index > 0 }"
-      />
+      <HoldSwatch v-if="holds[0]" :color="holds[0]" :second="holds[1]" :size="sizing.hold" />
     </span>
     <span
       class="min-w-0 flex-1 self-center px-2 pt-0.5 font-hand leading-tight font-bold"

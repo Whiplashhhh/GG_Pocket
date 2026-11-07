@@ -60,6 +60,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   même celles ajoutées après. Le binôme a tourné ? Coche « Plusieurs assureur·ses » et chaque voie retrouve son
   propre champ.
 
+- **Voies bicolores** : une seule prise coupée en deux couleurs sur l’étiquette, la fiche et partout ailleurs,
+  au lieu de deux prises qui se marchent dessus. Les photos des voies du topo passent en rond.
+- **Planning** : ta série s’affiche « 5 🔥 ». Plus ça brûle, plus tu grimpes.
+
 - Le vrai logo du club est arrivé, en haute définition : plus net en haut de l’appli, sur l’écran de connexion et
   sur l’icône du téléphone. L’orange et le vert de l’appli prennent les couleurs officielles du club.
 

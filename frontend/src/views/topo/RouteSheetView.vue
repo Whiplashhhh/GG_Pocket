@@ -261,11 +261,11 @@ const toggleClasses = (pressed: boolean, tone: 'brand' | 'success') => [
               aria-hidden="true"
             >
               <HoldSwatch
-                v-for="(hold, index) in summary.holds"
-                :key="hold.id"
-                :color="hold"
-                :size="52"
-                :class="index === 0 ? '-rotate-12' : 'rotate-12'"
+                v-if="summary.holds[0]"
+                :color="summary.holds[0]"
+                :second="summary.holds[1]"
+                :size="64"
+                class="-rotate-12"
               />
             </div>
 

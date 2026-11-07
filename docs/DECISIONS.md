@@ -1355,6 +1355,16 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
 - **Contexte** (Q17, Q19).
 - **Choix** : une voie à deux couleurs a **une** pastille coupée en deux moitiés ; la miniature de la photo d'une voie est
   ronde ; la série du planning s'affiche « 5 🔥 ».
+- **Détail d'implémentation** (frontend seulement) :
+  - `HoldSwatch` prend une seconde couleur (`second`) : la prise est coupée par une diagonale raide passant par le
+    boulon (première couleur à gauche), un trait neutre souligne la coupe (deux couleurs proches, blanc et jaune clair,
+    restent lisibles), chaque moitié garde le contour de sa couleur (contraste en sombre inchangé), une moitié
+    « multicolore » garde ses quartiers. Nom accessible « jaune et bleu » quand la pastille est annoncée ; l'étiquette
+    garde son nom complet. Utilisée par l'étiquette (`RouteLabel` : topo, fiche, saisie, gestion, À faire), la fiche
+    sans photo, la miniature et le bilan du topo.
+  - `RouteThumbnail` ronde (`rounded-full`), pour la photo comme pour la prise affichée sans photo (bicolore aussi).
+  - Planning : « 5 🔥 » et le rappel de la règle masqués aux lecteurs d'écran, qui lisent « Série de 5 semaines
+    d'affilée à 2 séances ou plus » (`planning.streakLabel`).
 - **Statut** : validée (club).
 
 ### D-123 — Logo du club (remplace D-039)

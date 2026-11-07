@@ -609,6 +609,8 @@
     },
     "streakTitle": "Série en cours",
     "streakWeeks": "Pas encore de série | semaine d’affilée à 2 séances ou plus | semaines d’affilée à 2 séances ou plus",
+    "streakFlames": "{n} 🔥",
+    "streakLabel": "Pas encore de série | Série de 1 semaine d’affilée à 2 séances ou plus | Série de {n} semaines d’affilée à 2 séances ou plus",
     "streakThisWeek": "Cette semaine : pas encore de séance, deux et la série repart. | Cette semaine : 1 séance sur 2, encore une ! | Cette semaine : {n} séances, validée.",
     "dayTitle": "Le {date}",
     "dayEmpty": "Rien ce jour-là. Repos mérité ?",
