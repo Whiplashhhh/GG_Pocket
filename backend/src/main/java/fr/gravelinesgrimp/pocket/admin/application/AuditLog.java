@@ -59,6 +59,26 @@ public class AuditLog {
     }
 
     /**
+     * What the application did on its own (the daily job on inactive accounts, D-119): no actor,
+     * the journal says so.
+     */
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void recordBySystem(
+            AuditAction action, AuditTargetType targetType, UUID targetId, String targetLabel) {
+        entries.save(
+                new AuditEntry(
+                        clock.instant(),
+                        null,
+                        null,
+                        action,
+                        targetType,
+                        targetId,
+                        shorten(targetLabel, LABEL_LENGTH),
+                        null,
+                        null));
+    }
+
+    /**
      * The entries about these targets keep the moderation, not the person: label and text go
      * (comments of a member who deleted their account, D-112).
      */

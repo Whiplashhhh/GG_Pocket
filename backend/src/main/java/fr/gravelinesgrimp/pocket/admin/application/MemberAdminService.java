@@ -51,6 +51,7 @@ public class MemberAdminService {
             UUID avatarId,
             Instant createdAt,
             Instant lastSeenAt,
+            Instant dormantSince,
             long sessionCount) {}
 
     /** What the actor may do to this member, so the screen only offers allowed actions. */
@@ -195,7 +196,7 @@ public class MemberAdminService {
             devices.closeAll(member.id());
             passwordResets.cancelLinks(member.id());
         } else {
-            member.enable();
+            member.enable(clock.instant());
         }
         auditLog.record(
                 actor,
@@ -272,6 +273,7 @@ public class MemberAdminService {
                 member.avatarId(),
                 member.createdAt(),
                 member.lastSeenAt(),
+                member.dormantSince(),
                 sessionCount);
     }
 

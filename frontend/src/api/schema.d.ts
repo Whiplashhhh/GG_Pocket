@@ -1528,12 +1528,14 @@ export interface components {
         | 'CLUB_HOLD_COLOR_UPDATED'
         | 'CLUB_DAYS_CLOSED'
         | 'CLUB_DAYS_REOPENED'
+        | 'MEMBER_PUT_TO_SLEEP'
+        | 'MEMBER_DELETED_INACTIVE'
       /**
        * Format: uuid
        * @description Absent if that member was deleted since
        */
       actorId?: string
-      /** @description Nickname at the time of the action */
+      /** @description Nickname at the time of the action; absent for what the application did on its own (D-119) */
       actorNickname?: string
       after?: string
       before?: string
@@ -2133,6 +2135,11 @@ export interface components {
       avatarUrl?: string
       /** @description Licensed at the club, as declared at sign-up; absent for accounts that never went through it */
       declaredLicensed?: boolean
+      /**
+       * Format: date-time
+       * @description When the account was put to sleep after a year without a visit (D-119); absent if active or disabled by the board
+       */
+      dormantSince?: string
       firstName: string
       /** Format: uuid */
       id: string

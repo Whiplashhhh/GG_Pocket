@@ -34,6 +34,26 @@ test.describe('a visitor', () => {
     )
   })
 
+  test('is told their account fell asleep after a year away, and whom to ask', async ({
+    page,
+    club,
+  }) => {
+    club.addMember({
+      nickname: 'gaston',
+      password: 'un mot de passe solide',
+      status: 'DISABLED',
+      dormantSince: '2026-10-02T01:15:00Z',
+    })
+    await page.goto('/connexion')
+    await page.getByLabel('Pseudo').fill('gaston')
+    await page.getByLabel('Mot de passe', { exact: true }).fill('un mot de passe solide')
+    await page.getByRole('button', { name: 'Se connecter' }).click()
+    await expect(page.getByRole('alert')).toContainText(
+      'Ton compte s’est endormi après un an sans visite.',
+    )
+    await expect(page.getByRole('alert')).toContainText('demande à la direction du club')
+  })
+
   test('gives the birth date an older account never gave, then goes on', async ({ page, club }) => {
     const member = club.addMember({
       nickname: 'tonton.talon',

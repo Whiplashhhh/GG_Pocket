@@ -38,6 +38,11 @@ public record MemberSummaryResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) Instant registeredAt,
         @Schema(description = "Roughly, to the hour; absent if never seen since registration")
                 Instant lastSeenAt,
+        @Schema(
+                        description =
+                                "When the account was put to sleep after a year without a visit"
+                                        + " (D-119); absent if active or disabled by the board")
+                Instant dormantSince,
         @Schema(requiredMode = RequiredMode.REQUIRED, description = "Sessions logged, ever")
                 long sessionCount) {
 
@@ -55,6 +60,7 @@ public record MemberSummaryResponse(
                 MediaUrls.of(view.avatarId()),
                 view.createdAt(),
                 view.lastSeenAt(),
+                view.dormantSince(),
                 view.sessionCount());
     }
 }

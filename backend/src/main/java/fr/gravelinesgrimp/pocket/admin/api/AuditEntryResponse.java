@@ -15,7 +15,11 @@ public record AuditEntryResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) UUID id,
         @Schema(requiredMode = RequiredMode.REQUIRED) Instant occurredAt,
         @Schema(description = "Absent if that member was deleted since") UUID actorId,
-        @Schema(description = "Nickname at the time of the action") String actorNickname,
+        @Schema(
+                        description =
+                                "Nickname at the time of the action; absent for what the"
+                                        + " application did on its own (D-119)")
+                String actorNickname,
         @Schema(requiredMode = RequiredMode.REQUIRED) AuditAction action,
         @Schema(requiredMode = RequiredMode.REQUIRED) AuditTargetType targetType,
         UUID targetId,

@@ -3289,7 +3289,9 @@
               "CLUB_HOLD_COLOR_CREATED",
               "CLUB_HOLD_COLOR_UPDATED",
               "CLUB_DAYS_CLOSED",
-              "CLUB_DAYS_REOPENED"
+              "CLUB_DAYS_REOPENED",
+              "MEMBER_PUT_TO_SLEEP",
+              "MEMBER_DELETED_INACTIVE"
             ]
           },
           "actorId": {
@@ -3299,7 +3301,7 @@
           },
           "actorNickname": {
             "type": "string",
-            "description": "Nickname at the time of the action"
+            "description": "Nickname at the time of the action; absent for what the application did on its own (D-119)"
           },
           "after": {
             "type": "string"
@@ -4813,6 +4815,11 @@
           "declaredLicensed": {
             "type": "boolean",
             "description": "Licensed at the club, as declared at sign-up; absent for accounts that never went through it"
+          },
+          "dormantSince": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the account was put to sleep after a year without a visit (D-119); absent if active or disabled by the board"
           },
           "firstName": {
             "type": "string"

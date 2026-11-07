@@ -41,6 +41,8 @@ export interface FakeMember {
   favoriteRouteId?: string
   registeredAt: string
   lastSeenAt?: string
+  /** Put to sleep after a year without a visit (D-119). */
+  dormantSince?: string
 }
 
 interface FakeSession {
@@ -255,6 +257,7 @@ export class FakeClub {
       minor: isMinor(member.birthDate ?? '', clubToday(new Date(this.now))),
       registeredAt: member.registeredAt,
       lastSeenAt: member.lastSeenAt,
+      dormantSince: member.dormantSince,
       sessionCount: this.climbs.sessions.filter((session) => session.memberId === member.id).length,
     }
   }
@@ -400,7 +403,8 @@ export class FakeClub {
         (candidate) => candidate.nickname.toLowerCase() === nickname.toLowerCase(),
       )
       if (member?.password !== password) return fail(401, 'BAD_CREDENTIALS')
-      if (member.status !== 'ACTIVE') return fail(403, 'ACCOUNT_DISABLED')
+      if (member.status !== 'ACTIVE')
+        return fail(403, member.dormantSince ? 'ACCOUNT_DORMANT' : 'ACCOUNT_DISABLED')
       this.openSession(member, rememberMe)
       return json(this.currentMember(member))
     }
@@ -614,6 +618,7 @@ export class FakeClub {
       if (action === 'status') {
         const { status } = body() as { status: FakeMember['status'] }
         member.status = status
+        member.dormantSince = undefined
         this.record(
           me,
           status === 'DISABLED' ? 'MEMBER_DISABLED' : 'MEMBER_ENABLED',

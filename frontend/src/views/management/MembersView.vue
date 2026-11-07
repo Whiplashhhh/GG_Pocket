@@ -196,7 +196,7 @@ function fullName(member: MemberSummary): string {
               <span
                 v-if="member.status === 'DISABLED'"
                 class="rounded-control border border-danger px-1.5 text-micro font-semibold text-danger"
-                >{{ t('members.disabledChip') }}</span
+                >{{ t(member.dormantSince ? 'members.dormantChip' : 'members.disabledChip') }}</span
               >
               <span
                 v-else-if="!member.validated"
@@ -267,7 +267,7 @@ function fullName(member: MemberSummary): string {
             class="py-2 pr-3"
             :class="{ 'font-semibold text-danger': member.status === 'DISABLED' }"
           >
-            {{ t(`members.status.${member.status}`) }}
+            {{ member.dormantSince ? t('members.dormant') : t(`members.status.${member.status}`) }}
           </td>
           <td class="py-2 pr-3 tabular-nums">{{ formatDate(member.registeredAt) }}</td>
           <td class="py-2 pr-3 text-ink-muted">

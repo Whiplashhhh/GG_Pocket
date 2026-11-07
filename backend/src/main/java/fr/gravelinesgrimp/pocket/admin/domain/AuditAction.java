@@ -28,5 +28,9 @@ public enum AuditAction {
     CLUB_HOLD_COLOR_CREATED,
     CLUB_HOLD_COLOR_UPDATED,
     CLUB_DAYS_CLOSED,
-    CLUB_DAYS_REOPENED
+    CLUB_DAYS_REOPENED,
+    /** By the daily job, without an actor: a year without a visit (D-119). */
+    MEMBER_PUT_TO_SLEEP,
+    /** By the daily job, without an actor: two years without a visit (D-119). */
+    MEMBER_DELETED_INACTIVE
 }

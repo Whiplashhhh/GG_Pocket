@@ -285,6 +285,16 @@ const someMembers = (club: FakeClub) => {
     clubArrivalYear: 2018,
   })
   club.addMember({ nickname: 'jo', firstName: 'Joséphine', lastName: 'Bleau', status: 'DISABLED' })
+  // Asleep after a year without a visit (D-119).
+  club.addMember({
+    nickname: 'gaston',
+    firstName: 'Gaston',
+    lastName: 'Lagaffe',
+    status: 'DISABLED',
+    registeredAt: '2023-04-12T18:00:00Z',
+    lastSeenAt: '2025-09-30T17:40:00Z',
+    dormantSince: '2026-10-01T01:15:00Z',
+  })
   club.addMember({
     nickname: 'lea.d',
     firstName: 'Léa',
@@ -355,6 +365,25 @@ export const CAPTURES: Capture[] = [
   { name: 'galerie', path: '/dev/galerie', as: null },
   { name: 'accueil', path: '/accueil', as: null },
   { name: 'connexion', path: '/connexion?fin=1', as: null },
+  {
+    name: 'connexion-compte-endormi',
+    path: '/connexion',
+    as: null,
+    prepare: (club) => {
+      club.addMember({
+        nickname: 'gaston',
+        password: 'un mot de passe solide',
+        status: 'DISABLED',
+        dormantSince: '2026-10-01T01:15:00Z',
+      })
+    },
+    act: async (page) => {
+      await page.getByLabel('Pseudo').fill('gaston')
+      await page.getByLabel('Mot de passe', { exact: true }).fill('un mot de passe solide')
+      await page.getByRole('button', { name: 'Se connecter' }).click()
+      await page.getByRole('alert').waitFor()
+    },
+  },
   { name: 'inscription-code', path: '/inscription', as: null },
   {
     name: 'inscription-fiche',
@@ -795,6 +824,20 @@ export const CAPTURES: Capture[] = [
         .getByRole('link', { name: /Alix Moreau/ })
         .click()
       await page.getByRole('heading', { name: 'Nouveau compte à valider' }).waitFor()
+    },
+  },
+  {
+    name: 'fiche-membre-endormi',
+    path: '/gestion/membres',
+    as: 'BOARD',
+    desktop: true,
+    prepare: someMembers,
+    act: async (page) => {
+      await page
+        .getByRole('link', { name: /Lagaffe/ })
+        .first()
+        .click()
+      await page.getByRole('button', { name: 'Réactiver le compte' }).waitFor()
     },
   },
   {
