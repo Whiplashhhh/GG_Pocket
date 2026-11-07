@@ -1392,6 +1392,25 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
 - **Choix** (par défaut, Willem à valider) : nouvelle issue de voie « Plus de la moitié », exclusive de « topée ». Elle
   compte **0,5** au classement « Voies » du podium et rien d'autre : ni réalisation du topo, ni badge, ni taux de réussite,
   ni « À faire » coché. Le classement affiche les demis (« 12,5 »).
+- **Détail d'implémentation** :
+  - V24 : `ascent.past_half boolean not null default false`, contrainte `ascent_past_half_check`
+    (`not (past_half and topped)`), refusée aussi par `AscentDraft.check()` (400 `INVALID_ASCENT`). Côté requête,
+    `pastHalf` est facultatif (absent = non) pour les applis encore en cache ; les séances, « Mon historique » de
+    la fiche voie et l'export de mes données le renvoient.
+  - Score : `monthly_ranking_snapshot.value` passe en `numeric(7, 1)` (scores entiers inchangés, demis gardés
+    tels quels au gel), plutôt que des demi-points ×2 dans un entier qui changeraient le sens des lignes figées
+    et de l'export. Côté Java, `BigDecimal` sans zéros inutiles (« 2 », « 12.5 ») ; l'API renvoie un nombre.
+    Le classement « Voies » en direct compte `topées + 0,5 × plus de la moitié` ; rangs et ex æquo inchangés.
+  - Ne sont classés que les scores **non nuls** (avant : au moins 1) : une seule voie à plus de la moitié
+    (0,5) suffit pour entrer au classement.
+  - Tout ce qui compte `topped` ignore la case (topo, badges, taux de réussite, À faire, chiffres du carnet) ;
+    seule la meilleure perf d'une voie dans le carnet gagne un niveau `PAST_HALF` (« Plus de la moitié, pas
+    encore topée »), entre « Topée en mouli » et « Pas encore topée ».
+  - Front : case « Plus de la moitié » sous « Chutes » quand « Topée » est sur « Non », décochée si on retope ;
+    les anciens brouillons reviennent sans la case. Sur les cartes : « plus de la moitié, 1 chute » à la place de
+    « pas topée ». Podium : « 12,5 voies » (`Intl.NumberFormat('fr-FR')`, singulier sous 2 : « 1,5 voie ») et une
+    ligne de règle sous Séances / Voies. Le seed de démo marque « plus de la moitié » les voies pas topées avec
+    2 chutes au plus.
 - **Statut** : à valider (Willem).
 
 ### D-122 — Affichage : pastille bicolore, miniature ronde, série en flammes (complète D-013, D-093)

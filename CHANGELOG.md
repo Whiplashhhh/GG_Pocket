@@ -53,6 +53,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   et tes séances « Tout le club » y apparaissent aussi. Tant que tu ne participes pas, l’onglet reste flouté.
 - Une troisième case quand tu enregistres une séance : **Tout le club**, en plus de « Mes amis » et « Juste moi ».
   Tes amis la voient toujours ; si tu te retires du fil du club, elle redevient visible de tes seuls amis.
+- **Plus de la moitié** : une voie pas topée mais lâchée au-delà de la mi-hauteur ? Coche la case qui apparaît
+  quand « Topée » est sur « Non ». Elle vaut **0,5 au podium « Voies »** (« 12,5 voies », ça a de l’allure), et
+  rien d’autre : pas de « je sais la faire », pas de badge, pas d’« À faire » coché. On la voit sur la séance,
+  dans le fil, dans ton historique de la voie et dans ton carnet.
 
 ### Modifié
 
