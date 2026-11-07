@@ -70,13 +70,16 @@ public interface AscentRepository extends JpaRepository<Ascent, UUID> {
                     + " from Ascent a join a.session s where s.memberId = :memberId")
     List<MyAscentLine> findAllMine(UUID memberId);
 
-    /** Every ascent of the sessions a climber shares with friends (their logbook, for a friend). */
+    /**
+     * Every ascent of the sessions a climber shares with friends or with the club (their logbook,
+     * for a friend).
+     */
     @Query(
             "select new fr.gravelinesgrimp.pocket.session.domain.MyAscentLine(s.id, s.climbedOn,"
                     + " a.routeId, a.mode, a.topped, a.clean)"
                     + " from Ascent a join a.session s where s.memberId = :memberId"
-                    + " and s.visibility ="
-                    + " fr.gravelinesgrimp.pocket.session.domain.SessionVisibility.FRIENDS")
+                    + " and s.visibility <>"
+                    + " fr.gravelinesgrimp.pocket.session.domain.SessionVisibility.PRIVATE")
     List<MyAscentLine> findAllShared(UUID memberId);
 
     /** Takes my name back from every route of a session; how many ascents lost it. */

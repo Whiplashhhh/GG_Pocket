@@ -4,6 +4,7 @@ import fr.gravelinesgrimp.pocket.badge.application.BadgeAwards;
 import fr.gravelinesgrimp.pocket.badge.domain.Award;
 import fr.gravelinesgrimp.pocket.badge.domain.BadgeCode;
 import fr.gravelinesgrimp.pocket.member.application.MediaService;
+import fr.gravelinesgrimp.pocket.member.application.ValidatedMember;
 import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
@@ -105,7 +106,8 @@ public class SessionService {
      *
      * @throws BusinessException {@code VALIDATION_FAILED}, {@code INVALID_ASCENT}, {@code
      *     DATE_IN_THE_FUTURE}, {@code SESSION_TOO_OLD}, {@code MONTH_FROZEN}, {@code NOT_FOUND}
-     *     (route), {@code ROUTE_DISMOUNTED}, {@code VALIDATION_FAILED} (belayer)
+     *     (route), {@code ROUTE_DISMOUNTED}, {@code VALIDATION_FAILED} (belayer), {@code
+     *     CLUB_FEED_NOT_JOINED}
      */
     @PreAuthorize("hasRole('TOURIST')")
     @Transactional
@@ -120,6 +122,7 @@ public class SessionService {
         SessionCalendar.checkNewDate(draft.climbedOn(), clock.instant());
         checkRoutes(draft);
         checkBelayers(memberId, draft);
+        checkVisibility(memberId, null, draft.visibility());
         var session = sessions.save(ClimbingSession.create(memberId, clientRef, draft));
         autoChecks.refresh(memberId, routeModes(session));
         var unlocked = badges.refresh(memberId);
@@ -156,6 +159,7 @@ public class SessionService {
         }
         checkRoutes(draft);
         checkBelayers(memberId, draft);
+        checkVisibility(memberId, session.visibility(), draft.visibility());
         var touched = new HashSet<>(routeModes(session));
         session.update(draft);
         touched.addAll(routeModes(session));
@@ -168,7 +172,8 @@ public class SessionService {
      * Who sees the session, and its comment: neither counts in the figures, so a frozen month does
      * not stop a climber from taking back what they shared (security review, D-112).
      *
-     * @throws BusinessException {@code NOT_FOUND}, {@code RATE_LIMITED}
+     * @throws BusinessException {@code NOT_FOUND}, {@code RATE_LIMITED}, {@code
+     *     CLUB_FEED_NOT_JOINED}
      */
     @PreAuthorize("hasRole('TOURIST')")
     @Transactional
@@ -177,6 +182,7 @@ public class SessionService {
         lockMember(memberId);
         var session = owned.load(memberId, sessionId);
         rateLimiter.consume(RateLimiter.SESSION_WRITE_PER_MEMBER, memberId.toString());
+        checkVisibility(memberId, session.visibility(), visibility);
         session.changePrivacy(visibility, removeComment);
         return views.of(session, memberId);
     }
@@ -226,10 +232,11 @@ public class SessionService {
     }
 
     /**
-     * The sessions a climber shares with friends, as one of their friends reads them (their
-     * profile, spec §8.8). Mine are all mine.
+     * The sessions of a climber as someone else reads them (their profile, spec §8.8): those shared
+     * with friends or with the club for a friend, those shared with the club for a member of the
+     * club feed while the climber takes part too (D-120). Mine are all mine.
      *
-     * @throws BusinessException {@code NOT_FOUND} (not a friend, or not an active member)
+     * @throws BusinessException {@code NOT_FOUND} (neither, or not an active member)
      */
     @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
@@ -237,16 +244,17 @@ public class SessionService {
         if (readerId.equals(climberId)) {
             return listMine(readerId, cursor, size);
         }
-        audience.checkFriendOf(readerId, climberId);
+        var visibilities = audience.sharedWith(readerId, climberId);
         var limit = Math.clamp(size, 1, MAX_PAGE_SIZE);
         List<ClimbingSession> found;
         if (cursor == null || cursor.isBlank()) {
-            found = sessions.findLatestShared(climberId, limit + 1);
+            found = sessions.findLatestShared(climberId, visibilities, limit + 1);
         } else {
             var position = Cursor.decode(cursor);
             found =
                     sessions.findSharedBefore(
                             climberId,
+                            visibilities,
                             position.climbedOn(),
                             position.createdAt(),
                             position.id(),
@@ -256,8 +264,8 @@ public class SessionService {
     }
 
     /**
-     * The feed (spec §8.2): my sessions and the ones my friends share with friends, latest day
-     * first. A friend whose account is disabled drops out, like everywhere else.
+     * The feed (spec §8.2): my sessions and the ones my friends share with friends or with the
+     * club, latest day first. A friend whose account is disabled drops out, like everywhere else.
      */
     @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
@@ -282,6 +290,30 @@ public class SessionService {
                             position.createdAt(),
                             position.id(),
                             limit + 1);
+        }
+        return page(found, limit, readerId);
+    }
+
+    /**
+     * The club feed (D-120): the sessions shared with the club by every member who takes part, mine
+     * included, latest day first. Only for a member who takes part: to read it, one shows oneself
+     * in it.
+     *
+     * @throws BusinessException {@code CLUB_FEED_NOT_JOINED}
+     */
+    @ValidatedMember
+    @Transactional(readOnly = true)
+    public SessionPage clubFeed(UUID readerId, String cursor, int size) {
+        audience.checkInClubFeed(readerId);
+        var limit = Math.clamp(size, 1, MAX_PAGE_SIZE);
+        List<ClimbingSession> found;
+        if (cursor == null || cursor.isBlank()) {
+            found = sessions.findLatestInClubFeed(limit + 1);
+        } else {
+            var position = Cursor.decode(cursor);
+            found =
+                    sessions.findInClubFeedBefore(
+                            position.climbedOn(), position.createdAt(), position.id(), limit + 1);
         }
         return page(found, limit, readerId);
     }
@@ -359,6 +391,22 @@ public class SessionService {
                         .count();
         if (active != ids.size()) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "No such belayer");
+        }
+    }
+
+    /**
+     * "Tout le club" is for the members who take part in the club feed (D-120). A session that
+     * already has it keeps it after its climber leaves (it is out of the club feed until they come
+     * back): the editor shows it and offers to change it.
+     */
+    private void checkVisibility(
+            UUID memberId, SessionVisibility current, SessionVisibility wanted) {
+        if (wanted != SessionVisibility.CLUB || current == SessionVisibility.CLUB) {
+            return;
+        }
+        if (members.findById(memberId).filter(Member::isInClubFeed).isEmpty()) {
+            throw new BusinessException(
+                    ErrorCode.CLUB_FEED_NOT_JOINED, "Tout le club without the club feed");
         }
     }
 

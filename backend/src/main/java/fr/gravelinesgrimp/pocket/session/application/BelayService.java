@@ -7,7 +7,6 @@ import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
 import fr.gravelinesgrimp.pocket.session.domain.ClimbingSession;
 import fr.gravelinesgrimp.pocket.session.domain.SessionCount;
-import fr.gravelinesgrimp.pocket.session.domain.SessionVisibility;
 import fr.gravelinesgrimp.pocket.session.infra.AscentRepository;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
 import fr.gravelinesgrimp.pocket.social.application.Friendships;
@@ -88,6 +87,7 @@ public class BelayService {
                         .stream()
                         .collect(Collectors.toMap(Member::id, Function.identity()));
         var friends = new HashSet<>(friendships.friendIdsOf(me));
+        var meInClubFeed = members.findById(me).filter(Member::isInClubFeed).isPresent();
         // A disabled climber drops out of sight, like everywhere else: "Ancien·ne membre" here
         // (security review, D-112).
         var former =
@@ -99,15 +99,17 @@ public class BelayService {
                         .map(
                                 session -> {
                                     var climber = climbers.get(session.memberId());
+                                    // What SessionAudience says, without a query per line.
+                                    var friend =
+                                            climber.isActive() && friends.contains(climber.id());
+                                    var together = meInClubFeed && climber.isInClubFeed();
                                     return new BelayView(
                                             session.id(),
                                             climber.isActive() ? MemberRefView.of(climber) : former,
                                             session.climbedOn(),
                                             routeCounts.getOrDefault(session.id(), 0L).intValue(),
-                                            // What SessionAudience says, without a query per line.
-                                            session.visibility() == SessionVisibility.FRIENDS
-                                                    && climber.isActive()
-                                                    && friends.contains(climber.id()));
+                                            session.visibility()
+                                                    .readableBy(() -> friend, () -> together));
                                 })
                         .toList();
         var last = page.getLast();

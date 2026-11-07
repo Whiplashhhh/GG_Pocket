@@ -58,6 +58,9 @@ public class DemoSessionSeeder {
     private static final Map<String, String> LEVELS =
             Map.of("grimpeur", "6a", "direction", "6c", "ouvreur", "7a");
 
+    /** The accounts that take part in the club feed (D-120). */
+    private static final List<String> CLUB_FEED = List.of("direction", "ouvreur");
+
     private static final List<String> COMMENTS =
             List.of(
                     "Les avant-bras en feu, le moral au beau fixe.",
@@ -108,6 +111,9 @@ public class DemoSessionSeeder {
         var climbers = List.of("grimpeur", "direction", "ouvreur");
         for (var nickname : climbers) {
             var member = accounts.get(nickname);
+            // D-120: two of them take part in the club feed and share some sessions with it.
+            var inClubFeed = CLUB_FEED.contains(nickname);
+            member.changeClubFeed(inClubFeed);
             var partners =
                     climbers.stream()
                             .filter(other -> !other.equals(nickname))
@@ -158,9 +164,7 @@ public class DemoSessionSeeder {
                                 random.nextInt(3) == 0
                                         ? COMMENTS.get(random.nextInt(COMMENTS.size()))
                                         : null,
-                                random.nextInt(6) == 0
-                                        ? SessionVisibility.PRIVATE
-                                        : SessionVisibility.FRIENDS,
+                                visibility(random.nextInt(6), inClubFeed),
                                 ascents);
                 draft.check();
                 var session =
@@ -191,5 +195,15 @@ public class DemoSessionSeeder {
         Integer feeling = random.nextBoolean() ? null : 5 + random.nextInt(6);
         return new AscentDraft(
                 route.id(), mode, topped, clean, falls, firstTry, feeling, belayerId);
+    }
+
+    /**
+     * One session in six is "Juste moi", one in six "Tout le club" for a member of the club feed.
+     */
+    private static SessionVisibility visibility(int roll, boolean inClubFeed) {
+        if (roll == 0) {
+            return SessionVisibility.PRIVATE;
+        }
+        return roll == 1 && inClubFeed ? SessionVisibility.CLUB : SessionVisibility.FRIENDS;
     }
 }

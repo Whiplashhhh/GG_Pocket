@@ -102,6 +102,10 @@ public class Member extends TimestampedEntity {
     @Column(name = "reactivated_at")
     private Instant reactivatedAt;
 
+    /** "Je participe au fil du club" (D-120): to read it, one shows oneself in it. */
+    @Column(name = "in_club_feed", nullable = false)
+    private boolean inClubFeed;
+
     protected Member() {
         // for JPA
     }
@@ -225,6 +229,11 @@ public class Member extends TimestampedEntity {
         this.reactivatedAt = now;
     }
 
+    /** By the member themself only (D-120); the caller checks that the account is validated. */
+    public void changeClubFeed(boolean inClubFeed) {
+        this.inClubFeed = inClubFeed;
+    }
+
     public void changeAvatar(UUID avatarId) {
         this.avatarId = avatarId;
     }
@@ -264,6 +273,19 @@ public class Member extends TimestampedEntity {
     /** Shown to the other members: in the directory, on profiles, as a friend (D-107). */
     public boolean isVisibleInClub() {
         return isActive() && isValidated();
+    }
+
+    /**
+     * Reads the club feed and shows their "Tout le club" sessions in it (D-120): they take part,
+     * and their account is active and validated. Checked when reading, never stored.
+     */
+    public boolean isInClubFeed() {
+        return inClubFeed && isVisibleInClub();
+    }
+
+    /** The member's choice, whatever the state of their account. */
+    public boolean inClubFeed() {
+        return inClubFeed;
     }
 
     public Boolean declaredLicensed() {
