@@ -61,6 +61,7 @@ class SessionRouteAscentStats implements RouteAscentStats {
                                         row.climbedOn(),
                                         row.mode(),
                                         row.topped(),
+                                        row.pastHalf(),
                                         row.clean(),
                                         row.falls(),
                                         row.firstTry()))

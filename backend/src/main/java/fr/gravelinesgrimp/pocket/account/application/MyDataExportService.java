@@ -25,6 +25,7 @@ import fr.gravelinesgrimp.pocket.topo.infra.RouteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -95,6 +96,7 @@ public class MyDataExportService {
             ExportedRoute route,
             String mode,
             boolean topped,
+            boolean pastHalf,
             boolean clean,
             int falls,
             boolean firstTry,
@@ -133,7 +135,7 @@ public class MyDataExportService {
     public record ExportedBelay(ExportedSessionRef session, int routeCount) {}
 
     /** A rank of mine in a frozen month's ranking. */
-    public record ExportedRank(String month, String ranking, int rank, int value) {}
+    public record ExportedRank(String month, String ranking, int rank, BigDecimal value) {}
 
     private final MemberRepository members;
     private final ClimbingSessionRepository sessions;
@@ -370,6 +372,7 @@ public class MyDataExportService {
                                                 route.apply(ascent.routeId()),
                                                 ascent.mode().name(),
                                                 ascent.topped(),
+                                                ascent.pastHalf(),
                                                 ascent.clean(),
                                                 ascent.falls(),
                                                 ascent.firstTry(),

@@ -1491,10 +1491,12 @@ export interface components {
       id: string
       /** @enum {string} */
       mode: 'TOP_ROPE' | 'LEAD'
+      /** @description Not topped, but past the half of the route */
+      pastHalf: boolean
       route: components['schemas']['RouteSummary']
       topped: boolean
     }
-    /** @description A clean ascent is topped, with 0 falls. */
+    /** @description A clean ascent is topped, with 0 falls. pastHalf: not topped, but past the half of the route. */
     AscentRequest: {
       /**
        * Format: uuid
@@ -1513,6 +1515,8 @@ export interface components {
       firstTry: boolean
       /** @enum {string} */
       mode: 'TOP_ROPE' | 'LEAD'
+      /** @description Not topped, but past the half of the route; false when absent */
+      pastHalf?: boolean
       /** Format: uuid */
       routeId: string
       topped: boolean
@@ -1835,6 +1839,7 @@ export interface components {
       feeling?: number
       firstTry?: boolean
       mode?: string
+      pastHalf?: boolean
       route?: components['schemas']['ExportedRoute']
       topped?: boolean
     }
@@ -1910,7 +1915,6 @@ export interface components {
       /** Format: int32 */
       rank?: number
       ranking?: string
-      /** Format: int32 */
       value?: number
     }
     ExportedRoute: {
@@ -2071,7 +2075,8 @@ export interface components {
       /** Format: int32 */
       ascentCount: number
       /** @enum {string} */
-      best: 'LEAD_CLEAN' | 'LEAD_TOPPED' | 'TOP_ROPE_CLEAN' | 'TOP_ROPE_TOPPED' | 'TRIED'
+      best:
+        'LEAD_CLEAN' | 'LEAD_TOPPED' | 'TOP_ROPE_CLEAN' | 'TOP_ROPE_TOPPED' | 'PAST_HALF' | 'TRIED'
       /** Format: date */
       firstClimbedOn: string
       /** Format: date */
@@ -2333,6 +2338,8 @@ export interface components {
       firstTry: boolean
       /** @enum {string} */
       mode: 'TOP_ROPE' | 'LEAD'
+      /** @description Not topped, but past the half of the route */
+      pastHalf: boolean
       /** Format: uuid */
       sessionId: string
       topped: boolean
@@ -2419,7 +2426,7 @@ export interface components {
     Ranking: {
       /** @description False when I chose not to appear in the rankings */
       appearsInRankings: boolean
-      /** @description Topped ascents, every mode, repeats included */
+      /** @description Topped ascents, every mode, repeats included, and half a point per route past its half */
       ascents: components['schemas']['RankingBoard']
       /**
        * Format: date-time
@@ -2446,7 +2453,10 @@ export interface components {
       member: components['schemas']['MemberRef']
       /** Format: int32 */
       rank: number
-      /** Format: int32 */
+      /**
+       * @description Halves in the ascents ranking (a route past its half)
+       * @example 12.5
+       */
       value: number
     }
     RankingMonth: {

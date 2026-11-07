@@ -21,6 +21,7 @@ import {
   setClean,
   setFalls,
   setManyBelayers,
+  setPastHalf,
   setSessionBelayer,
   setTopped,
   toSessionRequest,
@@ -37,6 +38,7 @@ function line(overrides: Partial<AscentLine> = {}): AscentLine {
     routeId: 'r1',
     mode: 'TOP_ROPE',
     topped: true,
+    pastHalf: false,
     clean: false,
     falls: 0,
     firstTry: false,
@@ -93,6 +95,14 @@ describe('the rules of a line', () => {
   it('not topped is never clean', () => {
     expect(setTopped(line({ clean: true }), false)).toMatchObject({ topped: false, clean: false })
     expect(setTopped(line({ topped: false }), true).clean).toBe(false)
+  })
+
+  it('only a route not topped is past its half, and topping it again unticks the box', () => {
+    expect(setPastHalf(line({ topped: false }), true).pastHalf).toBe(true)
+    expect(setPastHalf(line(), true).pastHalf).toBe(false)
+    const half = setPastHalf(setTopped(line(), false), true)
+    expect(setTopped(half, true)).toMatchObject({ topped: true, pastHalf: false })
+    expect(setTopped(half, false).pastHalf).toBe(true)
   })
 
   it('falls stay between 0 and 99', () => {
@@ -165,6 +175,7 @@ describe('what is sent', () => {
       routeId: 'r1',
       mode: 'TOP_ROPE',
       topped: true,
+      pastHalf: false,
       clean: true,
       falls: 0,
       firstTry: false,
@@ -188,8 +199,25 @@ describe('what is sent', () => {
     expect(requestToForm(body).ascents.map((item) => item.belayerId)).toEqual(['m1', null])
   })
 
+  it('sends « Plus de la moitié » only for a route not topped, and gets it back', () => {
+    const form = {
+      ...emptySessionForm('2026-10-20'),
+      ascents: [line({ topped: false, pastHalf: true, falls: 1 }), line({ pastHalf: true })],
+    }
+    const body = toSessionRequest(form)
+    expect(body.ascents.map((item) => item.pastHalf)).toEqual([true, false])
+    expect(requestToForm(body).ascents.map((item) => item.pastHalf)).toEqual([true, false])
+  })
+
+  it('a draft from before « Plus de la moitié » is not past the half', () => {
+    const old: Omit<AscentLine, 'pastHalf'> & { pastHalf?: boolean } = line({ topped: false })
+    delete old.pastHalf
+    const restored = restoredForm({ ...emptySessionForm(), ascents: [old] })
+    expect(restored.ascents[0]?.pastHalf).toBe(false)
+  })
+
   it('a draft from before belayers gets none', () => {
-    const old: Omit<AscentLine, 'belayerId'> = {
+    const old: Omit<AscentLine, 'belayerId' | 'pastHalf'> = {
       key: 'k',
       routeId: 'r1',
       mode: 'TOP_ROPE',

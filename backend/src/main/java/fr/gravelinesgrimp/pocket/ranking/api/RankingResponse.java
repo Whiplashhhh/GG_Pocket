@@ -7,6 +7,7 @@ import fr.gravelinesgrimp.pocket.topo.api.MemberRefResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -30,7 +31,9 @@ public record RankingResponse(
                 Board sessions,
         @Schema(
                         requiredMode = RequiredMode.REQUIRED,
-                        description = "Topped ascents, every mode, repeats included")
+                        description =
+                                "Topped ascents, every mode, repeats included, and half a point"
+                                        + " per route past its half")
                 Board ascents) {
 
     @Schema(name = "RankingBoard")
@@ -52,7 +55,11 @@ public record RankingResponse(
     public record Line(
             @Schema(requiredMode = RequiredMode.REQUIRED) int rank,
             @Schema(requiredMode = RequiredMode.REQUIRED) MemberRefResponse member,
-            @Schema(requiredMode = RequiredMode.REQUIRED) int value) {
+            @Schema(
+                            requiredMode = RequiredMode.REQUIRED,
+                            description = "Halves in the ascents ranking (a route past its half)",
+                            example = "12.5")
+                    BigDecimal value) {
 
         static Line from(RankingView.Line line) {
             return new Line(line.rank(), MemberRefResponse.from(line.member()), line.value());

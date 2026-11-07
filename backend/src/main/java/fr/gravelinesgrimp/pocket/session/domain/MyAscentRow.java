@@ -13,4 +13,5 @@ public record MyAscentRow(
         boolean topped,
         boolean clean,
         int falls,
-        boolean firstTry) {}
+        boolean firstTry,
+        boolean pastHalf) {}

@@ -86,6 +86,8 @@
     "falls": "Chutes",
     "fallsLess": "Une chute de moins",
     "fallsMore": "Une chute de plus",
+    "pastHalf": "Plus de la moitié",
+    "pastHalfHint": "Pas au relais, mais au-delà de la mi-hauteur : ça vaut 0,5 au podium « Voies ». Pas de « je sais la faire » pour autant.",
     "firstTry": "Premier essai de ma vie sur cette voie",
     "firstTryShort": "premier essai",
     "belayer": "À l’assurage",
@@ -153,7 +155,8 @@
     "outcome": {
       "clean": "enchaînée",
       "topped": "topée | topée, 1 chute | topée, {n} chutes",
-      "notTopped": "pas topée | pas topée, 1 chute | pas topée, {n} chutes"
+      "notTopped": "pas topée | pas topée, 1 chute | pas topée, {n} chutes",
+      "pastHalf": "plus de la moitié | plus de la moitié, 1 chute | plus de la moitié, {n} chutes"
     },
     "moreLines": "et 1 autre voie | et 1 autre voie | et {n} autres voies",
     "edit": "Modifier",
@@ -677,6 +680,7 @@
       "LEAD_TOPPED": "Topée en tête",
       "TOP_ROPE_CLEAN": "Enchaînée en mouli",
       "TOP_ROPE_TOPPED": "Topée en mouli",
+      "PAST_HALF": "Plus de la moitié, pas encore topée",
       "TRIED": "Pas encore topée"
     },
     "passages": "aucun passage | 1 passage | {n} passages",
@@ -712,8 +716,12 @@
       "FROZEN": "Figé : c’est gravé dans la résine."
     },
     "value": {
-      "sessions": "Aucun jour | 1 jour | {n} jours",
-      "ascents": "Aucune voie | 1 voie | {n} voies"
+      "sessions": "Aucun jour | {n} jour | {n} jours",
+      "ascents": "Aucune voie | {n} voie | {n} voies"
+    },
+    "rule": {
+      "sessions": "Un point par jour de grimpe : deux séances le même jour, ça reste un jour.",
+      "ascents": "Un point par voie topée, répétitions comprises. Lâchée au-delà de la moitié ? Un demi-point quand même (0,5)."
     },
     "rank": "{rank}e",
     "rankFirst": "1er",

@@ -39,7 +39,7 @@ public interface AscentRepository extends JpaRepository<Ascent, UUID> {
     /** Newest first. */
     @Query(
             "select new fr.gravelinesgrimp.pocket.session.domain.MyAscentRow(s.id, s.climbedOn,"
-                    + " a.mode, a.topped, a.clean, a.falls, a.firstTry)"
+                    + " a.mode, a.topped, a.clean, a.falls, a.firstTry, a.pastHalf)"
                     + " from Ascent a join a.session s"
                     + " where s.memberId = :memberId and a.routeId = :routeId"
                     + " order by s.climbedOn desc, s.createdAt desc, a.position desc")
@@ -66,7 +66,7 @@ public interface AscentRepository extends JpaRepository<Ascent, UUID> {
     /** Every ascent of mine, in no particular order (the logbook). */
     @Query(
             "select new fr.gravelinesgrimp.pocket.session.domain.MyAscentLine(s.id, s.climbedOn,"
-                    + " a.routeId, a.mode, a.topped, a.clean)"
+                    + " a.routeId, a.mode, a.topped, a.clean, a.pastHalf)"
                     + " from Ascent a join a.session s where s.memberId = :memberId")
     List<MyAscentLine> findAllMine(UUID memberId);
 
@@ -76,7 +76,7 @@ public interface AscentRepository extends JpaRepository<Ascent, UUID> {
      */
     @Query(
             "select new fr.gravelinesgrimp.pocket.session.domain.MyAscentLine(s.id, s.climbedOn,"
-                    + " a.routeId, a.mode, a.topped, a.clean)"
+                    + " a.routeId, a.mode, a.topped, a.clean, a.pastHalf)"
                     + " from Ascent a join a.session s where s.memberId = :memberId"
                     + " and s.visibility <>"
                     + " fr.gravelinesgrimp.pocket.session.domain.SessionVisibility.PRIVATE")

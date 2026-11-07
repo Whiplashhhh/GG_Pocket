@@ -51,3 +51,16 @@ const FREEZE_DAY = new Intl.DateTimeFormat('fr-FR', {
 export function formatFreezeDay(instant: string): string {
   return FREEZE_DAY.format(new Date(instant))
 }
+
+const SCORE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
+
+/** A score as the French write it: « 12,5 » (the « Voies » ranking keeps halves, D-121). */
+export function formatScore(value: number): string {
+  return SCORE.format(value)
+}
+
+/** The plural form of a score: none, then French keeps below 2 in the singular (« 1,5 voie »). */
+export function scorePlural(value: number): 0 | 1 | 2 {
+  if (value === 0) return 0
+  return value < 2 ? 1 : 2
+}

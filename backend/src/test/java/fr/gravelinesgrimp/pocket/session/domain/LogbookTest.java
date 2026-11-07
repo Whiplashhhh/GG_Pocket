@@ -93,6 +93,27 @@ class LogbookTest {
                 .isEqualTo(AscentBest.TOP_ROPE_TOPPED);
     }
 
+    @Test
+    void pastTheHalfBeatsATryButIsNotDone() {
+        assertThat(AscentBest.of(LEAD, false, false, true)).isEqualTo(AscentBest.PAST_HALF);
+        assertThat(AscentBest.TRIED.bestWith(AscentBest.PAST_HALF)).isEqualTo(AscentBest.PAST_HALF);
+        assertThat(AscentBest.PAST_HALF.bestWith(AscentBest.TOP_ROPE_TOPPED))
+                .isEqualTo(AscentBest.TOP_ROPE_TOPPED);
+        assertThat(AscentBest.PAST_HALF.topped()).isFalse();
+        assertThat(AscentBest.PAST_HALF.inLead()).isFalse();
+
+        var logbook =
+                Logbook.of(
+                        List.of(new MyAscentLine(monday, DAY, easy, LEAD, false, false, true)),
+                        grades::get);
+
+        assertThat(logbook.routes())
+                .extracting(RouteLine::best)
+                .containsExactly(AscentBest.PAST_HALF);
+        assertThat(logbook.totals().toppedCount()).isZero();
+        assertThat(logbook.grades()).isEmpty();
+    }
+
     /**
      * Two sessions on Monday the 12th, one on Friday the 16th: the easy route three times (clean in
      * lead once), the medium one clean in top rope after a fall, the hard one only tried.

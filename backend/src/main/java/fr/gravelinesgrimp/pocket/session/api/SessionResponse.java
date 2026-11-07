@@ -69,6 +69,10 @@ public record SessionResponse(
             @Schema(requiredMode = RequiredMode.REQUIRED) RouteSummaryResponse route,
             @Schema(requiredMode = RequiredMode.REQUIRED) ClimbMode mode,
             @Schema(requiredMode = RequiredMode.REQUIRED) boolean topped,
+            @Schema(
+                            requiredMode = RequiredMode.REQUIRED,
+                            description = "Not topped, but past the half of the route")
+                    boolean pastHalf,
             @Schema(requiredMode = RequiredMode.REQUIRED) boolean clean,
             @Schema(requiredMode = RequiredMode.REQUIRED) int falls,
             @Schema(requiredMode = RequiredMode.REQUIRED) boolean firstTry,
@@ -103,6 +107,7 @@ public record SessionResponse(
                                                 RouteSummaryResponse.from(ascent.route()),
                                                 ascent.mode(),
                                                 ascent.topped(),
+                                                ascent.pastHalf(),
                                                 ascent.clean(),
                                                 ascent.falls(),
                                                 ascent.firstTry(),

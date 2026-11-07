@@ -30,12 +30,18 @@ public interface MonthlyRankingRepository extends JpaRepository<MonthlyRankingSn
                     + " group by m.id, m.nickname, m.avatarId")
     List<ScoreRow> countClimbingDays(LocalDate from, LocalDate to, MemberStatus active);
 
-    /** Topped ascents between two days (D-003): every mode, repeats included. */
+    /**
+     * Topped ascents between two days (D-003): every mode, repeats included; and routes past their
+     * half, worth half a point each (D-121).
+     */
     @Query(
             "select new fr.gravelinesgrimp.pocket.ranking.infra.ScoreRow("
-                    + "m.id, m.nickname, m.avatarId, count(a))"
+                    + "m.id, m.nickname, m.avatarId,"
+                    + " count(case when a.topped = true then 1 end),"
+                    + " count(case when a.pastHalf = true then 1 end))"
                     + " from ClimbingSession s join s.ascents a join Member m on m.id = s.memberId"
-                    + " where s.climbedOn between :from and :to and a.topped = true"
+                    + " where s.climbedOn between :from and :to"
+                    + " and (a.topped = true or a.pastHalf = true)"
                     + " and m.status = :active and m.validatedAt is not null"
                     + " and m.appearsInRankings = true"
                     + " group by m.id, m.nickname, m.avatarId")

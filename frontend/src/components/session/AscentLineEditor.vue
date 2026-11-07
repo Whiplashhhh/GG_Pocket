@@ -14,7 +14,7 @@ import type { ClimbMode, RouteSummary } from '@/api/topo'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import CheckboxField from '@/components/ui/CheckboxField.vue'
 import SegmentedControl from '@/components/ui/SegmentedControl.vue'
-import { setClean, setFalls, setTopped, type AscentLine } from '@/lib/sessionForm'
+import { setClean, setFalls, setPastHalf, setTopped, type AscentLine } from '@/lib/sessionForm'
 
 import BelayerButton from './BelayerButton.vue'
 import FallsStepper from './FallsStepper.vue'
@@ -22,7 +22,8 @@ import FeelingSlider from './FeelingSlider.vue'
 
 /**
  * One ascent of the session sheet (docs/DESIGN.md, « Nouvelle séance »): mode, topped, clean,
- * falls, first try, feeling, and the belayer when the session has several (D-118). Big targets: hands are full of chalk.
+ * falls, « Plus de la moitié » when not topped (D-121), first try, feeling, and the belayer when the
+ * session has several (D-118). Big targets: hands are full of chalk.
  */
 const props = defineProps<{
   line: AscentLine
@@ -73,6 +74,12 @@ const clean = computed({
   get: (): YesNo => (props.line.clean ? 'yes' : 'no'),
   set: (value: YesNo) => {
     emit('update', setClean(props.line, value === 'yes'))
+  },
+})
+const pastHalf = computed({
+  get: () => props.line.pastHalf,
+  set: (value: boolean) => {
+    emit('update', setPastHalf(props.line, value))
   },
 })
 const firstTry = computed({
@@ -185,6 +192,11 @@ const menuItem =
         :disabled="line.clean"
         @change="emit('update', setFalls(line, $event))"
       />
+      <div v-if="!line.topped" class="col-span-2">
+        <CheckboxField v-model="pastHalf" :hint="t('session.pastHalfHint')">{{
+          t('session.pastHalf')
+        }}</CheckboxField>
+      </div>
       <div class="col-span-2 flex flex-col gap-1 sm:col-span-1">
         <CheckboxField v-model="firstTry">{{ t('session.firstTry') }}</CheckboxField>
       </div>

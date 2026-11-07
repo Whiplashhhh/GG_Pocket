@@ -3229,6 +3229,10 @@
               "LEAD"
             ]
           },
+          "pastHalf": {
+            "type": "boolean",
+            "description": "Not topped, but past the half of the route"
+          },
           "route": {
             "$ref": "#/components/schemas/RouteSummary"
           },
@@ -3242,13 +3246,14 @@
           "firstTry",
           "id",
           "mode",
+          "pastHalf",
           "route",
           "topped"
         ]
       },
       "AscentRequest": {
         "type": "object",
-        "description": "A clean ascent is topped, with 0 falls.",
+        "description": "A clean ascent is topped, with 0 falls. pastHalf: not topped, but past the half of the route.",
         "properties": {
           "belayerId": {
             "type": "string",
@@ -3281,6 +3286,10 @@
               "TOP_ROPE",
               "LEAD"
             ]
+          },
+          "pastHalf": {
+            "type": "boolean",
+            "description": "Not topped, but past the half of the route; false when absent"
           },
           "routeId": {
             "type": "string",
@@ -3977,6 +3986,9 @@
           "mode": {
             "type": "string"
           },
+          "pastHalf": {
+            "type": "boolean"
+          },
           "route": {
             "$ref": "#/components/schemas/ExportedRoute"
           },
@@ -4158,8 +4170,7 @@
             "type": "string"
           },
           "value": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number"
           }
         }
       },
@@ -4589,6 +4600,7 @@
               "LEAD_TOPPED",
               "TOP_ROPE_CLEAN",
               "TOP_ROPE_TOPPED",
+              "PAST_HALF",
               "TRIED"
             ]
           },
@@ -5358,6 +5370,10 @@
               "LEAD"
             ]
           },
+          "pastHalf": {
+            "type": "boolean",
+            "description": "Not topped, but past the half of the route"
+          },
           "sessionId": {
             "type": "string",
             "format": "uuid"
@@ -5372,6 +5388,7 @@
           "falls",
           "firstTry",
           "mode",
+          "pastHalf",
           "sessionId",
           "topped"
         ]
@@ -5632,7 +5649,7 @@
           },
           "ascents": {
             "$ref": "#/components/schemas/RankingBoard",
-            "description": "Topped ascents, every mode, repeats included"
+            "description": "Topped ascents, every mode, repeats included, and half a point per route past its half"
           },
           "freezesAt": {
             "type": "string",
@@ -5695,8 +5712,9 @@
             "format": "int32"
           },
           "value": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "description": "Halves in the ascents ranking (a route past its half)",
+            "example": 12.5
           }
         },
         "required": [

@@ -29,6 +29,13 @@ class SessionDraftTest {
     }
 
     @Test
+    void onlyARouteNotToppedIsPastItsHalf() {
+        assertThatCode(() -> pastHalf(false).check()).doesNotThrowAnyException();
+        assertCode(() -> pastHalf(true).check(), ErrorCode.INVALID_ASCENT);
+        assertThat(ascent(false, false, 2).pastHalf()).isFalse();
+    }
+
+    @Test
     void fallsAndFeelingStayInRange() {
         assertCode(() -> ascent(false, false, -1).check(), ErrorCode.INVALID_ASCENT);
         assertCode(() -> ascent(false, false, 100).check(), ErrorCode.INVALID_ASCENT);
@@ -99,6 +106,10 @@ class SessionDraftTest {
 
     static AscentDraft ascent(boolean topped, boolean clean, int falls) {
         return new AscentDraft(ROUTE, ClimbMode.TOP_ROPE, topped, clean, falls, false, null);
+    }
+
+    private static AscentDraft pastHalf(boolean topped) {
+        return new AscentDraft(ROUTE, ClimbMode.LEAD, topped, false, 1, false, null, null, true);
     }
 
     private static SessionDraft session(List<AscentDraft> ascents, String comment) {

@@ -233,6 +233,10 @@ const clubPodium = (club: FakeClub) => {
         Array.from({ length: topped }, () => ({ route: 'Bye Bye Morice' })),
       )
     }
+    // Tom let go past the half once: half a point (D-121), on a day he already counts.
+    if (nickname === 'Tom') {
+      club.climbs.add(member, 2, [{ route: 'Réglisse', topped: false, pastHalf: true }])
+    }
   }
   for (const day of [1, 4, 6]) {
     club.climbs.add(marie, day, [{ route: 'Réglisse' }, { route: 'Iron Man' }])
@@ -657,6 +661,7 @@ export const CAPTURES: Capture[] = [
         .getByRole('radio', { name: 'Non' })
         .click()
       await second.getByRole('button', { name: 'Une chute de plus' }).click()
+      await second.getByRole('checkbox', { name: 'Plus de la moitié' }).check()
       await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('')
       await page.getByLabel('Commentaire').fill('Grosse séance de conti.')
     },

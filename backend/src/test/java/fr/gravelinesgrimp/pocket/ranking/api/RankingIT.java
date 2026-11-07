@@ -3,6 +3,7 @@ package fr.gravelinesgrimp.pocket.ranking.api;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.as;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 import static fr.gravelinesgrimp.pocket.SessionFixtures.clean;
+import static fr.gravelinesgrimp.pocket.SessionFixtures.pastHalf;
 import static fr.gravelinesgrimp.pocket.SessionFixtures.topped;
 import static fr.gravelinesgrimp.pocket.SessionFixtures.tried;
 
@@ -209,6 +210,60 @@ class RankingIT {
                 .andExpect(
                         jsonPath("$.frozenRanks[*].ranking").value(contains("ASCENTS", "SESSIONS")))
                 .andExpect(jsonPath("$.frozenRanks[*].rank").value(contains(2, 2)));
+    }
+
+    @Test
+    void aRoutePastItsHalfCountsHalfAPointAndKeepsItOnceFrozen() throws Exception {
+        var month = untouchedMonth();
+        var route = routes.create(members.create(Role.SETTER));
+        var half = climber("half");
+        var whole = climber("whole");
+        var only = climber("only");
+        // Ascents: half 2 topped + 1 past the half = 2.5, whole 2 (a try below the half counts
+        // nothing), only 0.5.
+        sessions.log(
+                half,
+                month.atDay(2),
+                null,
+                topped(route, ClimbMode.LEAD),
+                topped(route, ClimbMode.TOP_ROPE),
+                pastHalf(route, ClimbMode.LEAD));
+        sessions.log(
+                whole,
+                month.atDay(3),
+                null,
+                topped(route, ClimbMode.LEAD),
+                clean(route, ClimbMode.TOP_ROPE),
+                tried(route, ClimbMode.LEAD));
+        sessions.log(only, month.atDay(4), null, pastHalf(route, ClimbMode.TOP_ROPE));
+
+        for (var frozen : new boolean[] {false, true}) {
+            if (frozen) {
+                assertThat(closure.closeDueMonths(clock.instant())).contains(month);
+            }
+            mockMvc.perform(get("/api/v1/rankings").param("month", month.toString()).with(as(half)))
+                    .andExpect(status().isOk())
+                    .andExpect(
+                            jsonPath("$.ascents.lines[*].member.nickname")
+                                    .value(
+                                            contains(
+                                                    half.nickname(),
+                                                    whole.nickname(),
+                                                    only.nickname())))
+                    .andExpect(jsonPath("$.ascents.lines[*].rank").value(contains(1, 2, 3)))
+                    .andExpect(jsonPath("$.ascents.lines[0].value").value(2.5))
+                    .andExpect(jsonPath("$.ascents.lines[1].value").value(2))
+                    .andExpect(jsonPath("$.ascents.lines[2].value").value(0.5))
+                    .andExpect(jsonPath("$.ascents.me.value").value(2.5))
+                    .andExpect(jsonPath("$.sessions.lines[*].value").value(contains(1, 1, 1)));
+        }
+
+        mockMvc.perform(get("/api/v1/me/export").with(as(half)))
+                .andExpect(status().isOk())
+                .andExpect(
+                        jsonPath("$.frozenRanks[*].ranking").value(contains("ASCENTS", "SESSIONS")))
+                .andExpect(jsonPath("$.frozenRanks[0].value").value(2.5))
+                .andExpect(jsonPath("$.frozenRanks[1].value").value(1));
     }
 
     @Test

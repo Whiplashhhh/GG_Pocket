@@ -84,6 +84,7 @@ export class FakeSessions implements AscentSource {
       route: string
       mode?: AscentRequest['mode']
       topped?: boolean
+      pastHalf?: boolean
       clean?: boolean
       belayerId?: string
     }[],
@@ -108,6 +109,7 @@ export class FakeSessions implements AscentSource {
         routeId: this.topo.route(ascent.route).id,
         mode: ascent.mode ?? 'TOP_ROPE',
         topped: ascent.topped ?? true,
+        pastHalf: ascent.topped === false && ascent.pastHalf === true,
         clean: ascent.clean ?? false,
         falls: ascent.clean === true || ascent.topped === false ? 0 : 1,
         firstTry: false,
@@ -178,6 +180,7 @@ export class FakeSessions implements AscentSource {
         climbedOn: session.climbedOn,
         mode: ascent.mode,
         topped: ascent.topped,
+        pastHalf: ascent.pastHalf === true,
         clean: ascent.clean,
         falls: ascent.falls,
         firstTry: ascent.firstTry,
@@ -226,10 +229,12 @@ export class FakeSessions implements AscentSource {
     for (const session of this.sessions) {
       if (!session.climbedOn.startsWith(month) || !this.inRankings(session.memberId)) continue
       days.set(session.memberId, (days.get(session.memberId) ?? new Set()).add(session.climbedOn))
-      topped.set(
-        session.memberId,
-        (topped.get(session.memberId) ?? 0) + session.ascents.filter((a) => a.topped).length,
+      // A route past its half is worth half a point (D-121).
+      const points = session.ascents.reduce(
+        (sum, a) => sum + (a.topped ? 1 : a.pastHalf === true ? 0.5 : 0),
+        0,
       )
+      topped.set(session.memberId, (topped.get(session.memberId) ?? 0) + points)
     }
     const board = (scores: Map<string, number>): Schemas['RankingBoard'] => {
       const sorted = [...scores.entries()]
@@ -358,11 +363,12 @@ export class FakeSessions implements AscentSource {
       'LEAD_TOPPED',
       'TOP_ROPE_CLEAN',
       'TOP_ROPE_TOPPED',
+      'PAST_HALF',
       'TRIED',
     ] as const
     type Best = (typeof BEST)[number]
     const bestOf = (ascent: AscentRequest): Best => {
-      if (!ascent.topped) return 'TRIED'
+      if (!ascent.topped) return ascent.pastHalf === true ? 'PAST_HALF' : 'TRIED'
       if (ascent.mode === 'LEAD') return ascent.clean ? 'LEAD_CLEAN' : 'LEAD_TOPPED'
       return ascent.clean ? 'TOP_ROPE_CLEAN' : 'TOP_ROPE_TOPPED'
     }
@@ -566,6 +572,7 @@ export class FakeSessions implements AscentSource {
         route,
         mode: ascent.mode,
         topped: ascent.topped,
+        pastHalf: ascent.pastHalf === true,
         clean: ascent.clean,
         falls: ascent.falls,
         firstTry: ascent.firstTry,
@@ -590,7 +597,13 @@ export class FakeSessions implements AscentSource {
     if (!Array.isArray(sent.ascents) || sent.ascents.length === 0 || sent.ascents.length > 50) {
       return problem(400, 'VALIDATION_FAILED')
     }
-    if (sent.ascents.some((ascent) => ascent.clean && (!ascent.topped || ascent.falls > 0))) {
+    if (
+      sent.ascents.some(
+        (ascent) =>
+          (ascent.clean && (!ascent.topped || ascent.falls > 0)) ||
+          (ascent.pastHalf === true && ascent.topped),
+      )
+    ) {
       return problem(400, 'INVALID_ASCENT')
     }
     if (dateChanged && sent.climbedOn > this.day()) return problem(400, 'DATE_IN_THE_FUTURE')

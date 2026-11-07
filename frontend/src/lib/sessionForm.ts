@@ -6,7 +6,7 @@ import { clubToday } from './age'
 /**
  * The session sheet (spec §8.3) as plain data: what the climber types, kept in the draft between
  * two openings. The server checks everything again; these rules only keep the form coherent
- * (a clean ascent is topped, without a fall).
+ * (a clean ascent is topped, without a fall; only a route not topped is past its half).
  */
 
 /** How far back a session may be dated (D-009); the server says the same. */
@@ -21,6 +21,8 @@ export interface AscentLine {
   routeId: string
   mode: ClimbMode
   topped: boolean
+  /** "Plus de la moitié" (D-121): not topped, but past the half; half a point on the podium. */
+  pastHalf: boolean
   clean: boolean
   falls: number
   firstTry: boolean
@@ -130,6 +132,7 @@ export function sessionToForm(session: Session): SessionForm {
       routeId: ascent.route.id,
       mode: ascent.mode,
       topped: ascent.topped,
+      pastHalf: !ascent.topped && ascent.pastHalf,
       clean: ascent.clean,
       falls: ascent.falls,
       firstTry: ascent.firstTry,
@@ -140,16 +143,21 @@ export function sessionToForm(session: Session): SessionForm {
 }
 
 /**
- * A draft kept on the phone, maybe from before belayers (D-101: its lines get none) or before the
- * belayer of the session (D-118: the box is ticked when its lines differ).
+ * A draft kept on the phone, maybe from before belayers (D-101: its lines get none), before the
+ * belayer of the session (D-118: the box is ticked when its lines differ) or before « Plus de la
+ * moitié » (D-121: its lines are not past the half).
  */
 export function restoredForm(
   form: Omit<SessionForm, 'ascents' | 'belayerId' | 'manyBelayers'> &
     Partial<Pick<SessionForm, 'belayerId' | 'manyBelayers'>> & {
-      ascents: (Omit<AscentLine, 'belayerId'> & Partial<AscentLine>)[]
+      ascents: (Omit<AscentLine, 'belayerId' | 'pastHalf'> & Partial<AscentLine>)[]
     },
 ): SessionForm {
-  const ascents = form.ascents.map((line) => ({ ...line, belayerId: line.belayerId ?? null }))
+  const ascents = form.ascents.map((line) => ({
+    ...line,
+    belayerId: line.belayerId ?? null,
+    pastHalf: !line.topped && line.pastHalf === true,
+  }))
   return { ...form, ...belayerFields(ascents, form), ascents }
 }
 
@@ -196,6 +204,7 @@ export function addAscent(
       routeId,
       mode,
       topped: true,
+      pastHalf: false,
       clean: false,
       falls: 0,
       firstTry,
@@ -205,9 +214,15 @@ export function addAscent(
   ]
 }
 
-/** Not topped cannot be clean. */
+/** Not topped cannot be clean; topped is more than past the half (the box goes). */
 export function setTopped(line: AscentLine, topped: boolean): AscentLine {
-  return { ...line, topped, clean: topped && line.clean }
+  return { ...line, topped, clean: topped && line.clean, pastHalf: !topped && line.pastHalf }
+}
+
+/** « Plus de la moitié » only goes with a route not topped (D-121). */
+export function setPastHalf(line: AscentLine, pastHalf: boolean): AscentLine {
+  if (pastHalf && line.topped) return line
+  return { ...line, pastHalf }
 }
 
 /** Clean means topped, without a fall: falls go back to 0 (and the stepper locks). */
@@ -279,6 +294,7 @@ export function toSessionRequest(form: SessionForm): SessionRequest {
       routeId: line.routeId,
       mode: line.mode,
       topped: line.topped,
+      pastHalf: !line.topped && line.pastHalf,
       clean: line.clean,
       falls: line.clean ? 0 : line.falls,
       firstTry: line.firstTry,
@@ -302,6 +318,7 @@ export function requestToForm(body: SessionRequest): SessionForm {
       routeId: ascent.routeId,
       mode: ascent.mode,
       topped: ascent.topped,
+      pastHalf: !ascent.topped && ascent.pastHalf === true,
       clean: ascent.clean,
       falls: ascent.falls,
       firstTry: ascent.firstTry,

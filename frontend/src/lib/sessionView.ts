@@ -18,13 +18,20 @@ export function sessionDay(
 }
 
 /** How an ascent went, as an i18n key and its count of falls. */
-export function ascentOutcome(ascent: Pick<Ascent, 'topped' | 'clean' | 'falls'>): {
-  key: 'session.outcome.clean' | 'session.outcome.topped' | 'session.outcome.notTopped'
+export function ascentOutcome(
+  ascent: Pick<Ascent, 'topped' | 'clean' | 'falls'> & Partial<Pick<Ascent, 'pastHalf'>>,
+): {
+  key:
+    | 'session.outcome.clean'
+    | 'session.outcome.topped'
+    | 'session.outcome.pastHalf'
+    | 'session.outcome.notTopped'
   falls: number
 } {
   if (ascent.clean) return { key: 'session.outcome.clean', falls: 0 }
+  if (ascent.topped) return { key: 'session.outcome.topped', falls: ascent.falls }
   return {
-    key: ascent.topped ? 'session.outcome.topped' : 'session.outcome.notTopped',
+    key: ascent.pastHalf === true ? 'session.outcome.pastHalf' : 'session.outcome.notTopped',
     falls: ascent.falls,
   }
 }

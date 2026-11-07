@@ -107,6 +107,36 @@ test.describe('a new session', () => {
     )
   })
 
+  test('a route let go past its half is worth half a point on the podium', async ({
+    page,
+    club,
+  }) => {
+    await sameDay(page, club)
+    await page.goto('/seance/nouvelle')
+    await addRoute(page, 'reglisse', 'Réglisse')
+    const pastHalf = line(page, 1).getByRole('checkbox', { name: 'Plus de la moitié' })
+    // Only for a route not topped; topping it again unticks the box.
+    await expect(pastHalf).toHaveCount(0)
+    await choose(page, 1, 'Topée', 'Non')
+    await pastHalf.check()
+    await choose(page, 1, 'Topée', 'Oui')
+    await expect(pastHalf).toHaveCount(0)
+    await choose(page, 1, 'Topée', 'Non')
+    await expect(pastHalf).not.toBeChecked()
+    await pastHalf.check()
+
+    await page.getByRole('button', { name: 'Enregistrer la séance' }).click()
+    await expect(page.getByText('Séance au carnet !')).toBeVisible()
+    const card = page.getByRole('article', { name: /Séance d’aujourd’hui/ })
+    await expect(card.getByText('aucune topée')).toBeVisible()
+    await expect(card.getByText(/Mouli · plus de la moitié/)).toBeVisible()
+
+    await page.goto('/podium?classement=voies')
+    await expect(
+      page.getByRole('list', { name: 'Les trois premiers' }).getByRole('listitem'),
+    ).toContainText('0,5 voie')
+  })
+
   test('keeps what was typed when the sheet is closed', async ({ page, club }) => {
     await sameDay(page, club)
     await page.goto('/seance/nouvelle')

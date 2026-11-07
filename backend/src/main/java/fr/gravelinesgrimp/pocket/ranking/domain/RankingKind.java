@@ -4,6 +4,9 @@ package fr.gravelinesgrimp.pocket.ranking.domain;
 public enum RankingKind {
     /** Climbing days in the month: two sessions on the same day count once. */
     SESSIONS,
-    /** Topped ascents in the month, every mode, repeats included. */
+    /**
+     * Topped ascents in the month, every mode, repeats included, and half a point per route past
+     * its half (D-121).
+     */
     ASCENTS
 }

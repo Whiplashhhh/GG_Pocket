@@ -193,8 +193,10 @@ public class DemoSessionSeeder {
         var clean = topped && random.nextInt(100) < 55;
         var falls = clean ? 0 : topped ? random.nextInt(3) : 1 + random.nextInt(4);
         Integer feeling = random.nextBoolean() ? null : 5 + random.nextInt(6);
+        // Not topped, with few falls: past the half (D-121), without drawing one more number.
+        var pastHalf = !topped && falls <= 2;
         return new AscentDraft(
-                route.id(), mode, topped, clean, falls, firstTry, feeling, belayerId);
+                route.id(), mode, topped, clean, falls, firstTry, feeling, belayerId, pastHalf);
     }
 
     /**

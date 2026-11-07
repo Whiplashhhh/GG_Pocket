@@ -6,6 +6,7 @@ import fr.gravelinesgrimp.pocket.ranking.domain.RankedScore;
 import fr.gravelinesgrimp.pocket.ranking.domain.RankingKind;
 import fr.gravelinesgrimp.pocket.ranking.domain.Score;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -15,7 +16,7 @@ import java.util.UUID;
 public record FrozenRow(
         RankingKind kind,
         int rank,
-        int value,
+        BigDecimal value,
         UUID memberId,
         String nickname,
         UUID avatarId,
