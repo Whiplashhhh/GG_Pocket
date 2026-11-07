@@ -17,7 +17,7 @@ async function addRoute(page: Page, search: string, name: string) {
 }
 
 test.describe('the belayer', () => {
-  test('is picked route by route, friends first, and shows on the session', async ({
+  test('is picked once for the session, friends first, or route by route', async ({
     page,
     club,
     me,
@@ -29,9 +29,8 @@ test.describe('the belayer', () => {
 
     await page.clock.setSystemTime(new Date(club.now))
     await page.goto('/seance/nouvelle')
-    await addRoute(page, '12', 'Bye Bye Morice')
-    await line(page, 1)
-      .getByRole('button', { name: 'À l’assurage sur la voie n° 1 : Pas précisé. Changer' })
+    await page
+      .getByRole('button', { name: 'À l’assurage pour toute la séance : Pas précisé. Changer' })
       .click()
     const picker = page.getByRole('dialog', { name: 'Qui t’assurait ?' })
     // No keyboard over the list: the current choice has the focus, not the search box.
@@ -49,9 +48,14 @@ test.describe('the belayer', () => {
     await picker.getByRole('button', { name: /Jules Martin/ }).click()
     await expect(picker).toBeHidden()
 
-    // The next route keeps the same partner, until I say otherwise.
+    // One belayer for the whole session: no field on the routes.
+    await addRoute(page, '12', 'Bye Bye Morice')
     await addRoute(page, 'reglisse', 'Réglisse')
-    await addRoute(page, '12', 'Bye Bye Morice encore une fois')
+    await expect(page.getByRole('button', { name: /^À l’assurage sur la voie/ })).toHaveCount(0)
+
+    // Several belayers: each route has its field, the next route keeps the same partner.
+    const many = page.getByRole('checkbox', { name: 'Plusieurs assureur·ses' })
+    await many.check()
     await expect(
       line(page, 2).getByRole('button', { name: /^À l’assurage sur la voie n° 2 : jules/ }),
     ).toBeVisible()
@@ -59,10 +63,21 @@ test.describe('the belayer', () => {
       .getByRole('button', { name: /^À l’assurage sur la voie n° 2/ })
       .click()
     await picker.getByRole('button', { name: /Tom Bloc/ }).click()
+    await addRoute(page, '12', 'Bye Bye Morice encore une fois')
+    await expect(
+      line(page, 3).getByRole('button', { name: /^À l’assurage sur la voie n° 3 : tom/ }),
+    ).toBeVisible()
     await line(page, 3)
       .getByRole('button', { name: /^À l’assurage sur la voie n° 3/ })
       .click()
     await picker.getByRole('button', { name: 'Pas précisé' }).click()
+
+    // Back to one belayer asks first, as the names differ; cancelling keeps them.
+    await many.uncheck()
+    const ask = page.getByRole('alertdialog', { name: 'Un·e seul·e assureur·se pour la séance ?' })
+    await expect(ask.getByText(/Toutes les voies prendront jules/)).toBeVisible()
+    await ask.getByRole('button', { name: 'Annuler' }).click()
+    await expect(many).toBeChecked()
 
     await page.getByRole('button', { name: 'Enregistrer la séance' }).click()
     await expect(page).toHaveURL(/\/actu$/)
@@ -73,6 +88,38 @@ test.describe('the belayer', () => {
 
     await card.getByRole('link', { name: /Séance d’aujourd’hui/ }).click()
     await expect(page.getByText(/à l’assurage : jules/)).toBeVisible()
+  })
+
+  test('a session with several belayers opens with the box ticked', async ({ page, club, me }) => {
+    const marie = signedIn(me)
+    const tom = club.addMember({ nickname: 'tom', firstName: 'Tom', lastName: 'Bloc' })
+    const jules = club.addMember({ nickname: 'jules', firstName: 'Jules', lastName: 'Martin' })
+    club.social.link(tom, marie)
+    const mine = club.climbs.add(marie, 1, [
+      { route: 'Bye Bye Morice', belayerId: tom.id },
+      { route: 'Réglisse', belayerId: jules.id },
+    ])
+
+    await page.clock.setSystemTime(new Date(club.now))
+    await page.goto(`/seances/${mine.id}/modifier`)
+    const many = page.getByRole('checkbox', { name: 'Plusieurs assureur·ses' })
+    await expect(many).toBeChecked()
+    await expect(
+      line(page, 2).getByRole('button', { name: /^À l’assurage sur la voie n° 2 : jules/ }),
+    ).toBeVisible()
+
+    await many.uncheck()
+    const ask = page.getByRole('alertdialog', { name: 'Un·e seul·e assureur·se pour la séance ?' })
+    await ask.getByRole('button', { name: 'Appliquer à toutes les voies' }).click()
+    await expect(many).not.toBeChecked()
+    await expect(
+      page.getByRole('button', { name: 'À l’assurage pour toute la séance : tom. Changer' }),
+    ).toBeVisible()
+    await expect(page.getByRole('button', { name: /^À l’assurage sur la voie/ })).toHaveCount(0)
+
+    await page.getByRole('button', { name: 'Enregistrer la séance' }).click()
+    await expect(page).toHaveURL(new RegExp(`/seances/${mine.id}$`))
+    expect(mine.ascents.map((ascent) => ascent.belayerId)).toEqual([tom.id, tom.id])
   })
 
   test('sees where they held the rope and takes their name back', async ({ page, club, me }) => {

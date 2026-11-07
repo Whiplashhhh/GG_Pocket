@@ -594,8 +594,26 @@ export const CAPTURES: Capture[] = [
     },
     act: async (page) => {
       await addToSession(page, '12', 'Bye Bye Morice')
-      await page.getByRole('button', { name: /^À l’assurage sur la voie n° 1/ }).click()
+      await page.getByRole('button', { name: /^À l’assurage pour toute la séance/ }).click()
       await page.getByRole('dialog', { name: 'Qui t’assurait ?' }).waitFor()
+    },
+  },
+  {
+    name: 'seance-assureurs',
+    path: '/seance/nouvelle',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      marieClimbs(club)
+      marieFriends(club)
+    },
+    act: async (page) => {
+      const picker = page.getByRole('dialog', { name: 'Qui t’assurait ?' })
+      await page.getByRole('button', { name: /^À l’assurage pour toute la séance/ }).click()
+      await picker.getByRole('region', { name: 'Tes amis' }).getByRole('button').first().click()
+      await picker.waitFor({ state: 'hidden' })
+      await addToSession(page, '12', 'Bye Bye Morice')
+      await page.getByRole('checkbox', { name: 'Plusieurs assureur·ses' }).check()
+      await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('')
     },
   },
   {

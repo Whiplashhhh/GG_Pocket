@@ -1295,6 +1295,21 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
   champ qui s'applique à toutes les voies. Cocher « Plusieurs assureur·ses » ouvre le champ sur chaque voie. À l'édition,
   la case est cochée d'office si les voies n'ont pas toutes le même assureur·se. Les règles de D-101 (membre de l'appli
   seulement, retrait libre du nom, « Mes assurages ») ne changent pas.
+- **Détail d'implémentation** (frontend seulement, ni API ni base) :
+  - `SessionForm` gagne `belayerId` (assureur·se de la séance) et `manyBelayers` (la case) ; l'envoi reste une valeur
+    par voie (`toSessionRequest` inchangé). Case décochée, chaque voie porte la valeur de la séance, y compris les voies
+    ajoutées ensuite ; cochée, une nouvelle voie reprend l'assureur·se de la voie d'avant (D-101), ou celui de la séance
+    s'il n'y a pas encore de voie (`belayerForNewLine`).
+  - Décocher la case quand les voies n'ont pas toutes le même assureur·se : une confirmation (« Toutes les voies
+    prendront jules, l'assureur·se de la première voie ») ; « Annuler » laisse la case cochée et les voies intactes.
+    Plus clair qu'appliquer en silence la première voie, qui effacerait des noms sans prévenir. Si elles ont toutes
+    le même (ou aucun), on revient au champ unique sans rien demander.
+  - Séance existante, séance refusée reprise de la file d'attente, brouillon (même antérieur à D-118) : case cochée
+    d'office si les voies diffèrent ; un brouillon garde aussi la case cochée par la personne.
+  - Fichiers : `lib/sessionForm.ts` (`sameBelayer`, `setSessionBelayer`, `setManyBelayers`, `belayerForNewLine`,
+    `addAscent` prend `{ mode, belayerId }`), `components/session/BelayerButton.vue` (bouton commun au champ de
+    séance et au champ par voie), `SessionEditorView.vue` ; e2e `belays.spec.ts`, captures `seance-assureur` et
+    `seance-assureurs` (case cochée).
 - **Statut** : validée (club et Willem).
 
 ### D-119 — Données personnelles : contact, comptes inactifs, date de naissance, mention « mineur » (remplace D-014, D-044 ; complète D-043, D-045)

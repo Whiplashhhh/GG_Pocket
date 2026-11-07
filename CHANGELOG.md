@@ -56,6 +56,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 - **Bilan du topo** : une barre par cotation, la 6b- n’est plus noyée avec la 6b et la 6b+. Les trous dans
   l’offre sautent aux yeux.
 
+- **Assureur·se** : un seul champ pour toute la séance, en haut de la saisie, et toutes tes voies le prennent,
+  même celles ajoutées après. Le binôme a tourné ? Coche « Plusieurs assureur·ses » et chaque voie retrouve son
+  propre champ.
+
 - Le vrai logo du club est arrivé, en haute définition : plus net en haut de l’appli, sur l’écran de connexion et
   sur l’icône du téléphone. L’orange et le vert de l’appli prennent les couleurs officielles du club.
 

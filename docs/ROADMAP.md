@@ -194,7 +194,7 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
   - [x] Badges : « Mois complet » sur les séances libres moins les jours de fermeture, 5 voies, 2 favoris (D-116)
   - [x] Gestion : jours de fermeture de la salle (D-116)
   - [x] Statistiques : taux de réussite sans chute, une barre par cotation (D-117)
-  - [ ] Assureur·se pour toute la séance, voie par voie sur demande (D-118)
+  - [x] Assureur·se pour toute la séance, voie par voie sur demande (D-118)
   - [ ] Données personnelles : contact, comptes inactifs 1 an / 2 ans, date de naissance obligatoire, mention
     « mineur » pour la direction, âge affichable par les majeur·es seulement (D-119)
   - [ ] Fil « tout le club » à double sens (D-120)

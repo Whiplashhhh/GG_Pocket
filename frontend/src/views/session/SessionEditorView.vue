@@ -17,11 +17,14 @@ import { useDirectory, type MemberCard } from '@/api/social'
 import { useRoutes, type RouteSummary } from '@/api/topo'
 import type { PhotoChange } from '@/api/topoAdmin'
 import AscentLineEditor from '@/components/session/AscentLineEditor.vue'
+import BelayerButton from '@/components/session/BelayerButton.vue'
 import BelayerPicker from '@/components/session/BelayerPicker.vue'
 import FeelingSlider from '@/components/session/FeelingSlider.vue'
 import SessionPhotoField from '@/components/session/SessionPhotoField.vue'
 import SessionRoutePicker from '@/components/session/SessionRoutePicker.vue'
 import SessionSavedMoment from '@/components/session/SessionSavedMoment.vue'
+import CheckboxField from '@/components/ui/CheckboxField.vue'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import GgIconButton from '@/components/ui/GgIconButton.vue'
@@ -35,6 +38,7 @@ import { canWait } from '@/lib/outbox'
 import { canLogOn } from '@/lib/planning'
 import {
   addAscent,
+  belayerForNewLine,
   dateBounds,
   duplicateAscent,
   emptySessionForm,
@@ -44,7 +48,10 @@ import {
   moveAscent,
   removeAscent,
   removeLastOf,
+  sameBelayer,
   sessionToForm,
+  setManyBelayers,
+  setSessionBelayer,
   toSessionRequest,
   withoutGoneRoutes,
   type AscentLine,
@@ -157,18 +164,55 @@ const belayerById = computed(() => {
   for (const entry of directory.data.value?.members ?? []) map.set(entry.member.id, entry.member)
   return map
 })
+const belayerOf = (id: string | null) => (id === null ? undefined : belayerById.value.get(id))
+const belayerHintId = useId()
 const pickingBelayer = ref(false)
-const belayerLine = ref(0)
+/** Whose belayer the picker changes: the whole session's, or one line's ("Plusieurs", D-118). */
+const belayerTarget = ref<number | 'session'>('session')
+const pickedBelayerId = computed(() =>
+  belayerTarget.value === 'session'
+    ? form.value.belayerId
+    : (form.value.ascents[belayerTarget.value]?.belayerId ?? null),
+)
 
-function chooseBelayer(index: number) {
-  belayerLine.value = index
+function chooseBelayer(target: number | 'session') {
+  belayerTarget.value = target
   pickingBelayer.value = true
 }
 
 function pickBelayer(member: MemberCard | null) {
-  const line = form.value.ascents[belayerLine.value]
+  const belayerId = member?.id ?? null
+  const target = belayerTarget.value
+  if (target === 'session') {
+    form.value = setSessionBelayer(form.value, belayerId)
+    return
+  }
+  const line = form.value.ascents[target]
   if (line === undefined) return
-  update(belayerLine.value, { ...line, belayerId: member?.id ?? null })
+  update(target, { ...line, belayerId })
+}
+
+/**
+ * The box "Plusieurs assureur·ses". Unticking it when the lines differ asks first: the box shows
+ * unticked meanwhile, and ticked again if the climber cancels.
+ */
+const manyBelayers = ref(form.value.manyBelayers)
+watch(
+  () => form.value.manyBelayers,
+  (many) => (manyBelayers.value = many),
+)
+const confirmingOneBelayer = ref(false)
+const firstBelayer = computed(() => belayerOf(form.value.ascents[0]?.belayerId ?? null))
+watch(manyBelayers, (many) => {
+  if (many === form.value.manyBelayers) return
+  if (many || sameBelayer(form.value.ascents)) form.value = setManyBelayers(form.value, many)
+  else confirmingOneBelayer.value = true
+})
+watch(confirmingOneBelayer, (open) => {
+  if (!open && !manyBelayers.value && form.value.manyBelayers) manyBelayers.value = true
+})
+function oneBelayer() {
+  form.value = setManyBelayers(form.value, false)
 }
 
 const recentIds = computed(() => (climbed.data.value ?? []).map((item) => item.routeId))
@@ -183,7 +227,9 @@ const addedCounts = computed(() => {
   return counts
 })
 function add(routeId: string) {
-  form.value.ascents = addAscent(form.value.ascents, routeId, climbedBefore.value)
+  form.value.ascents = addAscent(form.value.ascents, routeId, climbedBefore.value, {
+    belayerId: belayerForNewLine(form.value),
+  })
   const added = routeById.value.get(routeId)
   announce.value = t('session.added', {
     name: added?.name ?? '',
@@ -320,6 +366,30 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
           :max="bounds.max"
           :hint="t('session.dateHint')"
         />
+        <div class="mt-4 flex flex-col gap-1">
+          <template v-if="!form.manyBelayers">
+            <span class="font-semibold" aria-hidden="true">{{ t('session.belayer') }}</span>
+            <BelayerButton
+              :label="
+                t('session.sessionBelayerButton', {
+                  name: belayerOf(form.belayerId)?.nickname ?? t('session.belayerNobody'),
+                })
+              "
+              :belayer="belayerOf(form.belayerId)"
+              :aria-describedby="belayerHintId"
+              @choose="chooseBelayer('session')"
+            />
+            <p :id="belayerHintId" class="text-sm text-ink-muted">
+              {{ t('session.sessionBelayerHint') }}
+            </p>
+          </template>
+          <CheckboxField
+            v-model="manyBelayers"
+            :hint="form.manyBelayers ? t('session.manyBelayersHint') : undefined"
+          >
+            {{ t('session.manyBelayers') }}
+          </CheckboxField>
+        </div>
       </div>
 
       <div v-if="routes.isPending.value" class="flex flex-col gap-2 px-4 py-4" aria-hidden="true">
@@ -358,7 +428,8 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
             :position="index + 1"
             :count="form.ascents.length"
             :can-duplicate="!full"
-            :belayer="line.belayerId === null ? undefined : belayerById.get(line.belayerId)"
+            :many-belayers="form.manyBelayers"
+            :belayer="belayerOf(line.belayerId)"
             @update="update(index, $event)"
             @choose-belayer="chooseBelayer(index)"
             @duplicate="duplicate(index)"
@@ -369,8 +440,19 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
         <p v-if="full" class="px-4 py-3 text-sm text-ink-muted">{{ t('session.full') }}</p>
         <BelayerPicker
           v-model:open="pickingBelayer"
-          :selected-id="form.ascents[belayerLine]?.belayerId ?? null"
+          :selected-id="pickedBelayerId"
           @pick="pickBelayer"
+        />
+        <ConfirmDialog
+          v-model:open="confirmingOneBelayer"
+          :title="t('session.oneBelayerTitle')"
+          :body="
+            firstBelayer
+              ? t('session.oneBelayerBody', { name: firstBelayer.nickname })
+              : t('session.oneBelayerBodyNobody')
+          "
+          :confirm-label="t('session.oneBelayerConfirm')"
+          @confirm="oneBelayer"
         />
       </section>
 

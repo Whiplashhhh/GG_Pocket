@@ -4,6 +4,7 @@ import type { Session } from '@/api/sessions'
 
 import {
   addAscent,
+  belayerForNewLine,
   dateBounds,
   duplicateAscent,
   emptySessionForm,
@@ -13,13 +14,17 @@ import {
   removeLastOf,
   requestToForm,
   restoredForm,
+  sameBelayer,
   sessionToForm,
   setClean,
   setFalls,
+  setManyBelayers,
+  setSessionBelayer,
   setTopped,
   toSessionRequest,
   withoutGoneRoutes,
   type AscentLine,
+  type SessionForm,
 } from './sessionForm'
 
 const NEVER = new Set<string>()
@@ -59,6 +64,13 @@ describe('adding a route', () => {
     expect(lines[1]?.belayerId).toBe('m1')
     expect(addAscent([], 'r2', NEVER)[0]?.belayerId).toBeNull()
     expect(duplicateAscent(lines, 1)[2]?.belayerId).toBe('m1')
+  })
+
+  it('takes the belayer it is given', () => {
+    expect(
+      addAscent([line({ belayerId: 'm1' })], 'r2', NEVER, { belayerId: 'm2' })[1],
+    ).toMatchObject({ belayerId: 'm2', mode: 'TOP_ROPE' })
+    expect(addAscent([], 'r2', NEVER, { belayerId: null, mode: 'LEAD' })[0]?.mode).toBe('LEAD')
   })
 
   it('stops at 50 lines', () => {
@@ -216,6 +228,8 @@ describe('what is sent', () => {
       feeling: 8,
       comment: '',
       visibility: 'PRIVATE',
+      belayerId: 'm1',
+      manyBelayers: false,
     })
     expect(form.ascents[0]).toMatchObject({
       routeId: 'r7',
@@ -223,6 +237,105 @@ describe('what is sent', () => {
       clean: true,
       feeling: null,
       belayerId: 'm1',
+    })
+  })
+})
+
+describe('the belayer of the session (D-118)', () => {
+  const form = (overrides: Partial<SessionForm> = {}): SessionForm => ({
+    ...emptySessionForm('2026-10-20'),
+    ...overrides,
+  })
+
+  it('names one belayer for every line, and for the lines added after', () => {
+    const named = setSessionBelayer(
+      form({ belayerId: 'm1', ascents: [line({ belayerId: 'm1' }), line({ key: 'k2' })] }),
+      'm2',
+    )
+    expect(named.belayerId).toBe('m2')
+    expect(named.ascents.map((item) => item.belayerId)).toEqual(['m2', 'm2'])
+    expect(belayerForNewLine(form({ belayerId: 'm2' }))).toBe('m2')
+    expect(belayerForNewLine(named)).toBe('m2')
+    expect(setSessionBelayer(named, null).ascents.map((item) => item.belayerId)).toEqual([
+      null,
+      null,
+    ])
+  })
+
+  it('line by line, a new line takes the belayer of the line before, else the session one', () => {
+    const many = form({
+      belayerId: 'm1',
+      manyBelayers: true,
+      ascents: [line({ belayerId: 'm1' }), line({ key: 'k2', belayerId: 'm3' })],
+    })
+    expect(belayerForNewLine(many)).toBe('m3')
+    expect(belayerForNewLine({ ...many, ascents: [] })).toBe('m1')
+  })
+
+  it('ticking "Plusieurs assureur·ses" keeps every line as it is', () => {
+    const one = form({ belayerId: 'm1', ascents: [line({ belayerId: 'm1' })] })
+    expect(setManyBelayers(one, true)).toEqual({ ...one, manyBelayers: true })
+  })
+
+  it('unticking it gives the session, and every line, the belayer of the first line', () => {
+    const many = form({
+      belayerId: 'm9',
+      manyBelayers: true,
+      ascents: [line({ belayerId: 'm2' }), line({ key: 'k2', belayerId: 'm3' })],
+    })
+    const one = setManyBelayers(many, false)
+    expect(one).toMatchObject({ belayerId: 'm2', manyBelayers: false })
+    expect(one.ascents.map((item) => item.belayerId)).toEqual(['m2', 'm2'])
+    expect(setManyBelayers({ ...many, ascents: [] }, false)).toMatchObject({
+      belayerId: 'm9',
+      manyBelayers: false,
+    })
+  })
+
+  it('tells whether all lines share their belayer', () => {
+    expect(sameBelayer([])).toBe(true)
+    expect(sameBelayer([line(), line({ key: 'k2' })])).toBe(true)
+    expect(sameBelayer([line({ belayerId: 'm1' }), line({ key: 'k2', belayerId: 'm1' })])).toBe(
+      true,
+    )
+    expect(sameBelayer([line({ belayerId: 'm1' }), line({ key: 'k2' })])).toBe(false)
+  })
+
+  it('a session taken back ticks the box only when its lines differ', () => {
+    const body = (belayers: (string | undefined)[]) =>
+      toSessionRequest(
+        form({
+          ascents: belayers.map((belayerId, i) =>
+            line({ key: String(i), belayerId: belayerId ?? null }),
+          ),
+        }),
+      )
+    expect(requestToForm(body(['m1', 'm1']))).toMatchObject({
+      belayerId: 'm1',
+      manyBelayers: false,
+    })
+    expect(requestToForm(body([undefined]))).toMatchObject({ belayerId: null, manyBelayers: false })
+    expect(requestToForm(body(['m1', undefined]))).toMatchObject({ manyBelayers: true })
+  })
+
+  it('a draft keeps its box, ticked anyway when its lines differ, even from before D-118', () => {
+    const { clientRef, climbedOn, feeling, comment, visibility } = form()
+    const old = { clientRef, climbedOn, feeling, comment, visibility }
+    expect(
+      restoredForm({ ...old, ascents: [line({ belayerId: 'm1' }), line({ key: 'k2' })] }),
+    ).toMatchObject({ belayerId: null, manyBelayers: true })
+    expect(restoredForm({ ...old, ascents: [line({ belayerId: 'm1' })] })).toMatchObject({
+      belayerId: 'm1',
+      manyBelayers: false,
+    })
+    expect(
+      restoredForm(
+        form({ belayerId: 'm1', manyBelayers: true, ascents: [line({ belayerId: 'm1' })] }),
+      ),
+    ).toMatchObject({ belayerId: 'm1', manyBelayers: true })
+    expect(restoredForm(form({ belayerId: 'm4' }))).toMatchObject({
+      belayerId: 'm4',
+      manyBelayers: false,
     })
   })
 })
