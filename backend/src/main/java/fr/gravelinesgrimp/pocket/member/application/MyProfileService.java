@@ -69,8 +69,8 @@ public class MyProfileService {
     }
 
     /**
-     * The birth date an older account never gave (D-119), with the same parental consent rule as
-     * at registration.
+     * The birth date an older account never gave (D-119), with the same parental consent rule as at
+     * registration.
      *
      * @throws BusinessException {@code PARENTAL_CONSENT_REQUIRED} under 15 without consent
      */
@@ -81,6 +81,20 @@ public class MyProfileService {
         rateLimiter.consume(RateLimiter.PROFILE_UPDATE_PER_MEMBER, memberId.toString());
         checkParentalConsent(member, birthDate, parentalConsent, ClubTime.today(clock));
         member.changeBirthDate(birthDate, parentalConsent, clock.instant());
+        return CurrentMemberView.of(member);
+    }
+
+    /**
+     * "Je participe au fil du club" (D-120), by the member themself only. Leaving takes their
+     * sessions shared with the club out of it at once (read when reading, nothing rewritten). An
+     * account awaiting validation does not take part (D-107).
+     */
+    @ValidatedMember
+    @Transactional
+    public CurrentMemberView changeClubFeed(UUID memberId, boolean inClubFeed) {
+        var member = load(memberId);
+        rateLimiter.consume(RateLimiter.PROFILE_UPDATE_PER_MEMBER, memberId.toString());
+        member.changeClubFeed(inClubFeed);
         return CurrentMemberView.of(member);
     }
 

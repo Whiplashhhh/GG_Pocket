@@ -450,6 +450,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/feed/club': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The sessions shared with the club by the members who take part in the club feed, mine included, latest day first (cursor pagination); for the members who take part (D-120) */
+    get: operations['getClubFeed']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me': {
     parameters: {
       query?: never
@@ -563,6 +580,23 @@ export interface paths {
     /** Routes I climbed, most recently climbed first */
     get: operations['listMyClimbedRoutes']
     put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/club-feed': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Take part in the club feed, or leave it (validated accounts) */
+    put: operations['setMyClubFeed']
     post?: never
     delete?: never
     options?: never
@@ -1728,6 +1762,10 @@ export interface components {
        */
       to?: string
     }
+    /** @description Take part in the club feed or leave it (D-120): to read it, my sessions shared with the club show in it. */
+    ClubFeedRequest: {
+      inClubFeed: boolean
+    }
     Cord: {
       active: boolean
       /** Format: uuid */
@@ -1753,6 +1791,8 @@ export interface components {
       firstName: string
       /** Format: uuid */
       id: string
+      /** @description Takes part in the club feed: reads it, and shows their sessions shared with the club in it (D-120) */
+      inClubFeed: boolean
       lastName: string
       nickname: string
       /** @enum {string} */
@@ -2779,7 +2819,7 @@ export interface components {
         | 'RECORD'
       )[]
       /** @enum {string} */
-      visibility: 'FRIENDS' | 'PRIVATE'
+      visibility: 'FRIENDS' | 'PRIVATE' | 'CLUB'
     }
     SessionComment: {
       author: components['schemas']['MemberRef']
@@ -2803,7 +2843,7 @@ export interface components {
       /** @description Erase the session's comment */
       removeComment: boolean
       /** @enum {string} */
-      visibility: 'FRIENDS' | 'PRIVATE'
+      visibility: 'FRIENDS' | 'PRIVATE' | 'CLUB'
     }
     SessionReactionRequest: {
       /** @enum {string} */
@@ -2835,7 +2875,7 @@ export interface components {
        */
       feeling?: number
       /** @enum {string} */
-      visibility: 'FRIENDS' | 'PRIVATE'
+      visibility: 'FRIENDS' | 'PRIVATE' | 'CLUB'
     }
     /** @description maxGrade: the hardest topped grade. */
     SessionSummary: {
@@ -3618,6 +3658,29 @@ export interface operations {
       }
     }
   }
+  getClubFeed: {
+    parameters: {
+      query?: {
+        cursor?: string
+        size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionPage']
+        }
+      }
+    }
+  }
   getMyProfile: {
     parameters: {
       query?: never
@@ -3790,6 +3853,30 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ClimbedRoute'][]
+        }
+      }
+    }
+  }
+  setMyClubFeed: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ClubFeedRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CurrentMember']
         }
       }
     }

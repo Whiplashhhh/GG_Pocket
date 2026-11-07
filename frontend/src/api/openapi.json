@@ -989,6 +989,47 @@
         ]
       }
     },
+    "/api/v1/feed/club": {
+      "get": {
+        "operationId": "getClubFeed",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionPage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "The sessions shared with the club by the members who take part in the club feed, mine included, latest day first (cursor pagination); for the members who take part (D-120)",
+        "tags": [
+          "Feed"
+        ]
+      }
+    },
     "/api/v1/me": {
       "get": {
         "operationId": "getMyProfile",
@@ -1206,6 +1247,37 @@
         "summary": "Routes I climbed, most recently climbed first",
         "tags": [
           "Sessions"
+        ]
+      }
+    },
+    "/api/v1/me/club-feed": {
+      "put": {
+        "operationId": "setMyClubFeed",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClubFeedRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentMember"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Take part in the club feed, or leave it (validated accounts)",
+        "tags": [
+          "Me"
         ]
       }
     },
@@ -3670,6 +3742,18 @@
           "from"
         ]
       },
+      "ClubFeedRequest": {
+        "type": "object",
+        "description": "Take part in the club feed or leave it (D-120): to read it, my sessions shared with the club show in it.",
+        "properties": {
+          "inClubFeed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "inClubFeed"
+        ]
+      },
       "Cord": {
         "type": "object",
         "properties": {
@@ -3738,6 +3822,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "inClubFeed": {
+            "type": "boolean",
+            "description": "Takes part in the club feed: reads it, and shows their sessions shared with the club in it (D-120)"
+          },
           "lastName": {
             "type": "string"
           },
@@ -3763,6 +3851,7 @@
           "birthDateMissing",
           "firstName",
           "id",
+          "inClubFeed",
           "lastName",
           "nickname",
           "role",
@@ -6476,7 +6565,8 @@
             "type": "string",
             "enum": [
               "FRIENDS",
-              "PRIVATE"
+              "PRIVATE",
+              "CLUB"
             ]
           }
         },
@@ -6569,7 +6659,8 @@
             "type": "string",
             "enum": [
               "FRIENDS",
-              "PRIVATE"
+              "PRIVATE",
+              "CLUB"
             ]
           }
         },
@@ -6657,7 +6748,8 @@
             "type": "string",
             "enum": [
               "FRIENDS",
-              "PRIVATE"
+              "PRIVATE",
+              "CLUB"
             ]
           }
         },

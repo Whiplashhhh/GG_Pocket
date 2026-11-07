@@ -10,6 +10,7 @@ import java.util.UUID;
  *
  * @param validated false while the board has not validated the account (D-107)
  * @param birthDateMissing an older account without birth date: asked at sign-in (D-119)
+ * @param inClubFeed takes part in the club feed (D-120), validated and active
  */
 public record CurrentMemberView(
         UUID id,
@@ -19,6 +20,7 @@ public record CurrentMemberView(
         Role role,
         boolean validated,
         boolean birthDateMissing,
+        boolean inClubFeed,
         UUID avatarId) {
 
     public static CurrentMemberView of(Member member) {
@@ -30,6 +32,7 @@ public record CurrentMemberView(
                 member.role(),
                 member.isValidated(),
                 member.birthDate() == null,
+                member.isInClubFeed(),
                 member.avatarId());
     }
 }

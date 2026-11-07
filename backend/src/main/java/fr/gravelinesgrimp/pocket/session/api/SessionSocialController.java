@@ -65,6 +65,20 @@ class SessionSocialController {
         return SessionPageResponse.from(sessions.feed(me.memberId(), cursor, size));
     }
 
+    @GetMapping("/feed/club")
+    @Operation(
+            operationId = "getClubFeed",
+            summary =
+                    "The sessions shared with the club by the members who take part in the club"
+                            + " feed, mine included, latest day first (cursor pagination);"
+                            + " for the members who take part (D-120)")
+    SessionPageResponse clubFeed(
+            @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size) {
+        return SessionPageResponse.from(sessions.clubFeed(me.memberId(), cursor, size));
+    }
+
     @PutMapping("/sessions/{id}/reaction")
     @Operation(
             operationId = "reactToSession",
