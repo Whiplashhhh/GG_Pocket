@@ -64,7 +64,10 @@ export function toUpdate(
   const climbingSinceYear = parseYear(form.climbingSinceYear, currentYear)
   if (clubArrivalYear === 'invalid') errors.clubArrivalYear = { key: 'validation.year' }
   if (climbingSinceYear === 'invalid') errors.climbingSinceYear = { key: 'validation.year' }
-  if (clubArrivalYear === 'invalid' || climbingSinceYear === 'invalid') {
+  // Required since D-119: it can be corrected, not removed.
+  const birthDate = form.birthDate.trim()
+  if (birthDate === '') errors.birthDate = { key: 'validation.birthDate' }
+  if (clubArrivalYear === 'invalid' || climbingSinceYear === 'invalid' || birthDate === '') {
     return { errors }
   }
   const optional = (value: string) => (value.trim() === '' ? undefined : value.trim())
@@ -74,7 +77,7 @@ export function toUpdate(
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
       email: optional(form.email),
-      birthDate: optional(form.birthDate),
+      birthDate,
       parentalConsent: form.parentalConsent,
       showAge: form.showAge,
       appearsInRankings: form.appearsInRankings,

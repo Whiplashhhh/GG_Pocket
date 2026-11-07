@@ -34,6 +34,38 @@ test.describe('a visitor', () => {
     )
   })
 
+  test('gives the birth date an older account never gave, then goes on', async ({ page, club }) => {
+    const member = club.addMember({
+      nickname: 'tonton.talon',
+      password: 'un mot de passe solide',
+      birthDate: undefined,
+    })
+    await page.clock.setSystemTime(new Date(club.now))
+    await page.goto('/connexion?retour=/topo')
+    await page.getByLabel('Pseudo').fill('tonton.talon')
+    await page.getByLabel('Mot de passe', { exact: true }).fill('un mot de passe solide')
+    await page.getByRole('button', { name: 'Se connecter' }).click()
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Il manque ta date de naissance' }),
+    ).toBeVisible()
+    // Nowhere else until it is given.
+    await page.goto('/actu')
+    await expect(page).toHaveURL(/\/date-de-naissance$/)
+    await page.getByRole('button', { name: 'C’est noté, on y va' }).click()
+    await expect(
+      page.getByText('Ta date de naissance est obligatoire', { exact: false }),
+    ).toBeVisible()
+    // Under 15: the parental consent, as at registration.
+    await page.getByLabel('Date de naissance').fill('2015-02-03')
+    await page.getByRole('button', { name: 'C’est noté, on y va' }).click()
+    await expect(page.getByText('Obligatoire avant 15 ans.').first()).toBeVisible()
+    await page.getByRole('checkbox', { name: /Un parent ou responsable légal/ }).check()
+    await page.getByRole('button', { name: 'C’est noté, on y va' }).click()
+    await expect(page).toHaveURL(/\/actu$/)
+    expect(member.birthDate).toBe('2015-02-03')
+    expect(member.parentalConsent).toBe(true)
+  })
+
   test('reads the privacy page without an account', async ({ page }) => {
     await page.goto('/tes-donnees')
     await expect(page.getByRole('heading', { level: 1, name: 'Tes données' })).toBeVisible()
@@ -91,6 +123,7 @@ test.describe('joining the club', () => {
     await page.getByLabel('Nom', { exact: true }).fill('Dupont')
     await page.getByLabel('Pseudo').fill('lea.d')
     await page.getByLabel('Mot de passe', { exact: true }).fill('azertyuiop')
+    await page.getByLabel('Date de naissance').fill('1998-03-12')
     await page.getByRole('checkbox', { name: /J’ai lu la page/ }).check()
     await page.getByRole('button', { name: 'Créer mon compte' }).click()
     await expect(page.getByText('Dis-nous si tu as ta licence au club.')).toBeVisible()

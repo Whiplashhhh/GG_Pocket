@@ -8,6 +8,7 @@ import type { components } from './schema'
 
 export type MyProfile = components['schemas']['MyProfile']
 export type ProfileUpdate = components['schemas']['ProfileUpdate']
+export type BirthDateRequest = components['schemas']['BirthDateRequest']
 export type Device = components['schemas']['Device']
 
 export const MY_PROFILE_KEY = ['me'] as const
@@ -39,6 +40,7 @@ function useProfileSaved() {
               firstName: profile.firstName,
               lastName: profile.lastName,
               avatarUrl: profile.avatarUrl,
+              birthDateMissing: profile.birthDate === undefined,
             },
           }
         : state,
@@ -51,6 +53,18 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: (body: ProfileUpdate) => request(api.PUT('/api/v1/me/profile', { body })),
     onSuccess: saved,
+  })
+}
+
+/** The birth date an older account never gave, asked before anything else (D-119). */
+export function useSetBirthDate() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (body: BirthDateRequest) => request(api.PUT('/api/v1/me/birth-date', { body })),
+    onSuccess: (member) => {
+      queryClient.setQueryData<AuthState>(AUTH_STATE_KEY, { authenticated: true, member })
+      void queryClient.invalidateQueries({ queryKey: MY_PROFILE_KEY })
+    },
   })
 }
 

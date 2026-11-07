@@ -159,8 +159,9 @@ public class Member extends TimestampedEntity {
     }
 
     /**
-     * Sets the birth date. Declaring a parental consent records it once; it is kept even if the
-     * birth date is later removed (it was given).
+     * Sets the birth date, required since D-119 (older accounts may still have none). Declaring a
+     * parental consent records it once; it is kept even if the birth date is later corrected (it
+     * was given).
      */
     public void changeBirthDate(LocalDate birthDate, boolean parentalConsent, Instant now) {
         this.birthDate = birthDate;

@@ -74,6 +74,7 @@ class AuthorizationMatrixIT {
             List.of(
                     new Endpoint(HttpMethod.GET, "/api/v1/me", null, Role.TOURIST),
                     new Endpoint(HttpMethod.PUT, "/api/v1/me/profile", "{}", Role.TOURIST),
+                    new Endpoint(HttpMethod.PUT, "/api/v1/me/birth-date", "{}", Role.TOURIST),
                     new Endpoint(HttpMethod.PUT, "/api/v1/me/avatar", "{}", Role.TOURIST),
                     new Endpoint(HttpMethod.DELETE, "/api/v1/me/avatar", null, Role.TOURIST),
                     new Endpoint(HttpMethod.PUT, "/api/v1/me/password", "{}", Role.TOURIST),
@@ -356,6 +357,7 @@ class AuthorizationMatrixIT {
     static final List<Endpoint> OWN_LOGBOOK =
             List.of(
                     new Endpoint(HttpMethod.GET, "/api/v1/me", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.PUT, "/api/v1/me/birth-date", "{}", Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/sessions", null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/friends", null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/feed", null, Role.TOURIST),

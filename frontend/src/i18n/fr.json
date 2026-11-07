@@ -890,7 +890,7 @@
     "password": "Mot de passe",
     "passwordHint": "8 caractères minimum. Une petite phrase marche très bien : « avant-bras en béton ».",
     "birthDate": "Date de naissance",
-    "birthDateHint": "Ton âge reste caché, sauf si tu choisis de l’afficher.",
+    "birthDateHint": "Elle dit seulement si un accord parental est nécessaire. Ton âge reste caché, sauf si tu es majeur·e et choisis de l’afficher.",
     "parentalConsent": "Un parent ou responsable légal est d’accord pour que j’utilise GG Pocket.",
     "parentalConsentHint": "Obligatoire avant 15 ans.",
     "licenceLegend": "Tu as ta licence au club ?",
@@ -932,6 +932,13 @@
     "invalidTitle": "Ce lien ne mène plus nulle part.",
     "invalidBody": "Il a déjà servi, a expiré (24 heures) ou a été remplacé par un plus récent. Demande un nouveau lien à la direction du club.",
     "toLogin": "Aller à la connexion"
+  },
+  "birthDateStep": {
+    "title": "Il manque ta date de naissance",
+    "intro": "Le club la demande désormais à tout le monde, une seule fois. Elle dit si un accord parental est nécessaire ; la direction voit seulement si tu es mineur·e, jamais la date elle-même.",
+    "submit": "C’est noté, on y va",
+    "privacy": "Ce qu’on fait de tes données",
+    "later": "Plus tard : me déconnecter"
   },
   "privacy": {
     "title": "Tes données",
@@ -1631,6 +1638,7 @@
     "passwordShort": "8 caractères minimum.",
     "email": "Cette adresse e-mail a l’air bancale.",
     "dateInFuture": "Cette date n’est pas encore arrivée.",
+    "birthDate": "Ta date de naissance est obligatoire : elle dit si un accord parental est nécessaire.",
     "privacy": "Coche la case pour continuer.",
     "parentalConsent": "Obligatoire avant 15 ans.",
     "tooLong": "Trop long : {max} caractères maximum.",

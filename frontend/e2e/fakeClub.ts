@@ -1,6 +1,7 @@
 import type { Page, Route } from '@playwright/test'
 
 import type { components } from '../src/api/schema'
+import { clubToday, needsParentalConsent } from '../src/lib/age'
 
 import { FakeSessions } from './fakeSessions'
 import { FakeSocial, seniorityOf } from './fakeSocial'
@@ -126,6 +127,7 @@ export class FakeClub {
       role: 'CLIMBER',
       status: 'ACTIVE',
       validated: true,
+      birthDate: '1990-05-14',
       parentalConsent: false,
       showAge: false,
       appearsInRankings: true,
@@ -210,6 +212,7 @@ export class FakeClub {
       lastName: member.lastName,
       role: member.role,
       validated: member.validated,
+      birthDateMissing: member.birthDate === undefined,
       ...(member.avatarUrl ? { avatarUrl: member.avatarUrl } : {}),
     }
   }
@@ -418,6 +421,8 @@ export class FakeClub {
         return fail(409, 'NICKNAME_TAKEN')
       }
       if (form.password.toLowerCase() === 'azertyuiop') return fail(400, 'PASSWORD_TOO_COMMON')
+      // Required since D-119.
+      if (!form.birthDate) return fail(400, 'VALIDATION_FAILED')
       const note = form.licensed ? undefined : (form.joinNote ?? '').trim()
       if (note !== undefined && (note.length < 10 || note.length > 300))
         return fail(400, 'JOIN_NOTE_REQUIRED')
@@ -491,6 +496,15 @@ export class FakeClub {
       const update = body() as Schemas['ProfileUpdate']
       Object.assign(me, update)
       return json(this.profile(me))
+    }
+    if (path === '/me/birth-date') {
+      const { birthDate, parentalConsent } = body() as Schemas['BirthDateRequest']
+      const today = clubToday(new Date(this.now))
+      if (needsParentalConsent(birthDate, today) && !me.parentalConsent && !parentalConsent)
+        return fail(400, 'PARENTAL_CONSENT_REQUIRED')
+      me.birthDate = birthDate
+      me.parentalConsent ||= parentalConsent === true
+      return json(this.currentMember(me))
     }
     if (path === '/me/avatar') {
       me.avatarUrl = method === 'DELETE' ? undefined : `/api/v1/media/${this.nextId()}`

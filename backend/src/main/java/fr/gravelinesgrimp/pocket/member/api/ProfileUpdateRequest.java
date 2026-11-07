@@ -29,7 +29,10 @@ public record ProfileUpdateRequest(
         @Schema(requiredMode = RequiredMode.REQUIRED) @NotBlank @PlainText @Size(max = 50)
                 String lastName,
         @Email @Size(max = 254) String email,
-        @Past LocalDate birthDate,
+        @Schema(requiredMode = RequiredMode.REQUIRED, description = "Cannot be removed (D-119)")
+                @NotNull
+                @Past
+                LocalDate birthDate,
         @Schema(description = "Declares that a parent agreed; required once under 15")
                 boolean parentalConsent,
         boolean showAge,

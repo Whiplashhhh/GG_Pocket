@@ -394,6 +394,18 @@ export const CAPTURES: Capture[] = [
       club.resetTokens.set('jeton', member.id)
     },
   },
+  {
+    name: 'date-de-naissance',
+    path: '/date-de-naissance',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      const marie = club.members.find((member) => member.nickname === 'marie')
+      if (marie) marie.birthDate = undefined
+    },
+    act: async (page) => {
+      await page.getByLabel('Date de naissance').fill('2014-09-21')
+    },
+  },
   { name: 'premiers-pas-photo', path: '/premiers-pas/photo', as: 'CLIMBER' },
   { name: 'premiers-pas-infos', path: '/premiers-pas/infos', as: 'CLIMBER' },
   { name: 'premiers-pas-voie', path: '/premiers-pas/voie', as: 'CLIMBER' },

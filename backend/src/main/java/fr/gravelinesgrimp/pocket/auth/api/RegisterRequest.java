@@ -35,7 +35,12 @@ public record RegisterRequest(
                 @NotNull
                 @Size(max = 200)
                 String password,
-        @Past LocalDate birthDate,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description = "Required (D-119); only the board sees whether under 18")
+                @NotNull
+                @Past
+                LocalDate birthDate,
         @Schema(description = "Required when the birth date says under 15") boolean parentalConsent,
         @Schema(
                         requiredMode = RequiredMode.REQUIRED,

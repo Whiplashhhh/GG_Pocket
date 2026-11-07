@@ -7,6 +7,8 @@ export const HOME = '/actu'
 /** Where an account awaiting validation lands when it tries the rest of the club (D-107). */
 export const PROFILE = '/profil'
 export const WELCOME = '/accueil'
+/** Where an older account without birth date gives it, before anything else (D-119). */
+export const BIRTH_DATE = '/date-de-naissance'
 /** Query parameter carrying where to go back after signing in. */
 export const RETURN_PARAM = 'retour'
 
@@ -28,6 +30,15 @@ export function decideNavigation(
     return to.fullPath === HOME || to.fullPath === '/'
       ? WELCOME
       : { path: WELCOME, query: { [RETURN_PARAM]: to.fullPath } }
+  }
+  const birthDateMissing = state.member?.birthDateMissing === true
+  if (to.meta.birthDateStep === true) {
+    return birthDateMissing ? true : HOME
+  }
+  if (birthDateMissing) {
+    return to.fullPath === HOME || to.fullPath === '/'
+      ? BIRTH_DATE
+      : { path: BIRTH_DATE, query: { [RETURN_PARAM]: to.fullPath } }
   }
   if (to.meta.minRole !== undefined && !isAtLeast(state.member?.role, to.meta.minRole)) {
     return HOME

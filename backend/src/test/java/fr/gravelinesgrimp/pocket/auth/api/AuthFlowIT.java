@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 class AuthFlowIT {
 
     private static final AtomicInteger NICKNAMES = new AtomicInteger();
+    private static final LocalDate ADULT_BIRTH_DATE = LocalDate.of(1990, 1, 1);
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;
@@ -147,12 +148,33 @@ class AuthFlowIT {
                                         """
                                         {"code": "%s", "firstName": "Léa", "lastName": "Dupont",
                                          "nickname": "%s", "password": "%s",
-                                         "licensed": true, "privacyAccepted": false}
+                                         "birthDate": "1990-01-01", "licensed": true,
+                                         "privacyAccepted": false}
                                         """
                                                 .formatted(newCode(null), nickname(), PASSWORD)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
                 .andExpect(jsonPath("$.errors[0].field").value("privacyAccepted"));
+    }
+
+    /** D-119: required, so that the parental consent and the "mineur" mention can be decided. */
+    @Test
+    void theBirthDateIsRequired() throws Exception {
+        mockMvc.perform(
+                        post("/api/v1/auth/register")
+                                .with(xsrf())
+                                .with(freshAddress())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
+                                        {"code": "%s", "firstName": "Léa", "lastName": "Dupont",
+                                         "nickname": "%s", "password": "%s",
+                                         "licensed": true, "privacyAccepted": true}
+                                        """
+                                                .formatted(newCode(null), nickname(), PASSWORD)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+                .andExpect(jsonPath("$.errors[0].field").value("birthDate"));
     }
 
     @Test
@@ -213,7 +235,7 @@ class AuthFlowIT {
                                         """
                                         {"code": "%s", "firstName": "Léa", "lastName": "Dupont",
                                          "nickname": "%s", "password": "%s",
-                                         "privacyAccepted": true}
+                                         "birthDate": "1990-01-01", "privacyAccepted": true}
                                         """
                                                 .formatted(newCode(null), nickname(), PASSWORD)))
                 .andExpect(status().isBadRequest())
@@ -360,7 +382,8 @@ class AuthFlowIT {
             boolean licensed,
             String joinNote)
             throws Exception {
-        var birth = birthDate == null ? "null" : "\"" + birthDate + "\"";
+        // Required since D-119: an adult unless the test says otherwise.
+        var birth = "\"" + (birthDate == null ? ADULT_BIRTH_DATE : birthDate) + "\"";
         var note = joinNote == null ? "null" : "\"" + joinNote + "\"";
         return mockMvc.perform(
                 post("/api/v1/auth/register")

@@ -1154,6 +1154,37 @@
         ]
       }
     },
+    "/api/v1/me/birth-date": {
+      "put": {
+        "operationId": "setMyBirthDate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BirthDateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentMember"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Give my missing birth date",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/api/v1/me/climbed-routes": {
       "get": {
         "operationId": "listMyClimbedRoutes",
@@ -3561,6 +3592,23 @@
           "items"
         ]
       },
+      "BirthDateRequest": {
+        "type": "object",
+        "description": "The birth date an older account never gave, asked at sign-in (D-119).",
+        "properties": {
+          "birthDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "parentalConsent": {
+            "type": "boolean",
+            "description": "Declares that a parent agreed; required under 15"
+          }
+        },
+        "required": [
+          "birthDate"
+        ]
+      },
       "ClimbedRoute": {
         "type": "object",
         "description": "A route I climbed, and the last day I did.",
@@ -3677,6 +3725,10 @@
             "type": "string",
             "description": "Profile photo, absent when the member has none"
           },
+          "birthDateMissing": {
+            "type": "boolean",
+            "description": "True for an older account without birth date: the app asks for it before anything else (D-119)"
+          },
           "firstName": {
             "type": "string"
           },
@@ -3706,6 +3758,7 @@
           }
         },
         "required": [
+          "birthDateMissing",
           "firstName",
           "id",
           "lastName",
@@ -5418,7 +5471,8 @@
           },
           "birthDate": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "Cannot be removed (D-119)"
           },
           "climbingSinceYear": {
             "type": "integer",
@@ -5461,6 +5515,7 @@
           }
         },
         "required": [
+          "birthDate",
           "firstName",
           "lastName",
           "nickname"
@@ -5597,7 +5652,8 @@
         "properties": {
           "birthDate": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "Required (D-119); only the board sees whether under 18"
           },
           "code": {
             "type": "string",
@@ -5653,6 +5709,7 @@
           }
         },
         "required": [
+          "birthDate",
           "code",
           "firstName",
           "lastName",

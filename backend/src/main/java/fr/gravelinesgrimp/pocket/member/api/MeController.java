@@ -52,6 +52,17 @@ class MeController {
         return MyProfileResponse.from(profiles.update(me.memberId(), request.toChange()));
     }
 
+    /** The screen shown at sign-in to a member whose account has no birth date (D-119). */
+    @PutMapping(path = "/birth-date", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(operationId = "setMyBirthDate", summary = "Give my missing birth date")
+    CurrentMemberResponse setBirthDate(
+            @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
+            @Valid @RequestBody BirthDateRequest request) {
+        return CurrentMemberResponse.from(
+                profiles.setBirthDate(
+                        me.memberId(), request.birthDate(), request.parentalConsent()));
+    }
+
     @PutMapping(
             path = "/avatar",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,

@@ -82,8 +82,8 @@ function submit() {
   if (!NICKNAME_PATTERN.test(value.nickname.trim())) found.nickname = { key: 'validation.nickname' }
   if (value.email.trim() !== '' && !EMAIL_PATTERN.test(value.email.trim()))
     found.email = { key: 'validation.email' }
-  if (value.birthDate !== '' && value.birthDate > today)
-    found.birthDate = { key: 'validation.dateInFuture' }
+  if (value.birthDate === '') found.birthDate = { key: 'validation.birthDate' }
+  else if (value.birthDate > today) found.birthDate = { key: 'validation.dateInFuture' }
   if (consentNeeded.value && !value.parentalConsent)
     found.parentalConsent = { key: 'validation.parentalConsent' }
   const result = toUpdate(value, new Date().getFullYear())
@@ -176,7 +176,6 @@ function submit() {
         min="1900-01-01"
         :max="today"
         :error="message('birthDate')"
-        optional
       />
       <CheckboxField
         v-if="consentNeeded"

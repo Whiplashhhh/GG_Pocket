@@ -9,6 +9,7 @@ import java.util.UUID;
  * What the app shell needs about the signed-in member (header, menus, permissions).
  *
  * @param validated false while the board has not validated the account (D-107)
+ * @param birthDateMissing an older account without birth date: asked at sign-in (D-119)
  */
 public record CurrentMemberView(
         UUID id,
@@ -17,6 +18,7 @@ public record CurrentMemberView(
         String lastName,
         Role role,
         boolean validated,
+        boolean birthDateMissing,
         UUID avatarId) {
 
     public static CurrentMemberView of(Member member) {
@@ -27,6 +29,7 @@ public record CurrentMemberView(
                 member.lastName(),
                 member.role(),
                 member.isValidated(),
+                member.birthDate() == null,
                 member.avatarId());
     }
 }

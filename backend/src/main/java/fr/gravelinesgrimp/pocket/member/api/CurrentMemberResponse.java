@@ -21,6 +21,12 @@ public record CurrentMemberResponse(
                                 "False while the board has not validated the account: the member"
                                         + " only has their own logbook until then")
                 boolean validated,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description =
+                                "True for an older account without birth date: the app asks for it"
+                                        + " before anything else (D-119)")
+                boolean birthDateMissing,
         @Schema(description = "Profile photo, absent when the member has none") String avatarUrl) {
 
     public static CurrentMemberResponse from(CurrentMemberView view) {
@@ -31,6 +37,7 @@ public record CurrentMemberResponse(
                 view.lastName(),
                 view.role(),
                 view.validated(),
+                view.birthDateMissing(),
                 MediaUrls.of(view.avatarId()));
     }
 }

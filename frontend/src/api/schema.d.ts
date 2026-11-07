@@ -536,6 +536,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/birth-date': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Give my missing birth date */
+    put: operations['setMyBirthDate']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/climbed-routes': {
     parameters: {
       query?: never
@@ -1674,6 +1691,13 @@ export interface components {
       items: components['schemas']['Belay'][]
       nextCursor?: string
     }
+    /** @description The birth date an older account never gave, asked at sign-in (D-119). */
+    BirthDateRequest: {
+      /** Format: date */
+      birthDate: string
+      /** @description Declares that a parent agreed; required under 15 */
+      parentalConsent?: boolean
+    }
     /** @description A route I climbed, and the last day I did. */
     ClimbedRoute: {
       /** Format: date */
@@ -1722,6 +1746,8 @@ export interface components {
     CurrentMember: {
       /** @description Profile photo, absent when the member has none */
       avatarUrl?: string
+      /** @description True for an older account without birth date: the app asks for it before anything else (D-119) */
+      birthDateMissing: boolean
       firstName: string
       /** Format: uuid */
       id: string
@@ -2322,8 +2348,11 @@ export interface components {
     ProfileUpdate: {
       appearsInRankings?: boolean
       bio?: string
-      /** Format: date */
-      birthDate?: string
+      /**
+       * Format: date
+       * @description Cannot be removed (D-119)
+       */
+      birthDate: string
       /** Format: int32 */
       climbingSinceYear?: number
       /** Format: int32 */
@@ -2384,8 +2413,11 @@ export interface components {
     }
     /** @description The one-page registration form (spec §6). */
     RegisterRequest: {
-      /** Format: date */
-      birthDate?: string
+      /**
+       * Format: date
+       * @description Required (D-119); only the board sees whether under 18
+       */
+      birthDate: string
       code: string
       /** Format: email */
       email?: string
@@ -3704,6 +3736,30 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['BelayPage']
+        }
+      }
+    }
+  }
+  setMyBirthDate: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BirthDateRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CurrentMember']
         }
       }
     }

@@ -67,6 +67,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 - Le vrai logo du club est arrivé, en haute définition : plus net en haut de l’appli, sur l’écran de connexion et
   sur l’icône du téléphone. L’orange et le vert de l’appli prennent les couleurs officielles du club.
 
+- **Date de naissance obligatoire** : elle est demandée à l’inscription, et si ton compte n’en a pas, l’appli te la
+  demande une fois à ta prochaine connexion, avant tout le reste. Elle sert à savoir si un accord parental est
+  nécessaire (avant 15 ans, comme avant). Tu peux la corriger dans ton profil, plus l’effacer.
+
 - **Première cotation** : chaque cotation se gagne pour de vrai. Une 6b ne t’offre plus la 5b, la 5c et la 6a
   au passage, il faudra les grimper (une 6b- ou une 6b+ comptent pour la 6b). Les badges déjà gagnés sont
   recomptés avec cette règle : si une cotation disparaît de ta collection, c’est qu’elle n’est pas encore dans

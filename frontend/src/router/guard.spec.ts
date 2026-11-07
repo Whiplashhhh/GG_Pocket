@@ -9,9 +9,18 @@ const SIGNED_OUT: AuthState = { authenticated: false }
 const signedInAs = (
   role: 'TOURIST' | 'CLIMBER' | 'SETTER' | 'BOARD' | 'ADMIN',
   validated = true,
+  birthDateMissing = false,
 ): AuthState => ({
   authenticated: true,
-  member: { id: '1', nickname: 'marie', firstName: 'Marie', lastName: 'H', role, validated },
+  member: {
+    id: '1',
+    nickname: 'marie',
+    firstName: 'Marie',
+    lastName: 'H',
+    role,
+    validated,
+    birthDateMissing,
+  },
 })
 const to = (fullPath: string, meta: RouteMeta = {}) => ({ fullPath, meta })
 
@@ -47,6 +56,26 @@ describe('decideNavigation', () => {
     expect(decideNavigation(directory, signedInAs('TOURIST', false))).toBe('/profil')
     expect(decideNavigation(directory, signedInAs('TOURIST'))).toBe(true)
     expect(decideNavigation(to('/topo'), signedInAs('TOURIST', false))).toBe(true)
+  })
+
+  it('asks an older account for its missing birth date before anything else', () => {
+    const step = to('/date-de-naissance', { birthDateStep: true })
+    expect(decideNavigation(to('/actu'), signedInAs('CLIMBER', true, true))).toBe(
+      '/date-de-naissance',
+    )
+    expect(decideNavigation(to('/topo'), signedInAs('CLIMBER', true, true))).toEqual({
+      path: '/date-de-naissance',
+      query: { retour: '/topo' },
+    })
+    expect(decideNavigation(step, signedInAs('CLIMBER', true, true))).toBe(true)
+    expect(
+      decideNavigation(to('/tes-donnees', { public: true }), signedInAs('CLIMBER', true, true)),
+    ).toBe(true)
+    expect(decideNavigation(step, signedInAs('CLIMBER'))).toBe('/actu')
+    expect(decideNavigation(step, SIGNED_OUT)).toEqual({
+      path: '/accueil',
+      query: { retour: '/date-de-naissance' },
+    })
   })
 
   it('does not sign anyone out because the network is down', () => {

@@ -116,8 +116,8 @@ function validate(): FieldErrors<Field> {
   if (form.email.trim() !== '' && !EMAIL_PATTERN.test(form.email.trim()))
     found.email = { key: 'validation.email' }
   if (!isPasswordLongEnough(form.password)) found.password = { key: 'validation.passwordShort' }
-  if (form.birthDate !== '' && form.birthDate > today)
-    found.birthDate = { key: 'validation.dateInFuture' }
+  if (form.birthDate === '') found.birthDate = { key: 'validation.birthDate' }
+  else if (form.birthDate > today) found.birthDate = { key: 'validation.dateInFuture' }
   if (minor.value && !form.parentalConsent)
     found.parentalConsent = { key: 'validation.parentalConsent' }
   if (form.licensed === null) found.licensed = { key: 'validation.licence' }
@@ -142,7 +142,7 @@ function submitForm() {
       nickname: form.nickname.trim(),
       email: form.email.trim() === '' ? undefined : form.email.trim(),
       password: form.password,
-      birthDate: form.birthDate === '' ? undefined : form.birthDate,
+      birthDate: form.birthDate,
       parentalConsent: minor.value && form.parentalConsent,
       licensed: form.licensed === true,
       joinNote: form.licensed === false ? form.joinNote.trim() : undefined,
@@ -250,7 +250,6 @@ function submitForm() {
         min="1900-01-01"
         :max="today"
         :error="message('birthDate')"
-        optional
       />
       <CheckboxField
         v-if="minor"
