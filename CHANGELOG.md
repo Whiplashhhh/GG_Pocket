@@ -48,6 +48,12 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   le joindre (contact@gravelinesgrimp.org, un clic pour écrire). Cette page tient lieu de politique de
   confidentialité du club, et dit maintenant tout sur les comptes inactifs, la date de naissance et les mineur·es.
 
+- **Le fil du club**, un deuxième onglet dans Actu : les séances que les grimpeurs partagent avec tout le club.
+  C’est donnant-donnant : pour le voir, tu participes (« Je participe au fil du club », depuis l’onglet ou ton profil)
+  et tes séances « Tout le club » y apparaissent aussi. Tant que tu ne participes pas, l’onglet reste flouté.
+- Une troisième case quand tu enregistres une séance : **Tout le club**, en plus de « Mes amis » et « Juste moi ».
+  Tes amis la voient toujours ; si tu te retires du fil du club, elle redevient visible de tes seuls amis.
+
 ### Modifié
 
 - **Cotations** : on colle à ce que le club ouvre vraiment. Des « + » seulement à partir de 5b, des « - » seulement

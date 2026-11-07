@@ -144,7 +144,9 @@ voies, et celles qui l'utilisent déjà ne bougent pas. L'historique du club res
 ## 6. Modération et journal (direction)
 
 - **Modération** : les derniers commentaires du club, sur les voies et sur les séances. **Supprimer** retire un
-  commentaire pour tout le monde. Le journal garde qui l'a supprimé, et son texte.
+  commentaire pour tout le monde. Le journal garde qui l'a supprimé, et son texte. Les séances « Tout le club »
+  (le fil du club d'Actu, ouvert à qui y participe, mineur·es compris) se modèrent de la même façon : tu vois le
+  commentaire, pas la séance.
 - **Journal** : qui a fait quoi, et quand. Changements de rôle, validations, désactivations, liens de mot de passe,
   codes, voies démontées ou remontées, commentaires supprimés, changements de configuration. Il se lit, il ne se
   modifie pas.

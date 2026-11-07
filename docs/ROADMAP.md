@@ -197,7 +197,7 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
   - [x] Assureur·se pour toute la séance, voie par voie sur demande (D-118)
   - [x] Données personnelles : contact, comptes inactifs 1 an / 2 ans, date de naissance obligatoire, mention
     « mineur » pour la direction, âge affichable par les majeur·es seulement (D-119)
-  - [ ] Fil « tout le club » à double sens (D-120)
+  - [x] Fil « tout le club » à double sens (D-120)
   - [ ] Voie « à plus de 50 % » : 0,5 au classement Voies (D-121)
   - [x] Pastille bicolore, miniature ronde, série en flammes (D-122)
   - [ ] Logo du club et icônes PWA (D-123)

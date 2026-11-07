@@ -1365,6 +1365,25 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
   - Une fois activé, on voit les séances « Tout le club » des autres participant·es. Le désactiver retire aussitôt ses
     séances du fil du club (elles restent visibles des amis) et floute de nouveau le fil.
   - Les comptes en attente ne participent pas (D-107). Réactions et commentaires : mêmes règles que le fil des amis.
+- **Détail d'implémentation** :
+  - V23 : visibilité `CLUB` (contrainte CHECK refaite), colonne `member.in_club_feed` (faux par défaut), index partiel
+    sur les séances `CLUB`. Rien n'est réécrit quand on se retire : tout se décide à la lecture.
+  - Règle unique : `SessionVisibility.readableBy` (`PRIVATE` jamais, `FRIENDS` aux amis, `CLUB` aux amis ou si lecteur
+    et auteur participent, tous deux validés et actifs, `Member.isInClubFeed`). `SessionAudience` l'applique à la
+    séance, sa photo, ses réactions et commentaires (lire et écrire) et à la liste des séances d'un profil (un
+    participant non ami n'y voit que les séances `CLUB` ; le carnet d'un membre reste aux amis, `FRIENDS` + `CLUB`).
+    Séance illisible : 404, comme avant. Les mineur·es participent comme les autres ; la modération ne change pas.
+  - `GET /api/v1/feed/club` (même pagination que `/feed`, ses propres séances comprises) : 403 `ACCESS_DENIED` avant
+    validation, 403 `CLUB_FEED_NOT_JOINED` sans participation. `PUT /api/v1/me/club-feed` `{inClubFeed}` (membre
+    validé, lui seul) renvoie le membre courant, qui porte désormais `inClubFeed`. L'export contient le réglage.
+  - Choisir « Tout le club » (création, modification, « Qui la voit ») sans participer : 403 `CLUB_FEED_NOT_JOINED`.
+    Une séance qui l'a déjà le garde après le retrait (hors du fil du club jusqu'au retour) ; l'éditeur garde alors
+    l'option affichée avec une phrase qui dit qu'elle n'atteint plus que les amis, et propose d'en changer.
+  - Appli : onglets « Mes amis » / « Le club » en boutons segmentés ; l'onglet suit l'adresse (`/actu?club`, comme
+    `?amis` dans l'annuaire) plutôt que le stockage local, qui n'est pas un motif du projet pour les onglets. Non
+    participant : gabarits floutés dessinés par l'appli (aucune séance demandée au serveur), explication et bouton
+    avec confirmation qui rappelle la réciprocité ; compte en attente : même écran sans bouton. Réglage aussi dans
+    « Modifier mon profil », appliqué tout de suite comme la voie préférée (se retirer sans confirmation).
 - **Statut** : validée (club et Willem) ; détails d'interface à valider sur l'environnement dev.
 
 ### D-121 — Voie « à plus de 50 % » : 0,5 au classement « Voies »
