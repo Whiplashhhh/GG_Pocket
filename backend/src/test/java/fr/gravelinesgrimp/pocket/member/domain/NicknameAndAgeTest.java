@@ -35,4 +35,23 @@ class NicknameAndAgeTest {
         assertThat(Age.needsParentalConsent(birth, LocalDate.of(2026, 10, 21))).isFalse();
         assertThat(Age.needsParentalConsent(null, LocalDate.of(2026, 10, 21))).isFalse();
     }
+
+    @Test
+    void aMemberIsAMinorUntilTheEighteenthBirthday() {
+        var birth = LocalDate.of(2008, 11, 7);
+        assertThat(Age.isMinor(birth, LocalDate.of(2026, 11, 6))).isTrue();
+        assertThat(Age.isMinor(birth, LocalDate.of(2026, 11, 7))).isFalse();
+        assertThat(Age.isMinor(null, LocalDate.of(2026, 11, 7))).isFalse();
+    }
+
+    @Test
+    void othersSeeTheAgeOfAnAdultWhoShowsItOnly() {
+        var today = LocalDate.of(2026, 11, 7);
+        assertThat(Age.shownToOthers(LocalDate.of(1990, 1, 1), true, today)).isEqualTo(36);
+        assertThat(Age.shownToOthers(LocalDate.of(1990, 1, 1), false, today)).isNull();
+        assertThat(Age.shownToOthers(LocalDate.of(2008, 11, 7), true, today)).isEqualTo(18);
+        // A minor's age never shows, whatever was saved (D-119).
+        assertThat(Age.shownToOthers(LocalDate.of(2008, 11, 8), true, today)).isNull();
+        assertThat(Age.shownToOthers(null, true, today)).isNull();
+    }
 }

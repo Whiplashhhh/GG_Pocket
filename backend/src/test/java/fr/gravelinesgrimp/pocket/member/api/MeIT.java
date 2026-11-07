@@ -108,6 +108,17 @@ class MeIT {
                 .andExpect(jsonPath("$.parentalConsent").value(true));
     }
 
+    /** D-119: "Afficher mon âge" is for adults only; a minor's box is saved unchecked. */
+    @Test
+    void aMinorCannotShowTheirAge() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var birth = LocalDate.now().minusYears(16).toString();
+        showAge(me, birth).andExpect(status().isOk()).andExpect(jsonPath("$.showAge").value(false));
+        showAge(me, "1990-01-01")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.showAge").value(true));
+    }
+
     /** D-119: required, so it can be corrected but no longer removed. */
     @Test
     void myBirthDateCannotBeRemoved() throws Exception {
@@ -232,6 +243,21 @@ class MeIT {
                 .andExpect(status().isNoContent());
         mockMvc.perform(get("/api/v1/me").with(as(me)))
                 .andExpect(jsonPath("$.avatarUrl").doesNotExist());
+    }
+
+    private ResultActions showAge(Member me, String birthDate) throws Exception {
+        return mockMvc.perform(
+                put("/api/v1/me/profile")
+                        .with(as(me))
+                        .with(xsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                {"nickname": "%s", "firstName": "Léa", "lastName": "Dupont",
+                                 "birthDate": "%s", "parentalConsent": false, "showAge": true,
+                                 "appearsInRankings": true}
+                                """
+                                        .formatted(me.nickname(), birthDate)));
     }
 
     private Member withoutBirthDate(Member member) {

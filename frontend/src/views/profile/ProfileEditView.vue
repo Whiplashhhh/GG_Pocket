@@ -14,7 +14,7 @@ import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import TextField from '@/components/ui/TextField.vue'
-import { clubToday, needsParentalConsent } from '@/lib/age'
+import { clubToday, isMinor, needsParentalConsent } from '@/lib/age'
 import {
   EMAIL_PATTERN,
   focusFirstInvalid,
@@ -64,6 +64,14 @@ const consentNeeded = computed(
     needsParentalConsent(form.value.birthDate, today) &&
     profile.data.value?.parentalConsent !== true,
 )
+
+/** D-119: "Afficher mon âge" is offered to adults only; a minor's stays unchecked. */
+const minor = computed(() => form.value !== null && isMinor(form.value.birthDate, today))
+watch(minor, (isMinorNow) => {
+  if (isMinorNow && form.value !== null) {
+    form.value.showAge = false
+  }
+})
 
 function message(field: keyof ProfileForm): string | undefined {
   const error = errors.value[field]
@@ -197,7 +205,9 @@ function submit() {
       <h2 class="border-t border-rule pt-5 text-lg font-title">
         {{ t('profileEdit.visibility') }}
       </h2>
-      <CheckboxField v-model="form.showAge">{{ t('profileFields.showAge') }}</CheckboxField>
+      <CheckboxField v-if="!minor" v-model="form.showAge">{{
+        t('profileFields.showAge')
+      }}</CheckboxField>
       <CheckboxField
         v-model="form.appearsInRankings"
         :hint="t('profileFields.appearsInRankingsHint')"

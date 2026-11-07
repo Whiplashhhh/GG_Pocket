@@ -1178,6 +1178,7 @@
     "pendingIntro": "Nouveaux comptes à valider. Un clic sur un nom pour voir ce qu’ils ont déclaré.",
     "pendingCount": "Aucun compte en attente | 1 compte en attente | {n} comptes en attente",
     "pendingChip": "En attente",
+    "minorChip": "Mineur·e",
     "declaredLicensed": "Se dit licencié·e",
     "declaredVisitor": "Pas licencié·e"
   },
@@ -1186,7 +1187,9 @@
     "contact": "Contact",
     "email": "E-mail",
     "noEmail": "Non renseigné",
-    "minor": "Moins de 15 ans, accord parental déclaré",
+    "age": "Âge",
+    "minor": "Mineur·e (moins de 18 ans)",
+    "parentalConsent": "Moins de 15 ans, accord parental déclaré.",
     "registered": "Inscrit·e le {date}",
     "lastSeen": "Dernière activité {when}",
     "neverSeen": "Pas revenu·e depuis l’inscription",

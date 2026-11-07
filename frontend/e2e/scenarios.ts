@@ -302,6 +302,9 @@ const someMembers = (club: FakeClub) => {
     declaredLicensed: false,
     joinNote: 'Collègue de Lou au boulot, je viens grimper un jeudi sur deux avec elle.',
     registeredAt: '2026-10-19T20:15:00Z',
+    // 14: the board sees « Mineur·e » and the parental consent, never the date (D-119).
+    birthDate: '2012-03-09',
+    parentalConsent: true,
   })
 }
 

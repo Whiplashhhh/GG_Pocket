@@ -70,6 +70,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 - **Date de naissance obligatoire** : elle est demandée à l’inscription, et si ton compte n’en a pas, l’appli te la
   demande une fois à ta prochaine connexion, avant tout le reste. Elle sert à savoir si un accord parental est
   nécessaire (avant 15 ans, comme avant). Tu peux la corriger dans ton profil, plus l’effacer.
+- **Afficher mon âge** : l’option reste décochée tant que tu ne la coches pas, et elle n’est proposée qu’aux
+  majeur·es. L’âge d’un ou une mineur·e ne s’affiche jamais sur son profil, quoi qu’il arrive.
+- Pour la direction et l’admin : la fiche d’un membre et la file des comptes en attente indiquent « Mineur·e »
+  quand c’est le cas (jamais la date de naissance). Les autres membres ne voient pas cette mention.
 
 - **Première cotation** : chaque cotation se gagne pour de vrai. Une 6b ne t’offre plus la 5b, la 5c et la 6a
   au passage, il faudra les grimper (une 6b- ou une 6b+ comptent pour la 6b). Les badges déjà gagnés sont

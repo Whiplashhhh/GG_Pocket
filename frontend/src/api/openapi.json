@@ -4741,7 +4741,7 @@
       },
       "MemberProfile": {
         "type": "object",
-        "description": "age is absent unless the member chose to show it.",
+        "description": "age is absent unless an adult member chose to show it (D-119).",
         "properties": {
           "age": {
             "type": "integer",
@@ -4829,6 +4829,10 @@
             "format": "date-time",
             "description": "Roughly, to the hour; absent if never seen since registration"
           },
+          "minor": {
+            "type": "boolean",
+            "description": "Under 18, for the board and the admin only; never the birth date (D-119)"
+          },
           "nickname": {
             "type": "string"
           },
@@ -4867,6 +4871,7 @@
           "firstName",
           "id",
           "lastName",
+          "minor",
           "nickname",
           "registeredAt",
           "role",
@@ -5511,7 +5516,8 @@
             "description": "Declares that a parent agreed; required once under 15"
           },
           "showAge": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Ignored, and saved unchecked, for a member under 18 (D-119)"
           }
         },
         "required": [

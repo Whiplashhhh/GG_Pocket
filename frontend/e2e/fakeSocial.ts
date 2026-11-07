@@ -1,4 +1,5 @@
 import type { components } from '../src/api/schema'
+import { clubToday, isMinor, yearsOld } from '../src/lib/age'
 
 import type { FakeMember } from './fakeClub'
 import type { FakeSessions } from './fakeSessions'
@@ -246,12 +247,11 @@ export class FakeSocial {
       const hearts = this.topo.favorites.get(member.id) ?? []
       return json({
         member: this.card(member),
-        ...(member.showAge && member.birthDate !== undefined
-          ? {
-              age: Math.floor(
-                (this.clock() - Date.parse(member.birthDate)) / (365.25 * 24 * 3600 * 1000),
-              ),
-            }
+        // Only an adult's age, whatever a minor once saved (D-119).
+        ...(member.showAge &&
+        member.birthDate !== undefined &&
+        !isMinor(member.birthDate, clubToday(new Date(this.clock())))
+          ? { age: yearsOld(member.birthDate, clubToday(new Date(this.clock()))) }
           : {}),
         ...(member.climbingSinceYear === undefined
           ? {}

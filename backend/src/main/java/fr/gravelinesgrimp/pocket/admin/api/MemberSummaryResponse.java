@@ -28,6 +28,12 @@ public record MemberSummaryResponse(
                                 "Licensed at the club, as declared at sign-up; absent for accounts"
                                         + " that never went through it")
                 Boolean declaredLicensed,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description =
+                                "Under 18, for the board and the admin only; never the birth date"
+                                        + " (D-119)")
+                boolean minor,
         String avatarUrl,
         @Schema(requiredMode = RequiredMode.REQUIRED) Instant registeredAt,
         @Schema(description = "Roughly, to the hour; absent if never seen since registration")
@@ -45,6 +51,7 @@ public record MemberSummaryResponse(
                 view.status(),
                 view.validated(),
                 view.declaredLicensed(),
+                view.minor(),
                 MediaUrls.of(view.avatarId()),
                 view.createdAt(),
                 view.lastSeenAt(),

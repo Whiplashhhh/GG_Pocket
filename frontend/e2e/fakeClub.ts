@@ -1,7 +1,7 @@
 import type { Page, Route } from '@playwright/test'
 
 import type { components } from '../src/api/schema'
-import { clubToday, needsParentalConsent } from '../src/lib/age'
+import { clubToday, isMinor, needsParentalConsent } from '../src/lib/age'
 
 import { FakeSessions } from './fakeSessions'
 import { FakeSocial, seniorityOf } from './fakeSocial'
@@ -252,6 +252,7 @@ export class FakeClub {
       status: member.status,
       validated: member.validated,
       declaredLicensed: member.declaredLicensed,
+      minor: isMinor(member.birthDate ?? '', clubToday(new Date(this.now))),
       registeredAt: member.registeredAt,
       lastSeenAt: member.lastSeenAt,
       sessionCount: this.climbs.sessions.filter((session) => session.memberId === member.id).length,
@@ -274,7 +275,9 @@ export class FakeClub {
       member: this.summary(member),
       email: member.email,
       joinNote: member.joinNote,
-      underFifteenWithParentalConsent: false,
+      underFifteenWithParentalConsent:
+        needsParentalConsent(member.birthDate ?? '', clubToday(new Date(this.now))) &&
+        member.parentalConsent,
       clubArrivalYear: member.clubArrivalYear,
       climbingSinceYear: member.climbingSinceYear,
       permissions: {

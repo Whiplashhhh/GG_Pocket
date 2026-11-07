@@ -20,6 +20,7 @@ import fr.gravelinesgrimp.pocket.MemberFixtures;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDate;
 
 /** Member management by the board and the admin, with the role matrix of spec §5. */
 @IntegrationTest
@@ -61,6 +64,37 @@ class MemberAdminIT {
                 .andExpect(jsonPath("$.permissions.canDelete").value(false))
                 .andExpect(jsonPath("$.permissions.canDisable").value(true))
                 .andExpect(jsonPath("$.permissions.canCreateResetLink").value(true));
+    }
+
+    /** D-119: the board and the admin know who is a minor, never the birth date itself. */
+    @Test
+    void theBoardAndTheAdminSeeWhoIsAMinor() throws Exception {
+        var adult = members.create(Role.CLIMBER);
+        var teen = bornYearsAgo(members.create(Role.CLIMBER), 16, false);
+        var child = bornYearsAgo(members.createAwaitingValidation(), 12, true);
+        for (var actor : new Member[] {members.create(Role.BOARD), members.create(Role.ADMIN)}) {
+            mockMvc.perform(get("/api/v1/admin/members/" + teen.id()).with(as(actor)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.member.minor").value(true))
+                    .andExpect(jsonPath("$.underFifteenWithParentalConsent").value(false))
+                    .andExpect(jsonPath("$.birthDate").doesNotExist())
+                    .andExpect(jsonPath("$.member.birthDate").doesNotExist());
+            mockMvc.perform(get("/api/v1/admin/members/" + child.id()).with(as(actor)))
+                    .andExpect(jsonPath("$.member.minor").value(true))
+                    .andExpect(jsonPath("$.underFifteenWithParentalConsent").value(true));
+            mockMvc.perform(get("/api/v1/admin/members/" + adult.id()).with(as(actor)))
+                    .andExpect(jsonPath("$.member.minor").value(false));
+            // The queue of accounts awaiting validation is read from the table.
+            mockMvc.perform(get("/api/v1/admin/members").with(as(actor)))
+                    .andExpect(
+                            jsonPath("$[?(@.id == '" + child.id() + "')].minor")
+                                    .value(hasItem(true)))
+                    .andExpect(
+                            jsonPath("$[?(@.id == '" + adult.id() + "')].minor")
+                                    .value(hasItem(false)));
+        }
+        mockMvc.perform(get("/api/v1/admin/members/" + teen.id()).with(as(adult)))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -432,5 +466,11 @@ class MemberAdminIT {
         return JsonPath.read(
                 result.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8),
                 "$.token");
+    }
+
+    private Member bornYearsAgo(Member member, int years, boolean parentalConsent) {
+        member.changeBirthDate(
+                LocalDate.now(ClubTime.ZONE).minusYears(years), parentalConsent, Instant.now());
+        return memberRepository.saveAndFlush(member);
     }
 }

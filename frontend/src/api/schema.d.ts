@@ -2108,7 +2108,7 @@ export interface components {
       /** @description Validate this new account as a tourist or a climber */
       canValidate: boolean
     }
-    /** @description age is absent unless the member chose to show it. */
+    /** @description age is absent unless an adult member chose to show it (D-119). */
     MemberProfile: {
       /** Format: int32 */
       age?: number
@@ -2142,6 +2142,8 @@ export interface components {
        * @description Roughly, to the hour; absent if never seen since registration
        */
       lastSeenAt?: string
+      /** @description Under 18, for the board and the admin only; never the birth date (D-119) */
+      minor: boolean
       nickname: string
       /** Format: date-time */
       registeredAt: string
@@ -2364,6 +2366,7 @@ export interface components {
       nickname: string
       /** @description Declares that a parent agreed; required once under 15 */
       parentalConsent?: boolean
+      /** @description Ignored, and saved unchecked, for a member under 18 (D-119) */
       showAge?: boolean
     }
     Ranking: {

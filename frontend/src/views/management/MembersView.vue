@@ -113,6 +113,11 @@ function fullName(member: MemberSummary): string {
               }}</span>
               <span v-if="member.declaredLicensed !== undefined" aria-hidden="true">·</span>
               <span>{{ formatRelative(member.registeredAt) }}</span>
+              <span
+                v-if="member.minor"
+                class="rounded-control border border-ink px-1.5 text-micro font-semibold whitespace-nowrap text-ink"
+                >{{ t('members.minorChip') }}</span
+              >
             </span>
           </span>
           <ChevronRight :size="20" class="text-ink-muted" aria-hidden="true" />

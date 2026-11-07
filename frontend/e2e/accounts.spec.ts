@@ -221,6 +221,16 @@ test.describe('a signed-in member', () => {
     await expect(page.getByText('Ennemie jurée des dévers.')).toBeVisible()
   })
 
+  test('is not offered to show their age while a minor', async ({ page, club }) => {
+    await page.clock.setSystemTime(new Date(club.now))
+    await page.goto('/profil/modifier')
+    await expect(page.getByText('Afficher mon âge sur mon profil')).toBeVisible()
+    await page.getByLabel('Date de naissance').fill('2010-06-01')
+    await expect(page.getByText('Afficher mon âge sur mon profil')).toHaveCount(0)
+    await page.getByLabel('Date de naissance').fill('1990-06-01')
+    await expect(page.getByText('Afficher mon âge sur mon profil')).toBeVisible()
+  })
+
   test('downloads their data, then deletes their account behind their password', async ({
     page,
     club,

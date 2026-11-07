@@ -281,8 +281,14 @@ function makeResetLink() {
           >
         </dd>
       </div>
-      <div v-if="detail.underFifteenWithParentalConsent" class="sm:col-span-2">
-        <dd class="font-semibold">{{ t('member.minor') }}</dd>
+      <div v-if="detail.member.minor" class="sm:col-span-2">
+        <dt class="text-sm text-ink-muted">{{ t('member.age') }}</dt>
+        <dd class="font-semibold">
+          {{ t('member.minor') }}
+          <span v-if="detail.underFifteenWithParentalConsent" class="block font-normal">{{
+            t('member.parentalConsent')
+          }}</span>
+        </dd>
       </div>
     </dl>
 

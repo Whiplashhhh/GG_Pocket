@@ -2,6 +2,7 @@ package fr.gravelinesgrimp.pocket.member.application;
 
 import fr.gravelinesgrimp.pocket.member.domain.Age;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
+import fr.gravelinesgrimp.pocket.member.domain.MemberDetails;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
@@ -57,7 +58,7 @@ public class MyProfileService {
         uniqueFields.check(change.identity().nickname(), change.identity().email(), memberId);
 
         member.rename(change.identity());
-        member.describe(change.details());
+        member.describe(adultsOnlyShowAge(change, today));
         member.changeBirthDate(change.birthDate(), change.parentalConsent(), clock.instant());
         try {
             members.saveAndFlush(member);
@@ -81,6 +82,20 @@ public class MyProfileService {
         checkParentalConsent(member, birthDate, parentalConsent, ClubTime.today(clock));
         member.changeBirthDate(birthDate, parentalConsent, clock.instant());
         return CurrentMemberView.of(member);
+    }
+
+    /** "Afficher mon âge" is offered to adults only: a minor's box stays unchecked (D-119). */
+    private static MemberDetails adultsOnlyShowAge(ProfileChange change, LocalDate today) {
+        var details = change.details();
+        if (!details.showAge() || !Age.isMinor(change.birthDate(), today)) {
+            return details;
+        }
+        return new MemberDetails(
+                details.clubArrivalYear(),
+                details.climbingSinceYear(),
+                details.bio(),
+                false,
+                details.appearsInRankings());
     }
 
     private static void checkParentalConsent(

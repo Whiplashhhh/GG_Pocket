@@ -35,7 +35,8 @@ public record ProfileUpdateRequest(
                 LocalDate birthDate,
         @Schema(description = "Declares that a parent agreed; required once under 15")
                 boolean parentalConsent,
-        boolean showAge,
+        @Schema(description = "Ignored, and saved unchecked, for a member under 18 (D-119)")
+                boolean showAge,
         @Min(1950) @Max(2100) Integer clubArrivalYear,
         @Min(1950) @Max(2100) Integer climbingSinceYear,
         @PlainText @Size(max = 160) String bio,

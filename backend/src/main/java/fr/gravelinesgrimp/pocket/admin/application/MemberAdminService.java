@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,7 @@ public class MemberAdminService {
             MemberStatus status,
             boolean validated,
             Boolean declaredLicensed,
+            boolean minor,
             UUID avatarId,
             Instant createdAt,
             Instant lastSeenAt,
@@ -61,8 +63,9 @@ public class MemberAdminService {
             boolean canValidate) {}
 
     /**
-     * The member sheet (DECISIONS D-045): no birth date, only whether a parental consent covers a
-     * member under 15. The join note is there until the board decides on the account (D-107).
+     * The member sheet (DECISIONS D-045, D-119): no birth date, only whether the member is a minor
+     * (in the summary) and whether a parental consent covers a member under 15. The join note is
+     * there until the board decides on the account (D-107).
      */
     public record MemberDetailView(
             MemberSummaryView summary,
@@ -103,8 +106,9 @@ public class MemberAdminService {
                         .collect(
                                 Collectors.toMap(
                                         SessionCount::getMemberId, SessionCount::getSessions));
+        var today = ClubTime.today(clock);
         return members.findAllForDirectory().stream()
-                .map(member -> summary(member, sessionCounts.getOrDefault(member.id(), 0L)))
+                .map(member -> summary(member, sessionCounts.getOrDefault(member.id(), 0L), today))
                 .toList();
     }
 
@@ -242,18 +246,19 @@ public class MemberAdminService {
                         manageable && member.isActive(),
                         MemberGovernance.canDelete(actor.role(), self, validated),
                         manageable && !validated);
+        var today = ClubTime.today(clock);
         return new MemberDetailView(
-                summary(member, sessions.countByMemberId(member.id())),
+                summary(member, sessions.countByMemberId(member.id()), today),
                 member.email(),
                 member.joinNote(),
-                Age.needsParentalConsent(member.birthDate(), ClubTime.today(clock))
-                        && member.hasParentalConsent(),
+                Age.needsParentalConsent(member.birthDate(), today) && member.hasParentalConsent(),
                 member.clubArrivalYear(),
                 member.climbingSinceYear(),
                 permissions);
     }
 
-    private static MemberSummaryView summary(Member member, long sessionCount) {
+    /** Whether the member is a minor, never the birth date itself (D-119). */
+    private static MemberSummaryView summary(Member member, long sessionCount, LocalDate today) {
         return new MemberSummaryView(
                 member.id(),
                 member.nickname(),
@@ -263,6 +268,7 @@ public class MemberAdminService {
                 member.status(),
                 member.isValidated(),
                 member.declaredLicensed(),
+                Age.isMinor(member.birthDate(), today),
                 member.avatarId(),
                 member.createdAt(),
                 member.lastSeenAt(),
