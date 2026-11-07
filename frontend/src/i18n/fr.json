@@ -333,7 +333,7 @@
       "WEEK_2": "Grimper 2 jours différents dans la même semaine, du lundi au dimanche.",
       "WEEK_3": "Grimper 3 jours différents dans la même semaine, du lundi au dimanche.",
       "WEEK_4": "Grimper 4 jours différents dans la même semaine. Le canapé t’oublie.",
-      "MONTH_COMPLETE": "Grimper 10 jours différents dans le même mois.",
+      "MONTH_COMPLETE": "Grimper à chaque séance libre du mois : tous les mardis, jeudis et dimanches, sauf les jours où la salle est fermée. Pas une seule de loupée !",
       "MONTH_12": "Grimper 12 jours différents dans le même mois. Tu dors à la salle ?",
       "STREAK_3W": "Trois semaines de suite avec au moins 2 jours de grimpe chacune.",
       "MONTH_NO_MISS": "Grimper au moins une fois chaque semaine qui commence dans le mois.",
@@ -609,7 +609,12 @@
     "frozen": "Mois clôturé : ses séances sont gravées dans la résine.",
     "monthEmpty": "Pas une trace de magnésie ce mois-ci.",
     "loading": "On feuillette le calendrier…",
-    "loadError": "Impossible de charger ton planning."
+    "loadError": "Impossible de charger ton planning.",
+    "dayClosed": "{date}, salle fermée",
+    "dayClosedWith": "{date}, salle fermée : {label}",
+    "closedMark": "fermé",
+    "closedDay": "Salle fermée ce jour-là.",
+    "closedDayWith": "Salle fermée ce jour-là : {label}."
   },
   "logbook": {
     "title": "Mon carnet",
@@ -1096,7 +1101,8 @@
     "club": "Club",
     "attendance": "Fréquentation",
     "topoReview": "Bilan du topo",
-    "guide": "Guide du club"
+    "guide": "Guide du club",
+    "closedDays": "Jours de fermeture"
   },
   "clubGuide": {
     "title": "Guide du club",
@@ -1236,7 +1242,9 @@
       "CLUB_CORD_UPDATED": "{actor} a modifié la corde {target}",
       "CLUB_HOLD_COLOR_CREATED": "{actor} a créé la couleur de prises « {target} »",
       "CLUB_HOLD_COLOR_UPDATED": "{actor} a modifié la couleur de prises « {target} »",
-      "CLUB_SECTORS_REORDERED": "{actor} a réordonné les secteurs"
+      "CLUB_SECTORS_REORDERED": "{actor} a réordonné les secteurs",
+      "CLUB_DAYS_CLOSED": "{actor} a fermé la salle : {target}",
+      "CLUB_DAYS_REOPENED": "{actor} a rouvert la salle : {target}"
     },
     "targets": {
       "MEMBER": "Membre",
@@ -1246,7 +1254,8 @@
       "SESSION_COMMENT": "Commentaire de séance",
       "SECTOR": "Secteur",
       "CORD": "Corde",
-      "HOLD_COLOR": "Couleur de prises"
+      "HOLD_COLOR": "Couleur de prises",
+      "CLOSED_DAY": "Jour de fermeture"
     }
   },
   "routesAdmin": {
@@ -1536,6 +1545,33 @@
       "cordNumber": "Un numéro entier entre 1 et {max}.",
       "hex": "Un code couleur du type #F28C28."
     }
+  },
+  "closedDays": {
+    "title": "Jours de fermeture",
+    "intro": "Vacances, jours fériés, l’été : les jours où la salle reste fermée. Le badge « Mois complet » ne les attend pas, et chaque planning les affiche.",
+    "formTitle": "Fermer la salle",
+    "from": "Du",
+    "to": "Au",
+    "toHint": "Laisse vide pour un seul jour. Une année au plus.",
+    "label": "Raison",
+    "labelHint": "Les grimpeurs la verront sur leur planning.",
+    "labelPlaceholder": "Vacances de Noël",
+    "submit": "Fermer ces jours",
+    "closed": "C’est noté : salle fermée {period}.",
+    "upcoming": "À venir",
+    "past": "Passés ({n})",
+    "empty": "Aucune fermeture prévue : la salle tourne à plein régime.",
+    "single": "le {date}",
+    "range": "du {from} au {to}",
+    "days": "1 jour | {n} jours",
+    "noLabel": "Sans raison précisée",
+    "reopen": "Rouvrir la salle {period}",
+    "reopenTitle": "Rouvrir la salle ?",
+    "reopenBody": "Les jours {period} redeviennent des jours de séance libre, et le badge « Mois complet » de ces mois est recalculé.",
+    "reopenConfirm": "Rouvrir",
+    "reopened": "Salle rouverte {period}. Sortez les chaussons.",
+    "toBeforeFrom": "Le dernier jour tombe avant le premier : inverse-les.",
+    "tooLong": "Une année au plus : {max} jours maximum, coupe en deux si besoin."
   },
   "codes": {
     "title": "Codes d’inscription",

@@ -72,6 +72,7 @@ function targetOf(action: AuditAction): Schemas['AuditEntry']['targetType'] {
   if (action.startsWith('CLUB_SECTOR')) return 'SECTOR'
   if (action.startsWith('CLUB_CORD')) return 'CORD'
   if (action.startsWith('CLUB_HOLD_COLOR')) return 'HOLD_COLOR'
+  if (action.startsWith('CLUB_DAYS')) return 'CLOSED_DAY'
   return 'MEMBER'
 }
 
@@ -282,6 +283,45 @@ export class FakeClub {
         canValidate: manageable && !member.validated,
       },
     }
+  }
+
+  /** ClosedDayService: a range closed (label replaced) or reopened, then every closed day. */
+  private closedDays(
+    me: FakeMember,
+    method: string,
+    input: Record<string, unknown> | URLSearchParams,
+  ): Schemas['ClosedDay'][] | undefined {
+    const read = (key: string) =>
+      input instanceof URLSearchParams ? (input.get(key) ?? undefined) : (input[key] as string)
+    const all = this.climbs.closedDays
+    if (method === 'GET') return [...all].sort((a, b) => a.date.localeCompare(b.date))
+    const from = read('from') ?? ''
+    const to = read('to') ?? from
+    const days: string[] = []
+    for (let day = from; day <= to;) {
+      days.push(day)
+      const next = new Date(`${day}T12:00:00Z`)
+      next.setUTCDate(next.getUTCDate() + 1)
+      day = next.toISOString().slice(0, 10)
+    }
+    const range = from === to ? from : `${from} / ${to}`
+    if (method === 'DELETE') {
+      const before = all.length
+      for (const day of days) {
+        const index = all.findIndex((closed) => closed.date === day)
+        if (index >= 0) all.splice(index, 1)
+      }
+      if (all.length < before) this.record(me, 'CLUB_DAYS_REOPENED', range)
+      return undefined
+    }
+    const label = read('label')?.trim() || undefined
+    for (const day of days) {
+      const index = all.findIndex((closed) => closed.date === day)
+      if (index >= 0) all.splice(index, 1)
+      all.push({ date: day, ...(label === undefined ? {} : { label }) })
+    }
+    this.record(me, 'CLUB_DAYS_CLOSED', range, undefined, label)
+    return [...all].sort((a, b) => a.date.localeCompare(b.date))
   }
 
   private record(
@@ -512,6 +552,11 @@ export class FakeClub {
     if (path.startsWith('/admin/')) {
       if (ROLES.indexOf(me.role) < ROLES.indexOf('BOARD')) return fail(403, 'ACCESS_DENIED')
       if (path === '/admin/audit') return json({ entries: this.audit })
+      if (path === '/admin/closed-days') {
+        const query = new URL(request.url()).searchParams
+        const result = this.closedDays(me, method, method === 'POST' ? body() : query)
+        return result === undefined ? route.fulfill({ status: 204 }) : json(result)
+      }
       if (path === '/admin/moderation/comments') {
         return json({
           comments: [...this.topo.latestComments(), ...this.climbs.latestComments()].sort((a, b) =>

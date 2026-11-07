@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  CalendarOff,
   ChartColumn,
   ClipboardList,
   Grid3x3,
@@ -25,6 +26,7 @@ export interface ManagementSection {
     | 'management.members'
     | 'management.moderation'
     | 'management.audit'
+    | 'management.closedDays'
     | 'management.codes'
     | 'management.club'
     | 'management.guide'
@@ -62,6 +64,12 @@ export const SECTIONS: readonly ManagementSection[] = [
     minRole: 'BOARD',
   },
   { to: '/gestion/journal', labelKey: 'management.audit', icon: ClipboardList, minRole: 'BOARD' },
+  {
+    to: '/gestion/fermetures',
+    labelKey: 'management.closedDays',
+    icon: CalendarOff,
+    minRole: 'BOARD',
+  },
   { to: '/gestion/codes', labelKey: 'management.codes', icon: Ticket, minRole: 'ADMIN' },
   { to: '/gestion/club', labelKey: 'management.club', icon: Settings2, minRole: 'ADMIN' },
   { to: '/gestion/guide', labelKey: 'management.guide', icon: BookOpen, minRole: 'SETTER' },

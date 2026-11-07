@@ -239,6 +239,26 @@ const clubPodium = (club: FakeClub) => {
   }
 }
 
+/** Days from one date to another, both included, closed with the same label (D-116). */
+const closeGym = (club: FakeClub, from: string, to: string, label?: string) => {
+  for (let day = from; day <= to;) {
+    club.climbs.closedDays.push({ date: day, ...(label === undefined ? {} : { label }) })
+    const next = new Date(`${day}T12:00:00Z`)
+    next.setUTCDate(next.getUTCDate() + 1)
+    day = next.toISOString().slice(0, 10)
+  }
+}
+
+/** A year of closures: May Day, the summer, All Saints' holidays, Armistice Day, Christmas. */
+const gymClosures = (club: FakeClub) => {
+  closeGym(club, '2026-05-01', '2026-05-01')
+  closeGym(club, '2026-07-14', '2026-08-23', 'L’été, on grimpe dehors')
+  closeGym(club, '2026-10-01', '2026-10-01', 'Travaux au grand dévers')
+  closeGym(club, '2026-10-24', '2026-11-01', 'Vacances de la Toussaint')
+  closeGym(club, '2026-11-11', '2026-11-11', 'Armistice')
+  closeGym(club, '2026-12-19', '2027-01-03', 'Vacances de Noël')
+}
+
 const marieSeason = (club: FakeClub) => {
   marieClimbs(club)
   marieOnTheWall(club)
@@ -519,7 +539,10 @@ export const CAPTURES: Capture[] = [
     name: 'planning',
     path: '/planning',
     as: 'CLIMBER',
-    prepare: marieSeason,
+    prepare: (club) => {
+      marieSeason(club)
+      gymClosures(club)
+    },
     act: async (page) => {
       await page.getByRole('button', { name: '19 octobre 2026, grimpé' }).click()
     },
@@ -897,6 +920,28 @@ export const CAPTURES: Capture[] = [
     act: async (page) => {
       await page.getByRole('button', { name: 'Modifier la corde 12' }).click()
       await page.getByRole('dialog', { name: 'Corde 12' }).waitFor()
+    },
+  },
+  {
+    name: 'gestion-fermetures',
+    path: '/gestion/fermetures',
+    as: 'BOARD',
+    desktop: true,
+    prepare: gymClosures,
+    act: async (page) => {
+      await page.locator('summary', { hasText: 'Passés' }).click()
+    },
+  },
+  {
+    name: 'gestion-fermetures-erreur',
+    path: '/gestion/fermetures',
+    as: 'BOARD',
+    desktop: true,
+    act: async (page) => {
+      await page.getByLabel('Du').fill('2026-12-24')
+      await page.getByLabel('Au (facultatif)').fill('2026-12-20')
+      await page.getByRole('button', { name: 'Fermer ces jours' }).click()
+      await page.getByText('Le dernier jour tombe avant le premier').waitFor()
     },
   },
   {

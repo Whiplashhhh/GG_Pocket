@@ -8,5 +8,6 @@ public enum AuditTargetType {
     SESSION_COMMENT,
     SECTOR,
     CORD,
-    HOLD_COLOR
+    HOLD_COLOR,
+    CLOSED_DAY
 }

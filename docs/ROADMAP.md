@@ -191,8 +191,8 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [ ] Appliquer les réponses du club avant la 1.0 (branche `feature/decisions-club-0.9.0`) :
   - [x] Décisions validées ou remplacées dans `DECISIONS.md`
   - [x] Cotations : « + » dès 5b, « - » dès 6b, 25 cotations, conversion des données (D-115)
-  - [ ] Badges : « Mois complet » sur les séances libres moins les jours de fermeture, 5 voies, 2 favoris (D-116)
-  - [ ] Gestion : jours de fermeture de la salle (D-116)
+  - [x] Badges : « Mois complet » sur les séances libres moins les jours de fermeture, 5 voies, 2 favoris (D-116)
+  - [x] Gestion : jours de fermeture de la salle (D-116)
   - [x] Statistiques : taux de réussite sans chute, une barre par cotation (D-117)
   - [ ] Assureur·se pour toute la séance, voie par voie sur demande (D-118)
   - [ ] Données personnelles : contact, comptes inactifs 1 an / 2 ans, date de naissance obligatoire, mention

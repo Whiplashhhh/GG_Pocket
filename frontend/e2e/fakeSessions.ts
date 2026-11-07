@@ -45,6 +45,8 @@ const DAY = 24 * 3600 * 1000
  */
 export class FakeSessions implements AscentSource {
   readonly sessions: FakeSession[] = []
+  /** The days the gym is closed (D-116), set through FakeClub; every planning shows them. */
+  readonly closedDays: Schemas['ClosedDay'][] = []
   /** No network for the session writes: the requests fail like in a dead zone of the gym. */
   offline = false
   /** Accepted friends with an active account (FakeClub knows both). */
@@ -337,6 +339,9 @@ export class FakeSessions implements AscentSource {
             }),
       },
       streak: { weeks, minDaysPerWeek: 2, currentWeekDays },
+      closedDays: this.closedDays
+        .filter((day) => day.date.startsWith(month))
+        .sort((a, b) => a.date.localeCompare(b.date)),
     }
   }
 

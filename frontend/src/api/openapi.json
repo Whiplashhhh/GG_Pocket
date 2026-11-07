@@ -52,6 +52,96 @@
         ]
       }
     },
+    "/api/v1/admin/closed-days": {
+      "delete": {
+        "operationId": "reopenDays",
+        "parameters": [
+          {
+            "description": "First day to reopen",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "description": "Last day to reopen, included; the single day from by default",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "Reopen a day or a range of days (board+)",
+        "tags": [
+          "Club admin"
+        ]
+      },
+      "get": {
+        "operationId": "listClosedDays",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClosedDay"
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Every closed day, earliest first (board+)",
+        "tags": [
+          "Club admin"
+        ]
+      },
+      "post": {
+        "operationId": "closeDays",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClosedDaysSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClosedDay"
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Close a day or a range of days, 366 at most (board+); every closed day back",
+        "tags": [
+          "Club admin"
+        ]
+      }
+    },
     "/api/v1/admin/club/cords": {
       "post": {
         "operationId": "createCord",
@@ -3166,7 +3256,9 @@
               "CLUB_CORD_CREATED",
               "CLUB_CORD_UPDATED",
               "CLUB_HOLD_COLOR_CREATED",
-              "CLUB_HOLD_COLOR_UPDATED"
+              "CLUB_HOLD_COLOR_UPDATED",
+              "CLUB_DAYS_CLOSED",
+              "CLUB_DAYS_REOPENED"
             ]
           },
           "actorId": {
@@ -3210,7 +3302,8 @@
               "SESSION_COMMENT",
               "SECTOR",
               "CORD",
-              "HOLD_COLOR"
+              "HOLD_COLOR",
+              "CLOSED_DAY"
             ]
           }
         },
@@ -3484,6 +3577,47 @@
         "required": [
           "lastClimbedOn",
           "routeId"
+        ]
+      },
+      "ClosedDay": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "label": {
+            "type": "string",
+            "example": "Vacances de Noël"
+          }
+        },
+        "required": [
+          "date"
+        ]
+      },
+      "ClosedDaysSettings": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-12-21"
+          },
+          "label": {
+            "type": "string",
+            "example": "Vacances de Noël",
+            "maxLength": 60,
+            "minLength": 0
+          },
+          "to": {
+            "type": "string",
+            "format": "date",
+            "description": "Last day closed, included; the single day from when absent",
+            "example": "2027-01-04"
+          }
+        },
+        "required": [
+          "from"
         ]
       },
       "Cord": {
@@ -5176,6 +5310,13 @@
       "Planning": {
         "type": "object",
         "properties": {
+          "closedDays": {
+            "type": "array",
+            "description": "The days of the month the gym is closed, earliest first",
+            "items": {
+              "$ref": "#/components/schemas/PlanningClosedDay"
+            }
+          },
           "days": {
             "type": "array",
             "description": "Only the days with a session, earliest first",
@@ -5199,11 +5340,28 @@
           }
         },
         "required": [
+          "closedDays",
           "days",
           "frozen",
           "month",
           "streak",
           "totals"
+        ]
+      },
+      "PlanningClosedDay": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "label": {
+            "type": "string",
+            "example": "Vacances de Noël"
+          }
+        },
+        "required": [
+          "date"
         ]
       },
       "PlanningDay": {

@@ -10,6 +10,7 @@ import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import { clubToday } from '@/lib/age'
+import { closedByDate } from '@/lib/closedDays'
 import { formatDate } from '@/lib/format'
 import {
   calendarWeeks,
@@ -27,6 +28,7 @@ import {
 /**
  * Spec §8.6: my month at the gym. A day with a session carries a tick; touching it shows that
  * day's sessions under the calendar. The summary and the streak come computed from the server.
+ * The days the gym is closed say « fermé » (D-116).
  */
 const { t } = useI18n()
 const route = useRoute()
@@ -58,6 +60,8 @@ const byDate = computed(() => {
   for (const day of current.value?.days ?? []) map.set(day.date, day)
   return map
 })
+/** Date → label (or undefined) of the closed days of the month. */
+const closed = computed(() => closedByDate(current.value?.closedDays ?? []))
 const weeks = computed(() => calendarWeeks(month.value))
 const selectedDay = computed(() =>
   selected.value === undefined ? undefined : byDate.value.get(selected.value),
@@ -68,8 +72,21 @@ const streak = computed(() => current.value?.streak)
 function dayLabel(date: string): string {
   const formatted = formatDate(date)
   if (byDate.value.has(date)) return t('planning.dayClimbed', { date: formatted })
+  if (closed.value.has(date)) return closedLabel(date, formatted)
   if (date === today) return t('planning.dayToday', { date: formatted })
   return formatted
+}
+
+function closedLabel(date: string, formatted: string): string {
+  const label = closed.value.get(date)
+  return label === undefined
+    ? t('planning.dayClosed', { date: formatted })
+    : t('planning.dayClosedWith', { date: formatted, label })
+}
+
+function closedNotice(date: string): string {
+  const label = closed.value.get(date)
+  return label === undefined ? t('planning.closedDay') : t('planning.closedDayWith', { label })
 }
 
 function select(date: string) {
@@ -141,7 +158,9 @@ function select(date: string) {
                   ? 'border-ink bg-ink text-bg'
                   : byDate.has(cell.date)
                     ? 'border-brand bg-brand/15 text-ink'
-                    : 'border-transparent text-ink hover:border-rule',
+                    : closed.has(cell.date)
+                      ? 'border-transparent bg-surface-sunken text-ink-muted hover:border-rule'
+                      : 'border-transparent text-ink hover:border-rule',
                 cell.date === today && selected !== cell.date
                   ? 'outline-2 outline-offset-[-6px] outline-ink outline-dotted'
                   : '',
@@ -164,6 +183,12 @@ function select(date: string) {
                 :class="selected === cell.date ? 'text-bg' : 'text-brand-ink'"
                 aria-hidden="true"
               />
+              <span
+                v-else-if="closed.has(cell.date)"
+                class="-mt-0.5 text-micro leading-none font-semibold"
+                aria-hidden="true"
+                >{{ t('planning.closedMark') }}</span
+              >
             </button>
           </td>
         </tr>
@@ -190,6 +215,9 @@ function select(date: string) {
       <h2 class="text-base font-title">
         {{ t('planning.dayTitle', { date: formatDate(selected) }) }}
       </h2>
+      <p v-if="closed.has(selected)" class="mt-1 text-sm font-semibold text-ink-muted">
+        {{ closedNotice(selected) }}
+      </p>
       <ul v-if="selectedDay" class="mt-1">
         <li v-for="session in selectedDay.sessions" :key="session.id">
           <RouterLink

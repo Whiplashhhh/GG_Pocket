@@ -144,3 +144,44 @@ test.describe('the admin', () => {
     await expect(page.getByText('0 sur 30 inscriptions')).toBeVisible()
   })
 })
+
+test.describe('the board, for the days the gym is closed', () => {
+  test.use({ signedInAs: 'BOARD' })
+
+  test('closes the gym for the holidays, sees it on the planning, then reopens it', async ({
+    page,
+    club,
+  }) => {
+    // The browser lives on the fake club's day (2026-10-20), so the holidays are still to come.
+    await page.clock.setSystemTime(new Date(club.now))
+    await page.goto('/gestion/fermetures')
+    await expect(page.getByText('Aucune fermeture prévue')).toBeVisible()
+    await page.getByLabel('Du', { exact: true }).fill('2026-10-24')
+    await page.getByLabel('Au (facultatif)').fill('2026-10-26')
+    await page.getByLabel('Raison (facultatif)').fill('Vacances de la Toussaint')
+    await page.getByRole('button', { name: 'Fermer ces jours' }).click()
+    await expect(page.getByRole('status')).toHaveText(
+      'C’est noté : salle fermée du 24 octobre 2026 au 26 octobre 2026.',
+    )
+    await expect(page.getByText('Vacances de la Toussaint')).toBeVisible()
+    await expect(page.getByText('3 jours')).toBeVisible()
+
+    await page.goto('/planning')
+    await expect(
+      page.getByRole('button', {
+        name: '24 octobre 2026, salle fermée : Vacances de la Toussaint',
+      }),
+    ).toBeVisible()
+
+    await page.goto('/gestion/fermetures')
+    await page
+      .getByRole('button', { name: 'Rouvrir la salle du 24 octobre 2026 au 26 octobre 2026' })
+      .click()
+    await page
+      .getByRole('alertdialog', { name: 'Rouvrir la salle ?' })
+      .getByRole('button', { name: 'Rouvrir' })
+      .click()
+    await expect(page.getByRole('status')).toHaveText(/^Salle rouverte du 24 octobre 2026/)
+    await expect(page.getByText('Aucune fermeture prévue')).toBeVisible()
+  })
+})

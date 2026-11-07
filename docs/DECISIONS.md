@@ -1257,6 +1257,23 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
   de `BadgeCode.FULL_LEAD` et `PERFECT` à 5 (les badges déjà gagnés sont recomptés au démarrage par `BadgeRecount`) ;
   `FavoriteBadge.MAX` = 2 (d'où `@Size(max = 2)` et `maxItems: 2` dans le contrat), `MAX_FAVORITES` = 2 dans
   `BadgeDialog.vue` ; `V20__keep_two_favorite_badges.sql` supprime le 3e favori selon `slot`.
+- **Détail d'implémentation** (« Mois complet » et jours de fermeture) :
+  - table `closed_day` (`V21__create_closed_day.sql`) : une ligne par date fermée (`closed_on` unique), libellé
+    facultatif de 60 caractères. Gérée par la direction et la présidence (`hasRole('BOARD')`, sous
+    `/api/v1/admin/closed-days` : `GET` liste, `POST {from, to?, label?}` ferme un jour ou une plage de 366 jours
+    au plus, entre l'an 2000 et deux ans après cette année, un jour déjà fermé prend le nouveau libellé ;
+    `DELETE ?from&to` rouvre, sans erreur s'il n'y a rien à rouvrir). Journal : `CLUB_DAYS_CLOSED` /
+    `CLUB_DAYS_REOPENED`, cible `CLOSED_DAY`, libellé « 2026-12-21 / 2027-01-04 ».
+  - Les membres voient les fermetures du mois dans leur planning (`closedDays` de `GET /me/planning`), pas de liste
+    complète hors gestion. Écran `/gestion/fermetures` (section à part, car `/gestion/club` est réservé à la
+    présidence) ; les jours consécutifs de même libellé s'affichent en une période, rouverte d'un coup.
+  - Moteur : `BadgeEngine.awards(history, closedDays)` reçoit les fermetures de tout le club ; `FreeSessions` dit
+    les jours de séance libre (mardi, jeudi, dimanche, hors fermeture). Le badge tombe sur la séance qui grimpe le
+    dernier jour de séance libre manquant du mois, donc parfois avant la fin du mois. Le seuil de
+    `BadgeCode.MONTH_COMPLETE` (1) ne sert plus au calcul. Médaille : plus de chiffre « 10 ».
+  - Recalcul : au démarrage (`BadgeRecount`) et, à chaque fermeture ou réouverture, dans la même transaction,
+    pour les grimpeurs ayant une séance dans les mois touchés (`BadgeAwards.refreshMonthsOf`, verrous des membres
+    pris dans l'ordre des identifiants).
 - **Statut** : validée (club) ; jours de fermeture validés par Willem.
 
 ### D-117 — Statistiques de gestion : taux de réussite sans chute, une barre par cotation (remplace D-104 en partie)

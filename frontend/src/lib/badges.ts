@@ -93,7 +93,6 @@ const MARKS: Readonly<Partial<Record<Badge, string>>> = {
   WEEK_2: '2',
   WEEK_3: '3',
   WEEK_4: '4',
-  MONTH_COMPLETE: '10',
   MONTH_12: '12',
 }
 

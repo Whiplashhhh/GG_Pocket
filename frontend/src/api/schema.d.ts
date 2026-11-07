@@ -21,6 +21,25 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/admin/closed-days': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Every closed day, earliest first (board+) */
+    get: operations['listClosedDays']
+    put?: never
+    /** Close a day or a range of days, 366 at most (board+); every closed day back */
+    post: operations['closeDays']
+    /** Reopen a day or a range of days (board+) */
+    delete: operations['reopenDays']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/admin/club/cords': {
     parameters: {
       query?: never
@@ -1490,6 +1509,8 @@ export interface components {
         | 'CLUB_CORD_UPDATED'
         | 'CLUB_HOLD_COLOR_CREATED'
         | 'CLUB_HOLD_COLOR_UPDATED'
+        | 'CLUB_DAYS_CLOSED'
+        | 'CLUB_DAYS_REOPENED'
       /**
        * Format: uuid
        * @description Absent if that member was deleted since
@@ -1517,6 +1538,7 @@ export interface components {
         | 'SECTOR'
         | 'CORD'
         | 'HOLD_COLOR'
+        | 'CLOSED_DAY'
     }
     /** @description Newest first. */
     AuditPage: {
@@ -1658,6 +1680,27 @@ export interface components {
       lastClimbedOn: string
       /** Format: uuid */
       routeId: string
+    }
+    ClosedDay: {
+      /** Format: date */
+      date: string
+      /** @example Vacances de Noël */
+      label?: string
+    }
+    ClosedDaysSettings: {
+      /**
+       * Format: date
+       * @example 2026-12-21
+       */
+      from: string
+      /** @example Vacances de Noël */
+      label?: string
+      /**
+       * Format: date
+       * @description Last day closed, included; the single day from when absent
+       * @example 2027-01-04
+       */
+      to?: string
     }
     Cord: {
       active: boolean
@@ -2243,6 +2286,8 @@ export interface components {
       nickname: string
     }
     Planning: {
+      /** @description The days of the month the gym is closed, earliest first */
+      closedDays: components['schemas']['PlanningClosedDay'][]
       /** @description Only the days with a session, earliest first */
       days: components['schemas']['PlanningDay'][]
       /** @description Its sessions can no longer change */
@@ -2251,6 +2296,12 @@ export interface components {
       month: string
       streak: components['schemas']['Streak']
       totals: components['schemas']['MonthTotals']
+    }
+    PlanningClosedDay: {
+      /** Format: date */
+      date: string
+      /** @example Vacances de Noël */
+      label?: string
     }
     PlanningDay: {
       /** Format: date */
@@ -2847,6 +2898,73 @@ export interface operations {
         content: {
           'application/json': components['schemas']['AuditPage']
         }
+      }
+    }
+  }
+  listClosedDays: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ClosedDay'][]
+        }
+      }
+    }
+  }
+  closeDays: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ClosedDaysSettings']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ClosedDay'][]
+        }
+      }
+    }
+  }
+  reopenDays: {
+    parameters: {
+      query: {
+        /** @description First day to reopen */
+        from: string
+        /** @description Last day to reopen, included; the single day from by default */
+        to?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }

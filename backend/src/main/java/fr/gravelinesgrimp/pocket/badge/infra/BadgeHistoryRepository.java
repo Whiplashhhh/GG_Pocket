@@ -5,6 +5,7 @@ import fr.gravelinesgrimp.pocket.session.domain.ClimbingSession;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,4 +27,10 @@ public interface BadgeHistoryRepository extends Repository<ClimbingSession, UUID
     /** The members with at least one session (the sessions of a deleted account have none). */
     @Query("select distinct s.memberId from ClimbingSession s where s.memberId is not null")
     List<UUID> climbers();
+
+    /** The members with a session from {@code from} to {@code to}, both included. */
+    @Query(
+            "select distinct s.memberId from ClimbingSession s where s.memberId is not null"
+                    + " and s.climbedOn between :from and :to")
+    List<UUID> climbersBetween(LocalDate from, LocalDate to);
 }

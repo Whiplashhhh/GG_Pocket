@@ -263,6 +263,11 @@ const routes: RouteRecordRaw[] = [
         meta: { titleKey: 'audit.title', minRole: 'BOARD', wide: true },
       },
       {
+        path: 'fermetures',
+        component: () => import('@/views/management/ClosedDaysView.vue'),
+        meta: { titleKey: 'closedDays.title', minRole: 'BOARD', wide: true },
+      },
+      {
         path: 'codes',
         component: () => import('@/views/management/RegistrationCodesView.vue'),
         meta: { titleKey: 'codes.title', minRole: 'ADMIN', wide: true },

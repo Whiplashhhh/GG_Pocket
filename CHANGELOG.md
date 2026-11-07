@@ -33,6 +33,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 - **Une voie au hasard** : tu tournes en rond devant le mur ? Le bouton aux deux flèches croisées, en haut du
   topo, tire une voie au sort parmi celles affichées (tes filtres comptent, « Pas encore faite par moi »
   compris). Elle ne te dit rien ? « Une autre ! », autant de fois que tu veux.
+- Pour la direction, **Jours de fermeture** dans l’espace gestion : un jour ou toute une période (« Vacances de
+  Noël », l’été…), et la salle est fermée dans l’appli aussi. Ton planning affiche ces jours « fermé », raison
+  comprise quand tu touches le jour.
 
 - **Mois clos, mais toujours à toi** : une séance d’un mois clos ne change plus ses voies, mais tu peux encore la
   garder pour toi, effacer ton mot ou retirer la photo, directement depuis la séance.
@@ -47,6 +50,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 - **Badges** : « Séance full tête » et « Séance parfaite » se méritent sur au moins 5 voies (au lieu de 3),
   les badges déjà gagnés sont recomptés avec cette règle.
   Et 2 badges en avant à côté de ton pseudo, pas un de plus : si tu en avais 3, tu gardes les 2 premiers.
+- **Mois complet** : fini les 10 jours, il faut répondre présent à **chaque séance libre du mois**, tous les
+  mardis, jeudis et dimanches, sauf les jours où la salle est fermée. Le badge tombe dès la dernière séance du mois
+  grimpée, et les badges déjà gagnés sont recomptés avec cette règle.
 - **Bilan du topo** : une barre par cotation, la 6b- n’est plus noyée avec la 6b et la 6b+. Les trous dans
   l’offre sautent aux yeux.
 
