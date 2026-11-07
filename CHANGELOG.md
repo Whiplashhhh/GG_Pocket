@@ -39,6 +39,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ### Modifié
 
+- **Cotations** : on colle à ce que le club ouvre vraiment. Des « + » seulement à partir de 5b, des « - » seulement
+  à partir de 6b : 25 cotations, de 4a à 7c+. Les voies qui portaient une cotation disparue passent à la cotation
+  sans signe (une 4a+ devient une 4a, une 6a- une 6a), ton carnet et tes « À faire » suivent.
+
 - Le vrai logo du club est arrivé, en haute définition : plus net en haut de l’appli, sur l’écran de connexion et
   sur l’icône du téléphone. L’orange et le vert de l’appli prennent les couleurs officielles du club.
 

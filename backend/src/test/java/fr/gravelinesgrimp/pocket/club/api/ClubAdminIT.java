@@ -4,8 +4,10 @@ import static fr.gravelinesgrimp.pocket.MemberFixtures.as;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -47,10 +49,11 @@ class ClubAdminIT {
     void everyMemberReadsTheRealClubLayout() throws Exception {
         mockMvc.perform(get("/api/v1/topo/config").with(as(members.create(Role.CLIMBER))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.grades", hasSize(36)))
-                .andExpect(jsonPath("$.grades[0].code").value("4a-"))
-                .andExpect(jsonPath("$.grades[35].code").value("7c+"))
-                .andExpect(jsonPath("$.grades[35].rank").value(36))
+                .andExpect(jsonPath("$.grades", hasSize(25)))
+                .andExpect(jsonPath("$.grades[0].code").value("4a"))
+                .andExpect(jsonPath("$.grades[*].code").value(not(hasItem("6a-"))))
+                .andExpect(jsonPath("$.grades[24].code").value("7c+"))
+                .andExpect(jsonPath("$.grades[24].rank").value(36))
                 .andExpect(
                         jsonPath("$.sectors[?(@.name == 'Neutre 8 m')].cords[*].number")
                                 .value(hasItems(1, 2, 3)))

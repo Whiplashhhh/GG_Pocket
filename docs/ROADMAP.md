@@ -190,7 +190,7 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
   `docs/QUESTIONNAIRE_CLUB_PROMPT.md`, réponses reçues le 2026-11-07 (D-115 à D-123)
 - [ ] Appliquer les réponses du club avant la 1.0 (branche `feature/decisions-club-0.9.0`) :
   - [x] Décisions validées ou remplacées dans `DECISIONS.md`
-  - [ ] Cotations : « + » dès 5b, « - » dès 6b, 25 cotations, conversion des données (D-115)
+  - [x] Cotations : « + » dès 5b, « - » dès 6b, 25 cotations, conversion des données (D-115)
   - [ ] Badges : « Mois complet » sur les séances libres moins les jours de fermeture, 5 voies, 2 favoris (D-116)
   - [ ] Gestion : jours de fermeture de la salle (D-116)
   - [ ] Statistiques : taux de réussite sans chute, une barre par cotation (D-117)

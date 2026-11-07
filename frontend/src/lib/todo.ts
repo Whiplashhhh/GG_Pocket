@@ -10,7 +10,7 @@ export type TodoDirection = 'asc' | 'desc'
 export interface TodoView {
   mode: ClimbMode
   sectorId?: string
-  /** A grade family: "6a" covers 6a-, 6a and 6a+. */
+  /** A grade family: "6b" covers 6b-, 6b and 6b+. */
   family?: string
   direction: TodoDirection
 }
@@ -24,7 +24,7 @@ export function stateIn(item: TodoRoute, mode: ClimbMode) {
   return item[FIELD[mode]]
 }
 
-/** "6a+" → "6a", "4a-" → "4a". */
+/** "6a+" → "6a", "6b-" → "6b". */
 export function gradeFamily(grade: string): string {
   return grade.replace(/[+-]$/, '')
 }

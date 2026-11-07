@@ -171,6 +171,27 @@ class RouteIT {
     }
 
     @Test
+    void aRetiredGradeTakesNoRoute() throws Exception {
+        var setter = members.create(Role.SETTER);
+        var base = routes.draft(setter);
+        var draft =
+                new RouteDraft(
+                        base.name(),
+                        routes.gradeId("6a-"),
+                        base.cordId(),
+                        base.holdColorIds(),
+                        base.openedOn(),
+                        base.setterIds(),
+                        null,
+                        base.advice(),
+                        base.styles());
+
+        save(setter, post("/api/v1/routes"), draft)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("CLUB_ITEM_INACTIVE"));
+    }
+
+    @Test
     void aRouteKeepsItsCordWhenTheCordIsDeactivated() throws Exception {
         var setter = members.create(Role.SETTER);
         var sectorId = cords.findById(routes.cordId(1)).orElseThrow().sectorId();

@@ -216,7 +216,7 @@ function fold(text: string): string {
 }
 
 /**
- * Route picker search: by cord number ("12"), name, hold colour or grade ("6a" finds 6a and 6a+).
+ * Route picker search: by cord number ("12"), name, hold colour or grade ("6b" finds 6b-, 6b and 6b+).
  * Every word must match something.
  */
 export function matchesRouteSearch(route: RouteSummary, search: string): boolean {

@@ -1237,6 +1237,12 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
   7b-, 7b, 7b+, 7c-, 7c, 7c+. Les 11 cotations retirées (4a- à 5a+, 5b-, 5c-, 6a-) ne sont plus proposées ; les voies,
   « À faire » et données existantes qui les portent passent à la cotation sans signe (4a+ → 4a, 6a- → 6a), confirmé par
   Willem. Nouvelle migration Flyway (rien n'est supprimé de la table `grade`, voir D-074).
+- **Détail d'implémentation** : `V19__retire_unused_grades.sql` ajoute `grade.retired` (booléen), marque les 11
+  cotations et fait pointer les voies vers la cotation sans signe (« À faire », séances et badges suivent la voie ;
+  aucune autre table ne référence `grade`). Les rangs ne changent pas (4a reste 2, 7c+ reste 36) : seul l'ordre
+  compte. `ClubLayout.sortedGrades()` écarte les cotations retirées, donc `GET /api/v1/topo/config` n'en sert plus
+  que 25 (contrat inchangé) ; `RouteService` refuse une cotation retirée (`CLUB_ITEM_INACTIVE`), comme une corde
+  inactive. `GradeScale` (badges) lit toujours les anciens codes. Seed de démo et fausse API e2e passent aux 25.
 - **Statut** : validée (club et Willem).
 
 ### D-116 — Badges : « Mois complet » sur les séances libres, 5 voies, 2 favoris (remplace D-005, D-007 en partie, D-106 en partie)

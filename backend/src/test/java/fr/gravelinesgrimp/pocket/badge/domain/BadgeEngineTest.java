@@ -100,8 +100,8 @@ class BadgeEngineTest {
 
         @Test
         void aMinusOrAPlusCountsAsItsGrade() {
-            session("2025-03-03", top("6a-"));
-            session("2025-03-04", top("6b+"));
+            session("2025-03-03", top("6a+"));
+            session("2025-03-04", top("6b-"));
 
             assertThat(only(BadgeCode.GRADE_6A).earnedOn())
                     .isEqualTo(LocalDate.parse("2025-03-03"));
@@ -136,7 +136,7 @@ class BadgeEngineTest {
 
         @Test
         void theEasiestGradesHaveNoTier() {
-            session("2025-03-03", top("4c+"), top("5a"));
+            session("2025-03-03", top("4c"), top("5a"));
 
             assertThat(codes()).doesNotContain(BadgeCode.GRADE_5B);
         }

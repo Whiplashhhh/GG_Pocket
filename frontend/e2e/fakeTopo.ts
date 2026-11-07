@@ -102,26 +102,16 @@ const COLORS: [string, string][] = [
   ['multicolore', '#808080'],
 ]
 
+/** The 25 grades on offer (D-115). */
 const GRADES = [
-  '4a-',
   '4a',
-  '4a+',
-  '4b-',
   '4b',
-  '4b+',
-  '4c-',
   '4c',
-  '4c+',
-  '5a-',
   '5a',
-  '5a+',
-  '5b-',
   '5b',
   '5b+',
-  '5c-',
   '5c',
   '5c+',
-  '6a-',
   '6a',
   '6a+',
   '6b-',
