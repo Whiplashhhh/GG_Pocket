@@ -310,3 +310,29 @@ export function requestToForm(body: SessionRequest): SessionForm {
     })),
   }
 }
+
+/**
+ * Who may see the session, smallest audience first (D-120). « Tout le club » is offered to a member
+ * of the club feed; a session that already has it (or a draft that asks for it) keeps it on screen
+ * after its climber left, so they see it and change it.
+ */
+export function visibilityChoices(
+  inClubFeed: boolean,
+  saved: SessionVisibility | undefined,
+  current: SessionVisibility,
+): SessionVisibility[] {
+  const club = inClubFeed || saved === 'CLUB' || current === 'CLUB'
+  return club ? ['PRIVATE', 'FRIENDS', 'CLUB'] : ['PRIVATE', 'FRIENDS']
+}
+
+/** The line under the choice: what it means, or why « Tout le club » no longer reaches the club. */
+export function visibilityHintKey(visibility: SessionVisibility, inClubFeed: boolean): string {
+  switch (visibility) {
+    case 'CLUB':
+      return inClubFeed ? 'session.visibilityClubHint' : 'session.visibilityClubLeft'
+    case 'FRIENDS':
+      return 'session.visibilityFriendsHint'
+    default:
+      return 'session.visibilityPrivateHint'
+  }
+}

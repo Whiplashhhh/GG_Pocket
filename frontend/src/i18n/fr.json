@@ -123,6 +123,9 @@
     "visibilityPrivate": "Juste moi",
     "visibilityFriendsHint": "Tes amis la verront dans leur fil (dès que les amis arrivent dans l’appli).",
     "visibilityPrivateHint": "Personne d’autre que toi. Elle compte quand même pour le podium.",
+    "visibilityClub": "Tout le club",
+    "visibilityClubHint": "Tes amis, et tous les membres qui participent au fil du club.",
+    "visibilityClubLeft": "Tu ne participes plus au fil du club : cette séance n’y apparaît plus, seuls tes amis la voient. Choisis « Mes amis » ou « Juste moi », ou reviens dans le fil du club depuis ton profil.",
     "save": "Enregistrer la séance",
     "saving": "Enregistrement…",
     "savedTitle": "Séance au carnet !",
@@ -187,7 +190,7 @@
     "title": "Actu",
     "emptyTitle": "Le mur est calme… trop calme.",
     "emptyBody": "Ajoute des amis ou enregistre ta première séance avec le bouton « Nouvelle séance » : ton fil se remplira tout seul.",
-    "clubTagline": "Le fil du club : tes séances et celles de tes amis, au même endroit.",
+    "clubTagline": "Tes séances, celles des copains et, si tu joues le jeu, celles de tout le club.",
     "more": "Voir les séances d’avant",
     "loadingMore": "On remonte le carnet…",
     "end": "C’est tout ! Le reste est encore à grimper.",
@@ -196,7 +199,28 @@
     "clubCountHint": "Voir l’annuaire du club",
     "clubCountHintSuffix": ", voir l’annuaire du club",
     "feed": "Le fil",
-    "findFriends": "Trouver des copains de cordée"
+    "findFriends": "Trouver des copains de cordée",
+    "tabs": "Quel fil",
+    "tabFriends": "Mes amis",
+    "tabClub": "Le club",
+    "clubFeed": "Le fil du club",
+    "clubEmptyTitle": "Personne n’a encore ouvert le bal.",
+    "clubEmptyBody": "Le fil du club se remplit des séances « Tout le club ». Montre l’exemple : choisis « Tout le club » en enregistrant ta prochaine séance."
+  },
+  "clubFeed": {
+    "teaserTitle": "Le fil du club, c’est donnant-donnant",
+    "teaserBody": "Ici défilent les séances que les grimpeurs du club partagent avec tout le monde. Pour les voir, tu joues le jeu : tes séances « Tout le club » y apparaissent aussi.",
+    "teaserPrivacy": "Tes séances « Mes amis » et « Juste moi » ne bougent pas. Tu choisis séance par séance, et tu peux te retirer quand tu veux.",
+    "join": "Je participe au fil du club",
+    "confirmTitle": "Tu montres, tu vois",
+    "confirmBody": "Pour voir le fil du club, tes séances « Tout le club » y apparaissent aussi, pour tous les membres qui y participent. Les autres restent entre toi et tes amis. Tu peux te retirer quand tu veux depuis ton profil.",
+    "confirmLabel": "J’en suis",
+    "settingTitle": "Fil du club",
+    "settingOn": "Tu participes au fil du club : tu vois les séances « Tout le club » des autres, et ils voient les tiennes. Te retirer les rend aussitôt à tes seuls amis.",
+    "settingOff": "Tu ne participes pas au fil du club. C’est donnant-donnant : pour voir le fil du club, tes séances « Tout le club » y apparaissent aussi.",
+    "leave": "Me retirer du fil du club",
+    "joined": "Bienvenue dans le fil du club ! Choisis « Tout le club » quand tu enregistres une séance.",
+    "left": "C’est noté : tes séances « Tout le club » ne sont plus visibles que de tes amis."
   },
   "feed": {
     "authorProfile": "Profil de {nickname}",
@@ -809,7 +833,8 @@
     "SESSION_TOO_OLD": "Trop loin dans le passé : une séance se note jusqu’à 7 jours en arrière.",
     "MONTH_FROZEN": "Ce mois est clos et son podium gravé dans le marbre : ses séances ne bougent plus.",
     "INVALID_ASCENT": "Une ligne cloche : une voie enchaînée est forcément topée, sans chute.",
-    "CHECK_FROM_ASCENT": "Tu l’as enchaînée dans ce mode pendant une séance : c’est cette séance qu’il faut modifier pour la décocher."
+    "CHECK_FROM_ASCENT": "Tu l’as enchaînée dans ce mode pendant une séance : c’est cette séance qu’il faut modifier pour la décocher.",
+    "CLUB_FEED_NOT_JOINED": "« Tout le club », c’est pour les membres du fil du club. Participe au fil du club (onglet « Le club » d’Actu) ou choisis « Mes amis »."
   },
   "gallery": {
     "title": "Galerie des composants",
@@ -1685,6 +1710,7 @@
     "podium": "Le podium s’ouvre dès que la direction a validé ton compte. Tes séances comptent déjà : elles seront là le jour J.",
     "directory": "L’annuaire du club s’ouvre dès que la direction a validé ton compte.",
     "belayer": "Tu pourras dire qui t’assurait dès que la direction aura validé ton compte.",
-    "comments": "Tu pourras commenter les voies dès que la direction aura validé ton compte."
+    "comments": "Tu pourras commenter les voies dès que la direction aura validé ton compte.",
+    "clubFeed": "Le fil du club s’ouvrira dès que la direction aura validé ton compte."
   }
 }

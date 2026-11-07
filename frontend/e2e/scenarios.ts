@@ -319,6 +319,36 @@ const someMembers = (club: FakeClub) => {
 }
 
 /** Marie has just joined: her account awaits the board (D-107). */
+/**
+ * The club feed (D-120): marie, tom and Bernard-Emmanuel (not a friend of hers) take part; léa
+ * does not, so her « Tout le club » session stays with her friends.
+ */
+const clubFeedAlive = (club: FakeClub) => {
+  feedAlive(club)
+  const find = (nickname: string) => club.members.find((member) => member.nickname === nickname)
+  const marie = find('marie')
+  const tom = find('tom.bloc')
+  const lea = find('lea.dyno')
+  const bernard = find('bernard.leclercq.du.grand.devers')
+  if (marie === undefined || tom === undefined || lea === undefined || bernard === undefined) {
+    return
+  }
+  for (const member of [marie, tom, bernard]) member.inClubFeed = true
+  club.climbs.add(
+    bernard,
+    0,
+    [
+      { route: 'Iron Man', mode: 'LEAD', clean: true },
+      { route: 'Tonton Talon', mode: 'LEAD' },
+    ],
+    { visibility: 'CLUB', comment: 'Trente ans de dévers et toujours pas lassé.', feeling: 9 },
+  )
+  club.climbs.add(tom, 2, [{ route: 'Réglisse', mode: 'LEAD', clean: true }], {
+    visibility: 'CLUB',
+  })
+  club.climbs.add(lea, 1, [{ route: 'Sec !', clean: true }], { visibility: 'CLUB' })
+}
+
 const marieAwaits = (club: FakeClub) => {
   const marie = club.members.find((member) => member.nickname === 'marie')
   if (marie) marie.validated = false
@@ -510,6 +540,9 @@ export const CAPTURES: Capture[] = [
   },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
   { name: 'actu-fil', path: '/actu', as: 'CLIMBER', prepare: feedAlive },
+  { name: 'actu-club-flou', path: '/actu?club', as: 'CLIMBER', prepare: feedAlive },
+  { name: 'actu-club', path: '/actu?club', as: 'CLIMBER', prepare: clubFeedAlive },
+  { name: 'actu-club-en-attente', path: '/actu?club', as: 'TOURIST', prepare: marieAwaits },
   {
     name: 'seance-ami',
     path: '/actu',
@@ -626,6 +659,25 @@ export const CAPTURES: Capture[] = [
       await second.getByRole('button', { name: 'Une chute de plus' }).click()
       await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('')
       await page.getByLabel('Commentaire').fill('Grosse séance de conti.')
+    },
+  },
+  {
+    name: 'seance-saisie-club',
+    path: '/seance/nouvelle',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      marieClimbs(club)
+      const marie = club.members.find((member) => member.nickname === 'marie')
+      if (marie) marie.inClubFeed = true
+    },
+    act: async (page) => {
+      await addToSession(page, '12', 'Bye Bye Morice')
+      await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('')
+      const choice = page
+        .getByRole('radiogroup', { name: 'Qui la voit' })
+        .getByRole('radio', { name: 'Tout le club' })
+      await choice.click()
+      await choice.scrollIntoViewIfNeeded()
     },
   },
   {

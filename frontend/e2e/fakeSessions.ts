@@ -51,6 +51,8 @@ export class FakeSessions implements AscentSource {
   offline = false
   /** Accepted friends with an active account (FakeClub knows both). */
   isFriend: (readerId: string, climberId: string) => boolean = () => false
+  /** Takes part in the club feed, active and validated (D-120; FakeSocial knows). */
+  inClubFeed: (id: string) => boolean = () => false
   /** Active and not opted out of the podium (FakeSocial knows). */
   inRankings: (id: string) => boolean = () => true
   /** Nickname and photo of a member (FakeSocial knows them). */
@@ -366,7 +368,7 @@ export class FakeSessions implements AscentSource {
     }
     const mine = this.allAscents().filter(
       ({ session }) =>
-        session.memberId === climberId && (!sharedOnly || session.visibility === 'FRIENDS'),
+        session.memberId === climberId && (!sharedOnly || session.visibility !== 'PRIVATE'),
     )
     const byRoute = new Map<string, typeof mine>()
     for (const item of mine) {
@@ -467,11 +469,21 @@ export class FakeSessions implements AscentSource {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   }
 
+  /** SessionAudience (D-120): friends read FRIENDS and CLUB, the club feed reads CLUB. */
   private readable(me: TopoMember, session: FakeSession): boolean {
-    return (
-      session.memberId === me.id ||
-      (session.visibility === 'FRIENDS' && this.isFriend(me.id, session.memberId))
-    )
+    if (session.memberId === me.id) return true
+    if (session.visibility === 'PRIVATE') return false
+    if (this.isFriend(me.id, session.memberId)) return true
+    return session.visibility === 'CLUB' && this.inClubTogether(me.id, session.memberId)
+  }
+
+  private inClubTogether(readerId: string, climberId: string): boolean {
+    return this.inClubFeed(readerId) && this.inClubFeed(climberId)
+  }
+
+  /** "Tout le club" for the club feed only; a session that has it keeps it (D-120). */
+  private refusesClub(me: TopoMember, wanted: string, current?: string): boolean {
+    return wanted === 'CLUB' && current !== 'CLUB' && !this.inClubFeed(me.id)
   }
 
   private reactions(me: TopoMember, session: FakeSession): Schemas['SessionReactions'] {
@@ -611,12 +623,15 @@ export class FakeSessions implements AscentSource {
     const url = new URL(path, 'http://fake')
     const pathname = url.pathname
 
-    if (pathname === '/feed' && method === 'GET') {
+    if ((pathname === '/feed' || pathname === '/feed/club') && method === 'GET') {
+      const club = pathname === '/feed/club'
+      if (club && !this.inClubFeed(me.id)) return problem(403, 'CLUB_FEED_NOT_JOINED')
       const all = this.sessions
-        .filter(
-          (session) =>
-            session.memberId === me.id ||
-            (session.visibility === 'FRIENDS' && this.isFriend(me.id, session.memberId)),
+        .filter((session) =>
+          club
+            ? session.visibility === 'CLUB' && this.inClubFeed(session.memberId)
+            : session.memberId === me.id ||
+              (session.visibility !== 'PRIVATE' && this.isFriend(me.id, session.memberId)),
         )
         .sort(
           (a, b) =>
@@ -655,10 +670,15 @@ export class FakeSessions implements AscentSource {
     if (friendMatch !== null && method === 'GET') {
       const [, climberId = '', what] = friendMatch
       const mine = climberId === me.id
-      if (!mine && !this.isFriend(me.id, climberId)) return problem(404, 'NOT_FOUND')
+      const friend = this.isFriend(me.id, climberId)
+      const clubOnly = !mine && !friend && this.inClubTogether(me.id, climberId)
+      if (!mine && !friend && (what === 'logbook' || !clubOnly)) {
+        return problem(404, 'NOT_FOUND')
+      }
       if (what === 'logbook') return json(this.logbook(me, climberId, !mine))
       const all = this.ordered(climberId).filter(
-        (session) => mine || session.visibility === 'FRIENDS',
+        (session) =>
+          mine || session.visibility === 'CLUB' || (!clubOnly && session.visibility === 'FRIENDS'),
       )
       const start = Number(url.searchParams.get('cursor') ?? '0')
       const size = Number(url.searchParams.get('size') ?? '10')
@@ -736,6 +756,7 @@ export class FakeSessions implements AscentSource {
         (session) => session.memberId === me.id && session.clientRef === sent.clientRef,
       )
       if (existing !== undefined) return json(this.view(me, existing))
+      if (this.refusesClub(me, sent.visibility)) return problem(403, 'CLUB_FEED_NOT_JOINED')
       const refused = this.refusal(sent, true)
       if (refused !== undefined) return refused
       const session: FakeSession = {
@@ -832,6 +853,9 @@ export class FakeSessions implements AscentSource {
     // Who sees it, its comment, its photo removed: allowed in a frozen month too (D-112).
     if (part === '/privacy' && method === 'PUT') {
       const sent = body as Schemas['SessionPrivacyRequest']
+      if (this.refusesClub(me, sent.visibility, session.visibility)) {
+        return problem(403, 'CLUB_FEED_NOT_JOINED')
+      }
       session.visibility = sent.visibility
       if (sent.removeComment) delete session.comment
       return json(this.view(me, session))
@@ -847,6 +871,9 @@ export class FakeSessions implements AscentSource {
     }
     if (method === 'PUT') {
       const sent = body as Schemas['SessionRequest']
+      if (this.refusesClub(me, sent.visibility, session.visibility)) {
+        return problem(403, 'CLUB_FEED_NOT_JOINED')
+      }
       const refused = this.refusal(sent, sent.climbedOn !== session.climbedOn)
       if (refused !== undefined) return refused
       this.apply(session, sent)

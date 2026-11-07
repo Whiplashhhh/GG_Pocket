@@ -20,6 +20,7 @@ const signedInAs = (
     role,
     validated,
     birthDateMissing,
+    inClubFeed: false,
   },
 })
 const to = (fullPath: string, meta: RouteMeta = {}) => ({ fullPath, meta })

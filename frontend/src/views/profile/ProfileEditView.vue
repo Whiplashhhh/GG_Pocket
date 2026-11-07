@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { errorMessageKey } from '@/api/errors'
 import { useMyProfile, useUpdateProfile } from '@/api/me'
 import SubPageHeader from '@/components/layout/SubPageHeader.vue'
+import ClubFeedSetting from '@/components/profile/ClubFeedSetting.vue'
 import FavoriteRouteSetting from '@/components/profile/FavoriteRouteSetting.vue'
 import ProfileDetailsFields from '@/components/profile/ProfileDetailsFields.vue'
 import ProfilePhotoPicker from '@/components/profile/ProfilePhotoPicker.vue'
@@ -133,6 +134,7 @@ function submit() {
     </section>
 
     <FavoriteRouteSetting />
+    <ClubFeedSetting />
 
     <form class="flex flex-col gap-5 px-4 pb-10" novalidate @submit.prevent="submit">
       <FormAlert v-if="general">{{ t(general.key) }}</FormAlert>

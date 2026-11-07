@@ -1,39 +1,47 @@
 <script setup lang="ts">
-import { useIntersectionObserver } from '@vueuse/core'
 import { ChevronRight, Users } from 'lucide-vue-next'
-import { computed, useTemplateRef } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 
-import { useAwaitingValidation } from '@/api/auth'
-import { errorMessageKey } from '@/api/errors'
-import { useFeed } from '@/api/feed'
+import { useAwaitingValidation, useCurrentMember } from '@/api/auth'
+import { useClubFeed, useFeed } from '@/api/feed'
 import { useDirectory } from '@/api/social'
 import AwaitingValidationNotice from '@/components/member/AwaitingValidationNotice.vue'
-import SessionCard from '@/components/session/SessionCard.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
-import FormAlert from '@/components/ui/FormAlert.vue'
+import ClubFeedTeaser from '@/components/social/ClubFeedTeaser.vue'
+import SessionFeed from '@/components/social/SessionFeed.vue'
 import GgButton from '@/components/ui/GgButton.vue'
-import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
+import SegmentedControl from '@/components/ui/SegmentedControl.vue'
 
 /**
- * The feed (spec §8.2): the club header with its climber count (the way to the directory), then my
- * sessions and the ones my friends share, latest first, page by page as I scroll. Friend requests
- * wait on my profile (D-099). An account awaiting validation sees its own sessions only, and why
- * (D-107).
+ * The feed (spec §8.2): the club header with its climber count (the way to the directory), then two
+ * tabs (D-120). « Mes amis »: my sessions and the ones my friends share, latest first. « Le club »:
+ * the "Tout le club" sessions of the members who take part, for a member who takes part; blurred
+ * templates and the way in otherwise. `?club` in the address opens the club tab, like `?amis` in
+ * the directory. Friend requests wait on my profile (D-099). An account awaiting validation sees
+ * its own sessions only, and why (D-107).
  */
+type Tab = 'friends' | 'club'
+
 const { t } = useI18n()
-const sessions = useFeed()
+const route = useRoute()
+const router = useRouter()
+const member = useCurrentMember()
 const directory = useDirectory()
 const awaiting = useAwaitingValidation()
 
-const items = computed(() => sessions.data.value?.pages.flatMap((page) => page.items) ?? [])
-
-const sentinel = useTemplateRef<HTMLElement>('sentinel')
-useIntersectionObserver(sentinel, ([entry]) => {
-  if (entry?.isIntersecting && sessions.hasNextPage.value && !sessions.isFetchingNextPage.value) {
-    void sessions.fetchNextPage()
-  }
+const tab = computed<Tab>({
+  get: () => (route.query.club === undefined ? 'friends' : 'club'),
+  set: (value) => void router.replace({ query: value === 'club' ? { club: null } : {} }),
 })
+const tabs = computed(() => [
+  { value: 'friends' as const, label: t('actu.tabFriends') },
+  { value: 'club' as const, label: t('actu.tabClub') },
+])
+
+const inClubFeed = computed(() => member.value?.inClubFeed === true)
+const friendsFeed = useFeed()
+const clubFeed = useClubFeed(() => inClubFeed.value && tab.value === 'club')
 </script>
 
 <template>
@@ -59,50 +67,26 @@ useIntersectionObserver(sentinel, ([entry]) => {
       <template v-else>{{ t('actu.clubCountHint') }}</template>
       <ChevronRight :size="18" aria-hidden="true" />
     </RouterLink>
+    <SegmentedControl v-model="tab" class="mt-3" :label="t('actu.tabs')" :options="tabs" stretch />
   </section>
 
-  <div v-if="sessions.isPending.value" class="flex flex-col gap-3 px-4 py-4" aria-hidden="true">
-    <SkeletonBlock class="h-7 w-48" />
-    <SkeletonBlock class="h-5 w-64" />
-    <SkeletonBlock class="h-10 w-full" />
-  </div>
-  <div v-else-if="sessions.isError.value" class="flex flex-col items-start gap-3 px-4 py-4">
-    <FormAlert>{{ t('actu.loadError') }} {{ t(errorMessageKey(sessions.error.value)) }}</FormAlert>
-    <GgButton variant="secondary" @click="sessions.refetch()">{{ t('common.retry') }}</GgButton>
-  </div>
-  <EmptyState
-    v-else-if="items.length === 0"
-    :title="t('actu.emptyTitle')"
-    :body="t('actu.emptyBody')"
+  <SessionFeed
+    v-if="tab === 'friends'"
+    :feed="friendsFeed"
+    :heading="t('actu.feed')"
+    :empty-title="t('actu.emptyTitle')"
+    :empty-body="t('actu.emptyBody')"
   >
     <GgButton v-if="!awaiting" variant="secondary" to="/annuaire">{{
       t('actu.findFriends')
     }}</GgButton>
-  </EmptyState>
-  <template v-else>
-    <h2 class="sr-only">{{ t('actu.feed') }}</h2>
-    <div class="flex flex-col gap-3 px-3 pt-3 sm:px-4">
-      <SessionCard
-        v-for="session in items"
-        :key="session.id"
-        :session="session"
-        linked
-        show-author
-        framed
-        :max-lines="5"
-        :heading-level="3"
-      />
-    </div>
-    <div ref="sentinel" class="flex justify-center px-4 py-4">
-      <GgButton
-        v-if="sessions.hasNextPage.value"
-        variant="secondary"
-        :disabled="sessions.isFetchingNextPage.value"
-        @click="sessions.fetchNextPage()"
-      >
-        {{ sessions.isFetchingNextPage.value ? t('actu.loadingMore') : t('actu.more') }}
-      </GgButton>
-      <p v-else class="text-sm text-ink-muted">{{ t('actu.end') }}</p>
-    </div>
-  </template>
+  </SessionFeed>
+  <SessionFeed
+    v-else-if="inClubFeed"
+    :feed="clubFeed"
+    :heading="t('actu.clubFeed')"
+    :empty-title="t('actu.clubEmptyTitle')"
+    :empty-body="t('actu.clubEmptyBody')"
+  />
+  <ClubFeedTeaser v-else :awaiting="awaiting" />
 </template>

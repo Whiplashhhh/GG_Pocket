@@ -94,6 +94,7 @@ export class FakeSocial {
   ) {
     climbs.isFriend = (a, b) => this.state(a, b) === 'FRIENDS' && this.active(b) !== undefined
     climbs.inRankings = (id) => this.active(id)?.appearsInRankings === true
+    climbs.inClubFeed = (id) => this.active(id)?.inClubFeed === true
     climbs.authorBadges = (id) => this.shown(id)
     climbs.memberRef = (id) => {
       const member = this.members().find((candidate) => candidate.id === id)

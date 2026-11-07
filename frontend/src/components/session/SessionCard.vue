@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Lock, MessageCircle } from 'lucide-vue-next'
+import { Globe, Lock, MessageCircle } from 'lucide-vue-next'
 import { computed, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -84,7 +84,11 @@ const belayers = computed(() =>
       </RouterLink>
       <div class="min-w-0 flex-1">
         <div class="flex flex-wrap items-center gap-x-1.5">
-          <component :is="`h${headingLevel}`" :id="titleId" class="text-lg font-title break-words">
+          <component
+            :is="`h${headingLevel}`"
+            :id="titleId"
+            class="min-w-0 text-lg font-title [overflow-wrap:anywhere]"
+          >
             <RouterLink
               v-if="linked"
               :to="`/seances/${session.id}`"
@@ -111,6 +115,12 @@ const belayers = computed(() =>
       >
         <Lock :size="14" aria-hidden="true" />{{ t('session.visibilityPrivate') }}
       </span>
+      <span
+        v-else-if="session.visibility === 'CLUB'"
+        class="inline-flex shrink-0 items-center gap-1 text-sm text-ink-muted"
+      >
+        <Globe :size="14" aria-hidden="true" />{{ t('session.visibilityClub') }}
+      </span>
     </header>
     <header v-else class="flex items-baseline justify-between gap-3">
       <component :is="`h${headingLevel}`" :id="titleId" class="text-lg font-title">
@@ -127,6 +137,12 @@ const belayers = computed(() =>
         class="inline-flex shrink-0 items-center gap-1 text-sm text-ink-muted"
       >
         <Lock :size="14" aria-hidden="true" />{{ t('session.visibilityPrivate') }}
+      </span>
+      <span
+        v-else-if="session.visibility === 'CLUB'"
+        class="inline-flex shrink-0 items-center gap-1 text-sm text-ink-muted"
+      >
+        <Globe :size="14" aria-hidden="true" />{{ t('session.visibilityClub') }}
       </span>
     </header>
 

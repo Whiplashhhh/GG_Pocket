@@ -34,6 +34,8 @@ export interface FakeMember {
   parentalConsent: boolean
   showAge: boolean
   appearsInRankings: boolean
+  /** "Je participe au fil du club" (D-120). */
+  inClubFeed?: boolean
   clubArrivalYear?: number
   climbingSinceYear?: number
   bio?: string
@@ -215,6 +217,7 @@ export class FakeClub {
       role: member.role,
       validated: member.validated,
       birthDateMissing: member.birthDate === undefined,
+      inClubFeed: member.inClubFeed === true && member.validated && member.status === 'ACTIVE',
       ...(member.avatarUrl ? { avatarUrl: member.avatarUrl } : {}),
     }
   }
@@ -511,6 +514,11 @@ export class FakeClub {
         return fail(400, 'PARENTAL_CONSENT_REQUIRED')
       me.birthDate = birthDate
       me.parentalConsent ||= parentalConsent === true
+      return json(this.currentMember(me))
+    }
+    if (path === '/me/club-feed' && method === 'PUT') {
+      if (!me.validated) return fail(403, 'ACCESS_DENIED')
+      me.inClubFeed = (body() as Schemas['ClubFeedRequest']).inClubFeed
       return json(this.currentMember(me))
     }
     if (path === '/me/avatar') {

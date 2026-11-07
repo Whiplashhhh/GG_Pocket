@@ -10,6 +10,8 @@ import {
   emptySessionForm,
   formProblems,
   moveAscent,
+  visibilityChoices,
+  visibilityHintKey,
   removeAscent,
   removeLastOf,
   requestToForm,
@@ -350,5 +352,25 @@ describe('a draft kept while the wall changed', () => {
     expect(kept.dropped).toBe(1)
     expect(kept.form.ascents.map((ascent) => ascent.key)).toEqual(['a'])
     expect(withoutGoneRoutes(kept.form, new Set(['r1']))).toEqual({ form: kept.form, dropped: 0 })
+  })
+})
+
+describe('visibility (D-120)', () => {
+  it('offers « Tout le club » to a member of the club feed only', () => {
+    expect(visibilityChoices(true, undefined, 'FRIENDS')).toEqual(['PRIVATE', 'FRIENDS', 'CLUB'])
+    expect(visibilityChoices(false, undefined, 'FRIENDS')).toEqual(['PRIVATE', 'FRIENDS'])
+    expect(visibilityChoices(false, 'FRIENDS', 'PRIVATE')).toEqual(['PRIVATE', 'FRIENDS'])
+  })
+
+  it('keeps « Tout le club » on screen for a session that has it, after leaving the club feed', () => {
+    expect(visibilityChoices(false, 'CLUB', 'FRIENDS')).toEqual(['PRIVATE', 'FRIENDS', 'CLUB'])
+    expect(visibilityChoices(false, undefined, 'CLUB')).toEqual(['PRIVATE', 'FRIENDS', 'CLUB'])
+  })
+
+  it('says what « Tout le club » means, or that it no longer reaches the club', () => {
+    expect(visibilityHintKey('CLUB', true)).toBe('session.visibilityClubHint')
+    expect(visibilityHintKey('CLUB', false)).toBe('session.visibilityClubLeft')
+    expect(visibilityHintKey('FRIENDS', false)).toBe('session.visibilityFriendsHint')
+    expect(visibilityHintKey('PRIVATE', true)).toBe('session.visibilityPrivateHint')
   })
 })

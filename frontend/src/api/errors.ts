@@ -45,6 +45,7 @@ export const SERVER_ERROR_CODES = [
   'MONTH_FROZEN',
   'INVALID_ASCENT',
   'CHECK_FROM_ASCENT',
+  'CLUB_FEED_NOT_JOINED',
 ] as const
 
 export type ServerErrorCode = (typeof SERVER_ERROR_CODES)[number]

@@ -53,6 +53,8 @@ import {
   setManyBelayers,
   setSessionBelayer,
   toSessionRequest,
+  visibilityChoices,
+  visibilityHintKey,
   withoutGoneRoutes,
   type AscentLine,
   type SessionForm,
@@ -256,10 +258,19 @@ function remove(index: number) {
   form.value.ascents = removeAscent(form.value.ascents, index)
 }
 
-const visibilities = computed<{ value: SessionVisibility; label: string }[]>(() => [
-  { value: 'FRIENDS', label: t('session.visibilityFriends') },
-  { value: 'PRIVATE', label: t('session.visibilityPrivate') },
-])
+/** « Tout le club » for a member of the club feed (D-120). */
+const inClubFeed = computed(() => me.value?.inClubFeed === true)
+const VISIBILITY_LABELS: Record<SessionVisibility, string> = {
+  PRIVATE: 'session.visibilityPrivate',
+  FRIENDS: 'session.visibilityFriends',
+  CLUB: 'session.visibilityClub',
+}
+const visibilities = computed(() =>
+  visibilityChoices(inClubFeed.value, existing.data.value?.visibility, form.value.visibility).map(
+    (value) => ({ value, label: t(VISIBILITY_LABELS[value]) }),
+  ),
+)
+const visibilityHint = computed(() => t(visibilityHintKey(form.value.visibility, inClubFeed.value)))
 const commentId = useId()
 
 const problem = ref<string | null>(null)
@@ -497,12 +508,15 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
             size="lg"
             stretch
           />
-          <p class="text-sm text-ink-muted">
-            {{
-              form.visibility === 'FRIENDS'
-                ? t('session.visibilityFriendsHint')
-                : t('session.visibilityPrivateHint')
-            }}
+          <p
+            class="text-sm"
+            :class="
+              form.visibility === 'CLUB' && !inClubFeed
+                ? 'font-semibold text-ink'
+                : 'text-ink-muted'
+            "
+          >
+            {{ visibilityHint }}
           </p>
         </div>
       </section>
