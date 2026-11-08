@@ -4,6 +4,26 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-08 — Onglet « Juste moi » et formulaire de séance aéré (D-124)
+
+**Branche** : `feature/fil-juste-moi-seance-aeree-0.9.0` (depuis `main` en `7fae890`, après le merge squash de #61).
+
+### Fait
+- Willem a validé les 5 choix en attente de #61 (D-121 et détails de D-116, D-118, D-119), notés dans DECISIONS.
+- Actu : trois onglets « Juste moi » (`?moi`, `GET /api/v1/me/sessions`) / « Mes amis » / « Le club » ; e2e dans
+  `club-feed.spec.ts`, scénario de capture `actu-moi`.
+- Formulaire de séance en cartes (date et assurage, ajout de voies, chaque voie, fin de séance) ; 2 voies récentes
+  seulement avant la recherche (D-124, demande de la partie I d'abord rangée à tort après la 1.0).
+- Frontend seulement : lint, format, typecheck, 348 Vitest, build, e2e Desktop Chrome du fil et des séances (36),
+  captures regardées en clair et en sombre.
+
+### Reste / prochaine action
+- Dès que la CI tourne : corriger le job Backend jusqu'au vert (le backend de #61 n'a jamais été compilé).
+- e2e iPhone : CI uniquement.
+
+### Points bloquants
+- CI bloquée par la facturation GitHub.
+
 ## 2026-11-07 — Réponses du club au questionnaire (D-115 à D-123)
 
 **Branche** : `feature/decisions-club-0.9.0` (depuis `main` en `ee319ab`).
