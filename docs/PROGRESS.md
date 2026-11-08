@@ -4,6 +4,28 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-08 (soir) — CI rétablie, préparation de la 1.0
+
+**Branche** : `fix/backend-ci-0.9.0` (depuis `main` en `2f6e907`).
+
+### Fait
+- Willem a ajouté un moyen de paiement : la CI tourne de nouveau. Premier run complet sur `main` : Backend vert
+  (le code serveur de #61 compile et ses tests passent), Frontend, Docker stack, Deploy config et gitleaks verts.
+- Seuls 6 audits axe iPhone échouaient (planning, assureur·ses, nouvelle voie), corrigés : nom accessible des jours du
+  planning et du bouton d'assurage en texte masqué plutôt qu'en `aria-label` (le texte visible « fermé » ou l'initiale
+  de l'avatar n'y figurait pas) ; scénario de la nouvelle voie recentré (puces sous l'en-tête collant).
+- CI : les erreurs Maven et les causes d'échec des tests remontent en annotations (journaux bruts parfois injoignables).
+- D-059 : domaine `ggpocket.gravelinesgrimp.org` sur un autre serveur, après la mise en prod sur le VPS actuel.
+- Le dev tourne encore `57d1585` (4 novembre) : rien des PR #56 à #63 n'y est (dernier déploiement dev réussi).
+
+### Reste / prochaine action
+- CI verte sur cette PR, merge, déploiement dev de `main` (Willem approuve), vérification rapide par Willem et la
+  direction, puis « Prepare release » en `major` (1.0.0) par Willem.
+- Ensuite : sauvegardes hors serveur (D-063), puis déménagement vers le nouveau serveur et le domaine.
+
+### Points bloquants
+- Aucun.
+
 ## 2026-11-08 — Onglet « Juste moi » et formulaire de séance aéré (D-124)
 
 **Branche** : `feature/fil-juste-moi-seance-aeree-0.9.0` (depuis `main` en `7fae890`, après le merge squash de #61).
