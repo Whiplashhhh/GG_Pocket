@@ -330,6 +330,13 @@
     "maxReached": "Tout est débloqué. Respect.",
     "maxReachedButGaps": "Niveau max ! Il reste quelques cotations d’en dessous à cocher, pour la collection.",
     "levels": "Les niveaux",
+    "steps": "Les couleurs",
+    "stepTimes": "Une fois | {n} fois",
+    "stepReached": "C’est dans la poche",
+    "stepNext": "La prochaine couleur",
+    "nextStep": "Une première fois pour le débloquer | Prochaine couleur à {n} fois",
+    "goldForever": "Or massif. Plus haut, il n’y a que le plafond.",
+    "stepsAfter": "Au-delà de 100 fois, il reste en or : la couleur ne bouge plus, le compteur si.",
     "tierShort": {
       "TOPPED": "Ta première voie topée | {n} voies topées",
       "LEAD": "Ta première voie en tête | {n} voies en tête",
@@ -400,6 +407,25 @@
   },
   "seniority": {
     "label": "Ancienneté au club",
+    "open": "Ancienneté au club : {title}. Voir tous les titres",
+    "intro": "Les années au club se comptent depuis l’année d’arrivée : on change de titre chaque 1er janvier, sans rien faire d’autre que revenir grimper.",
+    "current": "Le titre actuel",
+    "years": {
+      "FRESH": "l’année d’arrivée",
+      "BABY_CARABINER": "1 an",
+      "PRO_BEGINNER": "2 à 4 ans",
+      "FORCER": "5 à 9 ans",
+      "RESIDENT": "10 à 14 ans",
+      "FOSSIL": "15 ans et plus"
+    },
+    "definitions": {
+      "FRESH": "La magnésie sent encore le neuf et le baudrier n’a pas un frottement. Bienvenue au mur !",
+      "BABY_CARABINER": "Le nœud de huit se fait sans regarder le schéma. Enfin, presque.",
+      "PRO_BEGINNER": "Assez d’années pour connaître toutes les voies, assez de mauvaise foi pour dire « je débute ».",
+      "FORCER": "Ne lâche rien, même quand la voie le demande gentiment. Les avant-bras s’en souviennent.",
+      "RESIDENT": "Une corde préférée, un coin attitré au vestiaire et un avis sur chaque ouverture.",
+      "FOSSIL": "Fait partie du mur. A vu passer plus de prises que la visseuse de l’ouvreur."
+    },
     "FRESH": "Tout frais",
     "BABY_CARABINER": "Le bébé mousqueton",
     "PRO_BEGINNER": "Le débutant professionnel",

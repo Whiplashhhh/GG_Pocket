@@ -1462,3 +1462,20 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
   sélecteur ne propose que les **2** voies grimpées le plus récemment (`SessionRoutePicker`, `recentLimit`) ; la
   recherche montre toujours jusqu'à 8 résultats.
 - **Statut** : validée (club, Willem).
+
+### D-125 — Le « dico » des badges (club, Q14)
+- **Contexte** (Q14, commentaire) : « Pourrait-il y avoir un endroit “dico” où l'on verrait les attributions de badge
+  avec le nombre d'années, les petites définitions rigolotes, etc. ? Peut-être si l'on clique sur le badge, on pourrait
+  voir toutes les possibilités ? » D'abord rangé après la 1.0 ; Willem le veut pour la 1.0 (2026-11-08).
+- **Choix** (frontend seulement) :
+  - L'étiquette d'ancienneté (profil, profil d'un membre) devient un bouton (zone tactile de 44 px) qui ouvre
+    « Ancienneté au club » : les 6 titres de la spec §9.4, leurs années, une définition humoristique chacun
+    (`seniority.definitions`, à faire relire par le club), le titre actuel marqué. `SeniorityDialog`, liste
+    `SENIORITIES` déplacée dans `lib/badges.ts`.
+  - La fiche d'un badge à répétition liste ses 10 couleurs (×1 à ×100, `REPEAT_STEPS`), toutes en couleur pour que le
+    dico serve, les paliers à venir atténués, la prochaine couleur marquée. Les badges à niveaux listaient déjà tous
+    leurs niveaux (D-111).
+  - Les définitions des badges eux-mêmes existaient déjà dans leur fiche ; pas d'écran « dico » séparé : on touche le
+    badge, comme le proposait le club.
+- **Statut** : validée (club, Willem) ; textes des définitions à faire relire par le club.
+

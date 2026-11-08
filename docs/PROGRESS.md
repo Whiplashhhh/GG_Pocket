@@ -14,8 +14,11 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
   `club-feed.spec.ts`, scénario de capture `actu-moi`.
 - Formulaire de séance en cartes (date et assurage, ajout de voies, chaque voie, fin de séance) ; 2 voies récentes
   seulement avant la recherche (D-124, demande de la partie I d'abord rangée à tort après la 1.0).
-- Frontend seulement : lint, format, typecheck, 348 Vitest, build, e2e Desktop Chrome du fil et des séances (36),
-  captures regardées en clair et en sombre.
+- Relecture complète du questionnaire : seul le « dico » des badges (Q14) manquait, ajouté (D-125) : fiche
+  « Ancienneté au club » en touchant le titre, couleurs ×1 à ×100 dans la fiche des badges à répétition.
+- Frontend seulement : lint, format, typecheck, 348 Vitest, build, e2e Desktop Chrome du fil, des séances et des
+  badges, audit axe des écrans touchés en Chromium mobile (config temporaire Pixel 5), captures regardées en clair
+  et en sombre.
 
 ### Reste / prochaine action
 - Dès que la CI tourne : corriger le job Backend jusqu'au vert (le backend de #61 n'a jamais été compilé).

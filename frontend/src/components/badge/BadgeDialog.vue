@@ -10,6 +10,7 @@ import GgButton from '@/components/ui/GgButton.vue'
 import GgDialog from '@/components/ui/GgDialog.vue'
 import { useBadgeText } from '@/composables/useBadgeText'
 import {
+  REPEAT_STEPS,
   isMaxLevel,
   isTiered,
   nextProgress,
@@ -27,7 +28,8 @@ import BadgeToken from './BadgeToken.vue'
 /**
  * One badge up close (D-106): its level, what it takes, the way to the next level (counted from
  * zero, my own library only), every level of a tier family with the ones already behind (club
- * feedback, D-111), and in my library the switch to show it next to my name.
+ * feedback, D-111), every colour step of a repeatable badge (the « dico », club feedback Q14), and
+ * in my library the switch to show it next to my name.
  */
 const props = defineProps<{
   state: BadgeState
@@ -65,6 +67,8 @@ const earnedLine = computed(() => {
     : t(`badges.earnedMany${key}`, { n: level, first: when(firstEarnedOn ?? lastEarnedOn), last })
 })
 const next = computed(() => nextTier(props.state))
+/** Repeatable badges: the next colour step, none past the gold one. */
+const nextStep = computed(() => REPEAT_STEPS.find((step) => step > props.state.level))
 const complete = computed(() => props.state.tiers.every((tier) => tier.earnedOn !== undefined))
 
 function tierStatus(tier: TierState): string {
@@ -165,6 +169,58 @@ function toggleFavorite() {
           />
         </li>
       </ol>
+    </template>
+
+    <template v-else>
+      <p class="mt-3 font-semibold">
+        {{
+          nextStep === undefined
+            ? t('badges.goldForever')
+            : t('badges.nextStep', { n: nextStep }, nextStep)
+        }}
+      </p>
+      <h3 class="mt-5 text-sm font-semibold tracking-wide text-ink-muted uppercase">
+        {{ t('badges.steps') }}
+      </h3>
+      <ol class="mt-1" data-testid="badge-steps">
+        <li
+          v-for="step in REPEAT_STEPS"
+          :key="step"
+          class="flex items-center gap-3 rounded-control px-2 py-1.5"
+          :class="step === nextStep ? 'bg-surface-sunken' : ''"
+          :aria-current="step === nextStep ? 'step' : undefined"
+        >
+          <BadgeMedal
+            :badge="state.badge"
+            :level="step"
+            :size="32"
+            :class="state.level >= step || step === nextStep ? '' : 'opacity-50'"
+          />
+          <div class="min-w-0 flex-1">
+            <p
+              :class="state.level >= step || step === nextStep ? 'font-semibold' : 'text-ink-muted'"
+            >
+              {{ t('badges.stepTimes', step) }}
+            </p>
+            <p class="text-sm text-ink-muted">
+              {{
+                state.level >= step
+                  ? t('badges.stepReached')
+                  : step === nextStep
+                    ? t('badges.stepNext')
+                    : t('badges.tierAhead')
+              }}
+            </p>
+          </div>
+          <Check
+            v-if="state.level >= step"
+            :size="20"
+            class="shrink-0 text-brand-ink"
+            aria-hidden="true"
+          />
+        </li>
+      </ol>
+      <p class="mt-2 text-sm text-ink-muted">{{ t('badges.stepsAfter') }}</p>
     </template>
 
     <div v-if="mine && state.level > 0" class="mt-5 border-t border-rule pt-4">

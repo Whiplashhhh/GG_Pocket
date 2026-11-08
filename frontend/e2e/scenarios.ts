@@ -542,6 +542,30 @@ export const CAPTURES: Capture[] = [
       await page.getByRole('dialog', { name: 'Première cotation' }).waitFor()
     },
   },
+  {
+    name: 'badge-couleurs',
+    path: '/profil',
+    as: 'CLIMBER',
+    prepare: marieBadges,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Voir tous les badges' }).click()
+      await page
+        .getByRole('list', { name: 'Mes badges' })
+        .getByRole('button', { name: '2 séances dans la semaine, obtenu 6 fois' })
+        .click()
+      await page.getByRole('dialog', { name: '2 séances dans la semaine' }).waitFor()
+    },
+  },
+  {
+    name: 'anciennete',
+    path: '/profil',
+    as: 'CLIMBER',
+    prepare: marieBadges,
+    act: async (page) => {
+      await page.getByRole('button', { name: /^Ancienneté au club : / }).click()
+      await page.getByRole('dialog', { name: 'Ancienneté au club' }).waitFor()
+    },
+  },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
   { name: 'actu-fil', path: '/actu', as: 'CLIMBER', prepare: feedAlive },
   { name: 'actu-moi', path: '/actu?moi', as: 'CLIMBER', prepare: feedAlive },
