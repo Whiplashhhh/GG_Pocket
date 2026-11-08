@@ -166,12 +166,13 @@ function select(date: string) {
                   : '',
                 cell.date > today ? 'opacity-45' : '',
               ]"
-              :aria-label="dayLabel(cell.date)"
               :aria-pressed="selected === cell.date"
               :aria-controls="selected ? dayTitleId : undefined"
               :disabled="cell.date > today"
               @click="select(cell.date)"
             >
+              <!-- The name in hidden text, not aria-label: the visible « fermé » is not in it (axe). -->
+              <span class="sr-only">{{ dayLabel(cell.date) }}</span>
               <span aria-hidden="true">{{
                 cell.day === 1 ? t('planning.firstOfMonth') : cell.day
               }}</span>
