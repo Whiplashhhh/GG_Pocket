@@ -11,6 +11,10 @@
 #   status                   deployed versions and containers
 #   login <user>             registry token on stdin (the job's short-lived GITHUB_TOKEN)
 #   edge                     (prod key only) edge proxy configuration from the bundle on stdin
+#
+# On a server where we are not root (the club's, D-126), the key of the user who runs the app names
+# the environment's directory too, and there is no edge proxy of ours:
+#   restrict,command="/srv/ggpocket/bin/gg-deploy prod /srv/ggpocket" ssh-ed25519 AAAA... gg-pocket-prod
 set -euo pipefail
 
 env=${1:-}
@@ -21,9 +25,10 @@ case $env in
         exit 1
         ;;
 esac
-home=/opt/gg-pocket/$env
+home=${2:-/opt/gg-pocket/$env}
+[[ $home == /* && $home != *..* ]] || { echo "gg-deploy: invalid directory '$home'" >&2; exit 1; }
 # Registry credentials per environment: a dev job never sees the prod one, nor overwrites it.
-export DOCKER_CONFIG=/home/deploy/.docker-$env
+export DOCKER_CONFIG=$HOME/.docker-$env
 read -r -a request <<<"${SSH_ORIGINAL_COMMAND:-status}"
 command=${request[0]:-status}
 
@@ -73,6 +78,11 @@ case $command in
         ;;
     edge)
         [[ $env == prod ]] || { echo "gg-deploy: only the prod key updates the edge proxy" >&2; exit 1; }
+        if [[ $home != "/opt/gg-pocket/$env" ]]; then
+            cat >/dev/null
+            echo "no edge proxy of ours on this server (shared reverse proxy): nothing to do"
+            exit 0
+        fi
         receive_bundle /opt/gg-pocket/edge/.incoming
         cp /opt/gg-pocket/edge/.incoming/edge/Caddyfile /opt/gg-pocket/edge/.incoming/edge/compose.yml /opt/gg-pocket/edge/
         rm -rf /opt/gg-pocket/edge/.incoming

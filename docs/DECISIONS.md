@@ -16,6 +16,7 @@ direction) ou **Willem**.
 | Décision | Question | Qui | Choix appliqué en attendant |
 |---|---|---|---|
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
+| D-126 | Prod sur le serveur du club : alias, volumes, mémoire, clé de déploiement, heure et rétention des sauvegardes | club (président) | Surcouche `compose.proxy.yml`, sauvegardes dans `/srv/ggpocket/data/backups` |
 | D-087 | En attendant les amis, Actu montre mes séances ? | Willem | Oui, « Mes séances » en haut du fil |
 | D-094 | Le carnet : chiffres, pyramide par cotation, toutes mes voies ? | Willem | Oui, depuis le Profil ; celui des amis en phase 5 |
 | D-108 | « Quoi de neuf ? » mémorisé par membre dans le navigateur (pas sur le serveur) | Willem | Oui : une fois par version, par membre et par appareil ; nouveaux comptes épargnés |
@@ -1482,3 +1483,35 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
     badge, comme le proposait le club.
 - **Statut** : validée (club, Willem) ; textes des définitions à faire relire par le club.
 
+
+### D-126 — La prod sur le serveur du club, derrière son proxy partagé (complète D-059, D-060, D-062)
+- **Contexte** (Willem, 2026-11-08) : le club fournit un VPS (OVH Beauharnois, 2 vCPU, 4 Go, Ubuntu 26.04, IP
+  51.222.157.180) pour `https://ggpocket.gravelinesgrimp.org`. Le président l'administre ; son Caddy (`/srv/proxy`)
+  reçoit tout le HTTPS et joint les applis par un réseau Docker externe `web`. Ses règles : pas de `ports:` publiés,
+  service joint sous le nom `ggpocket` sur le port 8080, secrets dans `/srv/ggpocket/.env`, données persistantes dans
+  `/srv/ggpocket/data` (sauvegardé chaque nuit avec le `.env`), compte `willem` (clé SSH, groupe `docker`, pas root),
+  ne pas toucher aux autres dossiers de `/srv`. D'autres applis du club viendront sur ce serveur.
+- **Choix** :
+  - Même pile et mêmes scripts que la prod actuelle (projet `gg-pocket-prod`), plus une surcouche
+    `deploy/compose.proxy.yml`, ajoutée par `lib.sh` quand le `.env` définit `GG_PROXY_NETWORK` : `web` sans port publié
+    (`ports: !reset []`), sur le réseau externe avec l'alias `GG_PROXY_ALIAS` (`ggpocket`). Le Caddyfile du club n'a pas à
+    changer. Test de fumée par `docker compose exec web wget` au lieu du port de la boucle locale.
+  - Déploiement par le workflow de release, comme avant : la clé de l'environnement `production` est ajoutée au compte
+    `willem`, limitée (`restrict,command=`) à `/srv/ggpocket/bin/gg-deploy prod /srv/ggpocket` ; `gg-deploy` prend le
+    dossier de l'environnement en second argument et répond « rien à faire » à la commande `edge`. Variable
+    `DEPLOY_USER` (défaut `deploy`) dans les workflows. Scripts : `.github/scripts/setup-prod-shared.sh` (GitHub, depuis
+    la machine de Willem) et `deploy/scripts/server/setup-shared.sh` (serveur, sans root).
+  - Base et photos restent dans des volumes Docker (une copie à chaud du dossier de PostgreSQL ne se restaure pas de
+    façon fiable) ; le service `backup` écrit chaque nuit à 3 h 30 (Paris) une sauvegarde cohérente (dump + photos) dans
+    `/srv/ggpocket/data/backups`, que la sauvegarde du club emporte hors du serveur : c'est la copie hors serveur de
+    D-063, une fois l'heure de passage et la rétention confirmées par le président.
+  - Le dev reste sur l'ancien VPS. L'ancienne prod s'arrête après la reprise éventuelle des données (DEPLOYMENT.md §10).
+- **Points à faire valider par le président** : alias `ggpocket` plutôt qu'un service renommé (Docker inscrit aussi
+  le nom du service, `web`, sur le réseau partagé : éviter de donner ce nom DNS à une autre appli) ; volumes Docker pour
+  la base et les photos, sauvegardes cohérentes dans `data/` ; budget mémoire d'environ 1,5 Go (pas 1 Go) ; clé de
+  déploiement GitHub limitée sur le compte `willem` (ou un compte dédié s'il le préfère) ; SSH joignable depuis GitHub
+  Actions ; sa sauvegarde après 4 h (Paris) et sa durée de rétention (les sauvegardes gardent les comptes supprimés
+  jusqu'à leur expiration) ; `X-Forwarded-For` laissé à son comportement par défaut.
+- **Reste à faire** : le frontal de l'ancien VPS (dev) était mis à jour par les releases prod (D-112) ; il ne l'est
+  plus. À reprendre dans le déploiement dev.
+- **Statut** : à valider (président du club, par Willem).

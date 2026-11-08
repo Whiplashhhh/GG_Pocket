@@ -107,6 +107,8 @@ jobs:
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          # The user the key is pinned to: deploy (bootstrap.sh), or the app's user on the club's server (D-126).
+          DEPLOY_USER: ${{ vars.DEPLOY_USER || 'deploy' }}
           DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
           RESET: ${{ github.event_name == 'pull_request' || inputs.reset }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -120,8 +122,8 @@ jobs:
           [[ $RESET != true ]] || option='--reset'
           # The server pulls the images with this job's read-only token, valid until the job ends.
           printf '%s' "$GITHUB_TOKEN" | ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes \
-            "deploy@$DEPLOY_HOST" "login $GITHUB_ACTOR"
-          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes "deploy@$DEPLOY_HOST" \
+            "$DEPLOY_USER@$DEPLOY_HOST" "login $GITHUB_ACTOR"
+          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" \
             "deploy $TAG $option" < "$RUNNER_TEMP/bundle.tgz"
       - name: Summary
         env:
