@@ -48,6 +48,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   le joindre (contact@gravelinesgrimp.org, un clic pour écrire). Cette page tient lieu de politique de
   confidentialité du club, et dit maintenant tout sur les comptes inactifs, la date de naissance et les mineur·es.
 
+- **Le dico des badges** : touche ton titre d’ancienneté (« Le bébé mousqueton »…) pour voir les six titres, les
+  années qu’il faut et leur petite définition. Et la fiche d’un badge qu’on gagne plusieurs fois montre toutes ses
+  couleurs, de la première fois à l’or des 100 fois.
 - **Trois onglets dans Actu** : « Juste moi » (toutes tes séances, même les « Juste moi »), « Mes amis » et « Le club ».
 - **Le fil du club**, le nouvel onglet d’Actu : les séances que les grimpeurs partagent avec tout le club.
   C’est donnant-donnant : pour le voir, tu participes (« Je participe au fil du club », depuis l’onglet ou ton profil)
