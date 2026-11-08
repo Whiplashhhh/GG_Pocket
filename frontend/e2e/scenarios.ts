@@ -1010,6 +1010,11 @@ export const CAPTURES: Capture[] = [
         .getByText('vert', { exact: true })
         .click()
       await page.getByRole('button', { name: 'Dalle', exact: true }).click()
+      // The click leaves the setters' chips half under the sticky header on a short phone screen:
+      // axe then reads them as too small (obscured), where a member would just scroll.
+      await page.getByRole('group', { name: 'Ouvreurs' }).evaluate((element) => {
+        element.scrollIntoView({ block: 'center' })
+      })
     },
   },
   {

@@ -15,7 +15,6 @@ direction) ou **Willem**.
 
 | Décision | Question | Qui | Choix appliqué en attendant |
 |---|---|---|---|
-| D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
 | D-087 | En attendant les amis, Actu montre mes séances ? | Willem | Oui, « Mes séances » en haut du fil |
 | D-094 | Le carnet : chiffres, pyramide par cotation, toutes mes voies ? | Willem | Oui, depuis le Profil ; celui des amis en phase 5 |
@@ -417,7 +416,11 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   qui renvoie l'IP écrite dans le nom : Let's Encrypt délivre un vrai certificat sans rien configurer. Le jour du vrai domaine :
   deux variables du frontal et `GG_URL` dans GitHub (DEPLOYMENT.md §4) ; les applis installées devront être réinstallées.
 - **Alternatives** : HTTP sur l'IP (pas de PWA) ; certificat auto-signé (alertes partout) ; acheter un domaine (décision du club).
-- **Statut** : à valider (Willem, quand le domaine existe).
+- **Suite** (Willem, 2026-11-08) : l'adresse définitive sera `https://ggpocket.gravelinesgrimp.org`, sur un **autre
+  serveur** que le VPS actuel. La 1.0 part d'abord en prod sur le VPS actuel (adresse `sslip.io`), puis on traitera les
+  sauvegardes hors serveur (D-063) et le déménagement : restauration de la base sur le nouveau serveur, DNS, `GG_URL`
+  de l'environnement `production`, et réinstallation de l'appli par les membres (l'origine change).
+- **Statut** : validée (Willem) : domaine choisi, déménagement après la mise en prod sur le VPS actuel.
 
 ### D-060 — Un frontal Caddy partagé, un Caddy par environnement
 - **Contexte** : dev et prod sur le même serveur, un seul couple de ports 80/443 (spec §16).
