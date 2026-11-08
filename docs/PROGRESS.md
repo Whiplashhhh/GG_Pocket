@@ -19,11 +19,11 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ### Reste / prochaine action
 - CI verte sur la PR, merge. Willem fait valider D-126 par le président, puis lance `setup-prod-shared.sh` et
-  `setup-shared.sh`, décide de reprendre ou non les données de l'ancienne prod, puis « Prepare release » en `major`.
+  `setup-shared.sh`, puis « Prepare release » en `major`. Base vierge (pas de reprise des données de l'ancienne prod).
 - Le frontal du dev (ancien VPS) n'est plus mis à jour par les releases : à reprendre dans `deploy-dev.yml`.
 
 ### Points bloquants
-- Validation du président (D-126) ; décision de Willem sur la reprise des données.
+- Validation du président (D-126).
 
 ## 2026-11-08 (soir) — CI rétablie, préparation de la 1.0
 

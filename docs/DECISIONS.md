@@ -1505,7 +1505,9 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
     façon fiable) ; le service `backup` écrit chaque nuit à 3 h 30 (Paris) une sauvegarde cohérente (dump + photos) dans
     `/srv/ggpocket/data/backups`, que la sauvegarde du club emporte hors du serveur : c'est la copie hors serveur de
     D-063, une fois l'heure de passage et la rétention confirmées par le président.
-  - Le dev reste sur l'ancien VPS. L'ancienne prod s'arrête après la reprise éventuelle des données (DEPLOYMENT.md §10).
+  - Le dev reste sur l'ancien VPS. **La 1.0 démarre sur une base vierge** (Willem, 2026-11-08) : les données de
+    l'ancienne prod ne sont pas reprises, l'admin s'inscrit avec le code du premier démarrage. L'ancienne prod s'arrête
+    après la mise en service (commande dans DEPLOYMENT.md §10).
 - **Points à faire valider par le président** : alias `ggpocket` plutôt qu'un service renommé (Docker inscrit aussi
   le nom du service, `web`, sur le réseau partagé : éviter de donner ce nom DNS à une autre appli) ; volumes Docker pour
   la base et les photos, sauvegardes cohérentes dans `data/` ; budget mémoire d'environ 1,5 Go (pas 1 Go) ; clé de
