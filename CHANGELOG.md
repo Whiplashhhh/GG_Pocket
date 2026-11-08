@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 1.0.0 — 2026-11-08
+
 ### Ajouté
 
 - Nouveau rôle **Touriste** pour celles et ceux qui passent grimper sans licence au club : mêmes droits qu’un
