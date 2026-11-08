@@ -8,6 +8,16 @@ export type ShownBadge = components['schemas']['ShownBadge']
 export type BadgeProgress = components['schemas']['BadgeProgress']
 export type Seniority = NonNullable<components['schemas']['MemberCard']['seniority']>
 
+/** The years-at-the-club titles (spec §9.4), from the arrival year to the wall's fossils. */
+export const SENIORITIES: readonly Seniority[] = [
+  'FRESH',
+  'BABY_CARABINER',
+  'PRO_BEGINNER',
+  'FORCER',
+  'RESIDENT',
+  'FOSSIL',
+]
+
 /** The drawings of BadgeIcon: one per badge, the weeks and the months sharing theirs. */
 export type BadgeGlyph =
   | 'topped'

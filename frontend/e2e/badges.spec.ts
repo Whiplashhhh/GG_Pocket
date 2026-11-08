@@ -64,6 +64,32 @@ test.describe('badges', () => {
     )
     await dialog.getByRole('button', { name: 'Fermer' }).click()
     await expect(page.getByText('Badges favoris : Voies topées, niveau 2')).toBeAttached()
+
+    // The « dico » (club feedback, Q14): every colour step of a repeatable badge…
+    await all.getByRole('button', { name: '2 séances dans la semaine, obtenu 3 fois' }).click()
+    const week = page.getByRole('dialog', { name: '2 séances dans la semaine' })
+    await expect(week.getByText('Prochaine couleur à 5 fois')).toBeVisible()
+    const steps = week.getByTestId('badge-steps').getByRole('listitem')
+    await expect(steps).toHaveCount(10)
+    await expect(steps.nth(2)).toContainText('3 fois')
+    await expect(steps.nth(2)).toContainText('C’est dans la poche')
+    await expect(steps.nth(3)).toHaveAttribute('aria-current', 'step')
+    await expect(steps.nth(9)).toContainText('100 fois')
+    await week.getByRole('button', { name: 'Fermer' }).click()
+
+    // …and every seniority title, with its years.
+    await page
+      .getByRole('button', {
+        name: 'Ancienneté au club : Le bébé mousqueton. Voir tous les titres',
+      })
+      .click()
+    const seniority = page.getByRole('dialog', { name: 'Ancienneté au club' })
+    const titles = seniority.getByTestId('seniority-titles').getByRole('listitem')
+    await expect(titles).toHaveCount(6)
+    await expect(titles.nth(1)).toHaveAttribute('aria-current', 'true')
+    await expect(titles.nth(1)).toContainText('Le titre actuel')
+    await expect(titles.nth(5)).toContainText('Le GG fossile')
+    await expect(titles.nth(5)).toContainText('15 ans et plus')
   })
 
   test('another member’s badges, favourites and seniority, in the directory and the feed', async ({
