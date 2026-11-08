@@ -1359,6 +1359,9 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
   BeReal). » Willem : pour la 1.0, mineurs compris ; troisième visibilité de séance.
 - **Choix** :
   - Une séance est « Juste moi », « Mes amis » ou **« Tout le club »**.
+  - Actu a **trois onglets** (Willem, 2026-11-08) : « Juste moi » (`?moi`, toutes mes séances, via
+    `GET /api/v1/me/sessions`), « Mes amis » (onglet par défaut, inchangé : mes séances et celles partagées par mes
+    amis) et « Le club » (`?club`).
   - Réglage de profil **« Je participe au fil du club »**, désactivé par défaut. Tant qu'il est désactivé, l'onglet
     « Club » d'Actu montre des cartes floutées et une explication avec le bouton pour l'activer ; la visibilité
     « Tout le club » n'est pas proposée.
@@ -1379,17 +1382,17 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
   - Choisir « Tout le club » (création, modification, « Qui la voit ») sans participer : 403 `CLUB_FEED_NOT_JOINED`.
     Une séance qui l'a déjà le garde après le retrait (hors du fil du club jusqu'au retour) ; l'éditeur garde alors
     l'option affichée avec une phrase qui dit qu'elle n'atteint plus que les amis, et propose d'en changer.
-  - Appli : onglets « Mes amis » / « Le club » en boutons segmentés ; l'onglet suit l'adresse (`/actu?club`, comme
-    `?amis` dans l'annuaire) plutôt que le stockage local, qui n'est pas un motif du projet pour les onglets. Non
+  - Appli : onglets « Juste moi » / « Mes amis » / « Le club » en boutons segmentés ; l'onglet suit l'adresse (`/actu?moi`, `/actu?club`,
+    comme `?amis` dans l'annuaire) plutôt que le stockage local, qui n'est pas un motif du projet pour les onglets. Non
     participant : gabarits floutés dessinés par l'appli (aucune séance demandée au serveur), explication et bouton
     avec confirmation qui rappelle la réciprocité ; compte en attente : même écran sans bouton. Réglage aussi dans
     « Modifier mon profil », appliqué tout de suite comme la voie préférée (se retirer sans confirmation).
-- **Statut** : validée (club et Willem) ; détails d'interface à valider sur l'environnement dev.
+- **Statut** : validée (club et Willem) ; trois onglets validés par Willem le 2026-11-08.
 
 ### D-121 — Voie « à plus de 50 % » : 0,5 au classement « Voies »
 - **Contexte** : demande du club du 2026-11-07 : une case « plus de 50 % » pour une voie pas finie mais grimpée au-delà de
   la moitié, qui compterait 0,5 au classement.
-- **Choix** (par défaut, Willem à valider) : nouvelle issue de voie « Plus de la moitié », exclusive de « topée ». Elle
+- **Choix** (validé par Willem le 2026-11-08) : nouvelle issue de voie « Plus de la moitié », exclusive de « topée ». Elle
   compte **0,5** au classement « Voies » du podium et rien d'autre : ni réalisation du topo, ni badge, ni taux de réussite,
   ni « À faire » coché. Le classement affiche les demis (« 12,5 »).
 - **Détail d'implémentation** :
@@ -1411,7 +1414,7 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
     « pas topée ». Podium : « 12,5 voies » (`Intl.NumberFormat('fr-FR')`, singulier sous 2 : « 1,5 voie ») et une
     ligne de règle sous Séances / Voies. Le seed de démo marque « plus de la moitié » les voies pas topées avec
     2 chutes au plus.
-- **Statut** : à valider (Willem).
+- **Statut** : validée (Willem, 2026-11-08 : apparaître au podium dès 0,5, niveau « Plus de la moitié » au carnet).
 
 ### D-122 — Affichage : pastille bicolore, miniature ronde, série en flammes (complète D-013, D-093)
 - **Contexte** (Q17, Q19).
@@ -1443,3 +1446,19 @@ Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles
   - couleurs officielles relevées dans l'image : orange `#F26522` et vert `#C8DC5D` remplacent `#F9561A` et `#C3C04C`
     (`tokens.css`, `DESIGN.md`) ; contrastes AA conservés (encre sur orange 5,8:1, sur vert 12,1:1).
 - **Statut** : appliquée en attendant une vraie source vectorielle et une version carrée (à redemander au club).
+
+Validés par Willem le 2026-11-08 (détails d'implémentation de D-116, D-118 et D-119) : bornes des jours de fermeture
+(de 2000 à l'année en cours + 2, rouvrir un jour ouvert n'est pas une erreur) ; suppression à 2 ans des comptes
+désactivés par la direction ; contact RGPD en dur dans les textes pour la 1.0 (au lieu de la saisie admin prévue par
+D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des voies qui diffèrent.
+
+### D-124 — Formulaire de séance aéré, 2 voies récentes (club, partie I du questionnaire)
+- **Contexte** : « Quand on ajoute une séance, est-ce qu'il est possible de ne proposer que 2 voies récemment grimpées
+  (pour pas en avoir trop), de bien séparer (peut-être avec des encadrés) les différentes voies et leurs paramètres
+  entre elles et entre les paramètres de dates et de fin de séance, pour que ce soit plus aéré ? » D'abord rangé à tort
+  dans les idées d'après la 1.0 ; Willem le veut pour la 1.0.
+- **Choix** : quatre sortes de cartes, du même style que les séances du fil (`rounded-control border border-rule
+  bg-surface`) : date et assurage, ajout de voies, une carte par voie, fin de séance. Avant toute recherche, le
+  sélecteur ne propose que les **2** voies grimpées le plus récemment (`SessionRoutePicker`, `recentLimit`) ; la
+  recherche montre toujours jusqu'à 8 résultats.
+- **Statut** : validée (club, Willem).
