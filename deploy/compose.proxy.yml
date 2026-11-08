@@ -1,0 +1,17 @@
+# Behind a reverse proxy shared with other apps (the club's server, DECISIONS D-126): no published
+# port; the web container joins the proxy's external network under the name the proxy forwards to
+# (ggpocket:8080). The API, the database and the backup stay on their internal networks.
+# Added after compose.prod.yml by scripts/lib.sh when the env file sets GG_PROXY_NETWORK.
+services:
+  web:
+    # The loopback port of compose.yml is for our own edge proxy (D-060), absent here.
+    ports: !reset []
+    networks:
+      app: {}
+      proxy:
+        aliases: ["${GG_PROXY_ALIAS:-ggpocket}"]
+
+networks:
+  proxy:
+    name: ${GG_PROXY_NETWORK:?GG_PROXY_NETWORK is required}
+    external: true

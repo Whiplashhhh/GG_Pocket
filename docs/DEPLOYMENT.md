@@ -218,3 +218,78 @@ Cette restauration est testée à chaque CI (job « Docker stack » : sonde en b
 | `backup` en `unhealthy` | `sudo docker logs gg-pocket-prod-backup-1` : la dernière nuit a échoué (disque, base) |
 | Plus de place disque | `sudo docker system df` ; chaque déploiement ne garde que les images de la version en place et de la précédente |
 | Mémoire | `sudo docker stats --no-stream` (budget : prod ≈ 1,5 Go, dev ≈ 1,1 Go, frontal 128 Mo) |
+
+## 10. La prod sur le serveur du club (proxy partagé)
+
+Depuis la 1.0, la prod tourne sur le VPS du club (D-126), à `https://ggpocket.gravelinesgrimp.org`. Le dev reste sur
+l'ancien VPS (sections 2 à 5). Sur le serveur du club, nous ne sommes pas root, et d'autres applis du club y viendront :
+
+| | Ancien VPS (sections 2 à 8) | Serveur du club |
+|---|---|---|
+| Proxy HTTPS | notre frontal Caddy (`deploy/edge`) | le Caddy du club (`/srv/proxy`, on n'y touche pas) |
+| Accès de l'appli | port de la boucle locale (`GG_WEB_PORT`) | réseau Docker externe `web`, alias `ggpocket`, port 8080, aucun port publié (`deploy/compose.proxy.yml`) |
+| Dossier | `/opt/gg-pocket/prod` | `/srv/ggpocket` (`.env`, `releases/`, `data/`, `bin/`) |
+| Compte SSH du déploiement | `deploy` (créé par `bootstrap.sh`) | `willem` : clé dédiée, limitée à `/srv/ggpocket/bin/gg-deploy` |
+| Sauvegardes | `/opt/gg-pocket/prod/backups` | `/srv/ggpocket/data/backups`, copié hors du serveur chaque nuit par la sauvegarde du club |
+
+Seul le conteneur `web` (le Caddy de l'appli) rejoint le réseau `web`. L'API, la base et la sauvegarde restent sur leurs
+réseaux internes. Le Caddy du club transmet l'adresse du client (`X-Forwarded-For`, son comportement par défaut) : le
+Caddy de l'appli et l'API la croient parce qu'elle vient d'une adresse privée. La limitation des tentatives de connexion
+en dépend : le Caddy du club ne doit pas faire confiance à un `X-Forwarded-For` envoyé par un client.
+
+### Mise en place (une seule fois)
+
+1. **GitHub**, depuis ta machine, la CLI `gh` connectée en admin du dépôt :
+
+   ```bash
+   .github/scripts/setup-prod-shared.sh --host 51.222.157.180 --user willem --url https://ggpocket.gravelinesgrimp.org
+   ```
+
+   Le script fait vérifier l'empreinte SSH du serveur, crée une nouvelle clé de déploiement pour l'environnement
+   `production` (la clé privée va directement dans le secret, nulle part ailleurs), règle `DEPLOY_HOST`,
+   `DEPLOY_KNOWN_HOSTS`, `DEPLOY_USER` et `GG_URL`, et affiche les commandes à lancer sur le serveur. Le dev n'est pas touché.
+2. **Serveur**, connecté en `willem` (sans sudo), les commandes affichées par le script :
+
+   ```bash
+   git clone https://github.com/Whiplashhhh/GG_Pocket.git /tmp/gg-pocket
+   /tmp/gg-pocket/deploy/scripts/server/setup-shared.sh --key 'ssh-ed25519 AAAA... gg-pocket-prod'
+   rm -rf /tmp/gg-pocket
+   ```
+
+   Il crée `/srv/ggpocket/{releases,bin,data/backups}`, écrit `/srv/ggpocket/.env` avec des secrets neufs (gardé s'il
+   existe), installe `bin/gg-deploy` et ajoute la clé à `~/.ssh/authorized_keys`, limitée à `gg-deploy` (`restrict` :
+   ni shell, ni redirection). Il se relance sans risque : le `.env` est gardé, la ligne de la clé remplacée.
+3. **Release** : section 6. Le job « Deploy to prod » déploie maintenant sur le serveur du club. L'étape « edge » répond
+   qu'il n'y a rien à faire : le proxy est celui du club.
+4. **Premier démarrage** (base vide) : le code admin est dans les journaux de l'API, lisibles sans sudo :
+   `docker logs gg-pocket-prod-api-1 2>&1 | grep -A1 "admin registration code"` (section 6).
+
+### Reprendre les données de l'ancienne prod (si on les garde)
+
+Une seule fois, après le premier déploiement sur le serveur du club et avant d'ouvrir l'appli aux membres :
+
+```bash
+# Ancien VPS : une sauvegarde à la demande, puis la copier sur ta machine.
+sudo -u deploy /opt/gg-pocket/prod/releases/$(cat /opt/gg-pocket/prod/current-tag)/scripts/backup-now.sh prod
+sudo ls /opt/gg-pocket/prod/backups/manual/
+# Serveur du club : la déposer dans les sauvegardes (dossier du conteneur de sauvegarde, uid 70), puis restaurer.
+docker run --rm -i -v /srv/ggpocket/data/backups:/b postgres:18-alpine \
+  sh -c 'mkdir -p /b/manual && cat > /b/manual/gg-pocket-AAAA-MM-JJ_HHMMSS.tar && chown -R 70:70 /b/manual' \
+  < gg-pocket-AAAA-MM-JJ_HHMMSS.tar
+cd /srv/ggpocket/releases/$(cat /srv/ggpocket/current-tag)
+scripts/restore.sh prod manual/gg-pocket-AAAA-MM-JJ_HHMMSS.tar
+```
+
+Les deux sont des environnements `prod` : l'API accepte la sauvegarde (D-034), puis applique au démarrage les migrations
+qui manquent à une base d'une version plus ancienne. Ensuite, arrêter l'ancienne prod :
+`cd /opt/gg-pocket/prod/releases/$(cat /opt/gg-pocket/prod/current-tag) && sudo -u deploy docker compose -f compose.yml -f compose.prod.yml --env-file /opt/gg-pocket/prod/.env --profile backup down`
+(les volumes restent, rien n'est effacé).
+
+### Au quotidien
+
+- Sauvegardes : comme en section 8, dans `/srv/ggpocket/data/backups/`. La sauvegarde nocturne du club copie `data/`
+  et le `.env` : elle doit passer après la nôtre (3 h 30, heure de Paris).
+- Restaurer, revenir en arrière : sections 7 et 8, avec `/srv/ggpocket` à la place de `/opt/gg-pocket/prod` et sans
+  `sudo -u deploy` (le compte `willem` est dans le groupe `docker`).
+- État : `docker ps --filter label=com.docker.compose.project=gg-pocket-prod`.
+- Mémoire : environ 1,5 Go au plus (API 768 Mo, base 512 Mo, sauvegarde 128 Mo, Caddy de l'appli 64 Mo).

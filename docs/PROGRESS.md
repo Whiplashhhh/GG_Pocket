@@ -4,6 +4,27 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-08 (nuit) — Prod sur le serveur du club (D-126)
+
+**Branche** : `feature/prod-serveur-club-0.9.0` (depuis `main` en `75860b1`, après le merge de #64).
+
+### Fait
+- Le club fournit un VPS (51.222.157.180, `ggpocket.gravelinesgrimp.org`) derrière le Caddy du président (réseau
+  Docker externe `web`, service `ggpocket:8080`, pas de port publié, `/srv/ggpocket`, compte `willem` sans root).
+- `deploy/compose.proxy.yml` (ajouté par `lib.sh` si `GG_PROXY_NETWORK`), test de fumée par `docker compose exec`,
+  `gg-deploy` avec dossier en argument, `DEPLOY_USER` dans les workflows, scripts `setup-prod-shared.sh` (GitHub) et
+  `setup-shared.sh` (serveur), modèle `env/prod-shared.env.example`, vérification dans le job « Deploy config ».
+- Vérifié ici : shellcheck, actionlint, `docker-compose config` (binaire autonome v2.40.3) avec et sans proxy.
+- DEPLOYMENT.md §10, D-126 (points à faire valider par le président).
+
+### Reste / prochaine action
+- CI verte sur la PR, merge. Willem fait valider D-126 par le président, puis lance `setup-prod-shared.sh` et
+  `setup-shared.sh`, puis « Prepare release » en `major`. Base vierge (pas de reprise des données de l'ancienne prod).
+- Le frontal du dev (ancien VPS) n'est plus mis à jour par les releases : à reprendre dans `deploy-dev.yml`.
+
+### Points bloquants
+- Validation du président (D-126).
+
 ## 2026-11-08 (soir) — CI rétablie, préparation de la 1.0
 
 **Branche** : `fix/backend-ci-0.9.0` (depuis `main` en `2f6e907`).

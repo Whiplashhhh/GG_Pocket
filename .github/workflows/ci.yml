@@ -203,6 +203,14 @@ jobs:
             GG_IMAGE_TAG=1.2.3 docker compose -f compose.yml -f "compose.$env.yml" \
               --env-file "$RUNNER_TEMP/$env.env" --profile backup config --quiet
           done
+          # Prod behind the club's shared reverse proxy (D-126): no published port, the proxy's alias.
+          sed -e 's/^GG_DB_PASSWORD=$/GG_DB_PASSWORD=x/' -e 's/^GG_DB_ADMIN_PASSWORD=$/GG_DB_ADMIN_PASSWORD=x/' \
+            env/prod-shared.env.example > "$RUNNER_TEMP/prod-shared.env"
+          GG_IMAGE_TAG=1.2.3 docker compose -f compose.yml -f compose.prod.yml -f compose.proxy.yml \
+            --env-file "$RUNNER_TEMP/prod-shared.env" --profile backup config --format json \
+            | jq -e '(.services.web.ports // []) == [] and (.services.web.networks.proxy.aliases | index("ggpocket"))
+                and .networks.proxy.external and (.services.api.networks | has("proxy") | not)' >/dev/null \
+            || { echo "::error::compose.proxy.yml: web must publish no port and join the proxy network as ggpocket"; exit 1; }
           GG_IMAGE_TAG=ci docker compose -f compose.yml -f compose.ci.yml --env-file env/ci.env config --quiet
           cp env/edge.env.example edge/.env
           docker compose -f edge/compose.yml config --quiet

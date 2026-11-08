@@ -174,6 +174,8 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [x] Revue de sécurité complète (D-112 ; trois points à trancher par Willem)
 - [ ] Seed final, démarrage d'une prod vide vérifié
 - [x] `docs/GUIDE_CLUB.md` (à compléter avec le logo quand il sera téléversable)
+- [x] Déploiement de la prod sur le serveur du club, derrière son proxy partagé (D-126, DEPLOYMENT.md §10)
+- [ ] Mise en place sur le serveur du club par Willem (scripts `setup-prod-shared.sh` puis `setup-shared.sh`)
 - [ ] Release `1.0.0` (déclenchée par Willem)
 
 ## Phase 9 — Après lancement (pas sans feu vert)

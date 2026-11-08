@@ -128,6 +128,8 @@ jobs:
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          # The user the key is pinned to: deploy (bootstrap.sh), or the app's user on the club's server (D-126).
+          DEPLOY_USER: ${{ vars.DEPLOY_USER || 'deploy' }}
           DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
           VERSION: ${{ steps.version.outputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -140,11 +142,11 @@ jobs:
           deploy/scripts/pin-edge-image.sh "$REGISTRY/gg-pocket-web:$VERSION"
           tar -czf "$RUNNER_TEMP/bundle.tgz" -C deploy .
           remote() {
-            ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes "deploy@$DEPLOY_HOST" "$@" < "$RUNNER_TEMP/bundle.tgz"
+            ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" "$@" < "$RUNNER_TEMP/bundle.tgz"
           }
           # The server pulls the images with this job's read-only token, valid until the job ends.
           printf '%s' "$GITHUB_TOKEN" | ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes \
-            "deploy@$DEPLOY_HOST" "login $GITHUB_ACTOR"
+            "$DEPLOY_USER@$DEPLOY_HOST" "login $GITHUB_ACTOR"
           remote edge
           remote deploy "$VERSION"
       - name: Summary
