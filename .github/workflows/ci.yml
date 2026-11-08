@@ -36,7 +36,29 @@ jobs:
           java-version: "25"
           cache: maven
       - name: Build and test (unit + Testcontainers integration tests)
-        run: ./mvnw --batch-mode --no-transfer-progress --errors verify
+        run: ./mvnw --batch-mode --no-transfer-progress --errors verify 2>&1 | tee "$RUNNER_TEMP/maven.log"
+      - name: Maven errors as annotations
+        if: failure()
+        # The raw logs are not always reachable (blob storage); annotations are, from the API.
+        run: |
+          annotate() {
+            local text=${2//'%'/'%25'}
+            text=${text//$'\r'/}
+            echo "::error title=$1::${text//$'\n'/'%0A'}"
+          }
+          errors=$(grep -F '[ERROR]' "$RUNNER_TEMP/maven.log" 2>/dev/null \
+            | grep -v -E '^\[ERROR\] *$|\[Help [0-9]|Re-run Maven|full stack trace|-e switch|-X switch|more information about' \
+            | awk '!seen[$0]++' | cut -c1-400 | head -n 120 || true)
+          part=0
+          while [ -n "$errors" ] && [ "$part" -lt 4 ]; do
+            part=$((part + 1))
+            annotate "Maven errors ($part)" "$(head -n 30 <<<"$errors")"
+            errors=$(tail -n +31 <<<"$errors")
+          done
+          causes=$(cat target/surefire-reports/*.txt target/failsafe-reports/*.txt 2>/dev/null \
+            | grep -E '^Caused by:|Exception|expected|but was' \
+            | awk '!seen[$0]++' | cut -c1-400 | head -n 40 || true)
+          if [ -n "$causes" ]; then annotate "Test failure causes" "$causes"; fi
       - name: Print the generated OpenAPI contract when it differs
         if: failure()
         run: |
