@@ -40,8 +40,8 @@ export const MY_LOGBOOK_KEY = ['me', 'logbook'] as const
 
 const PAGE_SIZE = 10
 
-/** My sessions, latest day first, page by page (cursor). */
-export function useMySessions() {
+/** My sessions, latest day first, page by page (cursor): the « Juste moi » tab of the feed. */
+export function useMySessions(enabled: MaybeRefOrGetter<boolean> = true) {
   return useInfiniteQuery({
     queryKey: MY_SESSIONS_KEY,
     queryFn: ({ pageParam, signal }) =>
@@ -55,6 +55,7 @@ export function useMySessions() {
       ),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.nextCursor,
+    enabled: computed(() => toValue(enabled)),
   })
 }
 

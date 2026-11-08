@@ -201,6 +201,6 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
   - [x] Voie « à plus de 50 % » : 0,5 au classement Voies (D-121)
   - [x] Pastille bicolore, miniature ronde, série en flammes (D-122)
   - [x] Logo du club et icônes PWA (D-123)
+  - [x] Onglet « Juste moi » dans Actu (D-120) ; formulaire de séance en cartes, 2 voies récentes proposées (D-124)
 - [ ] Idées du club pour après la 1.0 (questionnaire, partie I et commentaires) : « dico » des badges en touchant un
-  badge (tous les niveaux et seuils, Q14) ; formulaire de séance plus aéré, 2 voies récentes proposées ; récap mensuel
-  à l'ouverture du mois et section « Récaps » dans le profil
+  badge (tous les niveaux et seuils, Q14) ; récap mensuel à l'ouverture du mois et section « Récaps » dans le profil

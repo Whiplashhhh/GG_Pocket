@@ -48,7 +48,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   le joindre (contact@gravelinesgrimp.org, un clic pour écrire). Cette page tient lieu de politique de
   confidentialité du club, et dit maintenant tout sur les comptes inactifs, la date de naissance et les mineur·es.
 
-- **Le fil du club**, un deuxième onglet dans Actu : les séances que les grimpeurs partagent avec tout le club.
+- **Trois onglets dans Actu** : « Juste moi » (toutes tes séances, même les « Juste moi »), « Mes amis » et « Le club ».
+- **Le fil du club**, le nouvel onglet d’Actu : les séances que les grimpeurs partagent avec tout le club.
   C’est donnant-donnant : pour le voir, tu participes (« Je participe au fil du club », depuis l’onglet ou ton profil)
   et tes séances « Tout le club » y apparaissent aussi. Tant que tu ne participes pas, l’onglet reste flouté.
 - Une troisième case quand tu enregistres une séance : **Tout le club**, en plus de « Mes amis » et « Juste moi ».
@@ -60,6 +61,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ### Modifié
 
+- **Le formulaire de séance respire** : la date et l’assurage, l’ajout de voies, chaque voie et la fin de séance ont
+  chacun leur carte, comme les séances du fil. Seules tes **2 dernières voies** sont proposées d’office ; pour les
+  autres, la recherche par corde, nom, couleur ou cotation est juste au-dessus.
 - **Cotations** : on colle à ce que le club ouvre vraiment. Des « + » seulement à partir de 5b, des « - » seulement
   à partir de 6b : 25 cotations, de 4a à 7c+. Les voies qui portaient une cotation disparue passent à la cotation
   sans signe (une 4a+ devient une 4a, une 6a- une 6a), ton carnet et tes « À faire » suivent.

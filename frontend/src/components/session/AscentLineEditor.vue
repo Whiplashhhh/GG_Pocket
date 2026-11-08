@@ -23,7 +23,8 @@ import FeelingSlider from './FeelingSlider.vue'
 /**
  * One ascent of the session sheet (docs/DESIGN.md, « Nouvelle séance »): mode, topped, clean,
  * falls, « Plus de la moitié » when not topped (D-121), first try, feeling, and the belayer when the
- * session has several (D-118). Big targets: hands are full of chalk.
+ * session has several (D-118). One card per ascent, like the sessions of the feed (club feedback).
+ * Big targets: hands are full of chalk.
  */
 const props = defineProps<{
   line: AscentLine
@@ -100,7 +101,10 @@ const menuItem =
 </script>
 
 <template>
-  <li class="flex flex-col gap-3 border-b border-rule px-4 py-4" :aria-labelledby="labelId">
+  <li
+    class="flex flex-col gap-3 rounded-control border border-rule bg-surface p-4"
+    :aria-labelledby="labelId"
+  >
     <div class="flex items-start gap-3">
       <span
         class="mt-2 w-6 shrink-0 text-right font-bold text-ink-muted tabular-nums"

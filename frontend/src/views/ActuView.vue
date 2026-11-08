@@ -6,6 +6,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useAwaitingValidation, useCurrentMember } from '@/api/auth'
 import { useClubFeed, useFeed } from '@/api/feed'
+import { useMySessions } from '@/api/sessions'
 import { useDirectory } from '@/api/social'
 import AwaitingValidationNotice from '@/components/member/AwaitingValidationNotice.vue'
 import ClubFeedTeaser from '@/components/social/ClubFeedTeaser.vue'
@@ -14,14 +15,14 @@ import GgButton from '@/components/ui/GgButton.vue'
 import SegmentedControl from '@/components/ui/SegmentedControl.vue'
 
 /**
- * The feed (spec §8.2): the club header with its climber count (the way to the directory), then two
- * tabs (D-120). « Mes amis »: my sessions and the ones my friends share, latest first. « Le club »:
- * the "Tout le club" sessions of the members who take part, for a member who takes part; blurred
- * templates and the way in otherwise. `?club` in the address opens the club tab, like `?amis` in
- * the directory. Friend requests wait on my profile (D-099). An account awaiting validation sees
+ * The feed (spec §8.2): the club header with its climber count (the way to the directory), then
+ * three tabs (D-120). « Juste moi »: my sessions only. « Mes amis »: my sessions and the ones my
+ * friends share, latest first. « Le club »: the "Tout le club" sessions of the members who take
+ * part, for a member who takes part; blurred templates and the way in otherwise. `?moi` and `?club`
+ * in the address open those tabs, like `?amis` in the directory. Friend requests wait on my profile (D-099). An account awaiting validation sees
  * its own sessions only, and why (D-107).
  */
-type Tab = 'friends' | 'club'
+type Tab = 'me' | 'friends' | 'club'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -31,15 +32,23 @@ const directory = useDirectory()
 const awaiting = useAwaitingValidation()
 
 const tab = computed<Tab>({
-  get: () => (route.query.club === undefined ? 'friends' : 'club'),
-  set: (value) => void router.replace({ query: value === 'club' ? { club: null } : {} }),
+  get: () => {
+    if (route.query.moi !== undefined) return 'me'
+    return route.query.club === undefined ? 'friends' : 'club'
+  },
+  set: (value) =>
+    void router.replace({
+      query: value === 'friends' ? {} : value === 'me' ? { moi: null } : { club: null },
+    }),
 })
 const tabs = computed(() => [
+  { value: 'me' as const, label: t('actu.tabMe') },
   { value: 'friends' as const, label: t('actu.tabFriends') },
   { value: 'club' as const, label: t('actu.tabClub') },
 ])
 
 const inClubFeed = computed(() => member.value?.inClubFeed === true)
+const myFeed = useMySessions(() => tab.value === 'me')
 const friendsFeed = useFeed()
 const clubFeed = useClubFeed(() => inClubFeed.value && tab.value === 'club')
 </script>
@@ -71,7 +80,16 @@ const clubFeed = useClubFeed(() => inClubFeed.value && tab.value === 'club')
   </section>
 
   <SessionFeed
-    v-if="tab === 'friends'"
+    v-if="tab === 'me'"
+    :feed="myFeed"
+    :heading="t('actu.myFeed')"
+    :empty-title="t('actu.myEmptyTitle')"
+    :empty-body="t('actu.myEmptyBody')"
+  >
+    <GgButton variant="secondary" to="/seance/nouvelle">{{ t('actu.newSession') }}</GgButton>
+  </SessionFeed>
+  <SessionFeed
+    v-else-if="tab === 'friends'"
     :feed="friendsFeed"
     :heading="t('actu.feed')"
     :empty-title="t('actu.emptyTitle')"

@@ -14,6 +14,31 @@ async function sameDay(page: Page, club: FakeClub) {
 }
 
 test.describe('the club feed (D-120)', () => {
+  test('« Juste moi » shows my sessions only, « Juste moi » ones included', async ({
+    page,
+    club,
+    me,
+  }) => {
+    await sameDay(page, club)
+    const marie = signedIn(me)
+    const tom = club.addMember({ nickname: 'tom', firstName: 'Tom', lastName: 'Bloc' })
+    club.social.link(marie, tom)
+    club.climbs.add(tom, 1, [{ route: 'Iron Man' }], { comment: 'Tom au taquet.' })
+    club.climbs.add(marie, 2, [{ route: 'Bye Bye Morice' }], {
+      visibility: 'PRIVATE',
+      comment: 'Rien que pour moi.',
+    })
+    const tabs = page.getByRole('radiogroup', { name: 'Quel fil' })
+
+    await page.goto('/actu')
+    await expect(page.getByText('« Tom au taquet. »')).toBeVisible()
+    await tabs.getByRole('radio', { name: 'Juste moi' }).click()
+    await expect(page).toHaveURL(/\/actu\?moi/)
+    await expect(page.getByText('« Rien que pour moi. »')).toBeVisible()
+    await expect(page.getByText('« Tom au taquet. »')).toHaveCount(0)
+    await expect(page.getByRole('article')).toHaveCount(1)
+  })
+
   test('to see it, one shows oneself: join, read, share a session with the club', async ({
     page,
     club,

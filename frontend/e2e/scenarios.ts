@@ -544,6 +544,7 @@ export const CAPTURES: Capture[] = [
   },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
   { name: 'actu-fil', path: '/actu', as: 'CLIMBER', prepare: feedAlive },
+  { name: 'actu-moi', path: '/actu?moi', as: 'CLIMBER', prepare: feedAlive },
   { name: 'actu-club-flou', path: '/actu?club', as: 'CLIMBER', prepare: feedAlive },
   { name: 'actu-club', path: '/actu?club', as: 'CLIMBER', prepare: clubFeedAlive },
   { name: 'actu-club-en-attente', path: '/actu?club', as: 'TOURIST', prepare: marieAwaits },
