@@ -39,6 +39,10 @@ public class Ascent extends TimestampedEntity {
     @Column(nullable = false)
     private boolean clean;
 
+    /** "Plus de la moitié": not topped, but past the half of the route (D-121). */
+    @Column(name = "past_half", nullable = false)
+    private boolean pastHalf;
+
     @Column(nullable = false)
     private int falls;
 
@@ -73,6 +77,7 @@ public class Ascent extends TimestampedEntity {
         this.firstTry = draft.firstTry();
         this.feeling = draft.feeling();
         this.belayerId = draft.belayerId();
+        this.pastHalf = draft.pastHalf();
     }
 
     public int position() {
@@ -93,6 +98,11 @@ public class Ascent extends TimestampedEntity {
 
     public boolean clean() {
         return clean;
+    }
+
+    /** Not topped, but past the half: half a point in the "Voies" ranking, nothing else. */
+    public boolean pastHalf() {
+        return pastHalf;
     }
 
     public int falls() {

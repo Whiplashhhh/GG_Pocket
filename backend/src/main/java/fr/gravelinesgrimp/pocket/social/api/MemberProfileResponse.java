@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.util.List;
 import java.util.UUID;
 
-@Schema(name = "MemberProfile", description = "age is absent unless the member chose to show it.")
+@Schema(
+        name = "MemberProfile",
+        description = "age is absent unless an adult member chose to show it (D-119).")
 public record MemberProfileResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) MemberCardResponse member,
         Integer age,

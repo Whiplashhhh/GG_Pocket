@@ -21,6 +21,25 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/admin/closed-days': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Every closed day, earliest first (board+) */
+    get: operations['listClosedDays']
+    put?: never
+    /** Close a day or a range of days, 366 at most (board+); every closed day back */
+    post: operations['closeDays']
+    /** Reopen a day or a range of days (board+) */
+    delete: operations['reopenDays']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/admin/club/cords': {
     parameters: {
       query?: never
@@ -431,6 +450,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/feed/club': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** The sessions shared with the club by the members who take part in the club feed, mine included, latest day first (cursor pagination); for the members who take part (D-120) */
+    get: operations['getClubFeed']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me': {
     parameters: {
       query?: never
@@ -517,6 +553,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/birth-date': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Give my missing birth date */
+    put: operations['setMyBirthDate']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/climbed-routes': {
     parameters: {
       query?: never
@@ -527,6 +580,23 @@ export interface paths {
     /** Routes I climbed, most recently climbed first */
     get: operations['listMyClimbedRoutes']
     put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/club-feed': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Take part in the club feed, or leave it (validated accounts) */
+    put: operations['setMyClubFeed']
     post?: never
     delete?: never
     options?: never
@@ -1421,10 +1491,12 @@ export interface components {
       id: string
       /** @enum {string} */
       mode: 'TOP_ROPE' | 'LEAD'
+      /** @description Not topped, but past the half of the route */
+      pastHalf: boolean
       route: components['schemas']['RouteSummary']
       topped: boolean
     }
-    /** @description A clean ascent is topped, with 0 falls. */
+    /** @description A clean ascent is topped, with 0 falls. pastHalf: not topped, but past the half of the route. */
     AscentRequest: {
       /**
        * Format: uuid
@@ -1443,6 +1515,8 @@ export interface components {
       firstTry: boolean
       /** @enum {string} */
       mode: 'TOP_ROPE' | 'LEAD'
+      /** @description Not topped, but past the half of the route; false when absent */
+      pastHalf?: boolean
       /** Format: uuid */
       routeId: string
       topped: boolean
@@ -1460,7 +1534,7 @@ export interface components {
       climberCount: number
       /**
        * Format: int32
-       * @description Rounded share of topped ascents; absent without any ascent
+       * @description Rounded share of clean ascents; absent without any ascent
        */
       successPercent?: number
       /** Format: int32 */
@@ -1490,12 +1564,16 @@ export interface components {
         | 'CLUB_CORD_UPDATED'
         | 'CLUB_HOLD_COLOR_CREATED'
         | 'CLUB_HOLD_COLOR_UPDATED'
+        | 'CLUB_DAYS_CLOSED'
+        | 'CLUB_DAYS_REOPENED'
+        | 'MEMBER_PUT_TO_SLEEP'
+        | 'MEMBER_DELETED_INACTIVE'
       /**
        * Format: uuid
        * @description Absent if that member was deleted since
        */
       actorId?: string
-      /** @description Nickname at the time of the action */
+      /** @description Nickname at the time of the action; absent for what the application did on its own (D-119) */
       actorNickname?: string
       after?: string
       before?: string
@@ -1517,6 +1595,7 @@ export interface components {
         | 'SECTOR'
         | 'CORD'
         | 'HOLD_COLOR'
+        | 'CLOSED_DAY'
     }
     /** @description Newest first. */
     AuditPage: {
@@ -1652,12 +1731,44 @@ export interface components {
       items: components['schemas']['Belay'][]
       nextCursor?: string
     }
+    /** @description The birth date an older account never gave, asked at sign-in (D-119). */
+    BirthDateRequest: {
+      /** Format: date */
+      birthDate: string
+      /** @description Declares that a parent agreed; required under 15 */
+      parentalConsent?: boolean
+    }
     /** @description A route I climbed, and the last day I did. */
     ClimbedRoute: {
       /** Format: date */
       lastClimbedOn: string
       /** Format: uuid */
       routeId: string
+    }
+    ClosedDay: {
+      /** Format: date */
+      date: string
+      /** @example Vacances de Noël */
+      label?: string
+    }
+    ClosedDaysSettings: {
+      /**
+       * Format: date
+       * @example 2026-12-21
+       */
+      from: string
+      /** @example Vacances de Noël */
+      label?: string
+      /**
+       * Format: date
+       * @description Last day closed, included; the single day from when absent
+       * @example 2027-01-04
+       */
+      to?: string
+    }
+    /** @description Take part in the club feed or leave it (D-120): to read it, my sessions shared with the club show in it. */
+    ClubFeedRequest: {
+      inClubFeed: boolean
     }
     Cord: {
       active: boolean
@@ -1679,9 +1790,13 @@ export interface components {
     CurrentMember: {
       /** @description Profile photo, absent when the member has none */
       avatarUrl?: string
+      /** @description True for an older account without birth date: the app asks for it before anything else (D-119) */
+      birthDateMissing: boolean
       firstName: string
       /** Format: uuid */
       id: string
+      /** @description Takes part in the club feed: reads it, and shows their sessions shared with the club in it (D-120) */
+      inClubFeed: boolean
       lastName: string
       nickname: string
       /** @enum {string} */
@@ -1724,6 +1839,7 @@ export interface components {
       feeling?: number
       firstTry?: boolean
       mode?: string
+      pastHalf?: boolean
       route?: components['schemas']['ExportedRoute']
       topped?: boolean
     }
@@ -1799,7 +1915,6 @@ export interface components {
       /** Format: int32 */
       rank?: number
       ranking?: string
-      /** Format: int32 */
       value?: number
     }
     ExportedRoute: {
@@ -1960,7 +2075,8 @@ export interface components {
       /** Format: int32 */
       ascentCount: number
       /** @enum {string} */
-      best: 'LEAD_CLEAN' | 'LEAD_TOPPED' | 'TOP_ROPE_CLEAN' | 'TOP_ROPE_TOPPED' | 'TRIED'
+      best:
+        'LEAD_CLEAN' | 'LEAD_TOPPED' | 'TOP_ROPE_CLEAN' | 'TOP_ROPE_TOPPED' | 'PAST_HALF' | 'TRIED'
       /** Format: date */
       firstClimbedOn: string
       /** Format: date */
@@ -2039,7 +2155,7 @@ export interface components {
       /** @description Validate this new account as a tourist or a climber */
       canValidate: boolean
     }
-    /** @description age is absent unless the member chose to show it. */
+    /** @description age is absent unless an adult member chose to show it (D-119). */
     MemberProfile: {
       /** Format: int32 */
       age?: number
@@ -2064,6 +2180,11 @@ export interface components {
       avatarUrl?: string
       /** @description Licensed at the club, as declared at sign-up; absent for accounts that never went through it */
       declaredLicensed?: boolean
+      /**
+       * Format: date-time
+       * @description When the account was put to sleep after a year without a visit (D-119); absent if active or disabled by the board
+       */
+      dormantSince?: string
       firstName: string
       /** Format: uuid */
       id: string
@@ -2073,6 +2194,8 @@ export interface components {
        * @description Roughly, to the hour; absent if never seen since registration
        */
       lastSeenAt?: string
+      /** @description Under 18, for the board and the admin only; never the birth date (D-119) */
+      minor: boolean
       nickname: string
       /** Format: date-time */
       registeredAt: string
@@ -2215,6 +2338,8 @@ export interface components {
       firstTry: boolean
       /** @enum {string} */
       mode: 'TOP_ROPE' | 'LEAD'
+      /** @description Not topped, but past the half of the route */
+      pastHalf: boolean
       /** Format: uuid */
       sessionId: string
       topped: boolean
@@ -2243,6 +2368,8 @@ export interface components {
       nickname: string
     }
     Planning: {
+      /** @description The days of the month the gym is closed, earliest first */
+      closedDays: components['schemas']['PlanningClosedDay'][]
       /** @description Only the days with a session, earliest first */
       days: components['schemas']['PlanningDay'][]
       /** @description Its sessions can no longer change */
@@ -2251,6 +2378,12 @@ export interface components {
       month: string
       streak: components['schemas']['Streak']
       totals: components['schemas']['MonthTotals']
+    }
+    PlanningClosedDay: {
+      /** Format: date */
+      date: string
+      /** @example Vacances de Noël */
+      label?: string
     }
     PlanningDay: {
       /** Format: date */
@@ -2271,8 +2404,11 @@ export interface components {
     ProfileUpdate: {
       appearsInRankings?: boolean
       bio?: string
-      /** Format: date */
-      birthDate?: string
+      /**
+       * Format: date
+       * @description Cannot be removed (D-119)
+       */
+      birthDate: string
       /** Format: int32 */
       climbingSinceYear?: number
       /** Format: int32 */
@@ -2284,12 +2420,13 @@ export interface components {
       nickname: string
       /** @description Declares that a parent agreed; required once under 15 */
       parentalConsent?: boolean
+      /** @description Ignored, and saved unchecked, for a member under 18 (D-119) */
       showAge?: boolean
     }
     Ranking: {
       /** @description False when I chose not to appear in the rankings */
       appearsInRankings: boolean
-      /** @description Topped ascents, every mode, repeats included */
+      /** @description Topped ascents, every mode, repeats included, and half a point per route past its half */
       ascents: components['schemas']['RankingBoard']
       /**
        * Format: date-time
@@ -2316,7 +2453,10 @@ export interface components {
       member: components['schemas']['MemberRef']
       /** Format: int32 */
       rank: number
-      /** Format: int32 */
+      /**
+       * @description Halves in the ascents ranking (a route past its half)
+       * @example 12.5
+       */
       value: number
     }
     RankingMonth: {
@@ -2333,8 +2473,11 @@ export interface components {
     }
     /** @description The one-page registration form (spec §6). */
     RegisterRequest: {
-      /** Format: date */
-      birthDate?: string
+      /**
+       * Format: date
+       * @description Required (D-119); only the board sees whether under 18
+       */
+      birthDate: string
       code: string
       /** Format: email */
       email?: string
@@ -2686,7 +2829,7 @@ export interface components {
         | 'RECORD'
       )[]
       /** @enum {string} */
-      visibility: 'FRIENDS' | 'PRIVATE'
+      visibility: 'FRIENDS' | 'PRIVATE' | 'CLUB'
     }
     SessionComment: {
       author: components['schemas']['MemberRef']
@@ -2710,7 +2853,7 @@ export interface components {
       /** @description Erase the session's comment */
       removeComment: boolean
       /** @enum {string} */
-      visibility: 'FRIENDS' | 'PRIVATE'
+      visibility: 'FRIENDS' | 'PRIVATE' | 'CLUB'
     }
     SessionReactionRequest: {
       /** @enum {string} */
@@ -2742,7 +2885,7 @@ export interface components {
        */
       feeling?: number
       /** @enum {string} */
-      visibility: 'FRIENDS' | 'PRIVATE'
+      visibility: 'FRIENDS' | 'PRIVATE' | 'CLUB'
     }
     /** @description maxGrade: the hardest topped grade. */
     SessionSummary: {
@@ -2847,6 +2990,73 @@ export interface operations {
         content: {
           'application/json': components['schemas']['AuditPage']
         }
+      }
+    }
+  }
+  listClosedDays: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ClosedDay'][]
+        }
+      }
+    }
+  }
+  closeDays: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ClosedDaysSettings']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ClosedDay'][]
+        }
+      }
+    }
+  }
+  reopenDays: {
+    parameters: {
+      query: {
+        /** @description First day to reopen */
+        from: string
+        /** @description Last day to reopen, included; the single day from by default */
+        to?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -3458,6 +3668,29 @@ export interface operations {
       }
     }
   }
+  getClubFeed: {
+    parameters: {
+      query?: {
+        cursor?: string
+        size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionPage']
+        }
+      }
+    }
+  }
   getMyProfile: {
     parameters: {
       query?: never
@@ -3590,6 +3823,30 @@ export interface operations {
       }
     }
   }
+  setMyBirthDate: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BirthDateRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CurrentMember']
+        }
+      }
+    }
+  }
   listMyClimbedRoutes: {
     parameters: {
       query?: never
@@ -3606,6 +3863,30 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ClimbedRoute'][]
+        }
+      }
+    }
+  }
+  setMyClubFeed: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ClubFeedRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CurrentMember']
         }
       }
     }

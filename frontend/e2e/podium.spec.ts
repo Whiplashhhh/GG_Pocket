@@ -41,6 +41,8 @@ test.describe('podium', () => {
       climbs(club, club.addMember({ nickname: name }), 7 - Math.floor(index / 3), 1)
     }
     climbs(club, marie, 2, 3)
+    // Léa let go past the half once, on a day she already climbed: half a point (D-121).
+    club.climbs.add(lea, 1, [{ route: 'Réglisse', topped: false, pastHalf: true }])
 
     await page.goto('/podium')
     await expect(page.getByRole('heading', { level: 1, name: 'Podium' })).toBeVisible()
@@ -74,6 +76,8 @@ test.describe('podium', () => {
     await expect(top.nth(0)).toContainText('18 voies')
     await expect(top.nth(1)).toContainText('lea.dyno')
     await expect(top.nth(1)).toContainText('2e')
+    await expect(top.nth(1)).toContainText('9,5 voies')
+    await expect(page.getByText('Un demi-point quand même (0,5).')).toBeVisible()
   })
 
   test('goes back to a frozen month, not before the first one', async ({ page, club, me }) => {

@@ -1,5 +1,6 @@
 package fr.gravelinesgrimp.pocket.session.application;
 
+import fr.gravelinesgrimp.pocket.club.infra.ClosedDayRepository;
 import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 import fr.gravelinesgrimp.pocket.session.domain.MonthTotals;
 import fr.gravelinesgrimp.pocket.session.domain.PlanningMonth;
@@ -18,17 +19,23 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/** The planning (spec §8.6): my own sessions, a month at a time. */
+/** The planning (spec §8.6): my own sessions, a month at a time, and the gym's closed days. */
 @Service
 public class PlanningService {
 
     private final ClimbingSessionRepository sessions;
     private final SessionViews views;
+    private final ClosedDayRepository closedDays;
     private final Clock clock;
 
-    public PlanningService(ClimbingSessionRepository sessions, SessionViews views, Clock clock) {
+    public PlanningService(
+            ClimbingSessionRepository sessions,
+            SessionViews views,
+            ClosedDayRepository closedDays,
+            Clock clock) {
         this.sessions = sessions;
         this.views = views;
+        this.closedDays = closedDays;
         this.clock = clock;
     }
 
@@ -61,7 +68,13 @@ public class PlanningService {
                 SessionCalendar.isFrozen(shown.atDay(1), clock.instant()),
                 days,
                 MonthTotals.of(inMonth.stream().map(PlanningService::forTotals).toList()),
-                Streak.of(sessions.findClimbingDays(memberId), today));
+                Streak.of(sessions.findClimbingDays(memberId), today),
+                closedDays
+                        .findAllByClosedOnBetweenOrderByClosedOnAsc(
+                                shown.atDay(1), shown.atEndOfMonth())
+                        .stream()
+                        .map(day -> new PlanningView.ClosedDay(day.closedOn(), day.label()))
+                        .toList());
     }
 
     private static MonthTotals.Session forTotals(SessionView session) {

@@ -20,6 +20,7 @@ import fr.gravelinesgrimp.pocket.IntegrationTest;
 import fr.gravelinesgrimp.pocket.MemberFixtures;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
+import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Year;
 
@@ -46,6 +48,7 @@ class MeIT {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberFixtures members;
+    @Autowired private MemberRepository memberRepository;
 
     @Test
     void iReadMyWholeProfile() throws Exception {
@@ -103,6 +106,77 @@ class MeIT {
         update(me, me.nickname(), birth, true, null, null)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.parentalConsent").value(true));
+    }
+
+    /** D-119: "Afficher mon âge" is for adults only; a minor's box is saved unchecked. */
+    @Test
+    void aMinorCannotShowTheirAge() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var birth = LocalDate.now().minusYears(16).toString();
+        showAge(me, birth).andExpect(status().isOk()).andExpect(jsonPath("$.showAge").value(false));
+        showAge(me, "1990-01-01")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.showAge").value(true));
+    }
+
+    /** D-119: required, so it can be corrected but no longer removed. */
+    @Test
+    void myBirthDateCannotBeRemoved() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        mockMvc.perform(
+                        put("/api/v1/me/profile")
+                                .with(as(me))
+                                .with(xsrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
+                                        {"nickname": "%s", "firstName": "Léa",
+                                         "lastName": "Dupont", "birthDate": null,
+                                         "parentalConsent": false,
+                                         "showAge": false, "appearsInRankings": true}
+                                        """
+                                                .formatted(me.nickname())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+                .andExpect(jsonPath("$.errors[0].field").value("birthDate"));
+    }
+
+    /** D-119: an older account without birth date gives it at its next sign-in. */
+    @Test
+    void anOlderAccountGivesItsMissingBirthDate() throws Exception {
+        var me = withoutBirthDate(members.create(Role.CLIMBER));
+        var session = MemberFixtures.signIn(mockMvc, me, false);
+        mockMvc.perform(get("/api/v1/auth/state").cookie(session))
+                .andExpect(jsonPath("$.member.birthDateMissing").value(true));
+
+        setBirthDate(me, "1990-05-06", false)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nickname").value(me.nickname()))
+                .andExpect(jsonPath("$.birthDateMissing").value(false));
+        mockMvc.perform(get("/api/v1/auth/state").cookie(session))
+                .andExpect(jsonPath("$.member.birthDateMissing").value(false));
+        mockMvc.perform(get("/api/v1/me").with(as(me)))
+                .andExpect(jsonPath("$.birthDate").value("1990-05-06"));
+    }
+
+    @Test
+    void aMissingBirthDateUnderFifteenNeedsTheParentalConsentToo() throws Exception {
+        var me = withoutBirthDate(members.create(Role.CLIMBER));
+        var birth = LocalDate.now().minusYears(12).toString();
+        setBirthDate(me, birth, false)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("PARENTAL_CONSENT_REQUIRED"));
+        setBirthDate(me, birth, true).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/me").with(as(me)))
+                .andExpect(jsonPath("$.parentalConsent").value(true));
+    }
+
+    @Test
+    void theMissingBirthDateIsAnActualPastDate() throws Exception {
+        var me = withoutBirthDate(members.create(Role.CLIMBER));
+        setBirthDate(me, LocalDate.now().plusDays(2).toString(), false)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
     }
 
     @Test
@@ -171,6 +245,40 @@ class MeIT {
                 .andExpect(jsonPath("$.avatarUrl").doesNotExist());
     }
 
+    private ResultActions showAge(Member me, String birthDate) throws Exception {
+        return mockMvc.perform(
+                put("/api/v1/me/profile")
+                        .with(as(me))
+                        .with(xsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                {"nickname": "%s", "firstName": "Léa", "lastName": "Dupont",
+                                 "birthDate": "%s", "parentalConsent": false, "showAge": true,
+                                 "appearsInRankings": true}
+                                """
+                                        .formatted(me.nickname(), birthDate)));
+    }
+
+    private Member withoutBirthDate(Member member) {
+        member.changeBirthDate(null, false, Instant.now());
+        return memberRepository.saveAndFlush(member);
+    }
+
+    private ResultActions setBirthDate(Member me, String birthDate, boolean consent)
+            throws Exception {
+        return mockMvc.perform(
+                put("/api/v1/me/birth-date")
+                        .with(as(me))
+                        .with(xsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                {"birthDate": "%s", "parentalConsent": %s}
+                                """
+                                        .formatted(birthDate, consent)));
+    }
+
     private ResultActions update(
             Member me, String nickname, String birthDate, boolean consent, String year, String bio)
             throws Exception {
@@ -191,7 +299,7 @@ class MeIT {
                                                 nickname,
                                                 me.id(),
                                                 birthDate == null
-                                                        ? "null"
+                                                        ? "\"1990-01-01\""
                                                         : "\"" + birthDate + "\"",
                                                 consent,
                                                 year == null ? "null" : year,

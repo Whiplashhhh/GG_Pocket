@@ -45,10 +45,14 @@ const DAY = 24 * 3600 * 1000
  */
 export class FakeSessions implements AscentSource {
   readonly sessions: FakeSession[] = []
+  /** The days the gym is closed (D-116), set through FakeClub; every planning shows them. */
+  readonly closedDays: Schemas['ClosedDay'][] = []
   /** No network for the session writes: the requests fail like in a dead zone of the gym. */
   offline = false
   /** Accepted friends with an active account (FakeClub knows both). */
   isFriend: (readerId: string, climberId: string) => boolean = () => false
+  /** Takes part in the club feed, active and validated (D-120; FakeSocial knows). */
+  inClubFeed: (id: string) => boolean = () => false
   /** Active and not opted out of the podium (FakeSocial knows). */
   inRankings: (id: string) => boolean = () => true
   /** Nickname and photo of a member (FakeSocial knows them). */
@@ -80,6 +84,7 @@ export class FakeSessions implements AscentSource {
       route: string
       mode?: AscentRequest['mode']
       topped?: boolean
+      pastHalf?: boolean
       clean?: boolean
       belayerId?: string
     }[],
@@ -104,6 +109,7 @@ export class FakeSessions implements AscentSource {
         routeId: this.topo.route(ascent.route).id,
         mode: ascent.mode ?? 'TOP_ROPE',
         topped: ascent.topped ?? true,
+        pastHalf: ascent.topped === false && ascent.pastHalf === true,
         clean: ascent.clean ?? false,
         falls: ascent.clean === true || ascent.topped === false ? 0 : 1,
         firstTry: false,
@@ -135,13 +141,14 @@ export class FakeSessions implements AscentSource {
   private attendance(
     on: { session: FakeSession; ascent: FakeSession['ascents'][number] }[],
   ): Schemas['Attendance'] {
-    const topped = on.filter(({ ascent }) => ascent.topped).length
+    const clean = on.filter(({ ascent }) => ascent.clean).length
     return {
       ascentCount: on.length,
-      toppedCount: topped,
-      cleanCount: on.filter(({ ascent }) => ascent.clean).length,
+      toppedCount: on.filter(({ ascent }) => ascent.topped).length,
+      cleanCount: clean,
       climberCount: new Set(on.map(({ session }) => session.memberId)).size,
-      ...(on.length === 0 ? {} : { successPercent: Math.round((100 * topped) / on.length) }),
+      // D-117: only the clean ascents are a success.
+      ...(on.length === 0 ? {} : { successPercent: Math.round((100 * clean) / on.length) }),
     }
   }
 
@@ -173,6 +180,7 @@ export class FakeSessions implements AscentSource {
         climbedOn: session.climbedOn,
         mode: ascent.mode,
         topped: ascent.topped,
+        pastHalf: ascent.pastHalf === true,
         clean: ascent.clean,
         falls: ascent.falls,
         firstTry: ascent.firstTry,
@@ -221,10 +229,12 @@ export class FakeSessions implements AscentSource {
     for (const session of this.sessions) {
       if (!session.climbedOn.startsWith(month) || !this.inRankings(session.memberId)) continue
       days.set(session.memberId, (days.get(session.memberId) ?? new Set()).add(session.climbedOn))
-      topped.set(
-        session.memberId,
-        (topped.get(session.memberId) ?? 0) + session.ascents.filter((a) => a.topped).length,
+      // A route past its half is worth half a point (D-121).
+      const points = session.ascents.reduce(
+        (sum, a) => sum + (a.topped ? 1 : a.pastHalf === true ? 0.5 : 0),
+        0,
       )
+      topped.set(session.memberId, (topped.get(session.memberId) ?? 0) + points)
     }
     const board = (scores: Map<string, number>): Schemas['RankingBoard'] => {
       const sorted = [...scores.entries()]
@@ -336,6 +346,9 @@ export class FakeSessions implements AscentSource {
             }),
       },
       streak: { weeks, minDaysPerWeek: 2, currentWeekDays },
+      closedDays: this.closedDays
+        .filter((day) => day.date.startsWith(month))
+        .sort((a, b) => a.date.localeCompare(b.date)),
     }
   }
 
@@ -350,17 +363,18 @@ export class FakeSessions implements AscentSource {
       'LEAD_TOPPED',
       'TOP_ROPE_CLEAN',
       'TOP_ROPE_TOPPED',
+      'PAST_HALF',
       'TRIED',
     ] as const
     type Best = (typeof BEST)[number]
     const bestOf = (ascent: AscentRequest): Best => {
-      if (!ascent.topped) return 'TRIED'
+      if (!ascent.topped) return ascent.pastHalf === true ? 'PAST_HALF' : 'TRIED'
       if (ascent.mode === 'LEAD') return ascent.clean ? 'LEAD_CLEAN' : 'LEAD_TOPPED'
       return ascent.clean ? 'TOP_ROPE_CLEAN' : 'TOP_ROPE_TOPPED'
     }
     const mine = this.allAscents().filter(
       ({ session }) =>
-        session.memberId === climberId && (!sharedOnly || session.visibility === 'FRIENDS'),
+        session.memberId === climberId && (!sharedOnly || session.visibility !== 'PRIVATE'),
     )
     const byRoute = new Map<string, typeof mine>()
     for (const item of mine) {
@@ -461,11 +475,21 @@ export class FakeSessions implements AscentSource {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   }
 
+  /** SessionAudience (D-120): friends read FRIENDS and CLUB, the club feed reads CLUB. */
   private readable(me: TopoMember, session: FakeSession): boolean {
-    return (
-      session.memberId === me.id ||
-      (session.visibility === 'FRIENDS' && this.isFriend(me.id, session.memberId))
-    )
+    if (session.memberId === me.id) return true
+    if (session.visibility === 'PRIVATE') return false
+    if (this.isFriend(me.id, session.memberId)) return true
+    return session.visibility === 'CLUB' && this.inClubTogether(me.id, session.memberId)
+  }
+
+  private inClubTogether(readerId: string, climberId: string): boolean {
+    return this.inClubFeed(readerId) && this.inClubFeed(climberId)
+  }
+
+  /** "Tout le club" for the club feed only; a session that has it keeps it (D-120). */
+  private refusesClub(me: TopoMember, wanted: string, current?: string): boolean {
+    return wanted === 'CLUB' && current !== 'CLUB' && !this.inClubFeed(me.id)
   }
 
   private reactions(me: TopoMember, session: FakeSession): Schemas['SessionReactions'] {
@@ -548,6 +572,7 @@ export class FakeSessions implements AscentSource {
         route,
         mode: ascent.mode,
         topped: ascent.topped,
+        pastHalf: ascent.pastHalf === true,
         clean: ascent.clean,
         falls: ascent.falls,
         firstTry: ascent.firstTry,
@@ -572,7 +597,13 @@ export class FakeSessions implements AscentSource {
     if (!Array.isArray(sent.ascents) || sent.ascents.length === 0 || sent.ascents.length > 50) {
       return problem(400, 'VALIDATION_FAILED')
     }
-    if (sent.ascents.some((ascent) => ascent.clean && (!ascent.topped || ascent.falls > 0))) {
+    if (
+      sent.ascents.some(
+        (ascent) =>
+          (ascent.clean && (!ascent.topped || ascent.falls > 0)) ||
+          (ascent.pastHalf === true && ascent.topped),
+      )
+    ) {
       return problem(400, 'INVALID_ASCENT')
     }
     if (dateChanged && sent.climbedOn > this.day()) return problem(400, 'DATE_IN_THE_FUTURE')
@@ -605,12 +636,15 @@ export class FakeSessions implements AscentSource {
     const url = new URL(path, 'http://fake')
     const pathname = url.pathname
 
-    if (pathname === '/feed' && method === 'GET') {
+    if ((pathname === '/feed' || pathname === '/feed/club') && method === 'GET') {
+      const club = pathname === '/feed/club'
+      if (club && !this.inClubFeed(me.id)) return problem(403, 'CLUB_FEED_NOT_JOINED')
       const all = this.sessions
-        .filter(
-          (session) =>
-            session.memberId === me.id ||
-            (session.visibility === 'FRIENDS' && this.isFriend(me.id, session.memberId)),
+        .filter((session) =>
+          club
+            ? session.visibility === 'CLUB' && this.inClubFeed(session.memberId)
+            : session.memberId === me.id ||
+              (session.visibility !== 'PRIVATE' && this.isFriend(me.id, session.memberId)),
         )
         .sort(
           (a, b) =>
@@ -649,10 +683,15 @@ export class FakeSessions implements AscentSource {
     if (friendMatch !== null && method === 'GET') {
       const [, climberId = '', what] = friendMatch
       const mine = climberId === me.id
-      if (!mine && !this.isFriend(me.id, climberId)) return problem(404, 'NOT_FOUND')
+      const friend = this.isFriend(me.id, climberId)
+      const clubOnly = !mine && !friend && this.inClubTogether(me.id, climberId)
+      if (!mine && !friend && (what === 'logbook' || !clubOnly)) {
+        return problem(404, 'NOT_FOUND')
+      }
       if (what === 'logbook') return json(this.logbook(me, climberId, !mine))
       const all = this.ordered(climberId).filter(
-        (session) => mine || session.visibility === 'FRIENDS',
+        (session) =>
+          mine || session.visibility === 'CLUB' || (!clubOnly && session.visibility === 'FRIENDS'),
       )
       const start = Number(url.searchParams.get('cursor') ?? '0')
       const size = Number(url.searchParams.get('size') ?? '10')
@@ -730,6 +769,7 @@ export class FakeSessions implements AscentSource {
         (session) => session.memberId === me.id && session.clientRef === sent.clientRef,
       )
       if (existing !== undefined) return json(this.view(me, existing))
+      if (this.refusesClub(me, sent.visibility)) return problem(403, 'CLUB_FEED_NOT_JOINED')
       const refused = this.refusal(sent, true)
       if (refused !== undefined) return refused
       const session: FakeSession = {
@@ -826,6 +866,9 @@ export class FakeSessions implements AscentSource {
     // Who sees it, its comment, its photo removed: allowed in a frozen month too (D-112).
     if (part === '/privacy' && method === 'PUT') {
       const sent = body as Schemas['SessionPrivacyRequest']
+      if (this.refusesClub(me, sent.visibility, session.visibility)) {
+        return problem(403, 'CLUB_FEED_NOT_JOINED')
+      }
       session.visibility = sent.visibility
       if (sent.removeComment) delete session.comment
       return json(this.view(me, session))
@@ -841,6 +884,9 @@ export class FakeSessions implements AscentSource {
     }
     if (method === 'PUT') {
       const sent = body as Schemas['SessionRequest']
+      if (this.refusesClub(me, sent.visibility, session.visibility)) {
+        return problem(403, 'CLUB_FEED_NOT_JOINED')
+      }
       const refused = this.refusal(sent, sent.climbedOn !== session.climbedOn)
       if (refused !== undefined) return refused
       this.apply(session, sent)

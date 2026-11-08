@@ -4,6 +4,51 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-07 — Réponses du club au questionnaire (D-115 à D-123)
+
+**Branche** : `feature/decisions-club-0.9.0` (depuis `main` en `ee319ab`).
+
+### Fait
+
+- Questionnaire rempli par le bureau (`docs/GG-Pocket_questionnaire_reponses.docx`) dépouillé ; ambiguïtés tranchées
+  par Willem. 30 décisions passées en « validée (club) » ou « remplacée » dans `DECISIONS.md`, nouvelles D-115 à D-123.
+- Logo haute définition, icônes PWA et couleurs officielles (`#F26522`, `#C8DC5D`) ; sources dans `docs/references/club/` (D-123).
+- 25 cotations, « + » dès 5b, « - » dès 6b, voies converties (V19, D-115).
+- Badges : « full tête » et « parfaite » à 5 voies, 2 favoris (V20) ; « Mois complet » = tous les mardis, jeudis et
+  dimanches du mois moins les jours de fermeture ; écran `/gestion/fermetures` pour la direction, jours fermés dans le
+  planning (V21, D-116).
+- Statistiques : taux de réussite sans chute, une barre par cotation (D-117).
+- Assureur·se pour toute la séance, voie par voie sur demande (front seul, D-118).
+- Données personnelles : contact RGPD, date de naissance obligatoire (écran de rattrapage), mention « mineur·e » pour
+  la direction, âge affichable par les majeur·es seulement, comptes endormis à 1 an et supprimés à 2 ans (V22, D-119).
+- Fil « tout le club » à double sens, troisième visibilité « Tout le club » (V23, D-120).
+- Voie « plus de la moitié » : 0,5 au classement Voies, scores figés en `numeric(7, 1)` (V24, D-121).
+- Pastille bicolore coupée en deux, miniature ronde, série « 5 🔥 » (D-122).
+- Front vérifié en local : lint, format, typecheck, Vitest (348), build, e2e ciblés Desktop Chrome, captures relues.
+
+### Reste
+
+- **Le backend n'a jamais été compilé ni testé** (pas de Java ici, CI bloquée par la facturation GitHub) : six migrations
+  (V19 à V24), nouveaux services, jobs et tests `*IT` écrits à la main. Au retour de la CI, s'attendre à des corrections
+  (compilation, Spotless, contrat OpenAPI édité à la main, validation de schéma Hibernate).
+- Choix par défaut à faire valider par Willem : D-121 en entier ; fermetures (bornes, réouverture d'un jour ouvert) ;
+  suppression à 2 ans des comptes désactivés par la direction ; contact RGPD en dur (D-043 prévoyait une saisie admin) ;
+  confirmation au décochage « Plusieurs assureur·ses ».
+- Redemander au club un vrai logo vectoriel et une version carrée.
+- Idées du club après la 1.0 (ROADMAP, maintenance) : dico des badges, formulaire de séance aéré, récap mensuel.
+
+### Prochaine action
+
+Dès que la CI tourne : lire les échecs du job Backend de la PR, corriger jusqu'au vert (les journaux par
+`gh run view <run> --job <job> --log`, le contrat généré après `BEGIN GENERATED OPENAPI`). Puis e2e iPhone en CI.
+
+### Points bloquants
+
+- Compte GitHub verrouillé (facturation) : ni CI ni déploiement dev.
+- Piège noté : dans `fr.json`, une arobase doit s'écrire `{'@'}` (vue-i18n) ; Vitest ne le voit pas, seul le build casse.
+
+---
+
 ## 2026-11-06 — Questionnaire de validation pour le club
 
 **Branche** : `chore/questionnaire-club` (depuis `main` après la PR #59).

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowDown, ArrowUp, ChevronRight, Copy, EllipsisVertical, Trash2 } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, Copy, EllipsisVertical, Trash2 } from 'lucide-vue-next'
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -14,15 +14,16 @@ import type { ClimbMode, RouteSummary } from '@/api/topo'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import CheckboxField from '@/components/ui/CheckboxField.vue'
 import SegmentedControl from '@/components/ui/SegmentedControl.vue'
-import UserAvatar from '@/components/ui/UserAvatar.vue'
-import { setClean, setFalls, setTopped, type AscentLine } from '@/lib/sessionForm'
+import { setClean, setFalls, setPastHalf, setTopped, type AscentLine } from '@/lib/sessionForm'
 
+import BelayerButton from './BelayerButton.vue'
 import FallsStepper from './FallsStepper.vue'
 import FeelingSlider from './FeelingSlider.vue'
 
 /**
  * One ascent of the session sheet (docs/DESIGN.md, « Nouvelle séance »): mode, topped, clean,
- * falls, first try, feeling, belayer. Big targets: hands are full of chalk.
+ * falls, « Plus de la moitié » when not topped (D-121), first try, feeling, and the belayer when the
+ * session has several (D-118). Big targets: hands are full of chalk.
  */
 const props = defineProps<{
   line: AscentLine
@@ -31,6 +32,8 @@ const props = defineProps<{
   position: number
   count: number
   canDuplicate: boolean
+  /** "Plusieurs assureur·ses" is ticked: the line shows its own belayer field. */
+  manyBelayers: boolean
   /** Who line.belayerId is; undefined when nobody is named (or no longer in the club). */
   belayer: { nickname: string; avatarUrl?: string } | undefined
 }>()
@@ -71,6 +74,12 @@ const clean = computed({
   get: (): YesNo => (props.line.clean ? 'yes' : 'no'),
   set: (value: YesNo) => {
     emit('update', setClean(props.line, value === 'yes'))
+  },
+})
+const pastHalf = computed({
+  get: () => props.line.pastHalf,
+  set: (value: boolean) => {
+    emit('update', setPastHalf(props.line, value))
   },
 })
 const firstTry = computed({
@@ -183,38 +192,29 @@ const menuItem =
         :disabled="line.clean"
         @change="emit('update', setFalls(line, $event))"
       />
+      <div v-if="!line.topped" class="col-span-2">
+        <CheckboxField v-model="pastHalf" :hint="t('session.pastHalfHint')">{{
+          t('session.pastHalf')
+        }}</CheckboxField>
+      </div>
       <div class="col-span-2 flex flex-col gap-1 sm:col-span-1">
         <CheckboxField v-model="firstTry">{{ t('session.firstTry') }}</CheckboxField>
       </div>
       <div class="col-span-2 sm:col-span-1">
         <FeelingSlider v-model="feeling" :label="t('session.feeling')" />
       </div>
-      <div class="col-span-2 flex flex-col gap-1">
+      <div v-if="manyBelayers" class="col-span-2 flex flex-col gap-1">
         <span class="font-semibold" aria-hidden="true">{{ t('session.belayer') }}</span>
-        <button
-          type="button"
-          class="flex min-h-12 items-center gap-3 rounded-control border-2 border-rule bg-surface px-3 py-1.5 text-left hover:border-ink"
-          :aria-label="
+        <BelayerButton
+          :label="
             t('session.belayerButton', {
               n: position,
               name: belayer?.nickname ?? t('session.belayerNobody'),
             })
           "
-          @click="emit('chooseBelayer')"
-        >
-          <UserAvatar
-            v-if="belayer"
-            :first-name="belayer.nickname"
-            last-name=""
-            :seed="belayer.nickname"
-            :src="belayer.avatarUrl"
-            :size="32"
-          />
-          <span class="flex-1 truncate" :class="belayer ? 'font-semibold' : 'text-ink-muted'">{{
-            belayer?.nickname ?? t('session.belayerNobody')
-          }}</span>
-          <ChevronRight :size="20" aria-hidden="true" />
-        </button>
+          :belayer="belayer"
+          @choose="emit('chooseBelayer')"
+        />
       </div>
     </div>
   </li>

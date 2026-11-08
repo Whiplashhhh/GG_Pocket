@@ -94,6 +94,18 @@ public class Member extends TimestampedEntity {
     @Column(name = "join_note", length = LicenceDeclaration.NOTE_MAX)
     private String joinNote;
 
+    /** Put to sleep by the daily job after a year without a visit (D-119); null otherwise. */
+    @Column(name = "dormant_since")
+    private Instant dormantSince;
+
+    /** The last time the board enabled the account again: the year without a visit starts over. */
+    @Column(name = "reactivated_at")
+    private Instant reactivatedAt;
+
+    /** "Je participe au fil du club" (D-120): to read it, one shows oneself in it. */
+    @Column(name = "in_club_feed", nullable = false)
+    private boolean inClubFeed;
+
     protected Member() {
         // for JPA
     }
@@ -159,8 +171,9 @@ public class Member extends TimestampedEntity {
     }
 
     /**
-     * Sets the birth date. Declaring a parental consent records it once; it is kept even if the
-     * birth date is later removed (it was given).
+     * Sets the birth date, required since D-119 (older accounts may still have none). Declaring a
+     * parental consent records it once; it is kept even if the birth date is later corrected (it
+     * was given).
      */
     public void changeBirthDate(LocalDate birthDate, boolean parentalConsent, Instant now) {
         this.birthDate = birthDate;
@@ -197,12 +210,28 @@ public class Member extends TimestampedEntity {
         this.joinNote = null;
     }
 
+    /** By the board. */
     public void disable() {
         this.status = MemberStatus.DISABLED;
+        this.dormantSince = null;
     }
 
-    public void enable() {
+    /** By the daily job, after a year without a visit (D-119). */
+    public void fallAsleep(Instant now) {
+        this.status = MemberStatus.DISABLED;
+        this.dormantSince = now;
+    }
+
+    /** By the board; the year without a visit starts over from now (D-119). */
+    public void enable(Instant now) {
         this.status = MemberStatus.ACTIVE;
+        this.dormantSince = null;
+        this.reactivatedAt = now;
+    }
+
+    /** By the member themself only (D-120); the caller checks that the account is validated. */
+    public void changeClubFeed(boolean inClubFeed) {
+        this.inClubFeed = inClubFeed;
     }
 
     public void changeAvatar(UUID avatarId) {
@@ -226,9 +255,37 @@ public class Member extends TimestampedEntity {
         return validatedAt != null;
     }
 
+    /** Disabled by the daily job for inactivity, not by the board (D-119). */
+    public boolean isDormant() {
+        return status == MemberStatus.DISABLED && dormantSince != null;
+    }
+
+    /** The reference of the inactivity rules (D-119). */
+    public Instant lastVisit() {
+        return Inactivity.lastVisit(createdAt(), lastSeenAt, reactivatedAt);
+    }
+
+    /** What the daily job does with this account today (D-119). */
+    public Inactivity.Verdict inactivity(Instant now) {
+        return Inactivity.verdict(role, isActive(), lastVisit(), now);
+    }
+
     /** Shown to the other members: in the directory, on profiles, as a friend (D-107). */
     public boolean isVisibleInClub() {
         return isActive() && isValidated();
+    }
+
+    /**
+     * Reads the club feed and shows their "Tout le club" sessions in it (D-120): they take part,
+     * and their account is active and validated. Checked when reading, never stored.
+     */
+    public boolean isInClubFeed() {
+        return inClubFeed && isVisibleInClub();
+    }
+
+    /** The member's choice, whatever the state of their account. */
+    public boolean inClubFeed() {
+        return inClubFeed;
     }
 
     public Boolean declaredLicensed() {
@@ -317,6 +374,14 @@ public class Member extends TimestampedEntity {
 
     public UUID favoriteRouteId() {
         return favoriteRouteId;
+    }
+
+    public Instant dormantSince() {
+        return dormantSince;
+    }
+
+    public Instant reactivatedAt() {
+        return reactivatedAt;
     }
 
     private static String blankToNull(String value) {

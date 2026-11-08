@@ -50,18 +50,21 @@ public enum BadgeCode {
     WEEK_3(BadgeFamily.REPEATABLE, 3),
     /** An ISO week with at least 4 climbing days. */
     WEEK_4(BadgeFamily.REPEATABLE, 4),
-    /** "Mois complet": a month with at least 10 climbing days (D-005). */
-    MONTH_COMPLETE(BadgeFamily.REPEATABLE, 10),
+    /**
+     * "Mois complet": a month whose every free session day was climbed, the closed days apart
+     * (D-116, {@link FreeSessions}); a month without any earns nothing.
+     */
+    MONTH_COMPLETE(BadgeFamily.REPEATABLE, 1),
     /** A month with at least 12 climbing days. */
     MONTH_12(BadgeFamily.REPEATABLE, 12),
     /** 3 ISO weeks in a row with at least 2 climbing days each, blocks without overlap. */
     STREAK_3W(BadgeFamily.REPEATABLE, 3),
     /** A month whose every ISO week starting in it has a climbing day. */
     MONTH_NO_MISS(BadgeFamily.REPEATABLE, 1),
-    /** A session of at least 3 ascents, all in lead. */
-    FULL_LEAD(BadgeFamily.REPEATABLE, 3),
-    /** A session of at least 3 ascents, all clean. */
-    PERFECT(BadgeFamily.REPEATABLE, 3),
+    /** A session of at least 5 ascents, all in lead (D-116). */
+    FULL_LEAD(BadgeFamily.REPEATABLE, 5),
+    /** A session of at least 5 ascents, all clean (D-116). */
+    PERFECT(BadgeFamily.REPEATABLE, 5),
     /** A session with at least 10 topped ascents. */
     ZERO_REST(BadgeFamily.REPEATABLE, 10),
     /** A climbing day at least 30 days after the previous one (not the very first). */

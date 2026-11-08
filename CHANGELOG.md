@@ -33,11 +33,65 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 - **Une voie au hasard** : tu tournes en rond devant le mur ? Le bouton aux deux flèches croisées, en haut du
   topo, tire une voie au sort parmi celles affichées (tes filtres comptent, « Pas encore faite par moi »
   compris). Elle ne te dit rien ? « Une autre ! », autant de fois que tu veux.
+- Pour la direction, **Jours de fermeture** dans l’espace gestion : un jour ou toute une période (« Vacances de
+  Noël », l’été…), et la salle est fermée dans l’appli aussi. Ton planning affiche ces jours « fermé », raison
+  comprise quand tu touches le jour.
 
 - **Mois clos, mais toujours à toi** : une séance d’un mois clos ne change plus ses voies, mais tu peux encore la
   garder pour toi, effacer ton mot ou retirer la photo, directement depuis la séance.
+- **Comptes inactifs** : un compte sans aucune visite depuis **un an** s’endort (il disparaît pour les autres et
+  la connexion te dit de demander à la direction de le réactiver, rien n’est perdu). Sans visite depuis
+  **deux ans**, il est **supprimé pour de bon**, exactement comme si tu le supprimais toi-même : profil, photos et
+  commentaires effacés, séances gardées au nom d’« Ancien·ne membre ». Pour la direction : la fiche dit quand un
+  compte s’est endormi, et le réactiver relance une année complète. Les comptes admin ne sont jamais concernés.
+- **Tes données**, relue de fond en comble : le club y écrit noir sur blanc qui s’occupe de tes données et comment
+  le joindre (contact@gravelinesgrimp.org, un clic pour écrire). Cette page tient lieu de politique de
+  confidentialité du club, et dit maintenant tout sur les comptes inactifs, la date de naissance et les mineur·es.
+
+- **Le fil du club**, un deuxième onglet dans Actu : les séances que les grimpeurs partagent avec tout le club.
+  C’est donnant-donnant : pour le voir, tu participes (« Je participe au fil du club », depuis l’onglet ou ton profil)
+  et tes séances « Tout le club » y apparaissent aussi. Tant que tu ne participes pas, l’onglet reste flouté.
+- Une troisième case quand tu enregistres une séance : **Tout le club**, en plus de « Mes amis » et « Juste moi ».
+  Tes amis la voient toujours ; si tu te retires du fil du club, elle redevient visible de tes seuls amis.
+- **Plus de la moitié** : une voie pas topée mais lâchée au-delà de la mi-hauteur ? Coche la case qui apparaît
+  quand « Topée » est sur « Non ». Elle vaut **0,5 au podium « Voies »** (« 12,5 voies », ça a de l’allure), et
+  rien d’autre : pas de « je sais la faire », pas de badge, pas d’« À faire » coché. On la voit sur la séance,
+  dans le fil, dans ton historique de la voie et dans ton carnet.
 
 ### Modifié
+
+- **Cotations** : on colle à ce que le club ouvre vraiment. Des « + » seulement à partir de 5b, des « - » seulement
+  à partir de 6b : 25 cotations, de 4a à 7c+. Les voies qui portaient une cotation disparue passent à la cotation
+  sans signe (une 4a+ devient une 4a, une 6a- une 6a), ton carnet et tes « À faire » suivent.
+- Pour les ouvreurs et la direction, **Fréquentation** : le taux de réussite ne compte plus que les voies
+  enchaînées, du sol au relais sans une chute. Un repos sur la corde, c’est topé, pas réussi.
+- **Badges** : « Séance full tête » et « Séance parfaite » se méritent sur au moins 5 voies (au lieu de 3),
+  les badges déjà gagnés sont recomptés avec cette règle.
+  Et 2 badges en avant à côté de ton pseudo, pas un de plus : si tu en avais 3, tu gardes les 2 premiers.
+- **Mois complet** : fini les 10 jours, il faut répondre présent à **chaque séance libre du mois**, tous les
+  mardis, jeudis et dimanches, sauf les jours où la salle est fermée. Le badge tombe dès la dernière séance du mois
+  grimpée, et les badges déjà gagnés sont recomptés avec cette règle.
+- **Bilan du topo** : une barre par cotation, la 6b- n’est plus noyée avec la 6b et la 6b+. Les trous dans
+  l’offre sautent aux yeux.
+
+- **Assureur·se** : un seul champ pour toute la séance, en haut de la saisie, et toutes tes voies le prennent,
+  même celles ajoutées après. Le binôme a tourné ? Coche « Plusieurs assureur·ses » et chaque voie retrouve son
+  propre champ.
+
+- **Voies bicolores** : une seule prise coupée en deux couleurs sur l’étiquette, la fiche et partout ailleurs,
+  au lieu de deux prises qui se marchent dessus. Les photos des voies du topo passent en rond.
+- **Planning** : ta série s’affiche « 5 🔥 ». Plus ça brûle, plus tu grimpes.
+
+- Le vrai logo du club est arrivé, en haute définition : plus net en haut de l’appli, sur l’écran de connexion et
+  sur l’icône du téléphone. L’orange et le vert de l’appli prennent les couleurs officielles du club.
+
+- **Date de naissance obligatoire** : elle est demandée à l’inscription, et si ton compte n’en a pas, l’appli te la
+  demande une fois à ta prochaine connexion, avant tout le reste. Elle sert à savoir si un accord parental est
+  nécessaire (avant 15 ans, comme avant). Tu peux la corriger dans ton profil, plus l’effacer.
+- **Afficher mon âge** : l’option reste décochée tant que tu ne la coches pas, et elle n’est proposée qu’aux
+  majeur·es. L’âge d’un ou une mineur·e ne s’affiche jamais sur son profil, quoi qu’il arrive.
+- Pour la direction et l’admin : la fiche d’un membre et la file des comptes en attente indiquent « Mineur·e »
+  quand c’est le cas (jamais la date de naissance). Les autres membres ne voient pas cette mention.
 
 - **Première cotation** : chaque cotation se gagne pour de vrai. Une 6b ne t’offre plus la 5b, la 5c et la 6a
   au passage, il faudra les grimper (une 6b- ou une 6b+ comptent pour la 6b). Les badges déjà gagnés sont

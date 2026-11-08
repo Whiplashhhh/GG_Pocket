@@ -6,6 +6,7 @@ import fr.gravelinesgrimp.pocket.admin.domain.AuditTargetType;
 import fr.gravelinesgrimp.pocket.auth.infra.MemberSessionStore;
 import fr.gravelinesgrimp.pocket.member.application.MediaService;
 import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
+import fr.gravelinesgrimp.pocket.member.domain.Inactivity;
 import fr.gravelinesgrimp.pocket.member.domain.MediaFile;
 import fr.gravelinesgrimp.pocket.member.domain.MediaUsage;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
@@ -142,17 +143,48 @@ public class AccountDeletionService {
                 member.isValidated() ? AuditAction.MEMBER_DELETED : AuditAction.MEMBER_REFUSED);
     }
 
+    /**
+     * Two years without a visit (D-119): the daily job deletes the account exactly as its owner
+     * would, after checking again, under lock, that it is still that inactive (never an admin).
+     *
+     * @return whether the account was deleted
+     */
+    @Transactional
+    public boolean deleteIfInactive(UUID memberId) {
+        var member =
+                members.lockById(memberId)
+                        .filter(found -> !FormerMember.is(found.id()))
+                        .orElse(null);
+        if (member == null || member.inactivity(clock.instant()) != Inactivity.Verdict.DELETE) {
+            return false;
+        }
+        erase(null, member, AuditAction.MEMBER_DELETED_INACTIVE);
+        return true;
+    }
+
     private void erase(Member actor, Member member) {
         erase(actor, member, AuditAction.MEMBER_DELETED);
     }
 
+    /** A null actor: the application itself (the daily job on inactive accounts, D-119). */
     private void erase(Member actor, Member member, AuditAction action) {
         if (member.role() == Role.ADMIN && member.isActive()) {
             ensureAnotherActiveAdmin(member);
         }
         // Written first: the entry keeps the names once the account is gone (actor_id goes null).
-        auditLog.record(
-                actor, action, AuditTargetType.MEMBER, member.id(), member.nickname(), null, null);
+        if (actor == null) {
+            auditLog.recordBySystem(
+                    action, AuditTargetType.MEMBER, member.id(), member.nickname());
+        } else {
+            auditLog.record(
+                    actor,
+                    action,
+                    AuditTargetType.MEMBER,
+                    member.id(),
+                    member.nickname(),
+                    null,
+                    null);
+        }
         // My comments go with the account (foreign key): so does what the journal says of them.
         var myComments = new ArrayList<UUID>();
         sessionComments

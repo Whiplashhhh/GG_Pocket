@@ -1,6 +1,7 @@
 import type { Page, Route } from '@playwright/test'
 
 import type { components } from '../src/api/schema'
+import { clubToday, isMinor, needsParentalConsent } from '../src/lib/age'
 
 import { FakeSessions } from './fakeSessions'
 import { FakeSocial, seniorityOf } from './fakeSocial'
@@ -33,6 +34,8 @@ export interface FakeMember {
   parentalConsent: boolean
   showAge: boolean
   appearsInRankings: boolean
+  /** "Je participe au fil du club" (D-120). */
+  inClubFeed?: boolean
   clubArrivalYear?: number
   climbingSinceYear?: number
   bio?: string
@@ -40,6 +43,8 @@ export interface FakeMember {
   favoriteRouteId?: string
   registeredAt: string
   lastSeenAt?: string
+  /** Put to sleep after a year without a visit (D-119). */
+  dormantSince?: string
 }
 
 interface FakeSession {
@@ -72,6 +77,7 @@ function targetOf(action: AuditAction): Schemas['AuditEntry']['targetType'] {
   if (action.startsWith('CLUB_SECTOR')) return 'SECTOR'
   if (action.startsWith('CLUB_CORD')) return 'CORD'
   if (action.startsWith('CLUB_HOLD_COLOR')) return 'HOLD_COLOR'
+  if (action.startsWith('CLUB_DAYS')) return 'CLOSED_DAY'
   return 'MEMBER'
 }
 
@@ -125,6 +131,7 @@ export class FakeClub {
       role: 'CLIMBER',
       status: 'ACTIVE',
       validated: true,
+      birthDate: '1990-05-14',
       parentalConsent: false,
       showAge: false,
       appearsInRankings: true,
@@ -209,6 +216,8 @@ export class FakeClub {
       lastName: member.lastName,
       role: member.role,
       validated: member.validated,
+      birthDateMissing: member.birthDate === undefined,
+      inClubFeed: member.inClubFeed === true && member.validated && member.status === 'ACTIVE',
       ...(member.avatarUrl ? { avatarUrl: member.avatarUrl } : {}),
     }
   }
@@ -248,8 +257,10 @@ export class FakeClub {
       status: member.status,
       validated: member.validated,
       declaredLicensed: member.declaredLicensed,
+      minor: isMinor(member.birthDate ?? '', clubToday(new Date(this.now))),
       registeredAt: member.registeredAt,
       lastSeenAt: member.lastSeenAt,
+      dormantSince: member.dormantSince,
       sessionCount: this.climbs.sessions.filter((session) => session.memberId === member.id).length,
     }
   }
@@ -270,7 +281,9 @@ export class FakeClub {
       member: this.summary(member),
       email: member.email,
       joinNote: member.joinNote,
-      underFifteenWithParentalConsent: false,
+      underFifteenWithParentalConsent:
+        needsParentalConsent(member.birthDate ?? '', clubToday(new Date(this.now))) &&
+        member.parentalConsent,
       clubArrivalYear: member.clubArrivalYear,
       climbingSinceYear: member.climbingSinceYear,
       permissions: {
@@ -282,6 +295,45 @@ export class FakeClub {
         canValidate: manageable && !member.validated,
       },
     }
+  }
+
+  /** ClosedDayService: a range closed (label replaced) or reopened, then every closed day. */
+  private closedDays(
+    me: FakeMember,
+    method: string,
+    input: Record<string, unknown> | URLSearchParams,
+  ): Schemas['ClosedDay'][] | undefined {
+    const read = (key: string) =>
+      input instanceof URLSearchParams ? (input.get(key) ?? undefined) : (input[key] as string)
+    const all = this.climbs.closedDays
+    if (method === 'GET') return [...all].sort((a, b) => a.date.localeCompare(b.date))
+    const from = read('from') ?? ''
+    const to = read('to') ?? from
+    const days: string[] = []
+    for (let day = from; day <= to;) {
+      days.push(day)
+      const next = new Date(`${day}T12:00:00Z`)
+      next.setUTCDate(next.getUTCDate() + 1)
+      day = next.toISOString().slice(0, 10)
+    }
+    const range = from === to ? from : `${from} / ${to}`
+    if (method === 'DELETE') {
+      const before = all.length
+      for (const day of days) {
+        const index = all.findIndex((closed) => closed.date === day)
+        if (index >= 0) all.splice(index, 1)
+      }
+      if (all.length < before) this.record(me, 'CLUB_DAYS_REOPENED', range)
+      return undefined
+    }
+    const label = read('label')?.trim() || undefined
+    for (const day of days) {
+      const index = all.findIndex((closed) => closed.date === day)
+      if (index >= 0) all.splice(index, 1)
+      all.push({ date: day, ...(label === undefined ? {} : { label }) })
+    }
+    this.record(me, 'CLUB_DAYS_CLOSED', range, undefined, label)
+    return [...all].sort((a, b) => a.date.localeCompare(b.date))
   }
 
   private record(
@@ -354,7 +406,8 @@ export class FakeClub {
         (candidate) => candidate.nickname.toLowerCase() === nickname.toLowerCase(),
       )
       if (member?.password !== password) return fail(401, 'BAD_CREDENTIALS')
-      if (member.status !== 'ACTIVE') return fail(403, 'ACCOUNT_DISABLED')
+      if (member.status !== 'ACTIVE')
+        return fail(403, member.dormantSince ? 'ACCOUNT_DORMANT' : 'ACCOUNT_DISABLED')
       this.openSession(member, rememberMe)
       return json(this.currentMember(member))
     }
@@ -378,6 +431,8 @@ export class FakeClub {
         return fail(409, 'NICKNAME_TAKEN')
       }
       if (form.password.toLowerCase() === 'azertyuiop') return fail(400, 'PASSWORD_TOO_COMMON')
+      // Required since D-119.
+      if (!form.birthDate) return fail(400, 'VALIDATION_FAILED')
       const note = form.licensed ? undefined : (form.joinNote ?? '').trim()
       if (note !== undefined && (note.length < 10 || note.length > 300))
         return fail(400, 'JOIN_NOTE_REQUIRED')
@@ -452,6 +507,20 @@ export class FakeClub {
       Object.assign(me, update)
       return json(this.profile(me))
     }
+    if (path === '/me/birth-date') {
+      const { birthDate, parentalConsent } = body() as Schemas['BirthDateRequest']
+      const today = clubToday(new Date(this.now))
+      if (needsParentalConsent(birthDate, today) && !me.parentalConsent && !parentalConsent)
+        return fail(400, 'PARENTAL_CONSENT_REQUIRED')
+      me.birthDate = birthDate
+      me.parentalConsent ||= parentalConsent === true
+      return json(this.currentMember(me))
+    }
+    if (path === '/me/club-feed' && method === 'PUT') {
+      if (!me.validated) return fail(403, 'ACCESS_DENIED')
+      me.inClubFeed = (body() as Schemas['ClubFeedRequest']).inClubFeed
+      return json(this.currentMember(me))
+    }
     if (path === '/me/avatar') {
       me.avatarUrl = method === 'DELETE' ? undefined : `/api/v1/media/${this.nextId()}`
       return method === 'DELETE' ? route.fulfill({ status: 204 }) : json(this.profile(me))
@@ -512,6 +581,11 @@ export class FakeClub {
     if (path.startsWith('/admin/')) {
       if (ROLES.indexOf(me.role) < ROLES.indexOf('BOARD')) return fail(403, 'ACCESS_DENIED')
       if (path === '/admin/audit') return json({ entries: this.audit })
+      if (path === '/admin/closed-days') {
+        const query = new URL(request.url()).searchParams
+        const result = this.closedDays(me, method, method === 'POST' ? body() : query)
+        return result === undefined ? route.fulfill({ status: 204 }) : json(result)
+      }
       if (path === '/admin/moderation/comments') {
         return json({
           comments: [...this.topo.latestComments(), ...this.climbs.latestComments()].sort((a, b) =>
@@ -552,6 +626,7 @@ export class FakeClub {
       if (action === 'status') {
         const { status } = body() as { status: FakeMember['status'] }
         member.status = status
+        member.dormantSince = undefined
         this.record(
           me,
           status === 'DISABLED' ? 'MEMBER_DISABLED' : 'MEMBER_ENABLED',

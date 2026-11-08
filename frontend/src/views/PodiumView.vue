@@ -24,7 +24,15 @@ import {
   shiftMonth,
   type Month,
 } from '@/lib/planning'
-import { belowPodium, formatFreezeDay, isTie, podiumSteps, profileLink } from '@/lib/podium'
+import {
+  belowPodium,
+  formatFreezeDay,
+  formatScore,
+  isTie,
+  podiumSteps,
+  profileLink,
+  scorePlural,
+} from '@/lib/podium'
 
 /**
  * Spec §8.7: the two rankings of a month, the top three on a podium, then everyone else. My place
@@ -100,8 +108,9 @@ function rankLabel(rank: number): string {
   return rank === 1 ? t('podium.rankFirst') : t('podium.rank', { rank })
 }
 
+/** « 12,5 voies »: the « Voies » ranking keeps halves (D-121). */
 function valueLabel(value: number): string {
-  return t(`podium.value.${board.value}`, value)
+  return t(`podium.value.${board.value}`, { n: formatScore(value) }, scorePlural(value))
 }
 
 function isMine(line: RankingLine): boolean {
@@ -191,6 +200,7 @@ const columnClass: Record<number, string> = {
         :options="boardOptions"
         stretch
       />
+      <p class="mt-2 text-sm text-ink-muted">{{ t(`podium.rule.${board}`) }}</p>
     </section>
 
     <div v-if="ranking.isPending.value" class="px-4 pt-6" aria-hidden="true">

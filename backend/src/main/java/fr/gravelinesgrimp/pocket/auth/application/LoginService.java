@@ -36,7 +36,8 @@ public class LoginService {
 
     /**
      * @throws BusinessException {@code BAD_CREDENTIALS} whether the nickname or the password is
-     *     wrong (never says which), {@code ACCOUNT_DISABLED} only to someone who knows the password
+     *     wrong (never says which); {@code ACCOUNT_DORMANT} (asleep after a year without a visit,
+     *     D-119) or {@code ACCOUNT_DISABLED} only to someone who knows the password
      */
     @Transactional
     public CurrentMemberView authenticate(String nickname, String password, String clientAddress) {
@@ -56,6 +57,9 @@ public class LoginService {
         var member = found.get();
         if (!passwordEncoder.matches(password, member.passwordHash())) {
             throw failures.badCredentials();
+        }
+        if (member.isDormant()) {
+            throw new BusinessException(ErrorCode.ACCOUNT_DORMANT, "Asleep after a year away");
         }
         if (!member.isActive()) {
             throw new BusinessException(ErrorCode.ACCOUNT_DISABLED, "Disabled account");

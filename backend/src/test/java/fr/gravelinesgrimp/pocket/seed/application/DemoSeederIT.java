@@ -109,7 +109,8 @@ class DemoSeederIT {
                 .hasSize(3)
                 .anySatisfy(route -> assertThat(route.plannedDismountOn()).isNotNull());
         assertThat(all.stream().map(Route::cordId).distinct()).hasSize(29);
-        assertThat(all.stream().map(Route::gradeId).distinct()).hasSize((int) grades.count());
+        var gradesOnOffer = grades.findAll().stream().filter(grade -> !grade.retired()).count();
+        assertThat(all.stream().map(Route::gradeId).distinct()).hasSize((int) gradesOnOffer);
         assertThat(all).filteredOn(route -> route.setterNote() != null).isNotEmpty();
         assertThat(comments.count()).isPositive();
     }

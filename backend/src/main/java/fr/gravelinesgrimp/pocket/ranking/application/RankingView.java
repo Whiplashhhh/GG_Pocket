@@ -4,6 +4,7 @@ import fr.gravelinesgrimp.pocket.ranking.domain.RankedScore;
 import fr.gravelinesgrimp.pocket.ranking.domain.RankingStatus;
 import fr.gravelinesgrimp.pocket.topo.application.MemberRefView;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.YearMonth;
 import java.util.List;
@@ -35,7 +36,7 @@ public record RankingView(
         }
     }
 
-    public record Line(int rank, MemberRefView member, int value) {
+    public record Line(int rank, MemberRefView member, BigDecimal value) {
 
         static Line of(RankedScore ranked) {
             var score = ranked.score();

@@ -39,7 +39,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * The demo topo (spec §17): 60 routes over the 29 cords, every grade from 4a- to 7c+ (mostly 5 and
+ * The demo topo (spec §17): 60 routes over the 29 cords, every grade from 4a to 7c+ (mostly 5 and
  * 6), 5 dismounted, 3 in last chance, with comments, hearts (the {@code grimpeur} account has a
  * full heart, plus one on a dismounted route) and a few "je sais la faire". Fixed lists, no
  * randomness: every run gives the same topo. No photo yet (phase 8).
@@ -115,14 +115,14 @@ public class DemoTopoSeeder {
                     "Tendinite express",
                     "Sec comme un coup de trique");
 
-    /** One grade per route: every grade at least once, mostly 5 and 6. */
+    /** One grade per route: every grade on offer at least once (D-115), mostly 5 and 6. */
     static final List<String> GRADES =
             List.of(
-                    "4a-", "5a-", "6a-", "7a-", "4a", "5a", "6a", "7a", "4a+", "5a+", "6a+", "7a+",
-                    "4b-", "5b-", "6b-", "7b-", "4b", "5b", "6b", "7b", "4b+", "5b+", "6b+", "7b+",
-                    "4c-", "5c-", "6c-", "7c-", "4c", "5c", "6c", "7c", "4c+", "5c+", "6c+", "7c+",
-                    "5a", "6a", "5b", "6a+", "5c", "6b", "5a+", "6b+", "5b+", "6c", "5c+", "6a",
-                    "5c", "6a+", "5b", "6b", "7a", "6c+", "5a", "6a", "5c-", "6b-", "6a-", "5b-");
+                    "4a", "4b", "4c", "5a", "5b", "5b+", "5c", "5c+", "6a", "6a+", "6b-", "6b",
+                    "6b+", "6c-", "6c", "6c+", "7a-", "7a", "7a+", "7b-", "7b", "7b+", "7c-", "7c",
+                    "7c+", "5a", "6a", "5b", "6a+", "5c", "6b", "5b+", "6b+", "5c+", "6c", "6a",
+                    "5c", "6a+", "5b", "6b", "7a", "6c+", "5a", "6a", "5c+", "6b-", "6a", "5b",
+                    "6b", "5c", "6a+", "6c-", "5b+", "6a", "4c", "6b+", "5c", "7a+", "6a", "5a");
 
     private static final List<String> COLORS =
             List.of(

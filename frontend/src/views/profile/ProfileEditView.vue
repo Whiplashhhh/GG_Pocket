@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { errorMessageKey } from '@/api/errors'
 import { useMyProfile, useUpdateProfile } from '@/api/me'
 import SubPageHeader from '@/components/layout/SubPageHeader.vue'
+import ClubFeedSetting from '@/components/profile/ClubFeedSetting.vue'
 import FavoriteRouteSetting from '@/components/profile/FavoriteRouteSetting.vue'
 import ProfileDetailsFields from '@/components/profile/ProfileDetailsFields.vue'
 import ProfilePhotoPicker from '@/components/profile/ProfilePhotoPicker.vue'
@@ -14,7 +15,7 @@ import FormAlert from '@/components/ui/FormAlert.vue'
 import GgButton from '@/components/ui/GgButton.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import TextField from '@/components/ui/TextField.vue'
-import { clubToday, needsParentalConsent } from '@/lib/age'
+import { clubToday, isMinor, needsParentalConsent } from '@/lib/age'
 import {
   EMAIL_PATTERN,
   focusFirstInvalid,
@@ -65,6 +66,14 @@ const consentNeeded = computed(
     profile.data.value?.parentalConsent !== true,
 )
 
+/** D-119: "Afficher mon âge" is offered to adults only; a minor's stays unchecked. */
+const minor = computed(() => form.value !== null && isMinor(form.value.birthDate, today))
+watch(minor, (isMinorNow) => {
+  if (isMinorNow && form.value !== null) {
+    form.value.showAge = false
+  }
+})
+
 function message(field: keyof ProfileForm): string | undefined {
   const error = errors.value[field]
   return error && t(error.key, error.params ?? {})
@@ -82,8 +91,8 @@ function submit() {
   if (!NICKNAME_PATTERN.test(value.nickname.trim())) found.nickname = { key: 'validation.nickname' }
   if (value.email.trim() !== '' && !EMAIL_PATTERN.test(value.email.trim()))
     found.email = { key: 'validation.email' }
-  if (value.birthDate !== '' && value.birthDate > today)
-    found.birthDate = { key: 'validation.dateInFuture' }
+  if (value.birthDate === '') found.birthDate = { key: 'validation.birthDate' }
+  else if (value.birthDate > today) found.birthDate = { key: 'validation.dateInFuture' }
   if (consentNeeded.value && !value.parentalConsent)
     found.parentalConsent = { key: 'validation.parentalConsent' }
   const result = toUpdate(value, new Date().getFullYear())
@@ -125,6 +134,7 @@ function submit() {
     </section>
 
     <FavoriteRouteSetting />
+    <ClubFeedSetting />
 
     <form class="flex flex-col gap-5 px-4 pb-10" novalidate @submit.prevent="submit">
       <FormAlert v-if="general">{{ t(general.key) }}</FormAlert>
@@ -176,7 +186,6 @@ function submit() {
         min="1900-01-01"
         :max="today"
         :error="message('birthDate')"
-        optional
       />
       <CheckboxField
         v-if="consentNeeded"
@@ -198,7 +207,9 @@ function submit() {
       <h2 class="border-t border-rule pt-5 text-lg font-title">
         {{ t('profileEdit.visibility') }}
       </h2>
-      <CheckboxField v-model="form.showAge">{{ t('profileFields.showAge') }}</CheckboxField>
+      <CheckboxField v-if="!minor" v-model="form.showAge">{{
+        t('profileFields.showAge')
+      }}</CheckboxField>
       <CheckboxField
         v-model="form.appearsInRankings"
         :hint="t('profileFields.appearsInRankingsHint')"

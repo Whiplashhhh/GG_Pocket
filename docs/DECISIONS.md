@@ -15,38 +15,12 @@ direction) ou **Willem**.
 
 | Décision | Question | Qui | Choix appliqué en attendant |
 |---|---|---|---|
-| D-001 | Barre d'onglets à 5 entrées ? | club | Actu, Topo, À faire, Planning, Podium ; profil via l'avatar |
-| D-002 | Cotations avec les « + » ? | club | 4a- à 7c+ avec les « - » et les « + » (36 niveaux, révisé le 2026-10-23) |
-| D-003 | Classement « voies » : ascensions ou voies distinctes ? | club | Ascensions topées, répétitions comprises |
-| D-004 | Séances comptées en jours de grimpe ? | club | Oui : deux séances le même jour = une |
-| D-005 | Seuil du badge « Mois complet » ? | club | 10 jours de grimpe |
-| D-006 | Nom « Le flash » ou « L'à vue » ? | club | « Le flash » |
-| D-007 | Seuils inventés (absence, voie nouvelle, full tête, record) ? | club | 30 j, 14 j, 3 voies, dès la 4e séance |
-| D-008 | Badge « Tout frais » la première année ? | club | Oui |
-| D-009 | Saisie 7 jours en arrière, mois figé le 8 ? | club | Oui |
-| D-010 | Coup de cœur sur voie démontée : place libérée ? | club | Oui |
-| D-011 | Fil limité aux amis ? | club | Oui |
-| D-012 | Pas d'e-mail, lien de réinitialisation par la direction ? | club | Oui |
-| D-013 | Couleur des prises et photo de voie ? | club | Ajoutées |
-| D-014 | Âge masqué, accord parental sous 15 ans ? | club | Oui |
-| D-037 | Polices et étiquette de voie : le rendu plaît-il ? | club | Archivo + Kalam, à juger sur l'environnement dev |
-| D-039 | Logo vectoriel / haute définition / fond noir disponible ? | club | Détourage du JPEG fourni |
-| D-043 | Nom officiel de l'association et contact RGPD ? | club | « Gravelines Grimp », contact saisi par l'admin dans l'appli |
-| D-044 | Durée de conservation des comptes inactifs ? | club | Suppression après 3 ans sans connexion |
-| D-045 | Ce que la direction voit dans la fiche d'un membre ? | club | Tout sauf la date de naissance |
-| D-046 | Format du pseudo ? | Willem | 3 à 20 caractères, `a-z 0-9 . _ -`, insensible à la casse |
-| D-049 | La direction gère grimpeurs et ouvreurs, l'admin tout le monde : ça convient ? | club | Oui (règle de sécurité) |
 | D-059 | Nom de domaine du club ? | Willem | Adresses provisoires `sslip.io` tirées de l'IP du serveur |
 | D-063 | Copie des sauvegardes hors du serveur ? | Willem | Aucune pour l'instant (sauvegardes sur le VPS seulement) |
 | D-087 | En attendant les amis, Actu montre mes séances ? | Willem | Oui, « Mes séances » en haut du fil |
-| D-090 | « Réalisations » du topo = ascensions topées ? | club | Oui, par tout le monde, répétitions comprises |
-| D-093 | Série du planning : semaines d'affilée à 2 séances ou plus ? | club | Oui, la semaine en cours ne casse pas la série |
 | D-094 | Le carnet : chiffres, pyramide par cotation, toutes mes voies ? | Willem | Oui, depuis le Profil ; celui des amis en phase 5 |
-| D-105 | Badges : un 6a- ne donne pas « 6a » ; « retour » à 30 jours d'écart ; un flash par voie ? | club | Oui (détails dans D-105) |
-| D-106 | Badges à niveaux : couleur = niveau (échelle de rareté), couleur des répétables selon ×N, 3 favoris | Willem | Oui (détails dans D-106) |
 | D-108 | « Quoi de neuf ? » mémorisé par membre dans le navigateur (pas sur le serveur) | Willem | Oui : une fois par version, par membre et par appareil ; nouveaux comptes épargnés |
-| D-111 | Retours du club : cotations gagnées une à une (6b- et 6b+ comptent pour 6b), niveau = cotation la plus dure | club | À valider (détails dans D-111) |
-| D-112 | Revue de sécurité : suppression auto des comptes inactifs 3 ans, jeton `gh` de l'agent, rétention des sauvegardes | Willem | À trancher (détails dans D-112) |
+| D-112 | Jeton `gh` de l'agent (point 2 de la revue de sécurité) | Willem | À trancher (détails dans D-112) |
 
 ---
 
@@ -56,7 +30,7 @@ direction) ou **Willem**.
 - **Contexte** : la maquette de la famille a 6 onglets (Actu, Topo GG, À faire, Planning, Podium, Profil) ; 6 est trop serré à 360 px.
 - **Choix** : 5 onglets (Actu, Topo, À faire, Planning, Podium). Le profil s'ouvre en touchant l'avatar du header, la gestion via une icône du header.
 - **Alternatives** : 6 onglets ; menu « plus ».
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q01).
 
 ### D-002 — Cotations avec les « + » de 4a à 7c
 - **Contexte** : le cahier des charges cite des cotations de 4a à 7c sans préciser les « + ».
@@ -65,62 +39,62 @@ direction) ou **Willem**.
   (36 cotations, « - » avant la cotation simple, « + » après). Le badge « Première cotation » va jusqu'à 7c+.
   Faite dans V7, pas encore en prod.
 - **Alternatives** : sans « + » (12 cotations).
-- **Statut** : à valider.
+- **Statut** : remplacée par D-115 (club, questionnaire du 2026-11-07, Q04).
 
 ### D-003 — Classement « voies » = ascensions topées du mois, répétitions comprises
 - **Choix** : chaque ascension topée compte, même si c'est la même voie plusieurs fois.
 - **Alternatives** : voies distinctes topées dans le mois.
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q05).
 
 ### D-004 — Classement « séances » et badges de fréquence en jours de grimpe
 - **Choix** : deux séances le même jour comptent pour un seul jour de grimpe (évite de gonfler les chiffres en coupant une séance en deux).
 - **Alternatives** : compter les séances brutes.
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q06).
 
 ### D-005 — « Mois complet » = 10 jours de grimpe
 - **Choix** : badge « Mois complet » à 10 jours de grimpe dans le mois ; « 10 séances dans le mois » de la liste d'origine fusionné avec lui (doublon).
-- **Statut** : à valider.
+- **Statut** : remplacée par D-116 (club, questionnaire du 2026-11-07, Q11).
 
 ### D-006 — Nom du badge « Le flash »
 - **Contexte** : le texte d'origine (« sans information préalable ») décrit l'**à vue** ; le flash, c'est réussir du premier coup *avec* des infos.
 - **Choix** : nom « Le flash », condition du §9.5 (ascension enchaînée, premier essai, voie ouverte depuis ≤ 14 jours).
 - **Alternatives** : renommer en « L'à vue » si le club préfère être puriste (changement d'un libellé i18n).
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q12).
 
 ### D-007 — Seuils non précisés par le cahier des charges
 - **Choix** : longue absence = 30 jours ; voie « nouvelle » = 14 jours ; séance « full tête » / « parfaite » = 3 voies minimum ;
   « séance record » à partir de la 4e séance.
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q13), sauf « full tête » et « séance parfaite » : remplacé par D-116 (5 voies).
 
 ### D-008 — Badge d'ancienneté « Tout frais »
 - **Contexte** : le club n'a rien prévu sous 1 an d'ancienneté.
 - **Choix** : « Tout frais » pour l'année d'arrivée (0 an).
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q14).
 
 ### D-009 — Séances datables 7 jours en arrière, mois figé le 8
 - **Choix** : une séance peut être datée jusqu'à 7 jours dans le passé ; le mois précédent est figé le 8 à 04:00 (Europe/Paris).
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q09).
 
 ### D-010 — Coup de cœur sur une voie démontée
 - **Choix** : la place se libère (limite de 2 coups de cœur sur des voies non démontées) ; le coup de cœur reste visible dans l'historique du profil.
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q18).
 
 ### D-011 — Fil d'actu limité aux amis
 - **Choix** : pas de vue « tout le club » ; séances visibles des amis seulement (ou « juste moi »).
-- **Statut** : à valider.
+- **Statut** : remplacée par D-120 (club, questionnaire du 2026-11-07, Q21).
 
 ### D-012 — Pas d'e-mail en v1
 - **Choix** : mot de passe oublié = lien de réinitialisation à usage unique (24 h) généré par la direction depuis la fiche du membre.
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q31).
 
 ### D-013 — Couleur des prises et photo de voie ajoutées au modèle
 - **Contexte** : absentes du cahier des charges, indispensables pour reconnaître une voie au mur.
 - **Choix** : 1 ou 2 couleurs de prises par voie (liste configurable) et une photo optionnelle.
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q17) ; affichage complété par D-122.
 
 ### D-014 — Âge masqué par défaut, accord parental sous 15 ans
 - **Choix** : « afficher mon âge » désactivé par défaut ; case « Un parent ou responsable légal est d'accord » obligatoire sous 15 ans.
-- **Statut** : à valider.
+- **Statut** : remplacée par D-119 (club, questionnaire du 2026-11-07, Q28).
 
 ---
 
@@ -222,7 +196,7 @@ direction) ou **Willem**.
   Nanum Pen) rendues sur de vrais noms de voies.
 - **Choix** : Archivo variable (graisse + largeur, chiffres tabulaires) pour toute l'interface ; Kalam 700 uniquement pour le nom des voies.
   Raisons détaillées dans `DESIGN.md` §3.
-- **Statut** : validée (côté technique) ; le rendu est à juger par le club sur l'environnement dev.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q02).
 
 ### D-038 — Icônes : Lucide pour l'interface, icônes métier dessinées
 - **Choix** : `lucide-vue-next` (import icône par icône, tree-shaking) pour les icônes génériques ; icônes métier (onglets, prise, badges)
@@ -237,8 +211,7 @@ direction) ou **Willem**.
   « Gravelines GRIMP ») est illisible à 44 px de haut : on y affiche un mot-symbole composé (le sommet olive du logo dessiné
   en SVG + « Gravelines Grimp » en Archivo, « Grimp » en orange brique). En phase 8, l'admin pourra téléverser ses logos.
 - **À demander au club** : une version vectorielle (SVG, PDF, AI) ou en haute définition du logo, et la version « fond noir » qu'il utilise déjà.
-- **Statut** : à valider (rendu acceptable, mais une source vectorielle serait bien meilleure). La partie « header » est
-  remplacée par D-072.
+- **Statut** : remplacée par D-123 (club, questionnaire du 2026-11-07, partie H). La partie « header » était déjà remplacée par D-072.
 
 ### D-040 — Ce qui est reporté hors de la phase 0
 - **Choix** :
@@ -290,7 +263,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   adresse de contact saisie par l'admin dans la configuration du club (pas en dur dans le code). Si le club ou sa fédération
   a déjà une politique de confidentialité, la page s'y alignera.
 - **À fournir** : nom officiel de l'association, adresse de contact pour les demandes, politique existante éventuelle.
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q24) ; complétée par D-119 (pas de politique de confidentialité existante).
 
 ### D-044 — Durée de conservation
 - **Contexte** : la spec demande d'afficher une durée de conservation sans la fixer.
@@ -298,21 +271,21 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   (données personnelles et photos effacées, séances rattachées à « Ancien·ne membre », comme pour une suppression volontaire).
   Journal d'audit conservé 3 ans.
 - **Alternatives** : 2 ans ; pas de suppression automatique (déconseillé : contraire au principe de limitation de la conservation).
-- **Statut** : à valider.
+- **Statut** : remplacée par D-119 (club, questionnaire du 2026-11-07, Q25).
 
 ### D-045 — Données visibles par la direction dans la fiche d'un membre
 - **Contexte** : la spec liste les colonnes du tableau des membres, pas le contenu de la fiche.
 - **Choix** : prénom, nom, pseudo, rôle, statut, inscription, dernière activité, nombre de séances, e-mail s'il est renseigné.
   **Date de naissance masquée** : la direction voit seulement « moins de 15 ans, accord parental déclaré » quand c'est le cas
   (minimisation, mineurs possibles).
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q29) ; complétée par D-119 (mention « mineur »).
 
 ### D-046 — Format du pseudo
 - **Contexte** : le pseudo est l'identifiant de connexion ; la spec dit seulement « unique, insensible à la casse ».
 - **Choix** : 3 à 20 caractères parmi lettres sans accents, chiffres, `.`, `_`, `-` ; unicité insensible à la casse ; casse
   d'affichage conservée telle que saisie ; modifiable ensuite par le membre (l'ancien pseudo redevient libre).
 - **Alternatives** : accepter les accents (risque de doublons visuels « Élodie » / « Elodie » et de saisie difficile sur certains claviers).
-- **Statut** : à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q30).
 
 ### D-047 — Code admin de premier démarrage
 - **Contexte** : spec §16 : au premier démarrage de la prod, un code d'inscription admin à usage unique (24 h) s'affiche une fois dans les logs.
@@ -353,7 +326,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   sauf lui-même et donne n'importe quel rôle. Il reste toujours un admin actif : vérifié sous verrou (`select … for update` des admins)
   au moment d'un changement de rôle ou d'une désactivation ; avec la règle « pas sur soi-même », ce cas ne peut aujourd'hui pas se
   produire par l'API, la vérification protège les futurs chemins (suppression de compte).
-- **Statut** : validée (règle de sécurité) ; à relire par le club pour le confort d'usage.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q33).
 
 ### D-050 — Limitation de débit en mémoire
 - **Choix** : fenêtres glissantes en mémoire (une seule instance d'API ; un redémarrage remet les compteurs à zéro, acceptable).
@@ -738,7 +711,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
 - **Choix** : le nombre d'ascensions topées par tout le monde, répétitions comprises (comme les compteurs du §9.1). La
   fiche voie montre aussi ascensions, topées, grimpeur·ses différent·es et part en tête : des agrégats sans nom, qui
   comptent aussi les séances « juste moi ».
-- **Statut** : à valider (club).
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q07).
 
 ### D-091 — Mises à jour de l'appli installée : chercher plus souvent, dire pourquoi ça bloque
 - **Contexte** : sur l'iPhone de Willem, la PWA du dev affichait encore « GG Pocket 0.1.1 » avec un serveur en 0.2.0, et
@@ -786,7 +759,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   depuis la semaine en cours ; la semaine en cours compte dès qu'elle a ses 2 jours et ne casse jamais la série avant
   dimanche. Pas de mois futur ni avant 2000-01 (400). Un jour de la semaine écoulée sans séance propose d'en noter une
   (`/seance/nouvelle?jour=…`).
-- **Statut** : à valider (club : seuil de 2 séances par semaine).
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q19) ; affichage complété par D-122.
 
 ### D-094 — Le carnet personnel
 - **Contexte** : la roadmap prévoit un « carnet personnel » et le profil un « lien vers mon carnet complet » (§8.8),
@@ -821,7 +794,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - Le journal d'audit garde une ligne `MEMBER_DELETED` avec le pseudo (intérêt légitime, durée du journal : 3 ans).
   - Export : un fichier JSON (`GET /api/v1/me/export`) avec le profil, les séances, les coches, les coups de cœur,
     les commentaires, les accusés, les voies ouvertes, les appareils et la liste des photos (pas les images elles-mêmes).
-- **Statut** : à valider (choix par défaut appliqués : audit conservé, photos listées sans être incluses).
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q27).
 
 ### D-097 — La cotation avant la corde sur l'étiquette de voie
 - **Contexte** : demande du club (Willem, 2026-10-27) : la corde était l'info la plus voyante de l'étiquette, alors que
@@ -851,7 +824,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - Séances d'un autre : lisibles par ses amis acceptés si la séance est « amis » ; sinon 404, comme une séance qui
     n'existe pas (une demande en attente n'ouvre rien, un rôle non plus). Même règle pour la photo et le carnet d'un ami
     (calculé sur ses séances « amis » seulement). `Session` expose désormais `memberId`.
-- **Statut** : à valider (découpage et choix par défaut : refus silencieux, annuaire sans pagination, chiffres clés plus tard).
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q22).
 
 ### D-099 — Retours du club sur la PR 5.1 : demandes d'amis, accueil, déconnexion
 - **Contexte** : Willem a essayé la PR 5.1 sur le dev (2026-10-27). La spec (§8.2) plaçait les demandes reçues en
@@ -890,8 +863,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     séances partent, puisque plus personne ne voit ces séances. L'export contient mes réactions et mes commentaires
     de séance.
   - Badges dans la carte (« a débloqué… ») : avec la phase 7.
-- **Statut** : à valider (pas de réaction sur sa propre séance ; le grimpeur ne modère pas sous sa séance ; la direction
-  lit les commentaires de séance pour modérer).
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q23).
 
 ### D-101 — PR 5.3 : l'assureur, voie par voie
 - **Contexte** : demande de Willem (2026-10-29), hors spec : choisir son assureur en saisissant une séance. Willem a
@@ -911,8 +883,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - Suppression de compte : un assureur supprimé disparaît des voies (FK) ; les séances cédées à « Ancien·ne membre »
     perdent leurs assureurs. Export : l'assureur de mes voies (pseudo) et mes assurages (grimpeur, jour, nombre de voies).
   - Idée pour la phase 6, non engagée : un classement « assureur du mois ».
-- **Statut** : à valider (le retrait du nom sans blocage ; la liste « Mes assurages » visible même pour une séance privée,
-  réduite à qui et quand).
+- **Statut** : règles validées (club, questionnaire du 2026-11-07, Q10 : pas de classement des assureur·ses ; Q20) ; saisie remplacée par D-118.
 
 
 ### D-102 — Caddy de l'image web recompilé avec un Go corrigé
@@ -976,7 +947,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     ouverture, toutes tentatives comprises (à égalité, la plus ancienne d'abord) ; les plus anciennes (8, puis « Tout
     afficher ») ; les 5 premiers coups de cœur. Les agrégats sont calculés côté front (`lib/stats.ts`, testés), le
     backend ne donne que les voies et leurs compteurs.
-- **Statut** : à valider (définition du taux de réussite, cotations regroupées dans l'histogramme).
+- **Statut** : remplacée par D-117 (club, questionnaire du 2026-11-07, Q08).
 
 ### D-105 — PR 7.1 : le moteur de badges
 - **Contexte** : spec §9.4, §9.5. Plusieurs conditions laissent un choix : les cotations en « - » (D-002), le décompte
@@ -1009,7 +980,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     les badges d'une séance suivent la visibilité de la séance (fil). Toutes les séances comptent, « juste moi » comprises.
   - **Suppression de compte** : les badges partent avec le compte (clé étrangère), les séances passent à « Ancien·ne
     membre » sans badge.
-- **Statut** : à valider (6a-, décompte des 30 jours, flash une fois par voie).
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q13).
 
 ### D-106 — PR 7.2 : badges à niveaux, rareté et favoris
 - **Contexte** : retour de Willem sur la première bibliothèque (paliers alignés 1, 5, 10…, noms et conditions partout) :
@@ -1031,7 +1002,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - **Favoris** : 3 au maximum, obtenus, dans l'ordre choisi (`PUT /me/badges/favorites`, table `favorite_badge`, V16),
     choisis depuis la fenêtre d'un badge. Affichés au niveau actuel à côté du nom (profils, `Session.authorBadges` dans
     le fil) ; un favori perdu depuis (séance supprimée) n'est plus affiché mais reste choisi s'il revient.
-- **À valider** : l'échelle de couleurs et les paliers des répétables (Willem), coût faible à changer (`lib/badges.ts`).
+- **Statut** : échelle de couleurs et paliers validés (club, questionnaire du 2026-11-07, Q16) ; favoris remplacés par D-116 (2 au maximum).
 
 ### D-107 — Comptes « Touriste » et validation des nouveaux comptes par la direction
 - **Contexte** : Willem n'est ni président ni licencié, et ne veut pas de droits qui ne correspondent pas à son rôle
@@ -1078,8 +1049,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
     ensuite. Audit : `MEMBER_VALIDATED` (après = rôle choisi) et `MEMBER_REFUSED`.
   - Le code de premier démarrage crée toujours un admin validé d'office. Seed : comptes `touriste` (validé) et
     `nouveau` (en attente, non licencié).
-- **Statut** : validée par Willem (déclaration et texte ajoutés le 2026-10-31) ; à présenter au club (libellé « Touriste »,
-  message d'attente) ; l'effacement du texte après décision est un choix par défaut, à valider.
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q32).
 
 ### D-108 — « Quoi de neuf ? » : notes de version embarquées et fenêtre après mise à jour
 - **Contexte** : spec §8.12. `CHANGELOG.md` est la seule source, embarquée au build ; une fenêtre présente les
@@ -1158,7 +1128,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   - **Voie au hasard** : bouton dans la barre d'outils du topo, tirage parmi les voies **affichées** (filtres
     compris), jamais deux fois la même d'affilée quand il y a le choix (`pickRandomRoute`). Fenêtre « Et pourquoi
     pas celle-là ? » avec « Une autre ! » et « Voir la voie » (fiche de la voie, le filtre du topo conservé).
-- **Statut** : à valider (6b- compté pour 6b, niveau = cotation la plus dure, encadré du fil limité à Actu).
+- **Statut** : validée (club, questionnaire du 2026-11-07, Q03 et Q15).
 
 ### D-112 — Revue de sécurité complète (phase 8, 2026-11-04)
 - **Méthode** : quatre relectures indépendantes par sous-agents (authentification et sessions ; autorisations et IDOR sur
@@ -1206,7 +1176,7 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
      garder `main` seul si elles ne servent pas.
   3. *Sauvegardes* : celles d'avant déploiement (10 gardées quel que soit leur âge) et les manuelles (jamais effacées)
      peuvent garder des comptes supprimés pendant des mois ; plafonner leur âge et le dire dans « Tes données » ?
-- **Statut** : corrections faites ; trois points à trancher.
+- **Statut** : corrections faites ; point 1 tranché par D-119 (club, questionnaire du 2026-11-07, Q25), point 3 : on garde comme ça (Q26) ; point 2 à trancher par Willem.
 
 ### D-113 — Licence MIT
 - **Contexte** : le dépôt n'avait pas de licence, donc aucun droit de réutilisation explicite.
@@ -1252,3 +1222,224 @@ Points non couverts par la spec, relevés avant la phase 1. Appliqués par défa
   `prefers-reduced-motion`, tailles en `rem` (réglages de taille du système). Le lecteur d'écran réel (VoiceOver, TalkBack)
   n'a pas été testé : à faire sur téléphone avant la 1.0.0.
 - **Statut** : appliquée.
+
+---
+
+## Réponses du club au questionnaire (2026-11-07)
+
+Document rempli par le bureau : `docs/GG-Pocket_questionnaire_reponses.docx` (questions Q01 à Q33, logo, idées).
+Ambiguïtés tranchées par Willem le 2026-11-07. Les décisions gardées telles quelles sont marquées « validée » plus haut.
+
+### D-115 — Cotations : « + » à partir de 5b, « - » à partir de 6b (remplace D-002)
+- **Contexte** (Q04) : « Les + n'arrivent qu'à partir de 5b donc en dessous pas besoin de +. Et les moins uniquement à
+  partir de 6b. »
+- **Choix** : 25 cotations : 4a, 4b, 4c, 5a, 5b, 5b+, 5c, 5c+, 6a, 6a+, 6b-, 6b, 6b+, 6c-, 6c, 6c+, 7a-, 7a, 7a+,
+  7b-, 7b, 7b+, 7c-, 7c, 7c+. Les 11 cotations retirées (4a- à 5a+, 5b-, 5c-, 6a-) ne sont plus proposées ; les voies,
+  « À faire » et données existantes qui les portent passent à la cotation sans signe (4a+ → 4a, 6a- → 6a), confirmé par
+  Willem. Nouvelle migration Flyway (rien n'est supprimé de la table `grade`, voir D-074).
+- **Détail d'implémentation** : `V19__retire_unused_grades.sql` ajoute `grade.retired` (booléen), marque les 11
+  cotations et fait pointer les voies vers la cotation sans signe (« À faire », séances et badges suivent la voie ;
+  aucune autre table ne référence `grade`). Les rangs ne changent pas (4a reste 2, 7c+ reste 36) : seul l'ordre
+  compte. `ClubLayout.sortedGrades()` écarte les cotations retirées, donc `GET /api/v1/topo/config` n'en sert plus
+  que 25 (contrat inchangé) ; `RouteService` refuse une cotation retirée (`CLUB_ITEM_INACTIVE`), comme une corde
+  inactive. `GradeScale` (badges) lit toujours les anciens codes. Seed de démo et fausse API e2e passent aux 25.
+- **Statut** : validée (club et Willem).
+
+### D-116 — Badges : « Mois complet » sur les séances libres, 5 voies, 2 favoris (remplace D-005, D-007 en partie, D-106 en partie)
+- **Contexte** (Q11, Q13, Q16).
+- **Choix** :
+  - *Mois complet* : obtenu en grimpant **chaque jour de séance libre du mois** : les mardis, jeudis et dimanches, moins
+    les **jours de fermeture** que la direction saisit dans l'appli (vacances, jours fériés, été). Un mois sans aucun jour
+    de séance libre ne donne pas le badge.
+  - *Séance full tête* et *Séance parfaite* : au moins **5 voies** dans la séance (au lieu de 3).
+  - *Favoris* : **2** au maximum (au lieu de 3). Un membre qui en avait 3 garde les 2 premiers.
+- **Détail d'implémentation** (5 voies et favoris faits ; « Mois complet » et jours de fermeture à part) : seuils
+  de `BadgeCode.FULL_LEAD` et `PERFECT` à 5 (les badges déjà gagnés sont recomptés au démarrage par `BadgeRecount`) ;
+  `FavoriteBadge.MAX` = 2 (d'où `@Size(max = 2)` et `maxItems: 2` dans le contrat), `MAX_FAVORITES` = 2 dans
+  `BadgeDialog.vue` ; `V20__keep_two_favorite_badges.sql` supprime le 3e favori selon `slot`.
+- **Détail d'implémentation** (« Mois complet » et jours de fermeture) :
+  - table `closed_day` (`V21__create_closed_day.sql`) : une ligne par date fermée (`closed_on` unique), libellé
+    facultatif de 60 caractères. Gérée par la direction et la présidence (`hasRole('BOARD')`, sous
+    `/api/v1/admin/closed-days` : `GET` liste, `POST {from, to?, label?}` ferme un jour ou une plage de 366 jours
+    au plus, entre l'an 2000 et deux ans après cette année, un jour déjà fermé prend le nouveau libellé ;
+    `DELETE ?from&to` rouvre, sans erreur s'il n'y a rien à rouvrir). Journal : `CLUB_DAYS_CLOSED` /
+    `CLUB_DAYS_REOPENED`, cible `CLOSED_DAY`, libellé « 2026-12-21 / 2027-01-04 ».
+  - Les membres voient les fermetures du mois dans leur planning (`closedDays` de `GET /me/planning`), pas de liste
+    complète hors gestion. Écran `/gestion/fermetures` (section à part, car `/gestion/club` est réservé à la
+    présidence) ; les jours consécutifs de même libellé s'affichent en une période, rouverte d'un coup.
+  - Moteur : `BadgeEngine.awards(history, closedDays)` reçoit les fermetures de tout le club ; `FreeSessions` dit
+    les jours de séance libre (mardi, jeudi, dimanche, hors fermeture). Le badge tombe sur la séance qui grimpe le
+    dernier jour de séance libre manquant du mois, donc parfois avant la fin du mois. Le seuil de
+    `BadgeCode.MONTH_COMPLETE` (1) ne sert plus au calcul. Médaille : plus de chiffre « 10 ».
+  - Recalcul : au démarrage (`BadgeRecount`) et, à chaque fermeture ou réouverture, dans la même transaction,
+    pour les grimpeurs ayant une séance dans les mois touchés (`BadgeAwards.refreshMonthsOf`, verrous des membres
+    pris dans l'ordre des identifiants).
+- **Statut** : validée (club) ; jours de fermeture validés par Willem.
+
+### D-117 — Statistiques de gestion : taux de réussite sans chute, une barre par cotation (remplace D-104 en partie)
+- **Contexte** (Q08) : case « oui » cochée mais « Ne compter que les tentatives enchaînées » écrit ; le texte fait foi
+  (Willem).
+- **Choix** : taux de réussite = tentatives enchaînées (sans chute) / tentatives. L'histogramme des voies au mur a une
+  barre par cotation (plus de regroupement 6a-/6a/6a+).
+- **Détail d'implémentation** : `Attendance.successPercent()` divise `cleanCount` (ascensions `clean`, déjà
+  comptées par `AttendanceRepository`) par le nombre de tentatives ; contrat inchangé hormis la description de
+  `successPercent`. Écran Fréquentation : aide et ligne mobile parlent d'« enchaînées ». `gradeDistribution`
+  (`src/lib/stats.ts`) fait une barre par cotation servie par la config (25 au plus), toujours bornée de la plus
+  facile à la plus dure au mur ; les barres horizontales restent lisibles à 360 px et 1280 px.
+- **Statut** : validée (club et Willem).
+
+### D-118 — Assureur·se : un champ pour la séance, voie par voie sur demande (complète D-101)
+- **Contexte** (Q10, Q20) : « Il est très rare qu'une personne ait plus qu'1 assureur dans la séance. » Willem : un champ
+  pour toute la séance, et une case « Plusieurs assureur·ses » qui ouvre le champ voie par voie.
+- **Choix** : le modèle ne change pas (`ascent.belayer_id`, une valeur par voie) ; le formulaire de séance propose un seul
+  champ qui s'applique à toutes les voies. Cocher « Plusieurs assureur·ses » ouvre le champ sur chaque voie. À l'édition,
+  la case est cochée d'office si les voies n'ont pas toutes le même assureur·se. Les règles de D-101 (membre de l'appli
+  seulement, retrait libre du nom, « Mes assurages ») ne changent pas.
+- **Détail d'implémentation** (frontend seulement, ni API ni base) :
+  - `SessionForm` gagne `belayerId` (assureur·se de la séance) et `manyBelayers` (la case) ; l'envoi reste une valeur
+    par voie (`toSessionRequest` inchangé). Case décochée, chaque voie porte la valeur de la séance, y compris les voies
+    ajoutées ensuite ; cochée, une nouvelle voie reprend l'assureur·se de la voie d'avant (D-101), ou celui de la séance
+    s'il n'y a pas encore de voie (`belayerForNewLine`).
+  - Décocher la case quand les voies n'ont pas toutes le même assureur·se : une confirmation (« Toutes les voies
+    prendront jules, l'assureur·se de la première voie ») ; « Annuler » laisse la case cochée et les voies intactes.
+    Plus clair qu'appliquer en silence la première voie, qui effacerait des noms sans prévenir. Si elles ont toutes
+    le même (ou aucun), on revient au champ unique sans rien demander.
+  - Séance existante, séance refusée reprise de la file d'attente, brouillon (même antérieur à D-118) : case cochée
+    d'office si les voies diffèrent ; un brouillon garde aussi la case cochée par la personne.
+  - Fichiers : `lib/sessionForm.ts` (`sameBelayer`, `setSessionBelayer`, `setManyBelayers`, `belayerForNewLine`,
+    `addAscent` prend `{ mode, belayerId }`), `components/session/BelayerButton.vue` (bouton commun au champ de
+    séance et au champ par voie), `SessionEditorView.vue` ; e2e `belays.spec.ts`, captures `seance-assureur` et
+    `seance-assureurs` (case cochée).
+- **Statut** : validée (club et Willem).
+
+### D-119 — Données personnelles : contact, comptes inactifs, date de naissance, mention « mineur » (remplace D-014, D-044 ; complète D-043, D-045)
+- **Contexte** (Q24, Q25, Q28, Q29) et choix de Willem.
+- **Choix** :
+  - *Responsable et contact* : « Gravelines Grimp », `contact@gravelinesgrimp.org`. Le club n'a pas de politique de
+    confidentialité : la page « Tes données » en tient lieu.
+  - *Comptes inactifs* : sans connexion depuis **1 an**, le compte est **désactivé** (invisible des autres, connexion
+    refusée avec un message qui renvoie vers la direction, qui peut le réactiver) ; sans connexion depuis **2 ans**, il
+    est **supprimé** comme une suppression volontaire (D-096). Tâche planifiée quotidienne. « Tes données » le dit.
+  - *Date de naissance* : **obligatoire** à l'inscription ; un membre existant sans date la saisit à sa prochaine
+    connexion.
+  - *Mention « mineur »* : visible **seulement de la direction et de l'admin** (fiche du membre, file des comptes en
+    attente) ; les autres membres ne la voient jamais. L'accord parental sous 15 ans ne change pas.
+  - *Âge sur le profil* : option « Afficher mon âge », décochée par défaut, proposée **seulement aux majeur·es** ; pour un
+    mineur l'option n'apparaît pas et son âge n'est jamais montré, quel que soit le réglage enregistré (la règle est
+    appliquée par le serveur au moment de servir le profil).
+- **Statut** : validée (club et Willem).
+- **Détail d'implémentation** :
+  - *Contact* : en dur dans `privacy.email` (fr.json), lien `mailto:` dans « Qui s'en occupe » et « Tes droits » ;
+    D-043 prévoyait une adresse saisie par l'admin, inutile tant qu'il n'y en a qu'une. Page relue entière : badges
+    ajoutés à « Ce qu'on garde », date de dernière visite, rôle de la date de naissance, section « Les mineur·es ».
+  - *Comptes inactifs* : migration V22 (`member.dormant_since`, `member.reactivated_at`). « Dernière visite » =
+    le plus récent de `last_seen_at` (mis à jour à chaque requête, à l'heure près), de la réactivation par la
+    direction et, à défaut, de l'inscription : réactiver ne touche pas `last_seen_at` (la fiche reste vraie) mais
+    relance une année complète. « 1 an » = même jour et même heure un an plus tôt à Gravelines ; pile un an : gardé
+    (`Inactivity`, `InactivityTest`). Tâche `InactiveAccountJob`, tous les jours à 03:15 Europe/Paris, une
+    transaction par compte, revérifiée sous verrou (`InactiveAccountService.putToSleepIfInactive`,
+    `AccountDeletionService.deleteIfInactive`, la suppression de D-096 telle quelle). Endormi = `DISABLED` +
+    `dormant_since` : invisible des autres comme tout compte désactivé, sessions et liens de réinitialisation
+    supprimés, connexion refusée par `ACCOUNT_DORMANT` (au lieu de `ACCOUNT_DISABLED`), `dormantSince` dans la ligne
+    du tableau des membres. Un compte désactivé par la direction n'est pas « endormi », mais il est supprimé lui aussi
+    après deux ans sans visite (minimisation). Admins exclus (« il en reste toujours un ») ; « Ancien·ne membre »
+    aussi. Journal : `MEMBER_PUT_TO_SLEEP` et `MEMBER_DELETED_INACTIVE`, sans acteur (`AuditLog.recordBySystem`,
+    `actor_id` et `actor_nickname` déjà facultatifs).
+  - *Date de naissance* : `@NotNull` à l'inscription et dans `PUT /api/v1/me/profile` (corrigeable, plus effaçable) ;
+    `CurrentMember.birthDateMissing` ; écran `/date-de-naissance` imposé par la garde de route (pages publiques
+    exceptées) et `PUT /api/v1/me/birth-date` (même règle d'accord parental, même limite de débit que le profil).
+    L'API n'est pas bloquée pour autant.
+  - *Mineur* : `Age.isMinor` (moins de 18 ans ; date inconnue = pas mineur) → `MemberSummary.minor`, donc fiche et
+    file des comptes en attente ; `Age.shownToOthers` pour l'âge d'un profil vu par un autre ; une case « Afficher mon
+    âge » cochée par un mineur est enregistrée décochée.
+
+### D-120 — Fil « tout le club », à double sens (remplace D-011)
+- **Contexte** (Q21) : « On peut rajouter un fil “tout le club” en plus du “amis”, mais il est flouté : si quelqu'un veut
+  voir ce fil, il doit accepter un réglage qui le prévient que s'il veut voir, il doit être vu aussi (un peu comme
+  BeReal). » Willem : pour la 1.0, mineurs compris ; troisième visibilité de séance.
+- **Choix** :
+  - Une séance est « Juste moi », « Mes amis » ou **« Tout le club »**.
+  - Réglage de profil **« Je participe au fil du club »**, désactivé par défaut. Tant qu'il est désactivé, l'onglet
+    « Club » d'Actu montre des cartes floutées et une explication avec le bouton pour l'activer ; la visibilité
+    « Tout le club » n'est pas proposée.
+  - Une fois activé, on voit les séances « Tout le club » des autres participant·es. Le désactiver retire aussitôt ses
+    séances du fil du club (elles restent visibles des amis) et floute de nouveau le fil.
+  - Les comptes en attente ne participent pas (D-107). Réactions et commentaires : mêmes règles que le fil des amis.
+- **Détail d'implémentation** :
+  - V23 : visibilité `CLUB` (contrainte CHECK refaite), colonne `member.in_club_feed` (faux par défaut), index partiel
+    sur les séances `CLUB`. Rien n'est réécrit quand on se retire : tout se décide à la lecture.
+  - Règle unique : `SessionVisibility.readableBy` (`PRIVATE` jamais, `FRIENDS` aux amis, `CLUB` aux amis ou si lecteur
+    et auteur participent, tous deux validés et actifs, `Member.isInClubFeed`). `SessionAudience` l'applique à la
+    séance, sa photo, ses réactions et commentaires (lire et écrire) et à la liste des séances d'un profil (un
+    participant non ami n'y voit que les séances `CLUB` ; le carnet d'un membre reste aux amis, `FRIENDS` + `CLUB`).
+    Séance illisible : 404, comme avant. Les mineur·es participent comme les autres ; la modération ne change pas.
+  - `GET /api/v1/feed/club` (même pagination que `/feed`, ses propres séances comprises) : 403 `ACCESS_DENIED` avant
+    validation, 403 `CLUB_FEED_NOT_JOINED` sans participation. `PUT /api/v1/me/club-feed` `{inClubFeed}` (membre
+    validé, lui seul) renvoie le membre courant, qui porte désormais `inClubFeed`. L'export contient le réglage.
+  - Choisir « Tout le club » (création, modification, « Qui la voit ») sans participer : 403 `CLUB_FEED_NOT_JOINED`.
+    Une séance qui l'a déjà le garde après le retrait (hors du fil du club jusqu'au retour) ; l'éditeur garde alors
+    l'option affichée avec une phrase qui dit qu'elle n'atteint plus que les amis, et propose d'en changer.
+  - Appli : onglets « Mes amis » / « Le club » en boutons segmentés ; l'onglet suit l'adresse (`/actu?club`, comme
+    `?amis` dans l'annuaire) plutôt que le stockage local, qui n'est pas un motif du projet pour les onglets. Non
+    participant : gabarits floutés dessinés par l'appli (aucune séance demandée au serveur), explication et bouton
+    avec confirmation qui rappelle la réciprocité ; compte en attente : même écran sans bouton. Réglage aussi dans
+    « Modifier mon profil », appliqué tout de suite comme la voie préférée (se retirer sans confirmation).
+- **Statut** : validée (club et Willem) ; détails d'interface à valider sur l'environnement dev.
+
+### D-121 — Voie « à plus de 50 % » : 0,5 au classement « Voies »
+- **Contexte** : demande du club du 2026-11-07 : une case « plus de 50 % » pour une voie pas finie mais grimpée au-delà de
+  la moitié, qui compterait 0,5 au classement.
+- **Choix** (par défaut, Willem à valider) : nouvelle issue de voie « Plus de la moitié », exclusive de « topée ». Elle
+  compte **0,5** au classement « Voies » du podium et rien d'autre : ni réalisation du topo, ni badge, ni taux de réussite,
+  ni « À faire » coché. Le classement affiche les demis (« 12,5 »).
+- **Détail d'implémentation** :
+  - V24 : `ascent.past_half boolean not null default false`, contrainte `ascent_past_half_check`
+    (`not (past_half and topped)`), refusée aussi par `AscentDraft.check()` (400 `INVALID_ASCENT`). Côté requête,
+    `pastHalf` est facultatif (absent = non) pour les applis encore en cache ; les séances, « Mon historique » de
+    la fiche voie et l'export de mes données le renvoient.
+  - Score : `monthly_ranking_snapshot.value` passe en `numeric(7, 1)` (scores entiers inchangés, demis gardés
+    tels quels au gel), plutôt que des demi-points ×2 dans un entier qui changeraient le sens des lignes figées
+    et de l'export. Côté Java, `BigDecimal` sans zéros inutiles (« 2 », « 12.5 ») ; l'API renvoie un nombre.
+    Le classement « Voies » en direct compte `topées + 0,5 × plus de la moitié` ; rangs et ex æquo inchangés.
+  - Ne sont classés que les scores **non nuls** (avant : au moins 1) : une seule voie à plus de la moitié
+    (0,5) suffit pour entrer au classement.
+  - Tout ce qui compte `topped` ignore la case (topo, badges, taux de réussite, À faire, chiffres du carnet) ;
+    seule la meilleure perf d'une voie dans le carnet gagne un niveau `PAST_HALF` (« Plus de la moitié, pas
+    encore topée »), entre « Topée en mouli » et « Pas encore topée ».
+  - Front : case « Plus de la moitié » sous « Chutes » quand « Topée » est sur « Non », décochée si on retope ;
+    les anciens brouillons reviennent sans la case. Sur les cartes : « plus de la moitié, 1 chute » à la place de
+    « pas topée ». Podium : « 12,5 voies » (`Intl.NumberFormat('fr-FR')`, singulier sous 2 : « 1,5 voie ») et une
+    ligne de règle sous Séances / Voies. Le seed de démo marque « plus de la moitié » les voies pas topées avec
+    2 chutes au plus.
+- **Statut** : à valider (Willem).
+
+### D-122 — Affichage : pastille bicolore, miniature ronde, série en flammes (complète D-013, D-093)
+- **Contexte** (Q17, Q19).
+- **Choix** : une voie à deux couleurs a **une** pastille coupée en deux moitiés ; la miniature de la photo d'une voie est
+  ronde ; la série du planning s'affiche « 5 🔥 ».
+- **Détail d'implémentation** (frontend seulement) :
+  - `HoldSwatch` prend une seconde couleur (`second`) : la prise est coupée par une diagonale raide passant par le
+    boulon (première couleur à gauche), un trait neutre souligne la coupe (deux couleurs proches, blanc et jaune clair,
+    restent lisibles), chaque moitié garde le contour de sa couleur (contraste en sombre inchangé), une moitié
+    « multicolore » garde ses quartiers. Nom accessible « jaune et bleu » quand la pastille est annoncée ; l'étiquette
+    garde son nom complet. Utilisée par l'étiquette (`RouteLabel` : topo, fiche, saisie, gestion, À faire), la fiche
+    sans photo, la miniature et le bilan du topo.
+  - `RouteThumbnail` ronde (`rounded-full`), pour la photo comme pour la prise affichée sans photo (bicolore aussi).
+  - Planning : « 5 🔥 » et le rappel de la règle masqués aux lecteurs d'écran, qui lisent « Série de 5 semaines
+    d'affilée à 2 séances ou plus » (`planning.streakLabel`).
+- **Statut** : validée (club).
+
+### D-123 — Logo du club (remplace D-039)
+- **Contexte** (partie H) : logo pour fond clair (PNG 801 px sur fond blanc) et pour fond noir (PNG 2048 px) collés dans
+  le document ; le fichier `Logo_GravelinesGrimp_3-couleurs.svg` est en fait une image PNG de 3775 × 3719 px (plus son
+  masque de transparence) enveloppée dans du SVG, pas un vrai vectoriel. Pas de version carrée ni de charte. Utilisation
+  dans l'appli autorisée.
+- **Choix** :
+  - sources rangées dans `docs/references/club/` (le SVG et les deux images du questionnaire) ;
+  - `logo-light.webp` et `logo-dark.webp` (512 px) régénérés depuis le SVG : la version sombre remplace l'encre du texte
+    (`#231F20`) par le papier du thème sombre, comme la version fond noir du club ;
+  - icônes PWA, Apple et favicon : le logo complet sur le fond magnésie (zone sûre respectée pour l'icône « maskable »),
+    faute de version carrée simplifiée ;
+  - couleurs officielles relevées dans l'image : orange `#F26522` et vert `#C8DC5D` remplacent `#F9561A` et `#C3C04C`
+    (`tokens.css`, `DESIGN.md`) ; contrastes AA conservés (encre sur orange 5,8:1, sur vert 12,1:1).
+- **Statut** : appliquée en attendant une vraie source vectorielle et une version carrée (à redemander au club).

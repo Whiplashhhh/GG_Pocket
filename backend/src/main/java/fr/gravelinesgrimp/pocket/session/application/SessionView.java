@@ -74,6 +74,7 @@ public record SessionView(
             RouteSummaryView route,
             ClimbMode mode,
             boolean topped,
+            boolean pastHalf,
             boolean clean,
             int falls,
             boolean firstTry,

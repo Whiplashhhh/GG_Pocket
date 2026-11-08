@@ -208,6 +208,7 @@ public class SessionViews {
                                                 summaries.get(ascent.routeId()),
                                                 ascent.mode(),
                                                 ascent.topped(),
+                                                ascent.pastHalf(),
                                                 ascent.clean(),
                                                 ascent.falls(),
                                                 ascent.firstTry(),

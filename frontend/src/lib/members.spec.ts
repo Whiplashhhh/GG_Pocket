@@ -17,6 +17,7 @@ const member = (
   role: 'CLIMBER',
   status: 'ACTIVE',
   validated: true,
+  minor: false,
   registeredAt: '2026-01-01T10:00:00Z',
   sessionCount: 0,
   ...overrides,

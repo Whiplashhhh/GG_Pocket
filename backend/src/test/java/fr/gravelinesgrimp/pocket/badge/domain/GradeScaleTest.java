@@ -12,7 +12,10 @@ class GradeScaleTest {
     @Test
     void followsTheClubGrades() {
         var grades =
-                List.of("4a-", "4a", "4a+", "4c+", "5a-", "6a-", "6a", "6a+", "6b-", "7c", "7c+");
+                List.of(
+                        "4a", "4b", "4c", "5a", "5b", "5b+", "5c", "5c+", "6a", "6a+", "6b-", "6b",
+                        "6b+", "6c-", "6c", "6c+", "7a-", "7a", "7a+", "7b-", "7b", "7b+", "7c-",
+                        "7c", "7c+");
 
         assertThat(grades.stream().map(GradeScale::rank).toList())
                 .isSorted()
@@ -21,8 +24,8 @@ class GradeScaleTest {
 
     @Test
     void theBaseDropsTheModifier() {
-        assertThat(List.of("6a-", "6a", "6a+").stream().map(GradeScale::base).distinct())
-                .containsExactly("6a");
+        assertThat(List.of("6b-", "6b", "6b+").stream().map(GradeScale::base).distinct())
+                .containsExactly("6b");
     }
 
     @Test

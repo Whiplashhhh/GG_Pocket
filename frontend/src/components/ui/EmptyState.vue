@@ -12,7 +12,7 @@ withDefaults(
     /** h1 when the empty state is the whole page (404), h2 under a page title otherwise. */
     headingLevel?: 1 | 2
   }>(),
-  { hold: () => ({ label: '', hex: '#f9561a' }), headingLevel: 2 },
+  { hold: () => ({ label: '', hex: '#f26522' }), headingLevel: 2 },
 )
 </script>
 

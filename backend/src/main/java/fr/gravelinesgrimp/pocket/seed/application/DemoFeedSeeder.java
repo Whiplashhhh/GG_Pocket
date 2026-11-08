@@ -4,6 +4,7 @@ import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.session.domain.ReactionKind;
 import fr.gravelinesgrimp.pocket.session.domain.SessionComment;
 import fr.gravelinesgrimp.pocket.session.domain.SessionReaction;
+import fr.gravelinesgrimp.pocket.session.domain.SessionVisibility;
 import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
 import fr.gravelinesgrimp.pocket.session.infra.SessionCommentRepository;
 import fr.gravelinesgrimp.pocket.session.infra.SessionReactionRepository;
@@ -67,7 +68,12 @@ class DemoFeedSeeder {
         var kinds = ReactionKind.values();
         for (var climber : FRIENDS) {
             var shared =
-                    sessions.findLatestShared(accounts.get(climber).id(), SESSIONS_PER_CLIMBER);
+                    sessions.findLatestShared(
+                            accounts.get(climber).id(),
+                            List.of(
+                                    SessionVisibility.FRIENDS.name(),
+                                    SessionVisibility.CLUB.name()),
+                            SESSIONS_PER_CLIMBER);
             for (var session : shared) {
                 for (var friend : FRIENDS) {
                     if (friend.equals(climber)) {

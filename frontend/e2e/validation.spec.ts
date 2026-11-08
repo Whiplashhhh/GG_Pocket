@@ -50,15 +50,20 @@ test.describe('the board', () => {
       validated: false,
       declaredLicensed: false,
       joinNote: 'Collègue de Lou, je viens un jeudi sur deux.',
+      birthDate: '2009-04-02',
     })
 
     await page.goto('/gestion/membres')
     const pending = page.getByRole('region', { name: /En attente de validation/ })
     await expect(pending).toBeVisible()
+    // A minor: the board knows it, never the birth date (D-119).
+    await expect(pending.getByText('Mineur·e', { exact: true })).toBeVisible()
     await pending.getByRole('link', { name: /Alix Moreau/ }).click()
 
     await expect(page.getByRole('heading', { name: 'Nouveau compte à valider' })).toBeVisible()
     await expect(page.getByText('Collègue de Lou, je viens un jeudi sur deux.')).toBeVisible()
+    await expect(page.getByText('Mineur·e (moins de 18 ans)')).toBeVisible()
+    await expect(page.getByText('2009')).toHaveCount(0)
     await page.getByRole('button', { name: 'Valider : Touriste (pas licencié·e)' }).click()
     await expect(
       page.getByText('Compte validé : Alix Moreau est maintenant Touriste.'),

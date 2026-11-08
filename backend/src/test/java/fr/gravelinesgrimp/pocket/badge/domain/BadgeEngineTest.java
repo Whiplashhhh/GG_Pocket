@@ -11,9 +11,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -21,6 +24,7 @@ import java.util.stream.IntStream;
 class BadgeEngineTest {
 
     private final List<ClimbRecord> history = new ArrayList<>();
+    private final Set<LocalDate> closed = new HashSet<>();
     private Instant clock = Instant.parse("2020-01-01T00:00:00Z");
 
     @Nested
@@ -100,8 +104,8 @@ class BadgeEngineTest {
 
         @Test
         void aMinusOrAPlusCountsAsItsGrade() {
-            session("2025-03-03", top("6a-"));
-            session("2025-03-04", top("6b+"));
+            session("2025-03-03", top("6a+"));
+            session("2025-03-04", top("6b-"));
 
             assertThat(only(BadgeCode.GRADE_6A).earnedOn())
                     .isEqualTo(LocalDate.parse("2025-03-03"));
@@ -136,7 +140,7 @@ class BadgeEngineTest {
 
         @Test
         void theEasiestGradesHaveNoTier() {
-            session("2025-03-03", top("4c+"), top("5a"));
+            session("2025-03-03", top("4c"), top("5a"));
 
             assertThat(codes()).doesNotContain(BadgeCode.GRADE_5B);
         }
@@ -270,51 +274,128 @@ class BadgeEngineTest {
     @Nested
     class Months {
 
+        /** March 2025: Sundays 2 to 30, Tuesdays 4 to 25, Thursdays 6 to 27 (D-116). */
+        private static final List<String> MARCH_FREE_DAYS =
+                List.of(
+                        "2025-03-02",
+                        "2025-03-04",
+                        "2025-03-06",
+                        "2025-03-09",
+                        "2025-03-11",
+                        "2025-03-13",
+                        "2025-03-16",
+                        "2025-03-18",
+                        "2025-03-20",
+                        "2025-03-23",
+                        "2025-03-25",
+                        "2025-03-27",
+                        "2025-03-30");
+
         @Test
-        void tenDaysCompleteTheMonth() {
-            daysOfMarch(9);
+        void everyFreeSessionDayCompletesTheMonth() {
+            assertThat(FreeSessions.countIn(YearMonth.of(2025, 3), Set.of())).isEqualTo(13);
+            MARCH_FREE_DAYS.subList(0, 12).forEach(day -> session(day));
             assertThat(count(BadgeCode.MONTH_COMPLETE)).isZero();
 
-            session("2025-03-31");
+            var last = session("2025-03-30");
 
             assertThat(only(BadgeCode.MONTH_COMPLETE).key()).isEqualTo("2025-03");
+            assertThat(only(BadgeCode.MONTH_COMPLETE).sessionId()).isEqualTo(last.sessionId());
             assertThat(only(BadgeCode.MONTH_COMPLETE).earnedOn())
-                    .isEqualTo(LocalDate.parse("2025-03-31"));
+                    .isEqualTo(LocalDate.parse("2025-03-30"));
+        }
+
+        @Test
+        void aClosedDayIsNotWaitedFor() {
+            MARCH_FREE_DAYS.stream()
+                    .filter(day -> !day.equals("2025-03-18"))
+                    .forEach(day -> session(day));
+            assertThat(count(BadgeCode.MONTH_COMPLETE)).isZero();
+
+            closed.add(LocalDate.parse("2025-03-18"));
+
+            assertThat(only(BadgeCode.MONTH_COMPLETE).earnedOn())
+                    .isEqualTo(LocalDate.parse("2025-03-30"));
+        }
+
+        @Test
+        void comeBeforeTheEndOfTheMonthWithItsLastFreeDay() {
+            closed.add(LocalDate.parse("2025-03-30"));
+            MARCH_FREE_DAYS.subList(0, 12).forEach(day -> session(day));
+
+            assertThat(only(BadgeCode.MONTH_COMPLETE).earnedOn())
+                    .isEqualTo(LocalDate.parse("2025-03-27"));
+        }
+
+        @Test
+        void aMonthClosedAllMonthEarnsNothing() {
+            var august = YearMonth.of(2025, 8);
+            august.atDay(1).datesUntil(august.atEndOfMonth().plusDays(1)).forEach(closed::add);
+            assertThat(FreeSessions.countIn(august, closed)).isZero();
+
+            for (int day = 1; day <= 31; day++) {
+                session("2025-08-%02d".formatted(day));
+            }
+
+            assertThat(count(BadgeCode.MONTH_COMPLETE)).isZero();
+            assertThat(count(BadgeCode.MONTH_12)).isOne();
+        }
+
+        @Test
+        void aMondayDoesNotCount() {
+            MARCH_FREE_DAYS.subList(0, 12).forEach(day -> session(day));
+            session("2025-03-31");
+            session("2025-03-29");
+
+            assertThat(count(BadgeCode.MONTH_COMPLETE)).isZero();
+        }
+
+        @Test
+        void twoSessionsOnTheSameDayCountOnce() {
+            MARCH_FREE_DAYS.subList(0, 12).forEach(day -> session(day));
+            MARCH_FREE_DAYS.subList(0, 12).forEach(day -> session(day));
+            assertThat(count(BadgeCode.MONTH_COMPLETE)).isZero();
+
+            var first = session("2025-03-30");
+            session("2025-03-30");
+
+            assertThat(only(BadgeCode.MONTH_COMPLETE).sessionId()).isEqualTo(first.sessionId());
         }
 
         @Test
         void theFirstOfTheNextMonthDoesNotCount() {
-            daysOfMarch(9);
+            MARCH_FREE_DAYS.subList(0, 12).forEach(day -> session(day));
             session("2025-04-01");
 
             assertThat(count(BadgeCode.MONTH_COMPLETE)).isZero();
         }
 
         @Test
-        void twelveDaysEarnBoth() {
-            daysOfMarch(11);
+        void twelveDaysEarnTheTwelveDaysBadge() {
+            for (int day = 1; day <= 11; day++) {
+                session("2025-03-%02d".formatted(day));
+            }
             assertThat(count(BadgeCode.MONTH_12)).isZero();
 
-            session("2025-03-31");
+            session("2025-03-12");
 
-            assertThat(codes()).containsOnlyOnce(BadgeCode.MONTH_COMPLETE, BadgeCode.MONTH_12);
+            assertThat(only(BadgeCode.MONTH_12).key()).isEqualTo("2025-03");
+            assertThat(count(BadgeCode.MONTH_COMPLETE)).isZero();
         }
 
         @Test
         void comeOncePerMonth() {
-            daysOfMarch(15);
-            for (int day = 1; day <= 10; day++) {
-                session("2025-04-%02d".formatted(day));
-            }
+            MARCH_FREE_DAYS.forEach(day -> session(day));
+            var april = YearMonth.of(2025, 4);
+            april.atDay(1)
+                    .datesUntil(april.atEndOfMonth().plusDays(1))
+                    .filter(day -> FreeSessions.WEEKDAYS.contains(day.getDayOfWeek()))
+                    .forEach(day -> session(day.toString()));
 
-            assertThat(count(BadgeCode.MONTH_COMPLETE)).isEqualTo(2);
-            assertThat(count(BadgeCode.MONTH_12)).isOne();
-        }
-
-        private void daysOfMarch(int days) {
-            for (int day = 1; day <= days; day++) {
-                session("2025-03-%02d".formatted(day));
-            }
+            assertThat(awards().stream().filter(a -> a.code() == BadgeCode.MONTH_COMPLETE))
+                    .extracting(Award::key)
+                    .containsExactly("2025-03", "2025-04");
+            assertThat(count(BadgeCode.MONTH_12)).isEqualTo(2);
         }
     }
 
@@ -434,22 +515,22 @@ class BadgeEngineTest {
     class FullLead {
 
         @Test
-        void threeLeadsEarnIt() {
-            var full = session("2025-03-03", leads(3));
+        void fiveLeadsEarnIt() {
+            var full = session("2025-03-03", leads(5));
 
             assertThat(only(BadgeCode.FULL_LEAD).sessionId()).isEqualTo(full.sessionId());
         }
 
         @Test
-        void twoAreNotEnough() {
-            session("2025-03-03", leads(2));
+        void fourAreNotEnough() {
+            session("2025-03-03", leads(4));
 
             assertThat(count(BadgeCode.FULL_LEAD)).isZero();
         }
 
         @Test
         void oneTopRopeSpoilsIt() {
-            var lines = new ArrayList<>(leads(3));
+            var lines = new ArrayList<>(leads(5));
             lines.add(top("4a"));
             session("2025-03-03", lines);
 
@@ -460,15 +541,15 @@ class BadgeEngineTest {
         void fallsInLeadStillCount() {
             session(
                     "2025-03-03",
-                    Collections.nCopies(3, line(UUID.randomUUID(), ClimbMode.LEAD, false)));
+                    Collections.nCopies(5, line(UUID.randomUUID(), ClimbMode.LEAD, false)));
 
             assertThat(count(BadgeCode.FULL_LEAD)).isOne();
         }
 
         @Test
         void comesOncePerSession() {
-            session("2025-03-03", leads(3));
-            session("2025-03-03", leads(4));
+            session("2025-03-03", leads(5));
+            session("2025-03-03", leads(6));
 
             assertThat(count(BadgeCode.FULL_LEAD)).isEqualTo(2);
         }
@@ -478,22 +559,22 @@ class BadgeEngineTest {
     class Perfect {
 
         @Test
-        void threeCleanAscentsEarnIt() {
-            session("2025-03-03", cleans(3));
+        void fiveCleanAscentsEarnIt() {
+            session("2025-03-03", cleans(5));
 
             assertThat(count(BadgeCode.PERFECT)).isOne();
         }
 
         @Test
-        void twoAreNotEnough() {
-            session("2025-03-03", cleans(2));
+        void fourAreNotEnough() {
+            session("2025-03-03", cleans(4));
 
             assertThat(count(BadgeCode.PERFECT)).isZero();
         }
 
         @Test
         void oneFallSpoilsIt() {
-            var lines = new ArrayList<>(cleans(3));
+            var lines = new ArrayList<>(cleans(5));
             lines.add(top("4a"));
             session("2025-03-03", lines);
 
@@ -686,8 +767,8 @@ class BadgeEngineTest {
         @Test
         void theOrderOfTheHistoryDoesNotMatter() {
             session("2025-03-03", tops(3));
-            session("2025-03-05", leads(4));
-            session("2025-03-04", cleans(3));
+            session("2025-03-05", leads(5));
+            session("2025-03-04", cleans(5));
             var inOrder = awards();
 
             Collections.reverse(history);
@@ -707,7 +788,7 @@ class BadgeEngineTest {
         @Test
         void aLaterSessionNeverMovesEarlierAwards() {
             session("2025-03-03", tops(6));
-            session("2025-03-04", leads(3));
+            session("2025-03-04", leads(5));
             var before = awards();
 
             session("2025-03-10", tops(30));
@@ -778,7 +859,7 @@ class BadgeEngineTest {
     // --- awards ---
 
     private List<Award> awards() {
-        return BadgeEngine.awards(history);
+        return BadgeEngine.awards(history, closed);
     }
 
     private List<BadgeCode> codes() {

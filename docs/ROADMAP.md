@@ -185,6 +185,22 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [x] Retours du club du 2026-11-03 : niveaux des badges, cotations une à une, fil encadré, voie au hasard (D-111)
 - [x] Passer à Node 26 LTS après le 2026-10-28 (D-020, fait le 2026-11-01)
 - [ ] Passer à TypeScript 7 quand typescript-eslint et openapi-typescript le supportent (D-020)
-- [ ] Obtenir du club un logo vectoriel ou haute définition et sa version fond noir (D-039)
-- [ ] Faire valider par le club les choix « à valider » et récupérer le logo : questionnaire généré depuis
-  `docs/QUESTIONNAIRE_CLUB_PROMPT.md`, réponses à appliquer selon la marche à suivre en bas du fichier
+- [x] Obtenir du club un logo haute définition et sa version fond noir (D-123 ; un vrai vectoriel reste à demander)
+- [x] Faire valider par le club les choix « à valider » et récupérer le logo : questionnaire généré depuis
+  `docs/QUESTIONNAIRE_CLUB_PROMPT.md`, réponses reçues le 2026-11-07 (D-115 à D-123)
+- [ ] Appliquer les réponses du club avant la 1.0 (branche `feature/decisions-club-0.9.0`) :
+  - [x] Décisions validées ou remplacées dans `DECISIONS.md`
+  - [x] Cotations : « + » dès 5b, « - » dès 6b, 25 cotations, conversion des données (D-115)
+  - [x] Badges : « Mois complet » sur les séances libres moins les jours de fermeture, 5 voies, 2 favoris (D-116)
+  - [x] Gestion : jours de fermeture de la salle (D-116)
+  - [x] Statistiques : taux de réussite sans chute, une barre par cotation (D-117)
+  - [x] Assureur·se pour toute la séance, voie par voie sur demande (D-118)
+  - [x] Données personnelles : contact, comptes inactifs 1 an / 2 ans, date de naissance obligatoire, mention
+    « mineur » pour la direction, âge affichable par les majeur·es seulement (D-119)
+  - [x] Fil « tout le club » à double sens (D-120)
+  - [x] Voie « à plus de 50 % » : 0,5 au classement Voies (D-121)
+  - [x] Pastille bicolore, miniature ronde, série en flammes (D-122)
+  - [x] Logo du club et icônes PWA (D-123)
+- [ ] Idées du club pour après la 1.0 (questionnaire, partie I et commentaires) : « dico » des badges en touchant un
+  badge (tous les niveaux et seuils, Q14) ; formulaire de séance plus aéré, 2 voies récentes proposées ; récap mensuel
+  à l'ouverture du mois et section « Récaps » dans le profil

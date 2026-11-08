@@ -85,7 +85,7 @@ public record Logbook(Totals totals, List<GradeCount> grades, List<RouteLine> ro
     private static RouteLine line(UUID routeId, Grade grade, List<MyAscentLine> ascents) {
         var best =
                 ascents.stream()
-                        .map(a -> AscentBest.of(a.mode(), a.topped(), a.clean()))
+                        .map(a -> AscentBest.of(a.mode(), a.topped(), a.clean(), a.pastHalf()))
                         .reduce(AscentBest.TRIED, AscentBest::bestWith);
         var days = ascents.stream().map(MyAscentLine::climbedOn).sorted().toList();
         return new RouteLine(

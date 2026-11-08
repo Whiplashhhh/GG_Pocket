@@ -10,7 +10,8 @@ import java.util.UUID;
  * One try of a route, as sent by the climber. A clean ascent ("enchaînée") is topped, without a
  * fall; {@code firstTry} is what the climber says (the app fills it in when they never tried the
  * route before). {@code belayerId} is who held the rope, if the climber says so: a club member,
- * checked by the service.
+ * checked by the service. {@code pastHalf} ("Plus de la moitié", D-121) is a route not topped but
+ * climbed past its half.
  */
 public record AscentDraft(
         UUID routeId,
@@ -20,9 +21,23 @@ public record AscentDraft(
         int falls,
         boolean firstTry,
         Integer feeling,
-        UUID belayerId) {
+        UUID belayerId,
+        boolean pastHalf) {
 
     public static final int MAX_FALLS = 99;
+
+    /** Not past the half (a top, or a try below the half). */
+    public AscentDraft(
+            UUID routeId,
+            ClimbMode mode,
+            boolean topped,
+            boolean clean,
+            int falls,
+            boolean firstTry,
+            Integer feeling,
+            UUID belayerId) {
+        this(routeId, mode, topped, clean, falls, firstTry, feeling, belayerId, false);
+    }
 
     /** Without a belayer. */
     public AscentDraft(
@@ -33,7 +48,7 @@ public record AscentDraft(
             int falls,
             boolean firstTry,
             Integer feeling) {
-        this(routeId, mode, topped, clean, falls, firstTry, feeling, null);
+        this(routeId, mode, topped, clean, falls, firstTry, feeling, null, false);
     }
 
     /**
@@ -45,6 +60,9 @@ public record AscentDraft(
         }
         if (clean && (!topped || falls > 0)) {
             throw invalid("A clean ascent is topped without a fall");
+        }
+        if (pastHalf && topped) {
+            throw invalid("A topped route is not only past its half");
         }
         if (feeling != null && (feeling < Feeling.MIN || feeling > Feeling.MAX)) {
             throw invalid("Feeling out of range");

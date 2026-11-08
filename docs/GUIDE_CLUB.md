@@ -18,7 +18,7 @@ Chaque rôle a tous les droits de ceux du dessus.
 | **Touriste** | Grimpe sans licence au club. Mêmes droits qu'un grimpeur : carnet, fil, amis, podium, badges. |
 | **Grimpeur GG** | Licencié·e au club. |
 | **Ouvreur·se** | Ouvre, modifie et démonte les voies ; annonce les « dernières chances » ; voit la fréquentation et le bilan du topo. |
-| **Direction (ça grimpe en haut)** | Valide les nouveaux comptes ; gère les touristes, grimpeurs et ouvreurs (rôle, désactivation, mot de passe oublié) ; modère les commentaires ; lit le journal. |
+| **Direction (ça grimpe en haut)** | Valide les nouveaux comptes ; gère les touristes, grimpeurs et ouvreurs (rôle, désactivation, mot de passe oublié) ; modère les commentaires ; saisit les jours de fermeture de la salle ; lit le journal. |
 | **Le Président·e** | Tout le reste : codes d'inscription, configuration du mur, rôles Direction et Président·e, suppression définitive d'un compte. |
 
 Trois règles que l'appli fait respecter toute seule :
@@ -79,9 +79,26 @@ activité, nombre de séances…). Touche un nom pour ouvrir sa fiche.
   effacé : **Réactiver le compte** remet tout comme avant.
 - **Supprimer définitivement le compte** (présidence) : profil, photos et commentaires sont effacés. Ses séances restent
   dans les statistiques des voies, au nom d'« Ancien·ne membre ».
+- **Mineur·e** : la fiche et la file des comptes en attente l'indiquent pour un membre de moins de 18 ans, avec
+  « accord parental déclaré » avant 15 ans. La date de naissance, elle, n'est jamais montrée, et les autres membres ne
+  voient pas la mention.
+- **Comptes endormis** : sans aucune visite depuis un an, un compte s'endort tout seul (la liste et la fiche disent
+  « Endormi », avec la date). À la connexion, la personne apprend qu'il faut te demander de le réactiver : **Réactiver
+  le compte** lui redonne une année complète. Sans visite depuis deux ans, le compte est supprimé, comme une
+  suppression définitive. Les comptes de la présidence ne sont jamais concernés. Le journal note tout.
 
 Chaque membre peut aussi télécharger ses données ou supprimer lui-même son compte, depuis son profil :
 **Mes données et mon compte**. La page **Tes données** explique en clair ce que l'appli garde et pourquoi.
+
+### Les jours de fermeture (direction)
+
+**Espace gestion › Jours de fermeture** : vacances, jours fériés, l’été. Choisis un jour (ou une période **du… au…**,
+une année au plus) et, si tu veux, une raison (« Vacances de Noël ») : chaque planning affiche ces jours « fermé ».
+
+Le badge **Mois complet** se gagne en grimpant à **chaque séance libre du mois** : tous les mardis, jeudis et dimanches,
+sauf les jours de fermeture. Pense donc à saisir les fermetures, sinon personne ne l’aura ce mois-là. Fermer ou rouvrir
+un jour, même passé, recalcule tout de suite le badge des grimpeurs de ce mois. Un mois entièrement fermé ne donne pas
+le badge.
 
 ---
 
@@ -127,7 +144,9 @@ voies, et celles qui l'utilisent déjà ne bougent pas. L'historique du club res
 ## 6. Modération et journal (direction)
 
 - **Modération** : les derniers commentaires du club, sur les voies et sur les séances. **Supprimer** retire un
-  commentaire pour tout le monde. Le journal garde qui l'a supprimé, et son texte.
+  commentaire pour tout le monde. Le journal garde qui l'a supprimé, et son texte. Les séances « Tout le club »
+  (le fil du club d'Actu, ouvert à qui y participe, mineur·es compris) se modèrent de la même façon : tu vois le
+  commentaire, pas la séance.
 - **Journal** : qui a fait quoi, et quand. Changements de rôle, validations, désactivations, liens de mot de passe,
   codes, voies démontées ou remontées, commentaires supprimés, changements de configuration. Il se lit, il ne se
   modifie pas.

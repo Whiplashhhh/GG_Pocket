@@ -87,12 +87,12 @@ class StatsIT {
                         .andExpect(jsonPath("$.total.toppedCount").value(2))
                         .andExpect(jsonPath("$.total.cleanCount").value(1))
                         .andExpect(jsonPath("$.total.climberCount").value(2))
-                        .andExpect(jsonPath("$.total.successPercent").value(50))
+                        .andExpect(jsonPath("$.total.successPercent").value(25))
                         .andExpect(line(busy.id(), "ascentCount").value(contains(3)))
                         .andExpect(line(busy.id(), "toppedCount").value(contains(2)))
                         .andExpect(line(busy.id(), "cleanCount").value(contains(1)))
                         .andExpect(line(busy.id(), "climberCount").value(contains(2)))
-                        .andExpect(line(busy.id(), "successPercent").value(contains(67)))
+                        .andExpect(line(busy.id(), "successPercent").value(contains(33)))
                         .andExpect(line(quiet.id(), "ascentCount").value(contains(1)))
                         .andExpect(line(quiet.id(), "successPercent").value(contains(0)))
                         .andReturn()
@@ -134,14 +134,16 @@ class StatsIT {
                 today,
                 null,
                 tried(active, ClimbMode.LEAD),
-                topped(lastChance, ClimbMode.TOP_ROPE));
+                clean(lastChance, ClimbMode.TOP_ROPE),
+                topped(lastChance, ClimbMode.LEAD));
 
         mockMvc.perform(get("/api/v1/stats/routes").with(as(setter)))
                 .andExpect(status().isOk())
                 .andExpect(wallLine(active.id(), "ascentCount").value(contains(2)))
                 .andExpect(wallLine(active.id(), "toppedCount").value(contains(1)))
                 .andExpect(wallLine(active.id(), "climberCount").value(contains(1)))
-                .andExpect(wallLine(lastChance.id(), "successPercent").value(contains(100)))
+                .andExpect(wallLine(lastChance.id(), "toppedCount").value(contains(2)))
+                .andExpect(wallLine(lastChance.id(), "successPercent").value(contains(50)))
                 .andExpect(jsonPath("$[?(@.route.id == '%s')]", dismounted.id()).value(empty()));
     }
 

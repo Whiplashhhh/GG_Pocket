@@ -44,34 +44,45 @@ public interface ClimbingSessionRepository extends JpaRepository<ClimbingSession
     List<ClimbingSession> findBefore(
             UUID memberId, LocalDate climbedOn, Instant createdAt, UUID id, int limit);
 
-    /** The latest sessions a climber shares with friends, in the order of {@link #findLatest}. */
+    /**
+     * The latest sessions of a climber with one of the given visibilities (their profile, read by
+     * someone else), in the order of {@link #findLatest}.
+     */
     @Query(
             value =
                     "select * from climbing_session where member_id = :memberId"
-                            + " and visibility = 'FRIENDS'"
+                            + " and visibility in (:visibilities)"
                             + " order by climbed_on desc, created_at desc, id desc limit :limit",
             nativeQuery = true)
-    List<ClimbingSession> findLatestShared(UUID memberId, int limit);
+    List<ClimbingSession> findLatestShared(
+            UUID memberId, Collection<String> visibilities, int limit);
 
     /** The page after a cursor, in the same order as {@link #findLatestShared}. */
     @Query(
             value =
                     "select * from climbing_session where member_id = :memberId"
-                            + " and visibility = 'FRIENDS'"
+                            + " and visibility in (:visibilities)"
                             + " and (climbed_on, created_at, id) < (:climbedOn, :createdAt, :id)"
                             + " order by climbed_on desc, created_at desc, id desc limit :limit",
             nativeQuery = true)
     List<ClimbingSession> findSharedBefore(
-            UUID memberId, LocalDate climbedOn, Instant createdAt, UUID id, int limit);
+            UUID memberId,
+            Collection<String> visibilities,
+            LocalDate climbedOn,
+            Instant createdAt,
+            UUID id,
+            int limit);
 
     /**
-     * The feed (spec §8.2): my sessions and the ones my friends share with friends, in the order of
-     * {@link #findLatest}. {@code friendIds} is never empty: callers add mine.
+     * The feed (spec §8.2): my sessions and the ones my friends share with friends or with the
+     * club, in the order of {@link #findLatest}. {@code friendIds} is never empty: callers add
+     * mine.
      */
     @Query(
             value =
                     "select * from climbing_session where (member_id = :memberId"
-                            + " or (visibility = 'FRIENDS' and member_id in (:friendIds)))"
+                            + " or (visibility in ('FRIENDS', 'CLUB')"
+                            + " and member_id in (:friendIds)))"
                             + " order by climbed_on desc, created_at desc, id desc limit :limit",
             nativeQuery = true)
     List<ClimbingSession> findLatestInFeed(UUID memberId, Collection<UUID> friendIds, int limit);
@@ -80,7 +91,8 @@ public interface ClimbingSessionRepository extends JpaRepository<ClimbingSession
     @Query(
             value =
                     "select * from climbing_session where (member_id = :memberId"
-                            + " or (visibility = 'FRIENDS' and member_id in (:friendIds)))"
+                            + " or (visibility in ('FRIENDS', 'CLUB')"
+                            + " and member_id in (:friendIds)))"
                             + " and (climbed_on, created_at, id) < (:climbedOn, :createdAt, :id)"
                             + " order by climbed_on desc, created_at desc, id desc limit :limit",
             nativeQuery = true)
@@ -91,6 +103,35 @@ public interface ClimbingSessionRepository extends JpaRepository<ClimbingSession
             Instant createdAt,
             UUID id,
             int limit);
+
+    /**
+     * The club feed (D-120): the sessions shared with the club by the members who take part in it,
+     * with an active, validated account, mine included, in the order of {@link #findLatest}. Who
+     * takes part is read now: a member who leaves takes their sessions out at once.
+     */
+    @Query(
+            value =
+                    "select s.* from climbing_session s join member m on m.id = s.member_id"
+                            + " where s.visibility = 'CLUB' and m.in_club_feed"
+                            + " and m.status = 'ACTIVE' and m.validated_at is not null"
+                            + " order by s.climbed_on desc, s.created_at desc, s.id desc"
+                            + " limit :limit",
+            nativeQuery = true)
+    List<ClimbingSession> findLatestInClubFeed(int limit);
+
+    /** The page after a cursor, in the same order as {@link #findLatestInClubFeed}. */
+    @Query(
+            value =
+                    "select s.* from climbing_session s join member m on m.id = s.member_id"
+                            + " where s.visibility = 'CLUB' and m.in_club_feed"
+                            + " and m.status = 'ACTIVE' and m.validated_at is not null"
+                            + " and (s.climbed_on, s.created_at, s.id)"
+                            + " < (:climbedOn, :createdAt, :id)"
+                            + " order by s.climbed_on desc, s.created_at desc, s.id desc"
+                            + " limit :limit",
+            nativeQuery = true)
+    List<ClimbingSession> findInClubFeedBefore(
+            LocalDate climbedOn, Instant createdAt, UUID id, int limit);
 
     /**
      * The sessions where I held the rope on at least one route, whoever climbed and whatever they

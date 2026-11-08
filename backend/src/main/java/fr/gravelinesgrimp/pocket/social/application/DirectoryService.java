@@ -79,10 +79,8 @@ public class DirectoryService {
                 members.findById(memberId)
                         .filter(Member::isVisibleInClub)
                         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No member"));
-        var age =
-                member.showAge() && member.birthDate() != null
-                        ? Age.yearsOn(member.birthDate(), ClubTime.today(clock))
-                        : null;
+        // Never a minor's, whatever they once saved (D-119).
+        var age = Age.shownToOthers(member.birthDate(), member.showAge(), ClubTime.today(clock));
         return new MemberProfileView(
                 MemberCardView.of(member, ClubTime.today(clock)),
                 age,

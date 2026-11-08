@@ -57,7 +57,7 @@ function erase() {
     <p class="text-ink-muted">{{ t('session.frozen') }}</p>
     <div class="mt-3 flex flex-wrap gap-2">
       <GgButton
-        v-if="session.visibility === 'FRIENDS'"
+        v-if="session.visibility !== 'PRIVATE'"
         variant="secondary"
         :disabled="privacy.isPending.value"
         @click="setVisibility('PRIVATE')"

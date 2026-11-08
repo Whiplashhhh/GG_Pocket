@@ -27,5 +27,9 @@ describe('ascentOutcome', () => {
     expect(ascentOutcome({ topped: false, clean: false, falls: 1 }).key).toBe(
       'session.outcome.notTopped',
     )
+    expect(ascentOutcome({ topped: false, pastHalf: true, clean: false, falls: 1 })).toEqual({
+      key: 'session.outcome.pastHalf',
+      falls: 1,
+    })
   })
 })

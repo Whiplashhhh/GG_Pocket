@@ -233,10 +233,34 @@ const clubPodium = (club: FakeClub) => {
         Array.from({ length: topped }, () => ({ route: 'Bye Bye Morice' })),
       )
     }
+    // Tom let go past the half once: half a point (D-121), on a day he already counts.
+    if (nickname === 'Tom') {
+      club.climbs.add(member, 2, [{ route: 'Réglisse', topped: false, pastHalf: true }])
+    }
   }
   for (const day of [1, 4, 6]) {
     club.climbs.add(marie, day, [{ route: 'Réglisse' }, { route: 'Iron Man' }])
   }
+}
+
+/** Days from one date to another, both included, closed with the same label (D-116). */
+const closeGym = (club: FakeClub, from: string, to: string, label?: string) => {
+  for (let day = from; day <= to;) {
+    club.climbs.closedDays.push({ date: day, ...(label === undefined ? {} : { label }) })
+    const next = new Date(`${day}T12:00:00Z`)
+    next.setUTCDate(next.getUTCDate() + 1)
+    day = next.toISOString().slice(0, 10)
+  }
+}
+
+/** A year of closures: May Day, the summer, All Saints' holidays, Armistice Day, Christmas. */
+const gymClosures = (club: FakeClub) => {
+  closeGym(club, '2026-05-01', '2026-05-01')
+  closeGym(club, '2026-07-14', '2026-08-23', 'L’été, on grimpe dehors')
+  closeGym(club, '2026-10-01', '2026-10-01', 'Travaux au grand dévers')
+  closeGym(club, '2026-10-24', '2026-11-01', 'Vacances de la Toussaint')
+  closeGym(club, '2026-11-11', '2026-11-11', 'Armistice')
+  closeGym(club, '2026-12-19', '2027-01-03', 'Vacances de Noël')
 }
 
 const marieSeason = (club: FakeClub) => {
@@ -265,6 +289,16 @@ const someMembers = (club: FakeClub) => {
     clubArrivalYear: 2018,
   })
   club.addMember({ nickname: 'jo', firstName: 'Joséphine', lastName: 'Bleau', status: 'DISABLED' })
+  // Asleep after a year without a visit (D-119).
+  club.addMember({
+    nickname: 'gaston',
+    firstName: 'Gaston',
+    lastName: 'Lagaffe',
+    status: 'DISABLED',
+    registeredAt: '2023-04-12T18:00:00Z',
+    lastSeenAt: '2025-09-30T17:40:00Z',
+    dormantSince: '2026-10-01T01:15:00Z',
+  })
   club.addMember({
     nickname: 'lea.d',
     firstName: 'Léa',
@@ -282,10 +316,43 @@ const someMembers = (club: FakeClub) => {
     declaredLicensed: false,
     joinNote: 'Collègue de Lou au boulot, je viens grimper un jeudi sur deux avec elle.',
     registeredAt: '2026-10-19T20:15:00Z',
+    // 14: the board sees « Mineur·e » and the parental consent, never the date (D-119).
+    birthDate: '2012-03-09',
+    parentalConsent: true,
   })
 }
 
 /** Marie has just joined: her account awaits the board (D-107). */
+/**
+ * The club feed (D-120): marie, tom and Bernard-Emmanuel (not a friend of hers) take part; léa
+ * does not, so her « Tout le club » session stays with her friends.
+ */
+const clubFeedAlive = (club: FakeClub) => {
+  feedAlive(club)
+  const find = (nickname: string) => club.members.find((member) => member.nickname === nickname)
+  const marie = find('marie')
+  const tom = find('tom.bloc')
+  const lea = find('lea.dyno')
+  const bernard = find('bernard.leclercq.du.grand.devers')
+  if (marie === undefined || tom === undefined || lea === undefined || bernard === undefined) {
+    return
+  }
+  for (const member of [marie, tom, bernard]) member.inClubFeed = true
+  club.climbs.add(
+    bernard,
+    0,
+    [
+      { route: 'Iron Man', mode: 'LEAD', clean: true },
+      { route: 'Tonton Talon', mode: 'LEAD' },
+    ],
+    { visibility: 'CLUB', comment: 'Trente ans de dévers et toujours pas lassé.', feeling: 9 },
+  )
+  club.climbs.add(tom, 2, [{ route: 'Réglisse', mode: 'LEAD', clean: true }], {
+    visibility: 'CLUB',
+  })
+  club.climbs.add(lea, 1, [{ route: 'Sec !', clean: true }], { visibility: 'CLUB' })
+}
+
 const marieAwaits = (club: FakeClub) => {
   const marie = club.members.find((member) => member.nickname === 'marie')
   if (marie) marie.validated = false
@@ -332,6 +399,25 @@ export const CAPTURES: Capture[] = [
   { name: 'galerie', path: '/dev/galerie', as: null },
   { name: 'accueil', path: '/accueil', as: null },
   { name: 'connexion', path: '/connexion?fin=1', as: null },
+  {
+    name: 'connexion-compte-endormi',
+    path: '/connexion',
+    as: null,
+    prepare: (club) => {
+      club.addMember({
+        nickname: 'gaston',
+        password: 'un mot de passe solide',
+        status: 'DISABLED',
+        dormantSince: '2026-10-01T01:15:00Z',
+      })
+    },
+    act: async (page) => {
+      await page.getByLabel('Pseudo').fill('gaston')
+      await page.getByLabel('Mot de passe', { exact: true }).fill('un mot de passe solide')
+      await page.getByRole('button', { name: 'Se connecter' }).click()
+      await page.getByRole('alert').waitFor()
+    },
+  },
   { name: 'inscription-code', path: '/inscription', as: null },
   {
     name: 'inscription-fiche',
@@ -372,6 +458,18 @@ export const CAPTURES: Capture[] = [
     prepare: (club) => {
       const member = club.addMember({ nickname: 'tonton.talon', firstName: 'Tonton' })
       club.resetTokens.set('jeton', member.id)
+    },
+  },
+  {
+    name: 'date-de-naissance',
+    path: '/date-de-naissance',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      const marie = club.members.find((member) => member.nickname === 'marie')
+      if (marie) marie.birthDate = undefined
+    },
+    act: async (page) => {
+      await page.getByLabel('Date de naissance').fill('2014-09-21')
     },
   },
   { name: 'premiers-pas-photo', path: '/premiers-pas/photo', as: 'CLIMBER' },
@@ -446,6 +544,9 @@ export const CAPTURES: Capture[] = [
   },
   { name: 'actu-seances', path: '/actu', as: 'CLIMBER', prepare: marieClimbs },
   { name: 'actu-fil', path: '/actu', as: 'CLIMBER', prepare: feedAlive },
+  { name: 'actu-club-flou', path: '/actu?club', as: 'CLIMBER', prepare: feedAlive },
+  { name: 'actu-club', path: '/actu?club', as: 'CLIMBER', prepare: clubFeedAlive },
+  { name: 'actu-club-en-attente', path: '/actu?club', as: 'TOURIST', prepare: marieAwaits },
   {
     name: 'seance-ami',
     path: '/actu',
@@ -519,7 +620,10 @@ export const CAPTURES: Capture[] = [
     name: 'planning',
     path: '/planning',
     as: 'CLIMBER',
-    prepare: marieSeason,
+    prepare: (club) => {
+      marieSeason(club)
+      gymClosures(club)
+    },
     act: async (page) => {
       await page.getByRole('button', { name: '19 octobre 2026, grimpé' }).click()
     },
@@ -557,8 +661,28 @@ export const CAPTURES: Capture[] = [
         .getByRole('radio', { name: 'Non' })
         .click()
       await second.getByRole('button', { name: 'Une chute de plus' }).click()
+      await second.getByRole('checkbox', { name: 'Plus de la moitié' }).check()
       await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('')
       await page.getByLabel('Commentaire').fill('Grosse séance de conti.')
+    },
+  },
+  {
+    name: 'seance-saisie-club',
+    path: '/seance/nouvelle',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      marieClimbs(club)
+      const marie = club.members.find((member) => member.nickname === 'marie')
+      if (marie) marie.inClubFeed = true
+    },
+    act: async (page) => {
+      await addToSession(page, '12', 'Bye Bye Morice')
+      await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('')
+      const choice = page
+        .getByRole('radiogroup', { name: 'Qui la voit' })
+        .getByRole('radio', { name: 'Tout le club' })
+      await choice.click()
+      await choice.scrollIntoViewIfNeeded()
     },
   },
   {
@@ -571,8 +695,26 @@ export const CAPTURES: Capture[] = [
     },
     act: async (page) => {
       await addToSession(page, '12', 'Bye Bye Morice')
-      await page.getByRole('button', { name: /^À l’assurage sur la voie n° 1/ }).click()
+      await page.getByRole('button', { name: /^À l’assurage pour toute la séance/ }).click()
       await page.getByRole('dialog', { name: 'Qui t’assurait ?' }).waitFor()
+    },
+  },
+  {
+    name: 'seance-assureurs',
+    path: '/seance/nouvelle',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      marieClimbs(club)
+      marieFriends(club)
+    },
+    act: async (page) => {
+      const picker = page.getByRole('dialog', { name: 'Qui t’assurait ?' })
+      await page.getByRole('button', { name: /^À l’assurage pour toute la séance/ }).click()
+      await picker.getByRole('region', { name: 'Tes amis' }).getByRole('button').first().click()
+      await picker.waitFor({ state: 'hidden' })
+      await addToSession(page, '12', 'Bye Bye Morice')
+      await page.getByRole('checkbox', { name: 'Plusieurs assureur·ses' }).check()
+      await page.getByRole('searchbox', { name: 'Ajouter une voie' }).fill('')
     },
   },
   {
@@ -742,6 +884,20 @@ export const CAPTURES: Capture[] = [
     },
   },
   {
+    name: 'fiche-membre-endormi',
+    path: '/gestion/membres',
+    as: 'BOARD',
+    desktop: true,
+    prepare: someMembers,
+    act: async (page) => {
+      await page
+        .getByRole('link', { name: /Lagaffe/ })
+        .first()
+        .click()
+      await page.getByRole('button', { name: 'Réactiver le compte' }).waitFor()
+    },
+  },
+  {
     name: 'fiche-membre-admin',
     path: '/gestion/membres',
     as: 'ADMIN',
@@ -897,6 +1053,28 @@ export const CAPTURES: Capture[] = [
     act: async (page) => {
       await page.getByRole('button', { name: 'Modifier la corde 12' }).click()
       await page.getByRole('dialog', { name: 'Corde 12' }).waitFor()
+    },
+  },
+  {
+    name: 'gestion-fermetures',
+    path: '/gestion/fermetures',
+    as: 'BOARD',
+    desktop: true,
+    prepare: gymClosures,
+    act: async (page) => {
+      await page.locator('summary', { hasText: 'Passés' }).click()
+    },
+  },
+  {
+    name: 'gestion-fermetures-erreur',
+    path: '/gestion/fermetures',
+    as: 'BOARD',
+    desktop: true,
+    act: async (page) => {
+      await page.getByLabel('Du').fill('2026-12-24')
+      await page.getByLabel('Au (facultatif)').fill('2026-12-20')
+      await page.getByRole('button', { name: 'Fermer ces jours' }).click()
+      await page.getByText('Le dernier jour tombe avant le premier').waitFor()
     },
   },
   {

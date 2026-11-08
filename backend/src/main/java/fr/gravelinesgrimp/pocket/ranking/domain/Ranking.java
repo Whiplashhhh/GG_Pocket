@@ -19,9 +19,9 @@ public final class Ranking {
         var collator = Collator.getInstance(Locale.FRENCH);
         collator.setStrength(Collator.SECONDARY);
         var sorted = new ArrayList<>(scores);
-        sorted.removeIf(score -> score.value() < 1);
+        sorted.removeIf(score -> score.value().signum() <= 0);
         sorted.sort(
-                Comparator.comparingInt(Score::value)
+                Comparator.comparing(Score::value)
                         .reversed()
                         .thenComparing(Score::nickname, collator)
                         .thenComparing(Score::memberId));
@@ -29,7 +29,7 @@ public final class Ranking {
         for (var i = 0; i < sorted.size(); i++) {
             var score = sorted.get(i);
             var rank =
-                    i > 0 && sorted.get(i - 1).value() == score.value()
+                    i > 0 && sorted.get(i - 1).value().compareTo(score.value()) == 0
                             ? ranked.get(i - 1).rank()
                             : i + 1;
             ranked.add(new RankedScore(rank, score));

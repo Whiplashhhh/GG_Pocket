@@ -34,10 +34,66 @@ test.describe('a visitor', () => {
     )
   })
 
+  test('is told their account fell asleep after a year away, and whom to ask', async ({
+    page,
+    club,
+  }) => {
+    club.addMember({
+      nickname: 'gaston',
+      password: 'un mot de passe solide',
+      status: 'DISABLED',
+      dormantSince: '2026-10-02T01:15:00Z',
+    })
+    await page.goto('/connexion')
+    await page.getByLabel('Pseudo').fill('gaston')
+    await page.getByLabel('Mot de passe', { exact: true }).fill('un mot de passe solide')
+    await page.getByRole('button', { name: 'Se connecter' }).click()
+    await expect(page.getByRole('alert')).toContainText(
+      'Ton compte s’est endormi après un an sans visite.',
+    )
+    await expect(page.getByRole('alert')).toContainText('demande à la direction du club')
+  })
+
+  test('gives the birth date an older account never gave, then goes on', async ({ page, club }) => {
+    const member = club.addMember({
+      nickname: 'tonton.talon',
+      password: 'un mot de passe solide',
+      birthDate: undefined,
+    })
+    await page.clock.setSystemTime(new Date(club.now))
+    await page.goto('/connexion?retour=/topo')
+    await page.getByLabel('Pseudo').fill('tonton.talon')
+    await page.getByLabel('Mot de passe', { exact: true }).fill('un mot de passe solide')
+    await page.getByRole('button', { name: 'Se connecter' }).click()
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Il manque ta date de naissance' }),
+    ).toBeVisible()
+    // Nowhere else until it is given.
+    await page.goto('/actu')
+    await expect(page).toHaveURL(/\/date-de-naissance$/)
+    await page.getByRole('button', { name: 'C’est noté, on y va' }).click()
+    await expect(
+      page.getByText('Ta date de naissance est obligatoire', { exact: false }),
+    ).toBeVisible()
+    // Under 15: the parental consent, as at registration.
+    await page.getByLabel('Date de naissance').fill('2015-02-03')
+    await page.getByRole('button', { name: 'C’est noté, on y va' }).click()
+    await expect(page.getByText('Obligatoire avant 15 ans.').first()).toBeVisible()
+    await page.getByRole('checkbox', { name: /Un parent ou responsable légal/ }).check()
+    await page.getByRole('button', { name: 'C’est noté, on y va' }).click()
+    await expect(page).toHaveURL(/\/actu$/)
+    expect(member.birthDate).toBe('2015-02-03')
+    expect(member.parentalConsent).toBe(true)
+  })
+
   test('reads the privacy page without an account', async ({ page }) => {
     await page.goto('/tes-donnees')
     await expect(page.getByRole('heading', { level: 1, name: 'Tes données' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Combien de temps' })).toBeVisible()
+    await expect(page.getByText('tient lieu', { exact: false })).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'contact@gravelinesgrimp.org' }).first(),
+    ).toHaveAttribute('href', 'mailto:contact@gravelinesgrimp.org')
   })
 
   test('cannot join with a wrong code', async ({ page }) => {
@@ -91,6 +147,7 @@ test.describe('joining the club', () => {
     await page.getByLabel('Nom', { exact: true }).fill('Dupont')
     await page.getByLabel('Pseudo').fill('lea.d')
     await page.getByLabel('Mot de passe', { exact: true }).fill('azertyuiop')
+    await page.getByLabel('Date de naissance').fill('1998-03-12')
     await page.getByRole('checkbox', { name: /J’ai lu la page/ }).check()
     await page.getByRole('button', { name: 'Créer mon compte' }).click()
     await expect(page.getByText('Dis-nous si tu as ta licence au club.')).toBeVisible()
@@ -186,6 +243,16 @@ test.describe('a signed-in member', () => {
     await page.getByRole('button', { name: 'Enregistrer' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Mon profil' })).toBeVisible()
     await expect(page.getByText('Ennemie jurée des dévers.')).toBeVisible()
+  })
+
+  test('is not offered to show their age while a minor', async ({ page, club }) => {
+    await page.clock.setSystemTime(new Date(club.now))
+    await page.goto('/profil/modifier')
+    await expect(page.getByText('Afficher mon âge sur mon profil')).toBeVisible()
+    await page.getByLabel('Date de naissance').fill('2010-06-01')
+    await expect(page.getByText('Afficher mon âge sur mon profil')).toHaveCount(0)
+    await page.getByLabel('Date de naissance').fill('1990-06-01')
+    await expect(page.getByText('Afficher mon âge sur mon profil')).toBeVisible()
   })
 
   test('downloads their data, then deletes their account behind their password', async ({

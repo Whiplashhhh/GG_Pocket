@@ -205,6 +205,26 @@ class SessionIT {
     }
 
     @Test
+    void aRouteNotToppedMayBePastItsHalf() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var route = routes.create(members.create(Role.SETTER));
+
+        create(me, UUID.randomUUID(), today(), pastHalf(route, true))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_ASCENT"));
+        create(
+                        me,
+                        UUID.randomUUID(),
+                        today(),
+                        pastHalf(route, false),
+                        ascent(route, "LEAD", true, false, 1))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.summary.toppedCount").value(1))
+                .andExpect(jsonPath("$.ascents[*].topped").value(contains(false, true)))
+                .andExpect(jsonPath("$.ascents[*].pastHalf").value(contains(true, false)));
+    }
+
+    @Test
     void aDismountedRouteIsFineOnlyIfItWasStillOnTheWallThatDay() throws Exception {
         var me = members.create(Role.CLIMBER);
         // Dismounted three days ago.
@@ -469,6 +489,14 @@ class SessionIT {
                  "firstTry": false, "feeling": 6}
                 """
                 .formatted(route.id(), mode, topped, clean, falls);
+    }
+
+    private static String pastHalf(Route route, boolean topped) {
+        return """
+                {"routeId": "%s", "mode": "TOP_ROPE", "topped": %s, "clean": false, "falls": 1,
+                 "firstTry": false, "pastHalf": true}
+                """
+                .formatted(route.id(), topped);
     }
 
     private static String body(UUID clientRef, LocalDate day, String... ascents) {

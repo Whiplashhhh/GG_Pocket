@@ -8,17 +8,26 @@ import {
 } from '@tanstack/vue-query'
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 
+import { AUTH_STATE_KEY, type AuthState } from './auth'
+
 import { withMyReaction, type ReactionKind, type SessionReactions } from '@/lib/reactions'
 
 import { api } from './client'
 import { request, requestNoContent } from './request'
 import type { components } from './schema'
-import { FEED_KEY, MY_SESSIONS_KEY, sessionKey, type Session, type SessionPage } from './sessions'
+import {
+  CLUB_FEED_KEY,
+  FEED_KEY,
+  MY_SESSIONS_KEY,
+  sessionKey,
+  type Session,
+  type SessionPage,
+} from './sessions'
 import { MEMBERS_KEY } from './social'
 
 export type SessionComment = components['schemas']['SessionComment']
 
-export { FEED_KEY }
+export { CLUB_FEED_KEY, FEED_KEY }
 export const sessionCommentsKey = (id: string) => [...sessionKey(id), 'comments'] as const
 
 const PAGE_SIZE = 10
@@ -38,6 +47,47 @@ export function useFeed() {
       ),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.nextCursor,
+  })
+}
+
+/**
+ * The club feed (D-120): the "Tout le club" sessions of every member who takes part, mine included.
+ * Asked only once I take part: the server refuses it otherwise, and nothing real is ever sent.
+ */
+export function useClubFeed(enabled: MaybeRefOrGetter<boolean>) {
+  return useInfiniteQuery({
+    queryKey: CLUB_FEED_KEY,
+    queryFn: ({ pageParam, signal }) =>
+      request(
+        api.GET('/api/v1/feed/club', {
+          params: {
+            query: { size: PAGE_SIZE, ...(pageParam === undefined ? {} : { cursor: pageParam }) },
+          },
+          signal,
+        }),
+      ),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.nextCursor,
+    enabled: computed(() => toValue(enabled)),
+  })
+}
+
+/**
+ * "Je participe au fil du club" (D-120). Joining opens the club feed; leaving takes my "Tout le
+ * club" sessions out of it at once. Profiles of others show what I read now: asked again.
+ */
+export function useSetClubFeed() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (inClubFeed: boolean) =>
+      request(api.PUT('/api/v1/me/club-feed', { body: { inClubFeed } })),
+    onSuccess: (member) => {
+      queryClient.setQueryData<AuthState>(AUTH_STATE_KEY, (state) =>
+        state ? { ...state, member } : state,
+      )
+      queryClient.removeQueries({ queryKey: CLUB_FEED_KEY })
+      void queryClient.invalidateQueries({ queryKey: MEMBERS_KEY })
+    },
   })
 }
 

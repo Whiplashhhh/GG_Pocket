@@ -23,7 +23,10 @@ async function openSection(page: Page, isMobile: boolean, name: string) {
   await expect(page.getByRole('heading', { level: 1, name })).toBeVisible()
 }
 
-/** October: Bye Bye Morice 3 times (2 topped, 1 clean) by 2 climbers, Iron Man once, Sec ! tried. */
+/**
+ * October: Bye Bye Morice 3 times (2 topped, 1 clean) by 2 climbers, Iron Man once clean, Sec !
+ * tried. A success is a clean ascent (D-117): 2 out of 5.
+ */
 function climbOctober(club: FakeClub) {
   const tom = club.addMember({ nickname: 'tom', firstName: 'Tom', lastName: 'Bloc' })
   const lea = club.addMember({ nickname: 'lea', firstName: 'Léa', lastName: 'Dupont' })
@@ -36,7 +39,7 @@ function climbOctober(club: FakeClub) {
   // "Juste moi": counted all the same.
   club.climbs.add(lea, 3, [{ route: 'Sec !', topped: false }], { visibility: 'PRIVATE' })
   // September.
-  club.climbs.add(tom, 25, [{ route: 'Réglisse' }])
+  club.climbs.add(tom, 25, [{ route: 'Réglisse', clean: true }])
 }
 
 test.describe('a climber', () => {
@@ -60,7 +63,7 @@ test.describe('a setter', () => {
     await openSection(page, isMobile, 'Fréquentation')
     await expect(page.getByRole('heading', { level: 2, name: /octobre 2026/i })).toBeVisible()
     await expect(page.getByLabel('Le mois en chiffres')).toHaveText(
-      /ascensions\s*5\s*grimpeurs\s*2\s*de réussite\s*60\s%/,
+      /ascensions\s*5\s*grimpeurs\s*2\s*de réussite\s*40\s%/,
     )
 
     const rows = isMobile
@@ -70,11 +73,11 @@ test.describe('a setter', () => {
       await expect(rows.first()).toContainText('Bye Bye Morice')
       await expect(rows.first()).toContainText('3 ascensions')
       await expect(rows.first()).toContainText('2 grimpeurs')
-      await expect(rows.first()).toContainText('67 % topées')
+      await expect(rows.first()).toContainText('33 % enchaînées')
     } else {
       // The header, then the most climbed first.
       await expect(rows.nth(1)).toContainText('Bye Bye Morice')
-      await expect(rows.nth(1).getByRole('cell')).toHaveText([/.+/, '3', '2', '1', '2', /67\s%/])
+      await expect(rows.nth(1).getByRole('cell')).toHaveText([/.+/, '3', '2', '1', '2', /33\s%/])
     }
 
     await page.getByLabel('Trier par').selectOption('Le meilleur taux de réussite')
@@ -91,7 +94,7 @@ test.describe('a setter', () => {
     )
     expect(csv[1]).toMatch(/^3;[^;]+;Iron Man;6a\+;[^;]+;[\d-]+;1;1;1;1;100$/)
     expect(csv).toContainEqual(
-      expect.stringMatching(/^12;[^;]+;Bye Bye Morice;6b;[^;]+;2026-05-16;3;2;1;2;67$/),
+      expect.stringMatching(/^12;[^;]+;Bye Bye Morice;6b;[^;]+;2026-05-16;3;2;1;2;33$/),
     )
     await expect(
       page.getByText('Fichier « gg-pocket-frequentation-2026-10.csv » prêt'),

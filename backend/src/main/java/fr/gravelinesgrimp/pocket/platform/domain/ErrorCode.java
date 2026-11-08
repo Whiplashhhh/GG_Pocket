@@ -24,6 +24,8 @@ public enum ErrorCode {
     // Sign-in and sessions
     BAD_CREDENTIALS(ErrorCategory.UNAUTHENTICATED),
     ACCOUNT_DISABLED(ErrorCategory.FORBIDDEN),
+    /** Disabled by the daily job after a year without a visit (D-119); the board may enable it. */
+    ACCOUNT_DORMANT(ErrorCategory.FORBIDDEN),
 
     // Registration and passwords
     REGISTRATION_CODE_INVALID(ErrorCategory.INVALID),
@@ -64,7 +66,9 @@ public enum ErrorCode {
     SESSION_TOO_OLD(ErrorCategory.INVALID),
     MONTH_FROZEN(ErrorCategory.CONFLICT),
     INVALID_ASCENT(ErrorCategory.INVALID),
-    CHECK_FROM_ASCENT(ErrorCategory.CONFLICT);
+    CHECK_FROM_ASCENT(ErrorCategory.CONFLICT),
+    /** The club feed, or "Tout le club", without taking part in the club feed (D-120). */
+    CLUB_FEED_NOT_JOINED(ErrorCategory.FORBIDDEN);
 
     private final ErrorCategory category;
 

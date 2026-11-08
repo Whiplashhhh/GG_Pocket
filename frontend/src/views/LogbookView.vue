@@ -66,7 +66,7 @@ function sheetLink(item: LogbookRoute) {
 }
 
 function bestClass(item: LogbookRoute) {
-  if (item.best === 'TRIED') return 'text-ink-muted'
+  if (item.best === 'TRIED' || item.best === 'PAST_HALF') return 'text-ink-muted'
   return item.best.startsWith('LEAD') ? 'text-brand-ink' : 'text-success'
 }
 </script>

@@ -3,8 +3,9 @@ package fr.gravelinesgrimp.pocket.badge.domain;
 import java.util.regex.Pattern;
 
 /**
- * Reads the French grades of the club ("4a-" to "7c+", D-074) without reading the database: a "6a"
- * tier is earned by a 6a-, a 6a or a 6a+, and by nothing else (D-111).
+ * Reads the French grades of the club ("4a" to "7c+", D-074, D-115) without reading the database: a
+ * "6b" tier is earned by a 6b-, a 6b or a 6b+, and by nothing else (D-111). It also reads the
+ * retired codes ("4a+", "6a-"...): the order stays the same.
  */
 public final class GradeScale {
 
@@ -13,7 +14,7 @@ public final class GradeScale {
     private GradeScale() {}
 
     /**
-     * The grade without its modifier: "6a" for "6a-", "6a" and "6a+".
+     * The grade without its modifier: "6b" for "6b-", "6b" and "6b+".
      *
      * @throws IllegalArgumentException for a code that is not a French grade
      */

@@ -8,11 +8,17 @@ public enum AscentBest {
     LEAD_TOPPED,
     TOP_ROPE_CLEAN,
     TOP_ROPE_TOPPED,
+    /** Not topped, but past the half (D-121): still not done. */
+    PAST_HALF,
     TRIED;
 
     public static AscentBest of(ClimbMode mode, boolean topped, boolean clean) {
+        return of(mode, topped, clean, false);
+    }
+
+    public static AscentBest of(ClimbMode mode, boolean topped, boolean clean, boolean pastHalf) {
         if (!topped) {
-            return TRIED;
+            return pastHalf ? PAST_HALF : TRIED;
         }
         if (mode == ClimbMode.LEAD) {
             return clean ? LEAD_CLEAN : LEAD_TOPPED;
@@ -21,7 +27,7 @@ public enum AscentBest {
     }
 
     public boolean topped() {
-        return this != TRIED;
+        return this != TRIED && this != PAST_HALF;
     }
 
     public boolean inLead() {

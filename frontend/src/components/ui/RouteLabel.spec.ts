@@ -48,10 +48,13 @@ describe('RouteLabel', () => {
     expect(wrapper.text()).toContain('Démontée')
   })
 
-  it('draws one hold per colour', () => {
+  it('draws one hold cut in two for two colours, still named both', () => {
     const wrapper = mountWithApp(RouteLabel, {
       props: { cord: 3, name: 'Iron Man', grade: '6a+', holds: [yellow, blue] },
     })
-    expect(wrapper.findAll('svg')).toHaveLength(2)
+    expect(wrapper.findAll('svg')).toHaveLength(1)
+    const fills = wrapper.findAll('svg rect').map((rect) => rect.attributes('fill'))
+    expect(fills).toEqual([yellow.hex, blue.hex])
+    expect(wrapper.text()).toContain('jaune et bleu')
   })
 })

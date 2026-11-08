@@ -10,6 +10,7 @@ const PROFILE: MyProfile = {
   firstName: 'Marie',
   lastName: 'Hhh',
   role: 'CLIMBER',
+  birthDate: '1990-05-14',
   showAge: false,
   parentalConsent: false,
   appearsInRankings: true,
@@ -40,7 +41,7 @@ describe('toUpdate', () => {
         firstName: 'Marie',
         lastName: 'Hhh',
         email: undefined,
-        birthDate: undefined,
+        birthDate: '1990-05-14',
         parentalConsent: false,
         showAge: false,
         appearsInRankings: true,
@@ -48,6 +49,12 @@ describe('toUpdate', () => {
         climbingSinceYear: 2015,
         bio: undefined,
       },
+    })
+  })
+
+  it('never removes the birth date (D-119)', () => {
+    expect(toUpdate({ ...toForm(PROFILE), birthDate: ' ' }, 2026)).toEqual({
+      errors: { birthDate: { key: 'validation.birthDate' } },
     })
   })
 

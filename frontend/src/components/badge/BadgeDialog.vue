@@ -39,7 +39,7 @@ const props = defineProps<{
 
 const open = defineModel<boolean>('open', { required: true })
 
-const MAX_FAVORITES = 3
+const MAX_FAVORITES = 2
 
 const { t } = useI18n()
 const text = useBadgeText()

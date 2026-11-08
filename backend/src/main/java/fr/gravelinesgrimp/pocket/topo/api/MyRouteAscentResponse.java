@@ -15,6 +15,10 @@ public record MyRouteAscentResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) LocalDate climbedOn,
         @Schema(requiredMode = RequiredMode.REQUIRED) ClimbMode mode,
         @Schema(requiredMode = RequiredMode.REQUIRED) boolean topped,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description = "Not topped, but past the half of the route")
+                boolean pastHalf,
         @Schema(requiredMode = RequiredMode.REQUIRED) boolean clean,
         @Schema(requiredMode = RequiredMode.REQUIRED) int falls,
         @Schema(requiredMode = RequiredMode.REQUIRED) boolean firstTry) {
@@ -25,6 +29,7 @@ public record MyRouteAscentResponse(
                 view.climbedOn(),
                 view.mode(),
                 view.topped(),
+                view.pastHalf(),
                 view.clean(),
                 view.falls(),
                 view.firstTry());

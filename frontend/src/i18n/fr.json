@@ -36,7 +36,7 @@
   },
   "belayerPicker": {
     "title": "Qui t’assurait ?",
-    "description": "N’importe qui du club. Les voies que tu ajoutes ensuite gardent le même assureur.",
+    "description": "N’importe qui du club. Les voies que tu ajoutes ensuite gardent le même assureur·se.",
     "search": "Chercher un membre",
     "nobody": "Pas précisé",
     "friends": "Tes amis",
@@ -86,11 +86,21 @@
     "falls": "Chutes",
     "fallsLess": "Une chute de moins",
     "fallsMore": "Une chute de plus",
+    "pastHalf": "Plus de la moitié",
+    "pastHalfHint": "Pas au relais, mais au-delà de la mi-hauteur : ça vaut 0,5 au podium « Voies ». Pas de « je sais la faire » pour autant.",
     "firstTry": "Premier essai de ma vie sur cette voie",
     "firstTryShort": "premier essai",
     "belayer": "À l’assurage",
     "belayerNobody": "Pas précisé",
     "belayerButton": "À l’assurage sur la voie n° {n} : {name}. Changer",
+    "sessionBelayerButton": "À l’assurage pour toute la séance : {name}. Changer",
+    "sessionBelayerHint": "Vaut pour toutes les voies de la séance, même celles ajoutées après.",
+    "manyBelayers": "Plusieurs assureur·ses",
+    "manyBelayersHint": "Le binôme a tourné ? Chaque voie a alors son propre champ « À l’assurage ».",
+    "oneBelayerTitle": "Un·e seul·e assureur·se pour la séance ?",
+    "oneBelayerBody": "Toutes les voies prendront {name}, l’assureur·se de la première voie. Les autres noms disparaissent.",
+    "oneBelayerBodyNobody": "La première voie n’a pas d’assureur·se : toutes les voies passeront en « Pas précisé ». Les noms choisis disparaissent.",
+    "oneBelayerConfirm": "Appliquer à toutes les voies",
     "belayerShort": "à l’assurage : {name}",
     "belayedBy": "À l’assurage : {names}",
     "feeling": "Ressenti",
@@ -115,6 +125,9 @@
     "visibilityPrivate": "Juste moi",
     "visibilityFriendsHint": "Tes amis la verront dans leur fil (dès que les amis arrivent dans l’appli).",
     "visibilityPrivateHint": "Personne d’autre que toi. Elle compte quand même pour le podium.",
+    "visibilityClub": "Tout le club",
+    "visibilityClubHint": "Tes amis, et tous les membres qui participent au fil du club.",
+    "visibilityClubLeft": "Tu ne participes plus au fil du club : cette séance n’y apparaît plus, seuls tes amis la voient. Choisis « Mes amis » ou « Juste moi », ou reviens dans le fil du club depuis ton profil.",
     "save": "Enregistrer la séance",
     "saving": "Enregistrement…",
     "savedTitle": "Séance au carnet !",
@@ -142,7 +155,8 @@
     "outcome": {
       "clean": "enchaînée",
       "topped": "topée | topée, 1 chute | topée, {n} chutes",
-      "notTopped": "pas topée | pas topée, 1 chute | pas topée, {n} chutes"
+      "notTopped": "pas topée | pas topée, 1 chute | pas topée, {n} chutes",
+      "pastHalf": "plus de la moitié | plus de la moitié, 1 chute | plus de la moitié, {n} chutes"
     },
     "moreLines": "et 1 autre voie | et 1 autre voie | et {n} autres voies",
     "edit": "Modifier",
@@ -179,7 +193,7 @@
     "title": "Actu",
     "emptyTitle": "Le mur est calme… trop calme.",
     "emptyBody": "Ajoute des amis ou enregistre ta première séance avec le bouton « Nouvelle séance » : ton fil se remplira tout seul.",
-    "clubTagline": "Le fil du club : tes séances et celles de tes amis, au même endroit.",
+    "clubTagline": "Tes séances, celles des copains et, si tu joues le jeu, celles de tout le club.",
     "more": "Voir les séances d’avant",
     "loadingMore": "On remonte le carnet…",
     "end": "C’est tout ! Le reste est encore à grimper.",
@@ -188,7 +202,28 @@
     "clubCountHint": "Voir l’annuaire du club",
     "clubCountHintSuffix": ", voir l’annuaire du club",
     "feed": "Le fil",
-    "findFriends": "Trouver des copains de cordée"
+    "findFriends": "Trouver des copains de cordée",
+    "tabs": "Quel fil",
+    "tabFriends": "Mes amis",
+    "tabClub": "Le club",
+    "clubFeed": "Le fil du club",
+    "clubEmptyTitle": "Personne n’a encore ouvert le bal.",
+    "clubEmptyBody": "Le fil du club se remplit des séances « Tout le club ». Montre l’exemple : choisis « Tout le club » en enregistrant ta prochaine séance."
+  },
+  "clubFeed": {
+    "teaserTitle": "Le fil du club, c’est donnant-donnant",
+    "teaserBody": "Ici défilent les séances que les grimpeurs du club partagent avec tout le monde. Pour les voir, tu joues le jeu : tes séances « Tout le club » y apparaissent aussi.",
+    "teaserPrivacy": "Tes séances « Mes amis » et « Juste moi » ne bougent pas. Tu choisis séance par séance, et tu peux te retirer quand tu veux.",
+    "join": "Je participe au fil du club",
+    "confirmTitle": "Tu montres, tu vois",
+    "confirmBody": "Pour voir le fil du club, tes séances « Tout le club » y apparaissent aussi, pour tous les membres qui y participent. Les autres restent entre toi et tes amis. Tu peux te retirer quand tu veux depuis ton profil.",
+    "confirmLabel": "J’en suis",
+    "settingTitle": "Fil du club",
+    "settingOn": "Tu participes au fil du club : tu vois les séances « Tout le club » des autres, et ils voient les tiennes. Te retirer les rend aussitôt à tes seuls amis.",
+    "settingOff": "Tu ne participes pas au fil du club. C’est donnant-donnant : pour voir le fil du club, tes séances « Tout le club » y apparaissent aussi.",
+    "leave": "Me retirer du fil du club",
+    "joined": "Bienvenue dans le fil du club ! Choisis « Tout le club » quand tu enregistres une séance.",
+    "left": "C’est noté : tes séances « Tout le club » ne sont plus visibles que de tes amis."
   },
   "feed": {
     "authorProfile": "Profil de {nickname}",
@@ -302,8 +337,8 @@
     "tierMissing": "Pas encore, celle-là",
     "favorite": "Mettre en avant",
     "unfavorite": "Ne plus mettre en avant",
-    "favoriteFull": "Tu as déjà 3 badges en avant : retires-en un d’abord.",
-    "favoriteHint": "Tes badges mis en avant s’affichent à côté de ton nom, dans le fil et sur ton profil.",
+    "favoriteFull": "Tu as déjà 2 badges en avant : retires-en un d’abord.",
+    "favoriteHint": "Tes badges mis en avant (deux au maximum) s’affichent à côté de ton nom, dans le fil et sur ton profil.",
     "favoriteError": "Impossible de changer tes badges mis en avant.",
     "close": "Fermer",
     "names": {
@@ -333,12 +368,12 @@
       "WEEK_2": "Grimper 2 jours différents dans la même semaine, du lundi au dimanche.",
       "WEEK_3": "Grimper 3 jours différents dans la même semaine, du lundi au dimanche.",
       "WEEK_4": "Grimper 4 jours différents dans la même semaine. Le canapé t’oublie.",
-      "MONTH_COMPLETE": "Grimper 10 jours différents dans le même mois.",
+      "MONTH_COMPLETE": "Grimper à chaque séance libre du mois : tous les mardis, jeudis et dimanches, sauf les jours où la salle est fermée. Pas une seule de loupée !",
       "MONTH_12": "Grimper 12 jours différents dans le même mois. Tu dors à la salle ?",
       "STREAK_3W": "Trois semaines de suite avec au moins 2 jours de grimpe chacune.",
       "MONTH_NO_MISS": "Grimper au moins une fois chaque semaine qui commence dans le mois.",
-      "FULL_LEAD": "Une séance d’au moins 3 voies, toutes en tête.",
-      "PERFECT": "Une séance d’au moins 3 voies, toutes enchaînées.",
+      "FULL_LEAD": "Une séance d’au moins 5 voies, toutes en tête.",
+      "PERFECT": "Une séance d’au moins 5 voies, toutes enchaînées.",
       "ZERO_REST": "Toper au moins 10 voies dans la même séance.",
       "COMEBACK": "Revenir grimper après au moins 30 jours sans. On t’attendait.",
       "FLASH": "Enchaîner du premier coup une voie ouverte depuis 14 jours au plus.",
@@ -601,6 +636,8 @@
     },
     "streakTitle": "Série en cours",
     "streakWeeks": "Pas encore de série | semaine d’affilée à 2 séances ou plus | semaines d’affilée à 2 séances ou plus",
+    "streakFlames": "{n} 🔥",
+    "streakLabel": "Pas encore de série | Série de 1 semaine d’affilée à 2 séances ou plus | Série de {n} semaines d’affilée à 2 séances ou plus",
     "streakThisWeek": "Cette semaine : pas encore de séance, deux et la série repart. | Cette semaine : 1 séance sur 2, encore une ! | Cette semaine : {n} séances, validée.",
     "dayTitle": "Le {date}",
     "dayEmpty": "Rien ce jour-là. Repos mérité ?",
@@ -609,7 +646,12 @@
     "frozen": "Mois clôturé : ses séances sont gravées dans la résine.",
     "monthEmpty": "Pas une trace de magnésie ce mois-ci.",
     "loading": "On feuillette le calendrier…",
-    "loadError": "Impossible de charger ton planning."
+    "loadError": "Impossible de charger ton planning.",
+    "dayClosed": "{date}, salle fermée",
+    "dayClosedWith": "{date}, salle fermée : {label}",
+    "closedMark": "fermé",
+    "closedDay": "Salle fermée ce jour-là.",
+    "closedDayWith": "Salle fermée ce jour-là : {label}."
   },
   "logbook": {
     "title": "Mon carnet",
@@ -638,6 +680,7 @@
       "LEAD_TOPPED": "Topée en tête",
       "TOP_ROPE_CLEAN": "Enchaînée en mouli",
       "TOP_ROPE_TOPPED": "Topée en mouli",
+      "PAST_HALF": "Plus de la moitié, pas encore topée",
       "TRIED": "Pas encore topée"
     },
     "passages": "aucun passage | 1 passage | {n} passages",
@@ -673,8 +716,12 @@
       "FROZEN": "Figé : c’est gravé dans la résine."
     },
     "value": {
-      "sessions": "Aucun jour | 1 jour | {n} jours",
-      "ascents": "Aucune voie | 1 voie | {n} voies"
+      "sessions": "Aucun jour | {n} jour | {n} jours",
+      "ascents": "Aucune voie | {n} voie | {n} voies"
+    },
+    "rule": {
+      "sessions": "Un point par jour de grimpe : deux séances le même jour, ça reste un jour.",
+      "ascents": "Un point par voie topée, répétitions comprises. Lâchée au-delà de la moitié ? Un demi-point quand même (0,5)."
     },
     "rank": "{rank}e",
     "rankFirst": "1er",
@@ -765,6 +812,7 @@
     "CONCURRENT_CHANGE": "Quelqu’un a modifié la même chose au même moment. Recharge la page pour voir la dernière version, puis réessaie.",
     "BAD_CREDENTIALS": "Ce pseudo et ce mot de passe ne s’assurent pas mutuellement. Réessaie.",
     "ACCOUNT_DISABLED": "Ce compte est désactivé. Si c’est une erreur, vois avec la direction du club.",
+    "ACCOUNT_DORMANT": "Ton compte s’est endormi après un an sans visite. Pas de panique, rien n’est perdu : demande à la direction du club de le réactiver. Sans nouvelles, il sera supprimé deux ans après ta dernière visite.",
     "REGISTRATION_CODE_INVALID": "Ce code ne mène nulle part : il est faux, expiré ou épuisé. Vérifie-le, ou demande le code du moment à la salle.",
     "NICKNAME_TAKEN": "Ce pseudo est déjà pris. Choisis-en un autre (ajoute un chiffre, un point…).",
     "EMAIL_TAKEN": "Cet e-mail est déjà utilisé par un autre compte.",
@@ -793,7 +841,8 @@
     "SESSION_TOO_OLD": "Trop loin dans le passé : une séance se note jusqu’à 7 jours en arrière.",
     "MONTH_FROZEN": "Ce mois est clos et son podium gravé dans le marbre : ses séances ne bougent plus.",
     "INVALID_ASCENT": "Une ligne cloche : une voie enchaînée est forcément topée, sans chute.",
-    "CHECK_FROM_ASCENT": "Tu l’as enchaînée dans ce mode pendant une séance : c’est cette séance qu’il faut modifier pour la décocher."
+    "CHECK_FROM_ASCENT": "Tu l’as enchaînée dans ce mode pendant une séance : c’est cette séance qu’il faut modifier pour la décocher.",
+    "CLUB_FEED_NOT_JOINED": "« Tout le club », c’est pour les membres du fil du club. Participe au fil du club (onglet « Le club » d’Actu) ou choisis « Mes amis »."
   },
   "gallery": {
     "title": "Galerie des composants",
@@ -875,7 +924,7 @@
     "password": "Mot de passe",
     "passwordHint": "8 caractères minimum. Une petite phrase marche très bien : « avant-bras en béton ».",
     "birthDate": "Date de naissance",
-    "birthDateHint": "Ton âge reste caché, sauf si tu choisis de l’afficher.",
+    "birthDateHint": "Elle dit seulement si un accord parental est nécessaire. Ton âge reste caché, sauf si tu es majeur·e et choisis de l’afficher.",
     "parentalConsent": "Un parent ou responsable légal est d’accord pour que j’utilise GG Pocket.",
     "parentalConsentHint": "Obligatoire avant 15 ans.",
     "licenceLegend": "Tu as ta licence au club ?",
@@ -918,27 +967,35 @@
     "invalidBody": "Il a déjà servi, a expiré (24 heures) ou a été remplacé par un plus récent. Demande un nouveau lien à la direction du club.",
     "toLogin": "Aller à la connexion"
   },
+  "birthDateStep": {
+    "title": "Il manque ta date de naissance",
+    "intro": "Le club la demande désormais à tout le monde, une seule fois. Elle dit si un accord parental est nécessaire ; la direction voit seulement si tu es mineur·e, jamais la date elle-même.",
+    "submit": "C’est noté, on y va",
+    "privacy": "Ce qu’on fait de tes données",
+    "later": "Plus tard : me déconnecter"
+  },
   "privacy": {
     "title": "Tes données",
-    "intro": "Ce que GG Pocket garde sur toi, pourquoi, qui le voit, et comment le retirer. Sans jargon.",
+    "intro": "Ce que GG Pocket garde sur toi, pourquoi, qui le voit, et comment le retirer. Sans jargon. Le club n’a pas d’autre politique de confidentialité : c’est cette page qui en tient lieu.",
     "whoTitle": "Qui s’en occupe",
-    "whoBody": "Le club Gravelines Grimp, association qui fait tourner l’appli. Pour toute question ou demande sur tes données, adresse-toi à la direction du club.",
+    "whoBody": "Gravelines Grimp, l’association qui fait tourner l’appli, est responsable de tes données. Une question, une demande (voir, corriger, effacer) ? Écris à {email}.",
     "whatTitle": "Ce qu’on garde",
-    "whatBody": "Ton prénom, ton nom, ton pseudo et ton mot de passe (enregistré chiffré : personne ne peut le lire, pas même le club). Si tu les donnes : ton e-mail, ta date de naissance, ta photo et les infos de ton profil. Tes séances (voies, essais, ressentis, commentaires, photos), tes voies cochées, tes coups de cœur, tes commentaires sur les voies et sur les séances, tes réactions, la liste de tes amis et tes places au podium des mois terminés. Bientôt : tes badges.",
+    "whatBody": "Ton prénom, ton nom, ton pseudo, ta date de naissance et ton mot de passe (enregistré chiffré : personne ne peut le lire, pas même le club). Si tu les donnes : ton e-mail, ta photo et les infos de ton profil. Tes séances (voies, essais, ressentis, commentaires, photos), tes voies cochées, tes coups de cœur, tes commentaires sur les voies et sur les séances, tes réactions, la liste de tes amis, tes badges et tes places au podium des mois terminés. Et la date de ta dernière visite, pour savoir si ton compte sert encore.",
     "whyTitle": "Pourquoi",
-    "whyBody": "Seulement pour faire fonctionner l’appli du club : te connecter, tenir ton carnet, afficher le topo, les classements et le fil entre amis. Rien n’est vendu, rien ne sert à de la publicité.",
+    "whyBody": "Seulement pour faire fonctionner l’appli du club : te connecter, tenir ton carnet, afficher le topo, les classements et le fil entre amis. Ta date de naissance dit seulement si un accord parental est nécessaire et si tu es mineur·e. Rien n’est vendu, rien ne sert à de la publicité.",
     "whoSeesTitle": "Qui voit quoi",
-    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut. Tes séances, leurs photos et ton carnet sont visibles de tes amis seulement, ou de toi seul·e. Tes réactions et tes commentaires sur une séance se voient par ceux qui voient la séance ; pour la modération, la direction lit les derniers commentaires du club, sans voir les séances. Quand quelqu’un te note à l’assurage d’une de ses voies, ton pseudo s’affiche sur sa séance, pour ceux qui la voient ; tu le retires quand tu veux depuis « Mes assurages ». Au podium, tous les membres voient ton nombre de jours de grimpe et de voies topées du mois (séances « juste moi » comprises, jamais leur détail), sauf si tu choisis de ne pas y apparaître : tes places des mois déjà terminés restent alors, au nom d’« Ancien·ne membre ». La direction voit ta fiche de membre, sans ta date de naissance. Personne en dehors de l’appli ne voit quoi que ce soit.",
-    "minorsTitle": "Moins de 15 ans",
-    "minorsBody": "Avant 15 ans, un parent ou responsable légal doit être d’accord. Le profil d’un ou une jeune n’est jamais visible en dehors des membres du club.",
+    "whoSeesBody": "Les membres connectés voient ton profil : prénom, nom, pseudo, photo, rôle et ce que tu choisis d’afficher. Ton âge est caché par défaut, et seuls les majeur·es peuvent choisir de l’afficher. Tes séances et leurs photos sont visibles de tes amis (« Mes amis »), de toi seul·e (« Juste moi »), ou aussi des membres qui participent au fil du club (« Tout le club ») : seulement si tu y participes toi-même, c’est donnant-donnant, et en te retirant tu les rends aussitôt à tes seuls amis. Ton carnet reste réservé à tes amis. Tes réactions et tes commentaires sur une séance se voient par ceux qui voient la séance ; pour la modération, la direction lit les derniers commentaires du club, sans voir les séances. Quand quelqu’un te note à l’assurage d’une de ses voies, ton pseudo s’affiche sur sa séance, pour ceux qui la voient ; tu le retires quand tu veux depuis « Mes assurages ». Au podium, tous les membres voient ton nombre de jours de grimpe et de voies topées du mois (séances « juste moi » comprises, jamais leur détail), sauf si tu choisis de ne pas y apparaître : tes places des mois déjà terminés restent alors, au nom d’« Ancien·ne membre ». La direction et l’admin voient ta fiche de membre, sans ta date de naissance : seulement « mineur·e » si tu as moins de 18 ans, une mention que les autres membres ne voient jamais. Personne en dehors de l’appli ne voit quoi que ce soit.",
+    "minorsTitle": "Les mineur·es",
+    "minorsBody": "Avant 15 ans, un parent ou responsable légal doit être d’accord. Avant 18 ans, ton âge ne s’affiche jamais sur ton profil, et seules la direction et l’admin savent que tu es mineur·e. Le profil d’un ou une jeune n’est jamais visible en dehors des membres du club.",
     "howLongTitle": "Combien de temps",
-    "howLongBody": "Tant que ton compte existe. Un compte sans aucune connexion pendant 3 ans est supprimé. Le journal des actions de gestion est gardé 3 ans.",
+    "howLongBody": "Tant que ton compte sert. Sans aucune visite pendant un an, il s’endort : il disparaît pour les autres, et la direction le réactive si tu le lui demandes. Sans visite pendant deux ans, il est supprimé pour de bon, exactement comme si tu le supprimais toi-même (voir « Tes droits »). Le journal des actions de gestion est gardé 3 ans.",
     "cookiesTitle": "Cookies",
     "cookiesBody": "Un cookie garde ta session ouverte et un autre protège tes envois contre les sites malveillants. C’est tout : pas de pub, pas de pisteur, pas de mesure d’audience.",
     "rightsTitle": "Tes droits",
-    "rightsBody": "Tu peux voir et corriger ton profil quand tu veux, depuis l’appli. Dans ton profil, « Mes données et mon compte » te permet de télécharger tout ce qu’on garde sur toi (un fichier JSON) et de supprimer ton compte toi-même. Tes infos, tes photos et tes commentaires disparaissent ; tes séances restent pour les statistiques des voies, mais au nom d’« Ancien·ne membre », sans commentaire ni photo, et plus personne ne les voit ; tes places aux podiums des mois terminés restent aussi, à ce nom-là. Tu peux aussi saisir la CNIL.",
+    "rightsBody": "Tu peux voir et corriger ton profil quand tu veux, depuis l’appli. Dans ton profil, « Mes données et mon compte » te permet de télécharger tout ce qu’on garde sur toi (un fichier JSON) et de supprimer ton compte toi-même. Tes infos, tes photos et tes commentaires disparaissent ; tes séances restent pour les statistiques des voies, mais au nom d’« Ancien·ne membre », sans commentaire ni photo, et plus personne ne les voit ; tes places aux podiums des mois terminés restent aussi, à ce nom-là. Pour toute autre demande, écris à {email}. Tu peux aussi saisir la CNIL.",
     "back": "Retour",
-    "toAccount": "Mes données et mon compte"
+    "toAccount": "Mes données et mon compte",
+    "email": "contact{'@'}gravelinesgrimp.org"
   },
   "account": {
     "title": "Mes données et mon compte",
@@ -1096,7 +1153,8 @@
     "club": "Club",
     "attendance": "Fréquentation",
     "topoReview": "Bilan du topo",
-    "guide": "Guide du club"
+    "guide": "Guide du club",
+    "closedDays": "Jours de fermeture"
   },
   "clubGuide": {
     "title": "Guide du club",
@@ -1148,13 +1206,16 @@
       "DISABLED": "Désactivé"
     },
     "never": "Jamais",
+    "dormant": "Endormi",
     "noMatch": "Personne ne correspond à « {query} ».",
     "open": "Voir la fiche de {name}",
     "disabledChip": "Compte désactivé",
+    "dormantChip": "Compte endormi",
     "pendingTitle": "En attente de validation",
     "pendingIntro": "Nouveaux comptes à valider. Un clic sur un nom pour voir ce qu’ils ont déclaré.",
     "pendingCount": "Aucun compte en attente | 1 compte en attente | {n} comptes en attente",
     "pendingChip": "En attente",
+    "minorChip": "Mineur·e",
     "declaredLicensed": "Se dit licencié·e",
     "declaredVisitor": "Pas licencié·e"
   },
@@ -1163,7 +1224,9 @@
     "contact": "Contact",
     "email": "E-mail",
     "noEmail": "Non renseigné",
-    "minor": "Moins de 15 ans, accord parental déclaré",
+    "age": "Âge",
+    "minor": "Mineur·e (moins de 18 ans)",
+    "parentalConsent": "Moins de 15 ans, accord parental déclaré.",
     "registered": "Inscrit·e le {date}",
     "lastSeen": "Dernière activité {when}",
     "neverSeen": "Pas revenu·e depuis l’inscription",
@@ -1180,6 +1243,7 @@
     "disableConfirmTitle": "Désactiver le compte de {name} ?",
     "disableConfirmBody": "Ses sessions sont fermées tout de suite et la connexion lui est refusée. Rien n’est effacé : tu pourras le réactiver.",
     "disabled": "Compte désactivé.",
+    "dormantSince": "Compte endormi le {date} : un an sans visite. Si tu le réactives, son année repart de zéro. Sinon, il sera supprimé deux ans après sa dernière visite.",
     "enable": "Réactiver le compte",
     "enabled": "Compte réactivé.",
     "resetTitle": "Réinitialiser son mot de passe",
@@ -1236,7 +1300,11 @@
       "CLUB_CORD_UPDATED": "{actor} a modifié la corde {target}",
       "CLUB_HOLD_COLOR_CREATED": "{actor} a créé la couleur de prises « {target} »",
       "CLUB_HOLD_COLOR_UPDATED": "{actor} a modifié la couleur de prises « {target} »",
-      "CLUB_SECTORS_REORDERED": "{actor} a réordonné les secteurs"
+      "CLUB_SECTORS_REORDERED": "{actor} a réordonné les secteurs",
+      "CLUB_DAYS_CLOSED": "{actor} a fermé la salle : {target}",
+      "CLUB_DAYS_REOPENED": "{actor} a rouvert la salle : {target}",
+      "MEMBER_PUT_TO_SLEEP": "Le compte de {target} s’est endormi : un an sans visite",
+      "MEMBER_DELETED_INACTIVE": "Le compte de {target} a été supprimé : deux ans sans visite"
     },
     "targets": {
       "MEMBER": "Membre",
@@ -1246,7 +1314,8 @@
       "SESSION_COMMENT": "Commentaire de séance",
       "SECTOR": "Secteur",
       "CORD": "Corde",
-      "HOLD_COLOR": "Couleur de prises"
+      "HOLD_COLOR": "Couleur de prises",
+      "CLOSED_DAY": "Jour de fermeture"
     }
   },
   "routesAdmin": {
@@ -1344,7 +1413,7 @@
       "success": "de réussite",
       "noSuccess": "Pas encore de taux"
     },
-    "successHelp": "Réussite : la part des ascensions topées, avec ou sans chute.",
+    "successHelp": "Réussite : la part des tentatives enchaînées, du sol au relais sans une seule chute. Topée avec un repos sur la corde ? Elle compte dans « Topées », pas dans la réussite.",
     "sort": "Trier par",
     "sorts": {
       "ascents": "Les plus grimpées",
@@ -1370,7 +1439,7 @@
     "line": {
       "ascents": "Aucune ascension | 1 ascension | {n} ascensions",
       "climbers": "personne | 1 grimpeur | {n} grimpeurs",
-      "success": "{n} % topées"
+      "success": "{n} % enchaînées"
     },
     "csv": {
       "cord": "Corde",
@@ -1531,11 +1600,38 @@
     "colorUpdated": "Couleur « {label} » mise à jour.",
     "inactive": "Désactivée",
     "grades": "Cotations",
-    "gradesFixed": "Les cotations sont fixes, de 4a- à 7c+ : elles servent aux tris, aux filtres et bientôt aux classements. Pour en ajouter une, vois avec l’équipe de l’appli.",
+    "gradesFixed": "Les cotations sont fixes, de 4a à 7c+ (des « + » dès 5b, des « - » dès 6b) : elles servent aux tris, aux filtres et bientôt aux classements. Pour en ajouter une, vois avec l’équipe de l’appli.",
     "errors": {
       "cordNumber": "Un numéro entier entre 1 et {max}.",
       "hex": "Un code couleur du type #F28C28."
     }
+  },
+  "closedDays": {
+    "title": "Jours de fermeture",
+    "intro": "Vacances, jours fériés, l’été : les jours où la salle reste fermée. Le badge « Mois complet » ne les attend pas, et chaque planning les affiche.",
+    "formTitle": "Fermer la salle",
+    "from": "Du",
+    "to": "Au",
+    "toHint": "Laisse vide pour un seul jour. Une année au plus.",
+    "label": "Raison",
+    "labelHint": "Les grimpeurs la verront sur leur planning.",
+    "labelPlaceholder": "Vacances de Noël",
+    "submit": "Fermer ces jours",
+    "closed": "C’est noté : salle fermée {period}.",
+    "upcoming": "À venir",
+    "past": "Passés ({n})",
+    "empty": "Aucune fermeture prévue : la salle tourne à plein régime.",
+    "single": "le {date}",
+    "range": "du {from} au {to}",
+    "days": "1 jour | {n} jours",
+    "noLabel": "Sans raison précisée",
+    "reopen": "Rouvrir la salle {period}",
+    "reopenTitle": "Rouvrir la salle ?",
+    "reopenBody": "Les jours {period} redeviennent des jours de séance libre, et le badge « Mois complet » de ces mois est recalculé.",
+    "reopenConfirm": "Rouvrir",
+    "reopened": "Salle rouverte {period}. Sortez les chaussons.",
+    "toBeforeFrom": "Le dernier jour tombe avant le premier : inverse-les.",
+    "tooLong": "Une année au plus : {max} jours maximum, coupe en deux si besoin."
   },
   "codes": {
     "title": "Codes d’inscription",
@@ -1585,6 +1681,7 @@
     "passwordShort": "8 caractères minimum.",
     "email": "Cette adresse e-mail a l’air bancale.",
     "dateInFuture": "Cette date n’est pas encore arrivée.",
+    "birthDate": "Ta date de naissance est obligatoire : elle dit si un accord parental est nécessaire.",
     "privacy": "Coche la case pour continuer.",
     "parentalConsent": "Obligatoire avant 15 ans.",
     "tooLong": "Trop long : {max} caractères maximum.",
@@ -1621,6 +1718,7 @@
     "podium": "Le podium s’ouvre dès que la direction a validé ton compte. Tes séances comptent déjà : elles seront là le jour J.",
     "directory": "L’annuaire du club s’ouvre dès que la direction a validé ton compte.",
     "belayer": "Tu pourras dire qui t’assurait dès que la direction aura validé ton compte.",
-    "comments": "Tu pourras commenter les voies dès que la direction aura validé ton compte."
+    "comments": "Tu pourras commenter les voies dès que la direction aura validé ton compte.",
+    "clubFeed": "Le fil du club s’ouvrira dès que la direction aura validé ton compte."
   }
 }

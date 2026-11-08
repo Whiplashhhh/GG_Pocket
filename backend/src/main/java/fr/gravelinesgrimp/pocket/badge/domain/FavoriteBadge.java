@@ -15,8 +15,8 @@ import java.util.UUID;
 @Table(name = "favorite_badge")
 public class FavoriteBadge extends TimestampedEntity {
 
-    /** Two or three badges next to a name: more would crowd the feed's cards. */
-    public static final int MAX = 3;
+    /** Two badges next to a name at most: more would crowd the feed's cards (D-116). */
+    public static final int MAX = 2;
 
     @Column(name = "member_id", nullable = false, updatable = false)
     private UUID memberId;

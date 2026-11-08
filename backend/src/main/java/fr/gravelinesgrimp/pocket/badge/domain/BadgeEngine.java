@@ -23,7 +23,8 @@ import java.util.UUID;
  * moves the awards of earlier ones (frozen months stay as they were).
  *
  * <p>Climbing days, not sessions, count for the weeks, the months and the "séances réalisées" tiers
- * (D-004): those awards go to the first session of the day.
+ * (D-004): those awards go to the first session of the day. "Mois complet" waits for every free
+ * session day of the month, the days the gym was closed apart (D-116, {@link FreeSessions}).
  */
 public final class BadgeEngine {
 
@@ -31,8 +32,9 @@ public final class BadgeEngine {
 
     private BadgeEngine() {}
 
-    public static List<Award> awards(List<ClimbRecord> history) {
-        var replay = new Replay();
+    /** @param closedDays the days the gym was closed, whatever the climber */
+    public static List<Award> awards(List<ClimbRecord> history, Set<LocalDate> closedDays) {
+        var replay = new Replay(Set.copyOf(closedDays));
         history.stream()
                 .sorted(
                         Comparator.comparing(ClimbRecord::climbedOn)
@@ -45,10 +47,12 @@ public final class BadgeEngine {
     /** The replay of one history, session by session. */
     private static final class Replay {
 
+        private final Set<LocalDate> closedDays;
         private final List<Award> awards = new ArrayList<>();
         private final Set<BadgeCode> tiersEarned = new HashSet<>();
         private final Map<LocalDate, Integer> daysPerWeek = new HashMap<>();
         private final Map<YearMonth, Integer> daysPerMonth = new HashMap<>();
+        private final Map<YearMonth, Integer> freeDaysPerMonth = new HashMap<>();
         private final Set<UUID> flashedRoutes = new HashSet<>();
         private LocalDate lastDay;
         private int climbingDays;
@@ -58,6 +62,10 @@ public final class BadgeEngine {
         private int recordTopped;
         private LocalDate lastStreakWeek;
         private int streakWeeks;
+
+        Replay(Set<LocalDate> closedDays) {
+            this.closedDays = closedDays;
+        }
 
         void session(ClimbRecord session) {
             sessions++;
@@ -96,10 +104,22 @@ public final class BadgeEngine {
 
             var month = YearMonth.from(day);
             int inMonth = daysPerMonth.merge(month, 1, Integer::sum);
-            for (var code : List.of(BadgeCode.MONTH_COMPLETE, BadgeCode.MONTH_12)) {
-                if (inMonth == code.threshold()) {
-                    award(code, month.toString(), session);
-                }
+            if (inMonth == BadgeCode.MONTH_12.threshold()) {
+                award(BadgeCode.MONTH_12, month.toString(), session);
+            }
+            if (FreeSessions.isFreeSessionDay(day, closedDays)) {
+                monthComplete(month, session);
+            }
+        }
+
+        /**
+         * A free session day just got climbed: the month is complete with its last one, which can
+         * come before the end of the month. A month without any free session day earns nothing.
+         */
+        private void monthComplete(YearMonth month, ClimbRecord session) {
+            int climbed = freeDaysPerMonth.merge(month, 1, Integer::sum);
+            if (climbed == FreeSessions.countIn(month, closedDays)) {
+                award(BadgeCode.MONTH_COMPLETE, month.toString(), session);
             }
         }
 

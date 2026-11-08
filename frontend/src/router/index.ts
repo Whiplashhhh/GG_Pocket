@@ -38,6 +38,8 @@ declare module 'vue-router' {
     validated?: boolean
     /** A sheet over its parent screen (route sheet): the screen under it keeps its scroll. */
     sheet?: boolean
+    /** The screen asking an older account for its missing birth date (D-119), and only it. */
+    birthDateStep?: boolean
   }
 }
 
@@ -196,6 +198,11 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'privacy.title', public: true, layout: 'bare' },
   },
   {
+    path: '/date-de-naissance',
+    component: () => import('@/views/auth/BirthDateView.vue'),
+    meta: { titleKey: 'birthDateStep.title', layout: 'bare', birthDateStep: true },
+  },
+  {
     path: '/premiers-pas/:step(photo|infos|voie|installer)',
     component: () => import('@/views/onboarding/OnboardingView.vue'),
     meta: { titleKey: 'welcome.title', layout: 'bare' },
@@ -261,6 +268,11 @@ const routes: RouteRecordRaw[] = [
         path: 'journal',
         component: () => import('@/views/management/AuditView.vue'),
         meta: { titleKey: 'audit.title', minRole: 'BOARD', wide: true },
+      },
+      {
+        path: 'fermetures',
+        component: () => import('@/views/management/ClosedDaysView.vue'),
+        meta: { titleKey: 'closedDays.title', minRole: 'BOARD', wide: true },
       },
       {
         path: 'codes',

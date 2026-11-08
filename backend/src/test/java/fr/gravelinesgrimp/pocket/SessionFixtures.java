@@ -60,4 +60,9 @@ public class SessionFixtures {
     public static AscentDraft tried(Route route, ClimbMode mode) {
         return new AscentDraft(route.id(), mode, false, false, 2, false, null);
     }
+
+    /** Not topped, but past the half of the route (D-121). */
+    public static AscentDraft pastHalf(Route route, ClimbMode mode) {
+        return new AscentDraft(route.id(), mode, false, false, 1, false, null, null, true);
+    }
 }

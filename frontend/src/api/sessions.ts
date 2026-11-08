@@ -30,6 +30,8 @@ export type AscentBest = LogbookRoute['best']
 export const MY_SESSIONS_KEY = ['me', 'sessions'] as const
 /** The feed (api/feed.ts): here because a saved session changes it. */
 export const FEED_KEY = ['feed'] as const
+/** Under FEED_KEY: whatever refreshes the feed refreshes the club feed too (D-120). */
+export const CLUB_FEED_KEY = [...FEED_KEY, 'club'] as const
 export const CLIMBED_ROUTES_KEY = ['me', 'climbed-routes'] as const
 export const sessionKey = (id: string) => ['sessions', id] as const
 /** One month under it: [...MY_PLANNING_KEY, '2026-10']. */

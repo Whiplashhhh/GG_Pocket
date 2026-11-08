@@ -184,12 +184,21 @@ function makeResetLink() {
       <div class="flex min-w-0 flex-col items-start gap-1">
         <p class="text-ink-muted">@{{ detail.member.nickname }}</p>
         <RoleBadge :role="detail.member.role" />
-        <p v-if="detail.member.status === 'DISABLED'" class="text-sm font-semibold text-danger">
+        <p v-if="detail.member.dormantSince" class="text-sm font-semibold text-danger">
+          {{ t('members.dormant') }}
+        </p>
+        <p
+          v-else-if="detail.member.status === 'DISABLED'"
+          class="text-sm font-semibold text-danger"
+        >
           {{ t('members.status.DISABLED') }}
         </p>
       </div>
     </section>
 
+    <p v-if="detail.member.dormantSince" class="px-4 pb-3 text-ink-muted lg:px-0">
+      {{ t('member.dormantSince', { date: formatDate(detail.member.dormantSince) }) }}
+    </p>
     <div class="flex flex-col gap-3 px-4 lg:px-0" aria-live="polite">
       <FormAlert v-if="notice" tone="success">{{ notice }}</FormAlert>
       <FormAlert v-if="failure">{{ t(errorMessageKey(failure)) }}</FormAlert>
@@ -281,8 +290,14 @@ function makeResetLink() {
           >
         </dd>
       </div>
-      <div v-if="detail.underFifteenWithParentalConsent" class="sm:col-span-2">
-        <dd class="font-semibold">{{ t('member.minor') }}</dd>
+      <div v-if="detail.member.minor" class="sm:col-span-2">
+        <dt class="text-sm text-ink-muted">{{ t('member.age') }}</dt>
+        <dd class="font-semibold">
+          {{ t('member.minor') }}
+          <span v-if="detail.underFifteenWithParentalConsent" class="block font-normal">{{
+            t('member.parentalConsent')
+          }}</span>
+        </dd>
       </div>
     </dl>
 

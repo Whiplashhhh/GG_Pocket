@@ -85,7 +85,7 @@ describe('todo', () => {
 
   it('groups grades by family', () => {
     expect(gradeFamily('6a+')).toBe('6a')
-    expect(gradeFamily('4a-')).toBe('4a')
+    expect(gradeFamily('6b-')).toBe('6b')
     expect(gradeFamily('7c')).toBe('7c')
     expect(familyOptions(all)).toEqual(['5a', '6a', '6c'])
   })

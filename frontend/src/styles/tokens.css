@@ -13,10 +13,10 @@
   --gg-ink: #17140f;
   --gg-ink-muted: #5e574c;
   --gg-rule: #d9d1c1;
-  --gg-brand: #f9561a;
+  --gg-brand: #f26522;
   --gg-brand-ink: #b23e0b;
   --gg-on-brand: #17140f;
-  --gg-olive: #c3c04c;
+  --gg-olive: #c8dc5d;
   --gg-on-olive: #17140f;
   --gg-success: #4a5a0c;
   --gg-danger: #a3261b;
@@ -27,7 +27,7 @@
   --gg-bar: #17140f;
   --gg-bar-ink: #f4f1ea;
   --gg-bar-muted: #a39b8b;
-  --gg-bar-active: #f9561a;
+  --gg-bar-active: #f26522;
   --gg-bar-edge: #17140f;
 
   /* The route label is paper, in both themes. */
@@ -51,10 +51,10 @@
   --gg-ink: #f3efe6;
   --gg-ink-muted: #ada594;
   --gg-rule: #3a352d;
-  --gg-brand: #f9561a;
+  --gg-brand: #f26522;
   --gg-brand-ink: #ff7340;
   --gg-on-brand: #17140f;
-  --gg-olive: #c3c04c;
+  --gg-olive: #c8dc5d;
   --gg-on-olive: #17140f;
   --gg-success: #c9c653;
   --gg-danger: #ff8a7a;
@@ -64,7 +64,7 @@
   --gg-bar: #0a0908;
   --gg-bar-ink: #f3efe6;
   --gg-bar-muted: #a39b8b;
-  --gg-bar-active: #f9561a;
+  --gg-bar-active: #f26522;
   --gg-bar-edge: #3a352d;
 
   --gg-label-paper: #e9e2d0;
@@ -88,10 +88,10 @@
     --gg-ink: #f3efe6;
     --gg-ink-muted: #ada594;
     --gg-rule: #3a352d;
-    --gg-brand: #f9561a;
+    --gg-brand: #f26522;
     --gg-brand-ink: #ff7340;
     --gg-on-brand: #17140f;
-    --gg-olive: #c3c04c;
+    --gg-olive: #c8dc5d;
     --gg-on-olive: #17140f;
     --gg-success: #c9c653;
     --gg-danger: #ff8a7a;
@@ -101,7 +101,7 @@
     --gg-bar: #0a0908;
     --gg-bar-ink: #f3efe6;
     --gg-bar-muted: #a39b8b;
-    --gg-bar-active: #f9561a;
+    --gg-bar-active: #f26522;
     --gg-bar-edge: #3a352d;
 
     --gg-label-paper: #e9e2d0;

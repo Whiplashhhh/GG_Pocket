@@ -16,9 +16,11 @@ import fr.gravelinesgrimp.pocket.IntegrationTest;
 import fr.gravelinesgrimp.pocket.MemberFixtures;
 import fr.gravelinesgrimp.pocket.RouteFixtures;
 import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
+import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.MemberDetails;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
 import fr.gravelinesgrimp.pocket.topo.domain.Favorite;
 import fr.gravelinesgrimp.pocket.topo.infra.FavoriteRepository;
 
@@ -27,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /** The directory and the public profiles: what every member sees of the others, and no more. */
@@ -102,6 +106,28 @@ class DirectoryIT {
                 .andExpect(jsonPath("$.friendship").value("SELF"));
     }
 
+    /** D-119: a minor's age never shows, whatever they once saved; the birth date never does. */
+    @Test
+    void aFriendSeesTheAgeOfAnAdultWhoShowsItNeverAMinors() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var adult = showingAge(members.create(Role.CLIMBER), 30);
+        var minor = showingAge(members.create(Role.CLIMBER), 16);
+        friendships.befriend(adult, me);
+        friendships.befriend(minor, me);
+
+        mockMvc.perform(get("/api/v1/members/" + adult.id()).with(as(me)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.friendship").value("FRIENDS"))
+                .andExpect(jsonPath("$.age").value(30))
+                .andExpect(jsonPath("$.birthDate").doesNotExist());
+        mockMvc.perform(get("/api/v1/members/" + minor.id()).with(as(me)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.friendship").value("FRIENDS"))
+                .andExpect(jsonPath("$.age").doesNotExist())
+                .andExpect(jsonPath("$.birthDate").doesNotExist())
+                .andExpect(jsonPath("$.member.minor").doesNotExist());
+    }
+
     @Test
     void disabledFormerAndUnknownMembersHaveNoProfile() throws Exception {
         var me = members.create(Role.CLIMBER);
@@ -136,6 +162,14 @@ class DirectoryIT {
         var other = members.create(Role.CLIMBER);
         mockMvc.perform(get("/api/v1/members")).andExpect(status().isUnauthorized());
         mockMvc.perform(get("/api/v1/members/" + other.id())).andExpect(status().isUnauthorized());
+    }
+
+    /** Saved straight in the database: the profile endpoint would not let a minor check it. */
+    private Member showingAge(Member member, int years) {
+        member.changeBirthDate(
+                LocalDate.now(ClubTime.ZONE).minusYears(years).minusDays(1), false, Instant.now());
+        member.describe(new MemberDetails(null, null, null, true, true));
+        return memberRepository.saveAndFlush(member);
     }
 
     private static String entry(UUID id) {

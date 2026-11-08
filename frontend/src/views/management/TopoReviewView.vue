@@ -169,7 +169,12 @@ function retry() {
               class="inline-flex items-center gap-1 text-sm font-semibold"
               :title="route.name"
             >
-              <HoldSwatch v-for="hold in route.holds" :key="hold.id" :color="hold" :size="14" />
+              <HoldSwatch
+                v-if="route.holds[0]"
+                :color="route.holds[0]"
+                :second="route.holds[1]"
+                :size="16"
+              />
               {{ route.grade }}
               <span class="sr-only">{{ route.name }}</span>
             </li>

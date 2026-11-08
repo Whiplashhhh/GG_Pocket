@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { I18nT, useI18n } from 'vue-i18n'
 
 import { useAuthState } from '@/api/auth'
 import DoorHeader from '@/components/auth/DoorHeader.vue'
 
-/** Spec §14: what is collected, why, who sees it, how long, who is responsible, and the rights. */
+/**
+ * Spec §14: what is collected, why, who sees it, how long, who is responsible, and the rights. The
+ * club has no other privacy policy: this page is it (D-119).
+ */
 const { t } = useI18n()
 const { data: auth } = useAuthState()
 
@@ -35,7 +38,15 @@ const SECTIONS = [
       :aria-labelledby="title"
     >
       <h2 :id="title" class="mb-2 text-lg font-title">{{ t(title) }}</h2>
-      <p class="max-w-prose">{{ t(body) }}</p>
+      <I18nT :keypath="body" tag="p" class="max-w-prose" scope="global">
+        <template #email>
+          <a
+            :href="`mailto:${t('privacy.email')}`"
+            class="font-semibold whitespace-nowrap underline underline-offset-4"
+            >{{ t('privacy.email') }}</a
+          >
+        </template>
+      </I18nT>
     </section>
   </article>
 </template>

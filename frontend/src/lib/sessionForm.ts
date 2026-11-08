@@ -6,7 +6,7 @@ import { clubToday } from './age'
 /**
  * The session sheet (spec §8.3) as plain data: what the climber types, kept in the draft between
  * two openings. The server checks everything again; these rules only keep the form coherent
- * (a clean ascent is topped, without a fall).
+ * (a clean ascent is topped, without a fall; only a route not topped is past its half).
  */
 
 /** How far back a session may be dated (D-009); the server says the same. */
@@ -21,6 +21,8 @@ export interface AscentLine {
   routeId: string
   mode: ClimbMode
   topped: boolean
+  /** "Plus de la moitié" (D-121): not topped, but past the half; half a point on the podium. */
+  pastHalf: boolean
   clean: boolean
   falls: number
   firstTry: boolean
@@ -36,6 +38,13 @@ export interface SessionForm {
   feeling: number | null
   comment: string
   visibility: SessionVisibility
+  /**
+   * The belayer of the whole session (D-118): every line takes it, new ones too. Kept while
+   * `manyBelayers` is on, as the belayer of a first line added then.
+   */
+  belayerId: string | null
+  /** "Plusieurs assureur·ses": each line has its own belayer field. */
+  manyBelayers: boolean
   ascents: AscentLine[]
 }
 
@@ -50,8 +59,63 @@ export function emptySessionForm(today: string = clubToday()): SessionForm {
     feeling: null,
     comment: '',
     visibility: 'FRIENDS',
+    belayerId: null,
+    manyBelayers: false,
     ascents: [],
   }
+}
+
+/** Whether all lines have the same belayer (or nobody); true without lines. */
+export function sameBelayer(lines: readonly Pick<AscentLine, 'belayerId'>[]): boolean {
+  return lines.every((line) => line.belayerId === lines[0]?.belayerId)
+}
+
+/**
+ * The belayer fields of a form taken back (saved session, draft, refused session): one field when
+ * all lines share their belayer, the box "Plusieurs assureur·ses" ticked otherwise (D-118).
+ */
+function belayerFields(
+  lines: readonly Pick<AscentLine, 'belayerId'>[],
+  kept: { belayerId?: string | null; manyBelayers?: boolean } = {},
+): Pick<SessionForm, 'belayerId' | 'manyBelayers'> {
+  const same = sameBelayer(lines)
+  const first = lines[0]
+  return {
+    belayerId: same && first !== undefined ? first.belayerId : (kept.belayerId ?? null),
+    manyBelayers: kept.manyBelayers === true || !same,
+  }
+}
+
+/** The belayer of the whole session: every line takes it (D-118). */
+export function setSessionBelayer(form: SessionForm, belayerId: string | null): SessionForm {
+  return {
+    ...form,
+    belayerId,
+    ascents: form.ascents.map((line) => ({ ...line, belayerId })),
+  }
+}
+
+/**
+ * Ticks or unticks "Plusieurs assureur·ses". Ticked, each line keeps its belayer (the session's
+ * until changed). Unticked, the session takes the belayer of the first line, and so does every
+ * line: when they differ, the sheet asks first (see `sameBelayer`).
+ */
+export function setManyBelayers(form: SessionForm, many: boolean): SessionForm {
+  if (many) return { ...form, manyBelayers: true }
+  const first = form.ascents[0]
+  return {
+    ...setSessionBelayer(form, first === undefined ? form.belayerId : first.belayerId),
+    manyBelayers: false,
+  }
+}
+
+/**
+ * Who a new line names: the belayer of the session, or, line by line, the one of the line before
+ * (one usually climbs a whole evening with the same partner, D-101).
+ */
+export function belayerForNewLine(form: SessionForm): string | null {
+  const last = form.ascents.at(-1)
+  return form.manyBelayers && last !== undefined ? last.belayerId : form.belayerId
 }
 
 /** The form of a saved session, to change it. */
@@ -62,11 +126,13 @@ export function sessionToForm(session: Session): SessionForm {
     feeling: session.feeling ?? null,
     comment: session.comment ?? '',
     visibility: session.visibility,
+    ...belayerFields(session.ascents.map((ascent) => ({ belayerId: ascent.belayer?.id ?? null }))),
     ascents: session.ascents.map((ascent) => ({
       key: newKey(),
       routeId: ascent.route.id,
       mode: ascent.mode,
       topped: ascent.topped,
+      pastHalf: !ascent.topped && ascent.pastHalf,
       clean: ascent.clean,
       falls: ascent.falls,
       firstTry: ascent.firstTry,
@@ -76,16 +142,23 @@ export function sessionToForm(session: Session): SessionForm {
   }
 }
 
-/** A draft kept on the phone, maybe from before belayers (D-101): its lines get none. */
+/**
+ * A draft kept on the phone, maybe from before belayers (D-101: its lines get none), before the
+ * belayer of the session (D-118: the box is ticked when its lines differ) or before « Plus de la
+ * moitié » (D-121: its lines are not past the half).
+ */
 export function restoredForm(
-  form: Omit<SessionForm, 'ascents'> & {
-    ascents: (Omit<AscentLine, 'belayerId'> & Partial<AscentLine>)[]
-  },
+  form: Omit<SessionForm, 'ascents' | 'belayerId' | 'manyBelayers'> &
+    Partial<Pick<SessionForm, 'belayerId' | 'manyBelayers'>> & {
+      ascents: (Omit<AscentLine, 'belayerId' | 'pastHalf'> & Partial<AscentLine>)[]
+    },
 ): SessionForm {
-  return {
-    ...form,
-    ascents: form.ascents.map((line) => ({ ...line, belayerId: line.belayerId ?? null })),
-  }
+  const ascents = form.ascents.map((line) => ({
+    ...line,
+    belayerId: line.belayerId ?? null,
+    pastHalf: !line.topped && line.pastHalf === true,
+  }))
+  return { ...form, ...belayerFields(ascents, form), ascents }
 }
 
 /**
@@ -109,17 +182,19 @@ export function dateBounds(today: string = clubToday()): { min: string; max: str
 }
 
 /**
- * A new line for a route, topped in the mode and with the belayer of the line before (top rope and
- * nobody for the first one): one usually climbs a whole evening with the same partner.
+ * A new line for a route, topped in the mode of the line before (top rope for the first one), with
+ * the given belayer (see `belayerForNewLine`; by default the one of the line before).
  * "Premier essai" is ticked when I never logged this route before, nor higher in this session.
  */
 export function addAscent(
   lines: readonly AscentLine[],
   routeId: string,
   climbedBefore: ReadonlySet<string>,
-  mode: ClimbMode = lines.at(-1)?.mode ?? 'TOP_ROPE',
+  {
+    mode = lines.at(-1)?.mode ?? 'TOP_ROPE',
+    belayerId = lines.at(-1)?.belayerId ?? null,
+  }: { mode?: ClimbMode; belayerId?: string | null } = {},
 ): AscentLine[] {
-  const belayerId = lines.at(-1)?.belayerId ?? null
   if (lines.length >= MAX_ASCENTS) return [...lines]
   const firstTry = !climbedBefore.has(routeId) && !lines.some((line) => line.routeId === routeId)
   return [
@@ -129,6 +204,7 @@ export function addAscent(
       routeId,
       mode,
       topped: true,
+      pastHalf: false,
       clean: false,
       falls: 0,
       firstTry,
@@ -138,9 +214,15 @@ export function addAscent(
   ]
 }
 
-/** Not topped cannot be clean. */
+/** Not topped cannot be clean; topped is more than past the half (the box goes). */
 export function setTopped(line: AscentLine, topped: boolean): AscentLine {
-  return { ...line, topped, clean: topped && line.clean }
+  return { ...line, topped, clean: topped && line.clean, pastHalf: !topped && line.pastHalf }
+}
+
+/** « Plus de la moitié » only goes with a route not topped (D-121). */
+export function setPastHalf(line: AscentLine, pastHalf: boolean): AscentLine {
+  if (pastHalf && line.topped) return line
+  return { ...line, pastHalf }
 }
 
 /** Clean means topped, without a fall: falls go back to 0 (and the stepper locks). */
@@ -212,6 +294,7 @@ export function toSessionRequest(form: SessionForm): SessionRequest {
       routeId: line.routeId,
       mode: line.mode,
       topped: line.topped,
+      pastHalf: !line.topped && line.pastHalf,
       clean: line.clean,
       falls: line.clean ? 0 : line.falls,
       firstTry: line.firstTry,
@@ -229,16 +312,44 @@ export function requestToForm(body: SessionRequest): SessionForm {
     feeling: body.feeling ?? null,
     comment: body.comment ?? '',
     visibility: body.visibility,
+    ...belayerFields(body.ascents.map((ascent) => ({ belayerId: ascent.belayerId ?? null }))),
     ascents: body.ascents.map((ascent) => ({
       key: newKey(),
       routeId: ascent.routeId,
       mode: ascent.mode,
       topped: ascent.topped,
+      pastHalf: !ascent.topped && ascent.pastHalf === true,
       clean: ascent.clean,
       falls: ascent.falls,
       firstTry: ascent.firstTry,
       feeling: ascent.feeling ?? null,
       belayerId: ascent.belayerId ?? null,
     })),
+  }
+}
+
+/**
+ * Who may see the session, smallest audience first (D-120). « Tout le club » is offered to a member
+ * of the club feed; a session that already has it (or a draft that asks for it) keeps it on screen
+ * after its climber left, so they see it and change it.
+ */
+export function visibilityChoices(
+  inClubFeed: boolean,
+  saved: SessionVisibility | undefined,
+  current: SessionVisibility,
+): SessionVisibility[] {
+  const club = inClubFeed || saved === 'CLUB' || current === 'CLUB'
+  return club ? ['PRIVATE', 'FRIENDS', 'CLUB'] : ['PRIVATE', 'FRIENDS']
+}
+
+/** The line under the choice: what it means, or why « Tout le club » no longer reaches the club. */
+export function visibilityHintKey(visibility: SessionVisibility, inClubFeed: boolean): string {
+  switch (visibility) {
+    case 'CLUB':
+      return inClubFeed ? 'session.visibilityClubHint' : 'session.visibilityClubLeft'
+    case 'FRIENDS':
+      return 'session.visibilityFriendsHint'
+    default:
+      return 'session.visibilityPrivateHint'
   }
 }

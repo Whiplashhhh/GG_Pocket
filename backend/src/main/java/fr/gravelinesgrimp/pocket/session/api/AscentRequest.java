@@ -12,7 +12,11 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-@Schema(name = "AscentRequest", description = "A clean ascent is topped, with 0 falls.")
+@Schema(
+        name = "AscentRequest",
+        description =
+                "A clean ascent is topped, with 0 falls. pastHalf: not topped, but past the half of"
+                        + " the route.")
 public record AscentRequest(
         @Schema(requiredMode = RequiredMode.REQUIRED) @NotNull UUID routeId,
         @Schema(requiredMode = RequiredMode.REQUIRED) @NotNull ClimbMode mode,
@@ -22,9 +26,20 @@ public record AscentRequest(
         @Schema(requiredMode = RequiredMode.REQUIRED, description = "First try of my life")
                 boolean firstTry,
         @Schema(description = "Out of 10") @Min(1) @Max(10) Integer feeling,
-        @Schema(description = "Who held the rope: an active club member, not me") UUID belayerId) {
+        @Schema(description = "Who held the rope: an active club member, not me") UUID belayerId,
+        @Schema(description = "Not topped, but past the half of the route; false when absent")
+                Boolean pastHalf) {
 
     AscentDraft toDraft() {
-        return new AscentDraft(routeId, mode, topped, clean, falls, firstTry, feeling, belayerId);
+        return new AscentDraft(
+                routeId,
+                mode,
+                topped,
+                clean,
+                falls,
+                firstTry,
+                feeling,
+                belayerId,
+                Boolean.TRUE.equals(pastHalf));
     }
 }

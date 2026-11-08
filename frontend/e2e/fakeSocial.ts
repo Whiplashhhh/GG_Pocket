@@ -1,4 +1,5 @@
 import type { components } from '../src/api/schema'
+import { clubToday, isMinor, yearsOld } from '../src/lib/age'
 
 import type { FakeMember } from './fakeClub'
 import type { FakeSessions } from './fakeSessions'
@@ -93,6 +94,7 @@ export class FakeSocial {
   ) {
     climbs.isFriend = (a, b) => this.state(a, b) === 'FRIENDS' && this.active(b) !== undefined
     climbs.inRankings = (id) => this.active(id)?.appearsInRankings === true
+    climbs.inClubFeed = (id) => this.active(id)?.inClubFeed === true
     climbs.authorBadges = (id) => this.shown(id)
     climbs.memberRef = (id) => {
       const member = this.members().find((candidate) => candidate.id === id)
@@ -229,7 +231,7 @@ export class FakeSocial {
     if (path === '/me/badges' && method === 'GET') return json(this.library(me.id, true))
     if (path === '/me/badges/favorites' && method === 'PUT') {
       const chosen = (body as Schemas['FavoriteBadgesRequest']).badges
-      if (chosen.length > 3 || chosen.some((badge) => this.level(me.id, badge) === 0)) {
+      if (chosen.length > 2 || chosen.some((badge) => this.level(me.id, badge) === 0)) {
         return { kind: 'problem', status: 400, code: 'VALIDATION_FAILED' }
       }
       this.favorites.set(me.id, [...chosen])
@@ -246,12 +248,11 @@ export class FakeSocial {
       const hearts = this.topo.favorites.get(member.id) ?? []
       return json({
         member: this.card(member),
-        ...(member.showAge && member.birthDate !== undefined
-          ? {
-              age: Math.floor(
-                (this.clock() - Date.parse(member.birthDate)) / (365.25 * 24 * 3600 * 1000),
-              ),
-            }
+        // Only an adult's age, whatever a minor once saved (D-119).
+        ...(member.showAge &&
+        member.birthDate !== undefined &&
+        !isMinor(member.birthDate, clubToday(new Date(this.clock())))
+          ? { age: yearsOld(member.birthDate, clubToday(new Date(this.clock()))) }
           : {}),
         ...(member.climbingSinceYear === undefined
           ? {}

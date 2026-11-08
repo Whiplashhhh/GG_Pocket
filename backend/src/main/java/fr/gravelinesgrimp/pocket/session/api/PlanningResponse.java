@@ -26,12 +26,21 @@ public record PlanningResponse(
                         description = "Only the days with a session, earliest first")
                 List<DayItem> days,
         @Schema(requiredMode = RequiredMode.REQUIRED) Totals totals,
-        @Schema(requiredMode = RequiredMode.REQUIRED) StreakItem streak) {
+        @Schema(requiredMode = RequiredMode.REQUIRED) StreakItem streak,
+        @Schema(
+                        requiredMode = RequiredMode.REQUIRED,
+                        description = "The days of the month the gym is closed, earliest first")
+                List<ClosedDayItem> closedDays) {
 
     @Schema(name = "PlanningDay")
     public record DayItem(
             @Schema(requiredMode = RequiredMode.REQUIRED) LocalDate date,
             @Schema(requiredMode = RequiredMode.REQUIRED) List<SessionItem> sessions) {}
+
+    @Schema(name = "PlanningClosedDay")
+    public record ClosedDayItem(
+            @Schema(requiredMode = RequiredMode.REQUIRED) LocalDate date,
+            @Schema(example = "Vacances de Noël") String label) {}
 
     @Schema(name = "PlanningSession")
     public record SessionItem(
@@ -77,7 +86,10 @@ public record PlanningResponse(
                                                         .toList()))
                         .toList(),
                 totals(view.totals()),
-                streak(view.streak()));
+                streak(view.streak()),
+                view.closedDays().stream()
+                        .map(day -> new ClosedDayItem(day.date(), day.label()))
+                        .toList());
     }
 
     private static SessionItem session(SessionView session) {

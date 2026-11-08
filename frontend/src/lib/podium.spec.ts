@@ -6,9 +6,11 @@ import {
   belowPodium,
   FORMER_MEMBER_ID,
   formatFreezeDay,
+  formatScore,
   isTie,
   podiumSteps,
   profileLink,
+  scorePlural,
 } from './podium'
 
 function line(nickname: string, rank: number, value = 1): RankingLine {
@@ -77,5 +79,17 @@ describe('formatFreezeDay', () => {
   it('names the day in Gravelines time', () => {
     // 04:00 in Paris on 8 November 2026 is 03:00 UTC.
     expect(formatFreezeDay('2026-11-08T03:00:00Z')).toBe('dimanche 8 novembre')
+  })
+})
+
+describe('formatScore and scorePlural', () => {
+  it('writes halves the French way, whole scores without a comma', () => {
+    expect(formatScore(12.5)).toBe('12,5')
+    expect(formatScore(3)).toBe('3')
+    expect(formatScore(0.5)).toBe('0,5')
+  })
+
+  it('keeps below 2 in the singular', () => {
+    expect([0, 0.5, 1, 1.5, 2, 12.5].map(scorePlural)).toEqual([0, 1, 1, 1, 2, 2])
   })
 })

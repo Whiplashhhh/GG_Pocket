@@ -62,8 +62,12 @@ public record ClubLayout(
                 .toList();
     }
 
+    /** The grades on offer, easiest first: the retired ones are left out (D-115). */
     public List<Grade> sortedGrades() {
-        return grades.values().stream().sorted(Comparator.comparingInt(Grade::rank)).toList();
+        return grades.values().stream()
+                .filter(grade -> !grade.retired())
+                .sorted(Comparator.comparingInt(Grade::rank))
+                .toList();
     }
 
     private static <T extends TimestampedEntity> Map<UUID, T> byId(List<T> items) {

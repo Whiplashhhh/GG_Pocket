@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.UUID;
@@ -34,8 +35,9 @@ public class MonthlyRankingSnapshot extends TimestampedEntity {
     @Column(name = "member_id", nullable = false)
     private UUID memberId;
 
-    @Column(nullable = false, updatable = false)
-    private int value;
+    /** Keeps the halves of the "Voies" ranking (D-121). */
+    @Column(nullable = false, updatable = false, precision = 7, scale = 1)
+    private BigDecimal value;
 
     protected MonthlyRankingSnapshot() {
         // for JPA
@@ -65,7 +67,8 @@ public class MonthlyRankingSnapshot extends TimestampedEntity {
         return memberId;
     }
 
-    public int value() {
-        return value;
+    /** Without trailing zeros: 2, or 12.5. */
+    public BigDecimal value() {
+        return Score.plain(value);
     }
 }

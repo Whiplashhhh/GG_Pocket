@@ -172,13 +172,18 @@ public class RouteService {
     }
 
     /**
-     * Grade, cord and colours exist; the cord and colours are active unless the route already had
-     * them.
+     * Grade, cord and colours exist; the grade is not retired (D-115), the cord and colours are
+     * active, unless the route already had them.
      */
     private void checkClubItems(RouteDraft draft, Route existing) {
         var layout = layouts.read();
-        layout.grade(draft.gradeId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No grade"));
+        var grade =
+                layout.grade(draft.gradeId())
+                        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No grade"));
+        if (grade.retired() && (existing == null || !existing.gradeId().equals(grade.id()))) {
+            throw new BusinessException(
+                    ErrorCode.CLUB_ITEM_INACTIVE, "Grade " + grade.code() + " is retired");
+        }
         var cord =
                 layout.cord(draft.cordId())
                         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "No cord"));
