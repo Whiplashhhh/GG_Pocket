@@ -9,8 +9,8 @@ import TextField from '@/components/ui/TextField.vue'
 import { searchRoutes } from '@/lib/topo'
 
 /**
- * Adds routes to the session (spec §8.3): first the ones I climbed lately, then a search by cord
- * number ("12"), name, colour or grade.
+ * Adds routes to the session (spec §8.3): first the two I climbed last (club feedback: a short
+ * list, the form stays airy), then a search by cord number ("12"), name, colour or grade.
  */
 const props = withDefaults(
   defineProps<{
@@ -21,9 +21,12 @@ const props = withDefaults(
     /** How many lines each route already has in the session. */
     addedCounts?: ReadonlyMap<string, number>
     disabled?: boolean
+    /** How many search results are shown. */
     limit?: number
+    /** How many of my recent routes are offered before searching. */
+    recentLimit?: number
   }>(),
-  { addedCounts: () => new Map(), disabled: false, limit: 8 },
+  { addedCounts: () => new Map(), disabled: false, limit: 8, recentLimit: 2 },
 )
 const emit = defineEmits<{ add: [routeId: string]; remove: [routeId: string] }>()
 
@@ -36,7 +39,7 @@ const recent = computed(() =>
   props.recentIds
     .map((id) => byId.value.get(id))
     .filter((route): route is RouteSummary => route !== undefined)
-    .slice(0, props.limit),
+    .slice(0, props.recentLimit),
 )
 const results = computed(() => searchRoutes(props.routes, search.value))
 const searching = computed(() => search.value.trim() !== '')
@@ -56,7 +59,10 @@ function remove(id: string) {
 </script>
 
 <template>
-  <section class="flex flex-col gap-3 px-4 py-4" :aria-labelledby="`${baseId}-title`">
+  <section
+    class="flex flex-col gap-3 rounded-control border border-rule bg-surface p-4"
+    :aria-labelledby="`${baseId}-title`"
+  >
     <!-- The level under the page title, so « Récemment grimpées » below is a level 3. -->
     <h2 :id="`${baseId}-title`" class="sr-only">{{ t('session.pickerTitle') }}</h2>
     <TextField

@@ -368,158 +368,164 @@ const title = computed(() => (editing.value ? t('session.editTitle') : t('sessio
         <GgButton variant="ghost" @click="startOver">{{ t('session.startOver') }}</GgButton>
       </div>
 
-      <div class="px-4 pt-4">
-        <TextField
-          v-model="form.climbedOn"
-          type="date"
-          :label="t('session.date')"
-          :min="bounds.min"
-          :max="bounds.max"
-          :hint="t('session.dateHint')"
-        />
-        <div class="mt-4 flex flex-col gap-1">
-          <template v-if="!form.manyBelayers">
-            <span class="font-semibold" aria-hidden="true">{{ t('session.belayer') }}</span>
-            <BelayerButton
-              :label="
-                t('session.sessionBelayerButton', {
-                  name: belayerOf(form.belayerId)?.nickname ?? t('session.belayerNobody'),
-                })
-              "
-              :belayer="belayerOf(form.belayerId)"
-              :aria-describedby="belayerHintId"
-              @choose="chooseBelayer('session')"
-            />
-            <p :id="belayerHintId" class="text-sm text-ink-muted">
-              {{ t('session.sessionBelayerHint') }}
-            </p>
-          </template>
-          <CheckboxField
-            v-model="manyBelayers"
-            :hint="form.manyBelayers ? t('session.manyBelayersHint') : undefined"
-          >
-            {{ t('session.manyBelayers') }}
-          </CheckboxField>
-        </div>
-      </div>
-
-      <div v-if="routes.isPending.value" class="flex flex-col gap-2 px-4 py-4" aria-hidden="true">
-        <SkeletonBlock v-for="index in 3" :key="index" class="h-12 w-full" />
-      </div>
-      <div v-else-if="routes.isError.value" class="flex flex-col items-start gap-3 px-4 py-4">
-        <FormAlert
-          >{{ t('routePicker.loadError') }} {{ t(errorMessageKey(routes.error.value)) }}</FormAlert
+      <div class="flex flex-col gap-3 px-3 py-3 sm:px-4">
+        <section
+          class="rounded-control border border-rule bg-surface p-4"
+          :aria-label="t('session.whenTitle')"
         >
-        <GgButton variant="secondary" @click="routes.refetch()">{{ t('common.retry') }}</GgButton>
-      </div>
-      <SessionRoutePicker
-        v-else
-        :routes="routes.data.value ?? []"
-        :recent-ids="recentIds"
-        :added-counts="addedCounts"
-        :disabled="full"
-        @remove="takeBack"
-        @add="add"
-      />
-      <p class="sr-only" role="status" aria-live="polite">{{ announce }}</p>
-
-      <section class="border-t-2 border-ink" :aria-label="t('session.linesTitle')">
-        <h2 class="px-4 pt-4 text-lg font-title">
-          {{ t('session.linesCount', form.ascents.length) }}
-        </h2>
-        <p v-if="form.ascents.length === 0" class="px-4 py-3 text-ink-muted">
-          {{ t('session.noLine') }}
-        </p>
-        <ol v-else>
-          <AscentLineEditor
-            v-for="(line, index) in form.ascents"
-            :key="line.key"
-            :line="line"
-            :route="routeById.get(line.routeId)"
-            :position="index + 1"
-            :count="form.ascents.length"
-            :can-duplicate="!full"
-            :many-belayers="form.manyBelayers"
-            :belayer="belayerOf(line.belayerId)"
-            @update="update(index, $event)"
-            @choose-belayer="chooseBelayer(index)"
-            @duplicate="duplicate(index)"
-            @move="move(index, $event)"
-            @remove="remove(index)"
+          <TextField
+            v-model="form.climbedOn"
+            type="date"
+            :label="t('session.date')"
+            :min="bounds.min"
+            :max="bounds.max"
+            :hint="t('session.dateHint')"
           />
-        </ol>
-        <p v-if="full" class="px-4 py-3 text-sm text-ink-muted">{{ t('session.full') }}</p>
-        <BelayerPicker
-          v-model:open="pickingBelayer"
-          :selected-id="pickedBelayerId"
-          @pick="pickBelayer"
-        />
-        <ConfirmDialog
-          v-model:open="confirmingOneBelayer"
-          :title="t('session.oneBelayerTitle')"
-          :body="
-            firstBelayer
-              ? t('session.oneBelayerBody', { name: firstBelayer.nickname })
-              : t('session.oneBelayerBodyNobody')
-          "
-          :confirm-label="t('session.oneBelayerConfirm')"
-          @confirm="oneBelayer"
-        />
-      </section>
+          <div class="mt-4 flex flex-col gap-1">
+            <template v-if="!form.manyBelayers">
+              <span class="font-semibold" aria-hidden="true">{{ t('session.belayer') }}</span>
+              <BelayerButton
+                :label="
+                  t('session.sessionBelayerButton', {
+                    name: belayerOf(form.belayerId)?.nickname ?? t('session.belayerNobody'),
+                  })
+                "
+                :belayer="belayerOf(form.belayerId)"
+                :aria-describedby="belayerHintId"
+                @choose="chooseBelayer('session')"
+              />
+              <p :id="belayerHintId" class="text-sm text-ink-muted">
+                {{ t('session.sessionBelayerHint') }}
+              </p>
+            </template>
+            <CheckboxField
+              v-model="manyBelayers"
+              :hint="form.manyBelayers ? t('session.manyBelayersHint') : undefined"
+            >
+              {{ t('session.manyBelayers') }}
+            </CheckboxField>
+          </div>
+        </section>
 
-      <section
-        class="flex flex-col gap-5 border-t-2 border-ink px-4 py-5"
-        :aria-label="t('session.endTitle')"
-      >
-        <h2 class="text-lg font-title">{{ t('session.endTitle') }}</h2>
-        <FeelingSlider v-model="form.feeling" :label="t('session.globalFeeling')" />
-        <div class="flex flex-col gap-1.5">
-          <label :for="commentId" class="font-semibold">
-            {{ t('session.comment') }}
-            <span class="font-normal text-ink-muted">({{ t('common.optional') }})</span>
-          </label>
-          <textarea
-            :id="commentId"
-            v-model="form.comment"
-            rows="3"
-            :maxlength="MAX_COMMENT_LENGTH"
-            :placeholder="t('session.commentPlaceholder')"
-            :aria-describedby="`${commentId}-count`"
-            class="w-full rounded-control border-2 border-rule bg-surface px-3 py-2 text-base text-ink focus:border-ink focus:outline-none"
-          />
-          <p :id="`${commentId}-count`" class="text-right text-sm text-ink-muted tabular-nums">
-            {{
-              t('routeForm.adviceCount', { count: form.comment.length, max: MAX_COMMENT_LENGTH })
-            }}
-          </p>
+        <div v-if="routes.isPending.value" class="flex flex-col gap-2 py-1" aria-hidden="true">
+          <SkeletonBlock v-for="index in 3" :key="index" class="h-12 w-full" />
         </div>
-        <SessionPhotoField
-          v-model:photo="photo"
-          v-model:remove="removePhoto"
-          v-model:preparing="preparingPhoto"
-          :saved-url="existing.data.value?.photoUrl"
-        />
-        <div class="flex flex-col gap-1">
-          <span class="font-semibold" aria-hidden="true">{{ t('session.visibility') }}</span>
-          <SegmentedControl
-            v-model="form.visibility"
-            :label="t('session.visibility')"
-            :options="visibilities"
-            size="lg"
-            stretch
-          />
-          <p
-            class="text-sm"
-            :class="
-              form.visibility === 'CLUB' && !inClubFeed
-                ? 'font-semibold text-ink'
-                : 'text-ink-muted'
-            "
+        <div v-else-if="routes.isError.value" class="flex flex-col items-start gap-3 py-1">
+          <FormAlert
+            >{{ t('routePicker.loadError') }}
+            {{ t(errorMessageKey(routes.error.value)) }}</FormAlert
           >
-            {{ visibilityHint }}
-          </p>
+          <GgButton variant="secondary" @click="routes.refetch()">{{ t('common.retry') }}</GgButton>
         </div>
-      </section>
+        <SessionRoutePicker
+          v-else
+          :routes="routes.data.value ?? []"
+          :recent-ids="recentIds"
+          :added-counts="addedCounts"
+          :disabled="full"
+          @remove="takeBack"
+          @add="add"
+        />
+        <p class="sr-only" role="status" aria-live="polite">{{ announce }}</p>
+
+        <section :aria-label="t('session.linesTitle')">
+          <h2 class="px-1 pt-2 text-lg font-title">
+            {{ t('session.linesCount', form.ascents.length) }}
+          </h2>
+          <p v-if="form.ascents.length === 0" class="px-1 py-2 text-ink-muted">
+            {{ t('session.noLine') }}
+          </p>
+          <ol v-else class="mt-3 flex flex-col gap-3">
+            <AscentLineEditor
+              v-for="(line, index) in form.ascents"
+              :key="line.key"
+              :line="line"
+              :route="routeById.get(line.routeId)"
+              :position="index + 1"
+              :count="form.ascents.length"
+              :can-duplicate="!full"
+              :many-belayers="form.manyBelayers"
+              :belayer="belayerOf(line.belayerId)"
+              @update="update(index, $event)"
+              @choose-belayer="chooseBelayer(index)"
+              @duplicate="duplicate(index)"
+              @move="move(index, $event)"
+              @remove="remove(index)"
+            />
+          </ol>
+          <p v-if="full" class="px-1 py-3 text-sm text-ink-muted">{{ t('session.full') }}</p>
+          <BelayerPicker
+            v-model:open="pickingBelayer"
+            :selected-id="pickedBelayerId"
+            @pick="pickBelayer"
+          />
+          <ConfirmDialog
+            v-model:open="confirmingOneBelayer"
+            :title="t('session.oneBelayerTitle')"
+            :body="
+              firstBelayer
+                ? t('session.oneBelayerBody', { name: firstBelayer.nickname })
+                : t('session.oneBelayerBodyNobody')
+            "
+            :confirm-label="t('session.oneBelayerConfirm')"
+            @confirm="oneBelayer"
+          />
+        </section>
+
+        <section
+          class="flex flex-col gap-5 rounded-control border border-rule bg-surface p-4"
+          :aria-label="t('session.endTitle')"
+        >
+          <h2 class="text-lg font-title">{{ t('session.endTitle') }}</h2>
+          <FeelingSlider v-model="form.feeling" :label="t('session.globalFeeling')" />
+          <div class="flex flex-col gap-1.5">
+            <label :for="commentId" class="font-semibold">
+              {{ t('session.comment') }}
+              <span class="font-normal text-ink-muted">({{ t('common.optional') }})</span>
+            </label>
+            <textarea
+              :id="commentId"
+              v-model="form.comment"
+              rows="3"
+              :maxlength="MAX_COMMENT_LENGTH"
+              :placeholder="t('session.commentPlaceholder')"
+              :aria-describedby="`${commentId}-count`"
+              class="w-full rounded-control border-2 border-rule bg-surface px-3 py-2 text-base text-ink focus:border-ink focus:outline-none"
+            />
+            <p :id="`${commentId}-count`" class="text-right text-sm text-ink-muted tabular-nums">
+              {{
+                t('routeForm.adviceCount', { count: form.comment.length, max: MAX_COMMENT_LENGTH })
+              }}
+            </p>
+          </div>
+          <SessionPhotoField
+            v-model:photo="photo"
+            v-model:remove="removePhoto"
+            v-model:preparing="preparingPhoto"
+            :saved-url="existing.data.value?.photoUrl"
+          />
+          <div class="flex flex-col gap-1">
+            <span class="font-semibold" aria-hidden="true">{{ t('session.visibility') }}</span>
+            <SegmentedControl
+              v-model="form.visibility"
+              :label="t('session.visibility')"
+              :options="visibilities"
+              size="lg"
+              stretch
+            />
+            <p
+              class="text-sm"
+              :class="
+                form.visibility === 'CLUB' && !inClubFeed
+                  ? 'font-semibold text-ink'
+                  : 'text-ink-muted'
+              "
+            >
+              {{ visibilityHint }}
+            </p>
+          </div>
+        </section>
+      </div>
 
       <div
         class="sticky bottom-0 z-20 mt-auto flex flex-col gap-2 border-t border-rule bg-bg px-4 pt-3 pb-3"
