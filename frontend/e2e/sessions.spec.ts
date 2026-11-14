@@ -193,6 +193,22 @@ test.describe('a new session', () => {
     expect(club.climbs.sessions).toHaveLength(1)
   })
 
+  test('lets me pick a route from the whole wall, folded at first', async ({ page, club }) => {
+    await sameDay(page, club)
+    await page.goto('/seance/nouvelle')
+    const all = page.getByRole('button', { name: /^Voir les \d+ voies du mur$/ })
+    await expect(all).toHaveAttribute('aria-expanded', 'false')
+    await expect(page.getByRole('button', { name: 'Ajouter Iron Man' })).toBeHidden()
+
+    await all.click()
+    await page.getByRole('button', { name: 'Ajouter Iron Man' }).click()
+    await expect(page.getByRole('heading', { name: '1 voie' })).toBeVisible()
+
+    await page.getByRole('button', { name: 'Replier la liste des voies' }).click()
+    await expect(page.getByRole('button', { name: /^Ajouter Iron Man/ })).toBeHidden()
+    await expect(all).toHaveAttribute('aria-expanded', 'false')
+  })
+
   test('refuses a session without any route', async ({ page, club }) => {
     await sameDay(page, club)
     await page.goto('/seance/nouvelle')

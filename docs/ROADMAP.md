@@ -176,7 +176,12 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [x] `docs/GUIDE_CLUB.md` (à compléter avec le logo quand il sera téléversable)
 - [x] Déploiement de la prod sur le serveur du club, derrière son proxy partagé (D-126, DEPLOYMENT.md §10)
 - [ ] Mise en place sur le serveur du club par Willem (scripts `setup-prod-shared.sh` puis `setup-shared.sh`)
-- [ ] Release `1.0.0` (déclenchée par Willem)
+- [x] Release `1.0.0` (déclenchée par Willem, 2026-11-08)
+
+## Version 1.1.0
+
+- [x] Séance : toutes les voies du mur dans une liste dépliable sous la recherche (D-127, `feature/credit-et-liste-voies-1.0.0`)
+- [x] Profil : « Développé par Willem Vanbaelinghem » en pied de page, sans annonce (D-127)
 
 ## Phase 9 — Après lancement (pas sans feu vert)
 

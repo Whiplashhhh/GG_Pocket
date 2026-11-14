@@ -5,6 +5,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- **Toutes les voies sous la main** : dans une nouvelle séance, juste sous la recherche, « Voir les voies du mur »
+  déplie tout le mur, rangé par secteur. Tu ajoutes d’un doigt sans rien taper, et tu replies quand tu as fini.
+
 ## 1.0.0 — 2026-11-08
 
 ### Ajouté

@@ -4,7 +4,8 @@
     "clubName": "Gravelines Grimp",
     "skipToContent": "Aller au contenu",
     "versionFooter": "GG Pocket {version}",
-    "serverVersion": "Serveur {version}"
+    "serverVersion": "Serveur {version}",
+    "credits": "Développé par Willem Vanbaelinghem"
   },
   "nav": {
     "label": "Navigation principale",
@@ -60,6 +61,8 @@
     "pickerPlaceholder": "Corde, nom, couleur ou cotation",
     "pickerHint": "Tape « 12 » pour les voies de la corde 12, ou un nom, une couleur, une cotation.",
     "recent": "Récemment grimpées",
+    "allRoutesShow": "Voir la voie du mur | Voir la voie du mur | Voir les {n} voies du mur",
+    "allRoutesHide": "Replier la liste des voies",
     "addRoute": "Ajouter {name}",
     "addRouteAgain": "Ajouter {name} encore une fois (déjà {n} dans la séance)",
     "removeRoute": "Retirer {name} de la séance | Retirer un passage de {name} (il en restera 1) | Retirer un passage de {name} (il en restera {n})",
