@@ -15,8 +15,8 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 - Profil : « Développé par Willem Vanbaelinghem » en pied de page, hors CHANGELOG (Willem ne veut pas l'annoncer).
 - Vérifié ici : lint, format, typecheck, Vitest (352), e2e séances Desktop Chrome, captures 360 px clair/sombre.
   Audit axe iPhone non lancé ici (pas de WebKit) : la CI le fait.
-- `github.com` injoignable depuis le bac à sable (seule l'API répond) : `main` local avancé sur la release 1.0.0 en
-  reconstruisant le commit signé à l'identique depuis l'API ; branche et PR poussées par l'API si `git push` échoue.
+- `github.com` a été injoignable un moment (seule l'API répondait) : `main` local avancé sur la release 1.0.0 en
+  reconstruisant le commit signé à l'identique depuis l'API (même SHA) ; `git push` est repassé ensuite.
 
 ### Reste / prochaine action
 - CI verte sur la PR, merge, puis « Prepare release » en `minor` (1.1.0) par Willem.
