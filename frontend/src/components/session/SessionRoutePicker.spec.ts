@@ -10,11 +10,13 @@ const route = (
   name: string,
   cordNumber: number,
   sector: { id: string; name: string; position: number },
+  grade: string,
+  gradeRank: number,
 ): RouteSummary => ({
   id,
   name,
-  grade: '6a',
-  gradeRank: 12,
+  grade,
+  gradeRank,
   cordNumber,
   sectorId: sector.id,
   sectorName: sector.name,
@@ -33,9 +35,9 @@ const route = (
 const dalle = { id: 's1', name: 'Dalle', position: 1 }
 const devers = { id: 's2', name: 'Dévers', position: 2 }
 const routes = [
-  route('r3', 'Iron Man', 14, devers),
-  route('r1', 'Sec !', 5, dalle),
-  route('r2', 'Réglisse', 7, dalle),
+  route('r3', 'Iron Man', 14, devers, '6c', 18),
+  route('r1', 'Sec !', 5, dalle, '7a', 21),
+  route('r2', 'Réglisse', 7, dalle, '5b', 8),
 ]
 
 function mountPicker() {
@@ -54,16 +56,16 @@ describe('SessionRoutePicker, every route on the wall', () => {
     expect(listedNames(wrapper)).toEqual(['Ajouter Iron Man'])
   })
 
-  it('unfolds every route by sector, then folds back', async () => {
+  it('unfolds every route, easiest first, then folds back', async () => {
     const wrapper = mountPicker()
     await toggle(wrapper).trigger('click')
     expect(toggle(wrapper).attributes('aria-expanded')).toBe('true')
     expect(toggle(wrapper).text()).toBe('Replier la liste des voies')
-    expect(wrapper.findAll('h3').map((heading) => heading.text())).toEqual(['Dalle', 'Dévers'])
-    expect(listedNames(wrapper)).toEqual(['Ajouter Sec !', 'Ajouter Réglisse', 'Ajouter Iron Man'])
+    expect(wrapper.findAll('h3')).toHaveLength(0)
+    expect(listedNames(wrapper)).toEqual(['Ajouter Réglisse', 'Ajouter Iron Man', 'Ajouter Sec !'])
 
     await wrapper.get('li button').trigger('click')
-    expect(wrapper.emitted('add')).toEqual([['r1']])
+    expect(wrapper.emitted('add')).toEqual([['r2']])
 
     await toggle(wrapper).trigger('click')
     expect(listedNames(wrapper)).toEqual(['Ajouter Iron Man'])

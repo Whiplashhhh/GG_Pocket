@@ -6,12 +6,12 @@ import { useI18n } from 'vue-i18n'
 import type { RouteSummary } from '@/api/topo'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import TextField from '@/components/ui/TextField.vue'
-import { groupBySector, searchRoutes, sortRoutes } from '@/lib/topo'
+import { searchRoutes, sortRoutes } from '@/lib/topo'
 
 /**
  * Adds routes to the session (spec §8.3): first the two I climbed last (club feedback: a short
  * list, the form stays airy), then a search by cord number ("12"), name, colour or grade. Under the
- * search, a folded list of every route on the wall, by sector, for those who'd rather scroll than type.
+ * search, a folded list of every route on the wall, easiest first, for those who'd rather scroll than type.
  */
 const props = withDefaults(
   defineProps<{
@@ -48,14 +48,10 @@ const searching = computed(() => search.value.trim() !== '')
 const shown = computed(() => (searching.value ? results.value.slice(0, props.limit) : recent.value))
 const listingAll = computed(() => showAll.value && !searching.value)
 
-/** What is listed under the search: the matches, the whole wall by sector, or my last routes. */
+/** What is listed under the search: the matches, the whole wall easiest first, or my last routes. */
 const groups = computed<{ key: string; title?: string; routes: readonly RouteSummary[] }[]>(() => {
   if (listingAll.value) {
-    return groupBySector(sortRoutes(props.routes, 'sector', 'asc')).map((group) => ({
-      key: group.sectorId,
-      title: group.sectorName,
-      routes: group.routes,
-    }))
+    return [{ key: 'all', routes: sortRoutes(props.routes, 'grade', 'asc') }]
   }
   if (shown.value.length === 0) return []
   return [

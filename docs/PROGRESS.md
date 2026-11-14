@@ -10,7 +10,7 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ### Fait
 - `SessionRoutePicker` : bouton « Voir les N voies du mur » sous la recherche, replié au départ ; déplié, toutes les
-  voies par secteur (à la place de « Récemment grimpées ») ; s'efface pendant une recherche. Vitest
+  voies par cotation croissante, demandé par Willem (à la place de « Récemment grimpées ») ; s'efface pendant une recherche. Vitest
   (`SessionRoutePicker.spec.ts`), e2e (`sessions.spec.ts`), scénario de capture `seance-toutes-les-voies`.
 - Profil : « Développé par Willem Vanbaelinghem » en pied de page, hors CHANGELOG (Willem ne veut pas l'annoncer).
 - Vérifié ici : lint, format, typecheck, Vitest (352), e2e séances Desktop Chrome, captures 360 px clair/sombre.
