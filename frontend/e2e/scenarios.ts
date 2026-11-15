@@ -692,6 +692,16 @@ export const CAPTURES: Capture[] = [
     },
   },
   {
+    name: 'seance-toutes-les-voies',
+    path: '/seance/nouvelle',
+    as: 'CLIMBER',
+    prepare: marieClimbs,
+    act: async (page) => {
+      await page.getByRole('button', { name: /^Voir les \d+ voies du mur$/ }).click()
+      await addToSession(page, '', 'Sec !')
+    },
+  },
+  {
     name: 'seance-saisie-club',
     path: '/seance/nouvelle',
     as: 'CLIMBER',

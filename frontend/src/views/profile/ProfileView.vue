@@ -276,6 +276,7 @@ const facts = computed(() => {
         {{ t('app.serverVersion', { version: meta.version }) }}
       </p>
       <AppUpdateCheck class="mt-3" />
+      <p class="mt-4">{{ t('app.credits') }}</p>
     </footer>
   </template>
 

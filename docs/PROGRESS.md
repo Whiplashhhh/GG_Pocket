@@ -4,6 +4,26 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-14 — 1.1.0 : toutes les voies dans la séance, mention du développeur (D-127)
+
+**Branche** : `feature/credit-et-liste-voies-1.0.0` (depuis `main` en `c4008d2`, release 1.0.0).
+
+### Fait
+- `SessionRoutePicker` : bouton « Voir les N voies du mur » sous la recherche, replié au départ ; déplié, toutes les
+  voies par cotation croissante, demandé par Willem (à la place de « Récemment grimpées ») ; s'efface pendant une recherche. Vitest
+  (`SessionRoutePicker.spec.ts`), e2e (`sessions.spec.ts`), scénario de capture `seance-toutes-les-voies`.
+- Profil : « Développé par Willem Vanbaelinghem » en pied de page, hors CHANGELOG (Willem ne veut pas l'annoncer).
+- Vérifié ici : lint, format, typecheck, Vitest (352), e2e séances Desktop Chrome, captures 360 px clair/sombre.
+  Audit axe iPhone non lancé ici (pas de WebKit) : la CI le fait.
+- `github.com` a été injoignable un moment (seule l'API répondait) : `main` local avancé sur la release 1.0.0 en
+  reconstruisant le commit signé à l'identique depuis l'API (même SHA) ; `git push` est repassé ensuite.
+
+### Reste / prochaine action
+- CI verte sur la PR, merge, puis « Prepare release » en `minor` (1.1.0) par Willem.
+
+### Points bloquants
+- Aucun.
+
 ## 2026-11-08 (nuit) — Prod sur le serveur du club (D-126)
 
 **Branche** : `feature/prod-serveur-club-0.9.0` (depuis `main` en `75860b1`, après le merge de #64).

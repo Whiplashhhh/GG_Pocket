@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { Check, Minus, Plus } from 'lucide-vue-next'
+import { Check, ChevronDown, Minus, Plus } from 'lucide-vue-next'
 import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { RouteSummary } from '@/api/topo'
 import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import TextField from '@/components/ui/TextField.vue'
-import { searchRoutes } from '@/lib/topo'
+import { searchRoutes, sortRoutes } from '@/lib/topo'
 
 /**
  * Adds routes to the session (spec §8.3): first the two I climbed last (club feedback: a short
- * list, the form stays airy), then a search by cord number ("12"), name, colour or grade.
+ * list, the form stays airy), then a search by cord number ("12"), name, colour or grade. Under the
+ * search, a folded list of every route on the wall, easiest first, for those who'd rather scroll than type.
  */
 const props = withDefaults(
   defineProps<{
@@ -33,6 +34,7 @@ const emit = defineEmits<{ add: [routeId: string]; remove: [routeId: string] }>(
 const { t } = useI18n()
 const baseId = useId()
 const search = ref('')
+const showAll = ref(false)
 
 const byId = computed(() => new Map(props.routes.map((route) => [route.id, route])))
 const recent = computed(() =>
@@ -44,6 +46,18 @@ const recent = computed(() =>
 const results = computed(() => searchRoutes(props.routes, search.value))
 const searching = computed(() => search.value.trim() !== '')
 const shown = computed(() => (searching.value ? results.value.slice(0, props.limit) : recent.value))
+const listingAll = computed(() => showAll.value && !searching.value)
+
+/** What is listed under the search: the matches, the whole wall easiest first, or my last routes. */
+const groups = computed<{ key: string; title?: string; routes: readonly RouteSummary[] }[]>(() => {
+  if (listingAll.value) {
+    return [{ key: 'all', routes: sortRoutes(props.routes, 'grade', 'asc') }]
+  }
+  if (shown.value.length === 0) return []
+  return [
+    { key: 'shown', title: searching.value ? undefined : t('session.recent'), routes: shown.value },
+  ]
+})
 
 function addedCount(id: string): number {
   return props.addedCounts.get(id) ?? 0
@@ -74,10 +88,23 @@ function remove(id: string) {
       optional
       :show-optional-mark="false"
     />
-    <h3 v-if="!searching && recent.length > 0" class="font-semibold text-ink-muted">
-      {{ t('session.recent') }}
-    </h3>
-    <p v-if="!searching && recent.length === 0" class="text-ink-muted">
+    <button
+      v-if="!searching && routes.length > 0"
+      type="button"
+      class="-mt-1 -ml-2 flex min-h-11 items-center gap-1.5 self-start rounded-control px-2 font-semibold text-brand-ink"
+      :aria-expanded="showAll"
+      :aria-controls="`${baseId}-all`"
+      @click="showAll = !showAll"
+    >
+      {{ showAll ? t('session.allRoutesHide') : t('session.allRoutesShow', routes.length) }}
+      <ChevronDown
+        :size="18"
+        class="transition-transform duration-200 motion-reduce:transition-none"
+        :class="{ 'rotate-180': showAll }"
+        aria-hidden="true"
+      />
+    </button>
+    <p v-if="!searching && !showAll && recent.length === 0" class="text-ink-muted">
       {{ t('session.pickerHint') }}
     </p>
     <p v-if="searching" class="sr-only" role="status">
@@ -86,58 +113,63 @@ function remove(id: string) {
     <p v-if="searching && results.length === 0" class="text-ink-muted">
       {{ t('routePicker.noMatch') }}
     </p>
-    <ul v-if="shown.length > 0" class="divide-y divide-rule border-y border-rule">
-      <li
-        v-for="route in shown"
-        :key="route.id"
-        class="flex items-center gap-2"
-        :class="{ 'bg-brand/10': addedCount(route.id) > 0 }"
-      >
-        <span class="flex min-w-0 flex-1 flex-col items-start gap-0.5 py-2">
-          <RouteSummaryLabel :route="route" :label-id="`${baseId}-${route.id}`" />
-          <span
-            v-if="addedCount(route.id) > 0"
-            class="inline-flex items-center gap-1 text-sm font-semibold text-brand-ink"
+    <div :id="`${baseId}-all`" class="contents">
+      <template v-for="group in groups" :key="group.key">
+        <h3 v-if="group.title" class="font-semibold text-ink-muted">{{ group.title }}</h3>
+        <ul class="divide-y divide-rule border-y border-rule">
+          <li
+            v-for="route in group.routes"
+            :key="route.id"
+            class="flex items-center gap-2"
+            :class="{ 'bg-brand/10': addedCount(route.id) > 0 }"
           >
-            <Check :size="16" :stroke-width="3" aria-hidden="true" />
-            {{ t('session.inSession', addedCount(route.id)) }}
-          </span>
-        </span>
-        <button
-          v-if="addedCount(route.id) > 0"
-          type="button"
-          class="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-rule bg-bg text-ink hover:border-ink"
-          :aria-label="
-            t(
-              'session.removeRoute',
-              { name: route.name, n: addedCount(route.id) - 1 },
-              addedCount(route.id) - 1,
-            )
-          "
-          @click="remove(route.id)"
-        >
-          <Minus :size="24" :stroke-width="3" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          class="inline-flex size-12 shrink-0 items-center justify-center rounded-control disabled:cursor-not-allowed disabled:opacity-45"
-          :class="
-            addedCount(route.id) > 0
-              ? 'border-2 border-brand bg-bg text-brand-ink'
-              : 'bg-brand text-on-brand'
-          "
-          :disabled="disabled"
-          :aria-label="
-            addedCount(route.id) > 0
-              ? t('session.addRouteAgain', { name: route.name, n: addedCount(route.id) })
-              : t('session.addRoute', { name: route.name })
-          "
-          @click="add(route.id)"
-        >
-          <Plus :size="24" :stroke-width="3" aria-hidden="true" />
-        </button>
-      </li>
-    </ul>
+            <span class="flex min-w-0 flex-1 flex-col items-start gap-0.5 py-2">
+              <RouteSummaryLabel :route="route" :label-id="`${baseId}-${route.id}`" />
+              <span
+                v-if="addedCount(route.id) > 0"
+                class="inline-flex items-center gap-1 text-sm font-semibold text-brand-ink"
+              >
+                <Check :size="16" :stroke-width="3" aria-hidden="true" />
+                {{ t('session.inSession', addedCount(route.id)) }}
+              </span>
+            </span>
+            <button
+              v-if="addedCount(route.id) > 0"
+              type="button"
+              class="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-rule bg-bg text-ink hover:border-ink"
+              :aria-label="
+                t(
+                  'session.removeRoute',
+                  { name: route.name, n: addedCount(route.id) - 1 },
+                  addedCount(route.id) - 1,
+                )
+              "
+              @click="remove(route.id)"
+            >
+              <Minus :size="24" :stroke-width="3" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              class="inline-flex size-12 shrink-0 items-center justify-center rounded-control disabled:cursor-not-allowed disabled:opacity-45"
+              :class="
+                addedCount(route.id) > 0
+                  ? 'border-2 border-brand bg-bg text-brand-ink'
+                  : 'bg-brand text-on-brand'
+              "
+              :disabled="disabled"
+              :aria-label="
+                addedCount(route.id) > 0
+                  ? t('session.addRouteAgain', { name: route.name, n: addedCount(route.id) })
+                  : t('session.addRoute', { name: route.name })
+              "
+              @click="add(route.id)"
+            >
+              <Plus :size="24" :stroke-width="3" aria-hidden="true" />
+            </button>
+          </li>
+        </ul>
+      </template>
+    </div>
     <p v-if="searching && results.length > shown.length" class="text-sm text-ink-muted">
       {{ t('routePicker.more', { n: results.length - shown.length }) }}
     </p>

@@ -1517,3 +1517,15 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
 - **Reste à faire** : le frontal de l'ancien VPS (dev) était mis à jour par les releases prod (D-112) ; il ne l'est
   plus. À reprendre dans le déploiement dev.
 - **Statut** : à valider (président du club, par Willem).
+
+### D-127 — 1.1.0 : toutes les voies dépliables dans la séance, mention du développeur (Willem, 2026-11-14)
+- **Contexte** : Willem veut, sous la recherche du formulaire de séance, un bouton qui déplie toutes les voies pour les
+  ajouter sans rien taper, replié au départ ; et une mention « Développé par Willem Vanbaelinghem » en bas du profil,
+  sans l'annoncer dans les notes de version.
+- **Choix** : bouton « Voir les N voies du mur » (`aria-expanded`, chevron) juste sous le champ de recherche de
+  `SessionRoutePicker`, replié à chaque ouverture du formulaire (pas mémorisé). Déplié, il remplace « Récemment
+  grimpées » (ces voies sont dans la liste) par toutes les voies au mur, en une liste par cotation croissante
+  (tri « cotation » du topo : à cotation égale, corde de gauche à droite, puis nom). Pendant une recherche, le bouton et la liste s'effacent
+  devant les résultats ; vider la recherche ramène la liste telle qu'on l'avait laissée. Mention du développeur dans le
+  pied de page du profil, sous « Chercher une mise à jour », hors CHANGELOG (donc absente de « Quoi de neuf ? »).
+- **Statut** : validée (Willem, 2026-11-14 : tri par cotation croissante plutôt que par secteur).
