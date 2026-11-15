@@ -118,6 +118,27 @@
     outline-offset: 2px;
   }
 
+  /*
+   * iOS Safari sizes native date and time fields from their content and ignores `w-full`: « Jour de la
+   * séance » overflowed its card. Without the native look they shrink like any input; the value, centred
+   * by default, goes back to the start. The native look goes on iOS only (touch callout), so desktop
+   * keeps its calendar button.
+   */
+  input:is([type='date'], [type='time'], [type='datetime-local'], [type='month']) {
+    min-width: 0;
+  }
+
+  @supports (-webkit-touch-callout: none) {
+    input:is([type='date'], [type='time'], [type='datetime-local'], [type='month']) {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    ::-webkit-date-and-time-value {
+      text-align: start;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

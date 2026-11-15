@@ -11,6 +11,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   déplie tout le mur, de la plus facile à la plus dure. Tu ajoutes d’un doigt sans rien taper, et tu replies quand
   tu as fini.
 
+### Corrigé
+
+- Sur iPhone, le champ « Jour de la séance » débordait de sa carte. Il reste maintenant bien rangé, comme tous les
+  autres champs de date de l’appli.
+
 ## 1.0.0 — 2026-11-08
 
 ### Ajouté
