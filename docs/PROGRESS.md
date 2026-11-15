@@ -4,6 +4,24 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-15 — Champ date qui déborde sur iPhone
+
+**Branche** : `fix/champ-date-ios-1.0.0` (depuis `main` en `eaa5155`, après le merge de #73).
+
+### Fait
+- Willem a testé la 1.1.0 en dev : OK, sauf « Jour de la séance » qui dépasse de sa carte (iPhone). Safari iOS
+  dimensionne les champs date selon leur contenu et ignore `w-full`. Correctif global dans `src/styles/main.css` :
+  `min-width: 0` sur les champs date/heure, apparence native retirée sur iOS seulement (`@supports
+  (-webkit-touch-callout: none)`), valeur alignée au début.
+- Vérifié ici : build (règle présente dans le CSS final), capture Chromium 360 px inchangée. Pas de Safari iOS dans le
+  bac à sable : à vérifier par Willem sur son iPhone après déploiement dev.
+
+### Reste / prochaine action
+- CI verte, déploiement dev, vérification sur iPhone par Willem, merge, puis « Prepare release » en `minor`.
+
+### Points bloquants
+- Aucun.
+
 ## 2026-11-14 — 1.1.0 : toutes les voies dans la séance, mention du développeur (D-127)
 
 **Branche** : `feature/credit-et-liste-voies-1.0.0` (depuis `main` en `c4008d2`, release 1.0.0).
