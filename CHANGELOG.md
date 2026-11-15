@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 1.1.0 — 2026-11-15
+
 ### Ajouté
 
 - **Toutes les voies sous la main** : dans une nouvelle séance, juste sous la recherche, « Voir les voies du mur »
