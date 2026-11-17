@@ -1547,6 +1547,7 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
   - Push, réglages par défaut (Willem) : commentaires, réponses, demandes d'ami activés ; réactions et séances d'amis
     désactivées.
 - **Statut** : validée (Willem, 2026-11-17).
+
 ### D-129 — CI backend : les échecs Maven étaient masqués (2026-11-17)
 - **Contexte** : depuis #64 (2026-11-08), l'étape Maven de la CI écrit dans `| tee` sans `pipefail` : un échec de
   Maven ne faisait pas échouer le job. Depuis le passage de Spotless en 3.11.0 (#67), `spotless:check` refusait 3
