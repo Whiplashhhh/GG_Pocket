@@ -29,8 +29,8 @@ public final class Age {
     }
 
     /**
-     * The age the other members see: only an adult's, and only if they chose to show it, whatever
-     * a minor once saved.
+     * The age the other members see: only an adult's, and only if they chose to show it, whatever a
+     * minor once saved.
      */
     public static Integer shownToOthers(LocalDate birthDate, boolean showAge, LocalDate today) {
         if (!showAge || birthDate == null || isMinor(birthDate, today)) {
