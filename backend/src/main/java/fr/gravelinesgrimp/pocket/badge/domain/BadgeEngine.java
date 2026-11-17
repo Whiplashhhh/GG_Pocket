@@ -32,9 +32,7 @@ public final class BadgeEngine {
 
     private BadgeEngine() {}
 
-    /**
-     * @param closedDays the days the gym was closed, whatever the climber
-     */
+    /** @param closedDays the days the gym was closed, whatever the climber */
     public static List<Award> awards(List<ClimbRecord> history, Set<LocalDate> closedDays) {
         var replay = new Replay(Set.copyOf(closedDays));
         history.stream()
