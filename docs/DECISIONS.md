@@ -1529,3 +1529,29 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
   devant les résultats ; vider la recherche ramène la liste telle qu'on l'avait laissée. Mention du développeur dans le
   pied de page du profil, sous « Chercher une mise à jour », hors CHANGELOG (donc absente de « Quoi de neuf ? »).
 - **Statut** : validée (Willem, 2026-11-14 : tri par cotation croissante plutôt que par secteur).
+
+### D-128 — 1.2.0 : retours du club du 2026-11-16 (Willem, 2026-11-17)
+- **Contexte** : message du club relayé par Willem : le badge de cotation devait se gagner à l'**enchaînement** (le club
+  avait dit « topé » par erreur) ; demandes d'une cloche de notifications, de voir qui a réagi, de répondre aux
+  commentaires et de l'heure des posts. Willem met tout en 1.2.0, push compris (avancé de la phase 9).
+- **Choix** :
+  - Badge « Première cotation » : première ascension **enchaînée** (topée sans chute), **tête et moulinette** (Willem).
+    Le recalcul au démarrage (`BadgeRecount`) reprend les badges gagnés avec chutes et redate les autres au premier
+    enchaînement : à annoncer au club.
+  - Heure : on connaît l'heure d'enregistrement, pas celle de la grimpe. Séance saisie le jour même : « Séance
+    d'aujourd'hui · 19 h 42 » ; saisie plus tard : « Séance d'hier · publiée aujourd'hui à 9 h 05 », pour ne jamais
+    afficher une heure sur un jour où elle n'a pas eu lieu. Sur les cartes avec auteur (fil, profil, fiche), pas dans le carnet.
+  - Cloche : contenu calculé à la volée depuis les tables existantes + date de dernière ouverture par membre (rien à
+    synchroniser, une suppression ou une fin d'amitié retire l'élément d'elle-même). Contenu : réactions et commentaires
+    sur mes séances, réponses à mes commentaires, séances d'amis, demandes d'ami (Willem).
+  - Push, réglages par défaut (Willem) : commentaires, réponses, demandes d'ami activés ; réactions et séances d'amis
+    désactivées.
+- **Statut** : validée (Willem, 2026-11-17).
+
+### D-129 — CI backend : les échecs Maven étaient masqués (2026-11-17)
+- **Contexte** : depuis #64 (2026-11-08), l'étape Maven de la CI écrit dans `| tee` sans `pipefail` : un échec de
+  Maven ne faisait pas échouer le job. Depuis le passage de Spotless en 3.11.0 (#67), `spotless:check` refusait 3
+  fichiers et Maven s'arrêtait **avant les tests** : le job « Backend » restait vert sans rien tester (1.1.0 comprise).
+- **Choix** : `shell: bash` sur l'étape (GitHub lance alors `bash -eo pipefail`) ; les 3 fichiers reformatés à
+  l'identique de ce que demande Spotless 3.11.0. Repère pour la suite : l'étape Maven dure plusieurs minutes, pas 10 s.
+- **Statut** : validée (correctif CI, aucun changement visible).

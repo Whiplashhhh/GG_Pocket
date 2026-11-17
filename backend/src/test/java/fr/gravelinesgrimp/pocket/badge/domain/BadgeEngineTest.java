@@ -104,8 +104,8 @@ class BadgeEngineTest {
 
         @Test
         void aMinusOrAPlusCountsAsItsGrade() {
-            session("2025-03-03", top("6a+"));
-            session("2025-03-04", top("6b-"));
+            session("2025-03-03", send("6a+"));
+            session("2025-03-04", send("6b-"));
 
             assertThat(only(BadgeCode.GRADE_6A).earnedOn())
                     .isEqualTo(LocalDate.parse("2025-03-03"));
@@ -115,7 +115,7 @@ class BadgeEngineTest {
 
         @Test
         void aHardRouteEarnsItsOwnGradeOnly() {
-            session("2025-03-03", top("7a"));
+            session("2025-03-03", send("7a"));
 
             assertThat(codes())
                     .contains(BadgeCode.GRADE_7A)
@@ -130,8 +130,8 @@ class BadgeEngineTest {
 
         @Test
         void aLowerGradeClimbedLaterIsStillEarned() {
-            session("2025-03-03", top("6b"));
-            session("2025-03-10", top("5c"));
+            session("2025-03-03", send("6b"));
+            session("2025-03-10", send("5c"));
 
             assertThat(only(BadgeCode.GRADE_5C).earnedOn())
                     .isEqualTo(LocalDate.parse("2025-03-10"));
@@ -140,14 +140,14 @@ class BadgeEngineTest {
 
         @Test
         void theEasiestGradesHaveNoTier() {
-            session("2025-03-03", top("4c"), top("5a"));
+            session("2025-03-03", send("4c"), send("5a"));
 
             assertThat(codes()).doesNotContain(BadgeCode.GRADE_5B);
         }
 
         @Test
         void the7cPlusEarnsTheLastTier() {
-            session("2025-03-03", top("7c+"));
+            session("2025-03-03", send("7c+"));
 
             assertThat(count(BadgeCode.GRADE_7C)).isOne();
         }
@@ -159,12 +159,24 @@ class BadgeEngineTest {
                     new ClimbRecord.Line(
                             UUID.randomUUID(), ClimbMode.LEAD, false, false, false, "7a", null));
 
-            assertThat(codes()).doesNotContain(BadgeCode.GRADE_5B);
+            assertThat(codes()).doesNotContain(BadgeCode.GRADE_7A);
+        }
+
+        /** Club feedback (2026-11-16): the grade is earned when « enchaînée », not just topped. */
+        @Test
+        void aTopWithFallsWaitsForTheFirstCleanAscent() {
+            session("2025-03-03", top("6b"));
+            assertThat(codes()).doesNotContain(BadgeCode.GRADE_6B);
+
+            session("2025-03-10", send("6b"));
+
+            assertThat(only(BadgeCode.GRADE_6B).earnedOn())
+                    .isEqualTo(LocalDate.parse("2025-03-10"));
         }
 
         @Test
         void comesOnceWhateverTheMode() {
-            session("2025-03-03", top("5b"), leadOn("5b"));
+            session("2025-03-03", send("5b"), sendLead("5b"));
 
             assertThat(count(BadgeCode.GRADE_5B)).isOne();
         }
@@ -827,6 +839,17 @@ class BadgeEngineTest {
     private static ClimbRecord.Line leadOn(String grade) {
         return new ClimbRecord.Line(
                 UUID.randomUUID(), ClimbMode.LEAD, true, false, false, grade, null);
+    }
+
+    /** A clean ascent (« enchaînée »): topped without a fall. */
+    private static ClimbRecord.Line send(String grade) {
+        return new ClimbRecord.Line(
+                UUID.randomUUID(), ClimbMode.TOP_ROPE, true, true, false, grade, null);
+    }
+
+    private static ClimbRecord.Line sendLead(String grade) {
+        return new ClimbRecord.Line(
+                UUID.randomUUID(), ClimbMode.LEAD, true, true, false, grade, null);
     }
 
     private static ClimbRecord.Line flash(UUID route, LocalDate openedOn) {

@@ -6,7 +6,9 @@ public enum BadgeFamily {
     TOPPED,
     /** Cumulated topped ascents in lead. */
     LEAD,
-    /** First topped ascent of a route graded at least the tier. */
+    /**
+     * First clean ascent (« enchaînée », any mode) of a route of the tier's grade (D-111, D-128).
+     */
     FIRST_GRADE,
     /** Cumulated climbing days. */
     CLIMBING_DAYS,

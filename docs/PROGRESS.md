@@ -4,6 +4,41 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-17 — CI backend qui ne testait plus rien (D-129)
+
+**Branche** : `fix/ci-backend-masque-1.1.0` (depuis `main` en `2a10c28`).
+
+### Fait
+- Repéré en suivant les PR de la 1.2.0 : l'étape Maven finissait en 10 s, `BUILD FAILURE` (Spotless 3.11.0, 3
+  fichiers) masqué par `| tee`. `shell: bash` (pipefail) sur l'étape, 3 fichiers reformatés, actionlint OK.
+
+### Reste / prochaine action
+- CI de cette PR : vérifier que l'étape Maven dure des minutes et que les tests passent (des échecs cachés depuis le
+  2026-11-08 peuvent apparaître). Puis fusionner `main` dans la pile 1.2.0 (#81 → #82 → #83).
+
+### Points bloquants
+- Aucun.
+## 2026-11-17 — 1.2.0, PR 1/5 : badge à l'enchaînement, heure des séances (D-128)
+
+**Branche** : `feature/badge-enchainement-heure-1.1.0` (depuis `main` en `2a10c28`, release 1.1.0).
+
+### Fait
+- Retours du club (2026-11-16) cadrés avec Willem : tout en 1.2.0, push compris, en 5 PR (voir ROADMAP « Version 1.2.0 »).
+- `BadgeEngine` : « Première cotation » sur `line.clean()` (enchaînée, tous modes) au lieu de `topped`. Tests
+  unitaires adaptés + cas « topée avec chutes puis enchaînée » ; `BadgeIT` (recompte) passe sur une ascension enchaînée.
+  Textes du badge (dico, condition) mis à jour.
+- Carte de séance avec auteur : « Séance d'aujourd'hui · 19 h 42 » ou « … · publiée hier à 9 h » (`sessionPublished`,
+  `formatTime`, `formatDayMonth`), Vitest. Captures `actu-fil` 360 px clair/sombre regardées.
+- Vérifié ici : typecheck, lint, format, Vitest (356). Backend : CI.
+
+### Reste / prochaine action
+- CI verte, puis PR 2 « qui a réagi » (`feature/qui-a-reagi-1.1.0`) : `GET /api/v1/sessions/{id}/reactions`
+  (lecteurs de la séance, sinon 404) + feuille ouverte depuis `SessionReactions.vue`.
+- Les 5 PR seront testées ensemble en dev avant la release 1.2.0.
+
+### Points bloquants
+- Push (PR 5) : il faudra des clés VAPID dans les `.env` dev/prod (Willem) et l'accès HTTPS sortant du serveur.
+
 ## 2026-11-15 — Champ date qui déborde sur iPhone
 
 **Branche** : `fix/champ-date-ios-1.0.0` (depuis `main` en `eaa5155`, après le merge de #73).

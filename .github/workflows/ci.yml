@@ -36,6 +36,8 @@ jobs:
           java-version: "25"
           cache: maven
       - name: Build and test (unit + Testcontainers integration tests)
+        # bash, so that pipefail is on: without it, « | tee » hid every Maven failure (D-129).
+        shell: bash
         run: ./mvnw --batch-mode --no-transfer-progress --errors verify 2>&1 | tee "$RUNNER_TEMP/maven.log"
       - name: Maven errors as annotations
         if: failure()
