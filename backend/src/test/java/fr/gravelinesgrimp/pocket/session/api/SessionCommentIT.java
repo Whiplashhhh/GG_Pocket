@@ -34,6 +34,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * Comments on sessions (spec §8.2): whoever reads the session comments on it; the author or the
@@ -101,6 +102,49 @@ class SessionCommentIT {
             mockMvc.perform(get("/api/v1/sessions/" + shared.id() + "/comments").with(as(reader)))
                     .andExpect(status().isNotFound());
         }
+    }
+
+    @Test
+    void aCommentAnswersAnotherOfTheSameSession() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var friend = members.create(Role.CLIMBER);
+        var stranger = members.create(Role.CLIMBER);
+        friendships.befriend(me, friend);
+        var session = shared(me);
+        var other = shared(me);
+        var question = idOf(comment(friend, session, "Tu me montres la méthode ?"));
+
+        var answer =
+                idOf(
+                        reply(me, session, "Jeudi, promis.", question)
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.replyTo.id").value(question))
+                                .andExpect(
+                                        jsonPath("$.replyTo.author.nickname")
+                                                .value(friend.nickname())));
+        // An answer to the answer is fine too.
+        reply(friend, session, "Top !", answer)
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.replyTo.author.nickname").value(me.nickname()));
+
+        mockMvc.perform(get("/api/v1/sessions/" + session.id() + "/comments").with(as(friend)))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].replyTo").doesNotExist())
+                .andExpect(jsonPath("$[1].replyTo.id").value(question))
+                .andExpect(jsonPath("$[2].replyTo.id").value(answer));
+
+        // Not a comment of this session, or a deleted one: refused.
+        reply(me, other, "Mauvaise séance", question).andExpect(status().isBadRequest());
+        reply(me, session, "Inconnu", UUID.randomUUID().toString())
+                .andExpect(status().isBadRequest());
+        remove(friend, question).andExpect(status().isNoContent());
+        reply(me, session, "Trop tard", question).andExpect(status().isBadRequest());
+        // The answers stay, still saying whom they answered.
+        mockMvc.perform(get("/api/v1/sessions/" + session.id() + "/comments").with(as(me)))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].replyTo.author.nickname").value(friend.nickname()));
+        // Who cannot read the session cannot answer there.
+        reply(stranger, session, "Coucou", answer).andExpect(status().isNotFound());
     }
 
     @Test
@@ -189,6 +233,16 @@ class SessionCommentIT {
                         .with(xsrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"body\": \"" + body + "\"}"));
+    }
+
+    private ResultActions reply(Member author, ClimbingSession session, String body, String replyTo)
+            throws Exception {
+        return mockMvc.perform(
+                post("/api/v1/sessions/" + session.id() + "/comments")
+                        .with(as(author))
+                        .with(xsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"body\": \"" + body + "\", \"replyTo\": \"" + replyTo + "\"}"));
     }
 
     private ResultActions remove(Member actor, String commentId) throws Exception {

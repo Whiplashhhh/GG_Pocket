@@ -187,16 +187,22 @@ export function useSessionComments(id: MaybeRefOrGetter<string>) {
   })
 }
 
-export function useAddSessionComment(sessionId: MaybeRefOrGetter<string>) {
+/** `replyTo`: the comment answered (D-128), read when the comment is sent. */
+export function useAddSessionComment(
+  sessionId: MaybeRefOrGetter<string>,
+  replyTo?: MaybeRefOrGetter<string | undefined>,
+) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (body: string) =>
-      request(
+    mutationFn: (body: string) => {
+      const answered = toValue(replyTo)
+      return request(
         api.POST('/api/v1/sessions/{id}/comments', {
           params: { path: { id: toValue(sessionId) } },
-          body: { body },
+          body: answered === undefined ? { body } : { body, replyTo: answered },
         }),
-      ),
+      )
+    },
     onSuccess: (comment) => {
       const id = toValue(sessionId)
       queryClient.setQueryData<SessionComment[]>(sessionCommentsKey(id), (comments) =>

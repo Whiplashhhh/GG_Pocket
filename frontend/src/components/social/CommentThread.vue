@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { Trash2 } from 'lucide-vue-next'
-import { computed, ref, useId } from 'vue'
+import { CornerDownRight, Trash2 } from 'lucide-vue-next'
+import { computed, nextTick, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useAwaitingValidation } from '@/api/auth'
+import { useAwaitingValidation, useCurrentMember } from '@/api/auth'
 import { errorMessageKey } from '@/api/errors'
-import { useAddSessionComment, useDeleteSessionComment, useSessionComments } from '@/api/feed'
+import {
+  useAddSessionComment,
+  useDeleteSessionComment,
+  useSessionComments,
+  type SessionComment,
+} from '@/api/feed'
 import { useAddComment, useDeleteComment, useRouteComments, type RouteComment } from '@/api/topo'
 import AwaitingValidationNotice from '@/components/member/AwaitingValidationNotice.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
@@ -14,6 +19,7 @@ import GgButton from '@/components/ui/GgButton.vue'
 import GgIconButton from '@/components/ui/GgIconButton.vue'
 import SkeletonBlock from '@/components/ui/SkeletonBlock.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
+import { threadComments } from '@/lib/commentThread'
 import { formatDateTime, formatRelative } from '@/lib/format'
 
 /**
@@ -21,6 +27,8 @@ import { formatDateTime, formatRelative } from '@/lib/format'
  * server says with `deletable`) can be deleted. A dismounted route takes no new comment, but its
  * comments can still be deleted (D-081). An account awaiting validation reads a route's comments
  * but does not post any: everyone would see it (D-107). The target never changes for a given thread.
+ * Under a session, a comment can answer another (D-128): the answers sit one level in, under the
+ * comment they started from.
  */
 const props = defineProps<{
   target: { kind: 'route' | 'session'; id: string }
@@ -28,13 +36,15 @@ const props = defineProps<{
   count: number
 }>()
 
-/** A comment on a route or on a session: the same shape. */
-type ThreadComment = RouteComment
+/** A comment on a route or on a session: the same shape, a session one may answer another. */
+type ThreadComment = RouteComment & Partial<Pick<SessionComment, 'replyTo'>>
 
 const MAX_LENGTH = 500
 
 const { t } = useI18n()
 const targetId = () => props.target.id
+/** The comment I am answering, if any (session comments only). */
+const replying = ref<ThreadComment | null>(null)
 const { comments, add, remove } =
   props.target.kind === 'route'
     ? {
@@ -44,10 +54,11 @@ const { comments, add, remove } =
       }
     : {
         comments: useSessionComments(targetId),
-        add: useAddSessionComment(targetId),
+        add: useAddSessionComment(targetId, () => replying.value?.id),
         remove: useDeleteSessionComment(targetId),
       }
 
+const member = useCurrentMember()
 const awaiting = useAwaitingValidation()
 const closedToMe = computed(() => awaiting.value && props.target.kind === 'route')
 const headingId = useId()
@@ -76,6 +87,14 @@ const texts = computed(() =>
 )
 
 const shownCount = computed(() => comments.data.value?.length ?? props.count)
+const thread = computed(() => threadComments<ThreadComment>(comments.data.value ?? []))
+const canReply = computed(() => props.target.kind === 'session' && !props.readOnly)
+
+async function replyTo(comment: ThreadComment) {
+  replying.value = comment
+  await nextTick()
+  document.getElementById(fieldId)?.focus()
+}
 
 /** Kept after the confirmation closes: the dialog may close before it says "confirm". */
 function askDelete(comment: ThreadComment) {
@@ -95,6 +114,7 @@ function submit() {
   add.mutate(text, {
     onSuccess: () => {
       body.value = ''
+      replying.value = null
     },
     onError: (error) => {
       sendError.value = error
@@ -138,16 +158,17 @@ function confirmDelete() {
     </p>
     <ul v-else class="mt-2 divide-y divide-rule border-y border-rule">
       <li
-        v-for="comment in comments.data.value"
+        v-for="{ comment, reply } in thread"
         :key="comment.id"
-        class="flex gap-3 py-3 pr-2 pl-4"
+        class="flex gap-3 py-3 pr-2"
+        :class="reply ? 'pl-14' : 'pl-4'"
       >
         <UserAvatar
           :first-name="comment.author.nickname"
           last-name=""
           :seed="comment.author.nickname"
           :src="comment.author.avatarUrl"
-          :size="36"
+          :size="reply ? 28 : 36"
         />
         <div class="min-w-0 flex-1">
           <p class="text-sm">
@@ -160,7 +181,21 @@ function confirmDelete() {
               >{{ formatRelative(comment.createdAt) }}</time
             >
           </p>
+          <p v-if="comment.replyTo" class="flex items-center gap-1 text-sm text-ink-muted">
+            <CornerDownRight :size="14" aria-hidden="true" />{{
+              t('comments.answering', { nickname: comment.replyTo.author.nickname })
+            }}
+          </p>
           <p class="mt-0.5 break-words whitespace-pre-line">{{ comment.body }}</p>
+          <button
+            v-if="canReply && comment.author.id !== member?.id"
+            type="button"
+            class="-ml-1 min-h-11 px-1 text-sm font-semibold text-ink-muted underline-offset-4 hover:underline"
+            :aria-label="t('comments.replyNamed', { nickname: comment.author.nickname })"
+            @click="replyTo(comment)"
+          >
+            {{ t('comments.reply') }}
+          </button>
         </div>
         <GgIconButton
           v-if="comment.deletable"
@@ -188,7 +223,21 @@ function confirmDelete() {
       novalidate
       @submit.prevent="submit"
     >
-      <label :for="fieldId" class="font-semibold">{{ t('comments.label') }}</label>
+      <div class="flex items-center justify-between gap-3">
+        <label :for="fieldId" class="font-semibold">{{
+          replying
+            ? t('comments.replyLabel', { nickname: replying.author.nickname })
+            : t('comments.label')
+        }}</label>
+        <button
+          v-if="replying"
+          type="button"
+          class="min-h-11 px-1 text-sm font-semibold text-ink-muted underline-offset-4 hover:underline"
+          @click="replying = null"
+        >
+          {{ t('comments.replyCancel') }}
+        </button>
+      </div>
       <textarea
         :id="fieldId"
         v-model="body"

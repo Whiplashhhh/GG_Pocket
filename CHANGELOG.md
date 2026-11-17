@@ -11,6 +11,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   On l’écrit aussi, pas de faux alibi.
 - **Qui a réagi ?** Touche les réactions de ta séance (ou « Qui a réagi ? » sous celle d’un copain) : tu vois qui
   a mis le feu, qui a sorti le gorille.
+- **Répondre** sous chaque commentaire d’une séance : ta réponse se range juste en dessous, avec « en réponse à… »
+  pour que tout le monde suive la conversation.
 
 ### Modifié
 

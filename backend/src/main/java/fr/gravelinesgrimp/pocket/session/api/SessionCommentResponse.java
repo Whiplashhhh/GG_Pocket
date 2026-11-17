@@ -16,14 +16,26 @@ public record SessionCommentResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) String body,
         @Schema(requiredMode = RequiredMode.REQUIRED) Instant createdAt,
         @Schema(requiredMode = RequiredMode.REQUIRED, description = "Whether I may delete it")
-                boolean deletable) {
+                boolean deletable,
+        @Schema(description = "The comment it answers; absent for a plain comment")
+                ReplyTo replyTo) {
+
+    /** The comment answered and its author (D-128). */
+    @Schema(name = "SessionCommentReplyTo")
+    public record ReplyTo(
+            @Schema(requiredMode = RequiredMode.REQUIRED) UUID id,
+            @Schema(requiredMode = RequiredMode.REQUIRED) MemberRefResponse author) {}
 
     static SessionCommentResponse from(SessionCommentView view) {
+        var replyTo = view.replyTo();
         return new SessionCommentResponse(
                 view.id(),
                 MemberRefResponse.from(view.author()),
                 view.body(),
                 view.createdAt(),
-                view.deletable());
+                view.deletable(),
+                replyTo == null
+                        ? null
+                        : new ReplyTo(replyTo.id(), MemberRefResponse.from(replyTo.author())));
     }
 }

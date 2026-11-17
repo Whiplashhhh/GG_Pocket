@@ -2857,9 +2857,21 @@ export interface components {
       deletable: boolean
       /** Format: uuid */
       id: string
+      /** @description The comment it answers; absent for a plain comment */
+      replyTo?: components['schemas']['SessionCommentReplyTo']
+    }
+    SessionCommentReplyTo: {
+      author: components['schemas']['MemberRef']
+      /** Format: uuid */
+      id: string
     }
     SessionCommentRequest: {
       body: string
+      /**
+       * Format: uuid
+       * @description The comment of the same session this one answers
+       */
+      replyTo?: string
     }
     /** @description nextCursor is absent on the last page. */
     SessionPage: {
