@@ -173,8 +173,7 @@ public class AccountDeletionService {
         }
         // Written first: the entry keeps the names once the account is gone (actor_id goes null).
         if (actor == null) {
-            auditLog.recordBySystem(
-                    action, AuditTargetType.MEMBER, member.id(), member.nickname());
+            auditLog.recordBySystem(action, AuditTargetType.MEMBER, member.id(), member.nickname());
         } else {
             auditLog.record(
                     actor,

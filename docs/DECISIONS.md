@@ -1552,3 +1552,11 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
   - Push, réglages par défaut (Willem) : commentaires, réponses, demandes d'ami activés ; réactions et séances d'amis
     désactivées.
 - **Statut** : validée (Willem, 2026-11-17).
+
+### D-129 — CI backend : les échecs Maven étaient masqués (2026-11-17)
+- **Contexte** : depuis #64 (2026-11-08), l'étape Maven de la CI écrit dans `| tee` sans `pipefail` : un échec de
+  Maven ne faisait pas échouer le job. Depuis le passage de Spotless en 3.11.0 (#67), `spotless:check` refusait 3
+  fichiers et Maven s'arrêtait **avant les tests** : le job « Backend » restait vert sans rien tester (1.1.0 comprise).
+- **Choix** : `shell: bash` sur l'étape (GitHub lance alors `bash -eo pipefail`) ; les 3 fichiers reformatés à
+  l'identique de ce que demande Spotless 3.11.0. Repère pour la suite : l'étape Maven dure plusieurs minutes, pas 10 s.
+- **Statut** : validée (correctif CI, aucun changement visible).
