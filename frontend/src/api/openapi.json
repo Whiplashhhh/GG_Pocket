@@ -4301,6 +4301,9 @@
           "firstName": {
             "type": "string"
           },
+          "inClubFeed": {
+            "type": "boolean"
+          },
           "lastName": {
             "type": "string"
           },
