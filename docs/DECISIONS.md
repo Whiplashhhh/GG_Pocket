@@ -1529,3 +1529,11 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
   devant les résultats ; vider la recherche ramène la liste telle qu'on l'avait laissée. Mention du développeur dans le
   pied de page du profil, sous « Chercher une mise à jour », hors CHANGELOG (donc absente de « Quoi de neuf ? »).
 - **Statut** : validée (Willem, 2026-11-14 : tri par cotation croissante plutôt que par secteur).
+
+### D-129 — CI backend : les échecs Maven étaient masqués (2026-11-17)
+- **Contexte** : depuis #64 (2026-11-08), l'étape Maven de la CI écrit dans `| tee` sans `pipefail` : un échec de
+  Maven ne faisait pas échouer le job. Depuis le passage de Spotless en 3.11.0 (#67), `spotless:check` refusait 3
+  fichiers et Maven s'arrêtait **avant les tests** : le job « Backend » restait vert sans rien tester (1.1.0 comprise).
+- **Choix** : `shell: bash` sur l'étape (GitHub lance alors `bash -eo pipefail`) ; les 3 fichiers reformatés à
+  l'identique de ce que demande Spotless 3.11.0. Repère pour la suite : l'étape Maven dure plusieurs minutes, pas 10 s.
+- **Statut** : validée (correctif CI, aucun changement visible).
