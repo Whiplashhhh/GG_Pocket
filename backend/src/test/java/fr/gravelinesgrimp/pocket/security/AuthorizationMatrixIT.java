@@ -300,6 +300,10 @@ class AuthorizationMatrixIT {
                             Role.TOURIST),
                     new Endpoint(
                             HttpMethod.GET,
+                            "/api/v1/sessions/" + SOME_ID + "/reactions",
+                            null,
+                            Role.TOURIST),                    new Endpoint(
+                            HttpMethod.GET,
                             "/api/v1/sessions/" + SOME_ID + "/comments",
                             null,
                             Role.TOURIST),
