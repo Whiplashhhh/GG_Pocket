@@ -6663,6 +6663,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "replyTo": {
+            "$ref": "#/components/schemas/SessionCommentReplyTo",
+            "description": "The comment it answers; absent for a plain comment"
           }
         },
         "required": [
@@ -6673,6 +6677,22 @@
           "id"
         ]
       },
+      "SessionCommentReplyTo": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "$ref": "#/components/schemas/MemberRef"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "author",
+          "id"
+        ]
+      },
       "SessionCommentRequest": {
         "type": "object",
         "properties": {
@@ -6680,6 +6700,11 @@
             "type": "string",
             "maxLength": 500,
             "minLength": 1
+          },
+          "replyTo": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The comment of the same session this one answers"
           }
         },
         "required": [

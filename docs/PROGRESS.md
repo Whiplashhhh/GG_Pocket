@@ -18,6 +18,27 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ### Points bloquants
 - Aucun.
+## 2026-11-17 — 1.2.0, PR 3/5 : répondre aux commentaires (D-128)
+
+**Branche** : `feature/repondre-commentaires-1.1.0`, empilée sur `feature/qui-a-reagi-1.1.0` (PR #82).
+
+### Fait
+- Migration `V25__add_session_comment_reply.sql` (`reply_to_id`, `on delete set null`, index partiel).
+  `SessionCommentService.add(…, replyTo)` : même séance et non supprimé, sinon 400 ; `list` renvoie `replyTo`
+  (id + auteur, même si le commentaire répondu est supprimé). `SessionCommentIT.aCommentAnswersAnotherOfTheSameSession`.
+- Contrat écrit à la main (`SessionCommentReplyTo`, `replyTo` dans requête et réponse), types régénérés.
+- Front : `lib/commentThread.ts` (+ Vitest), `CommentThread.vue` (« Répondre », retrait, « en réponse à », libellé
+  « Ta réponse à X » + « Annuler la réponse »), faux serveur, e2e `social.spec.ts`, scénario `seance-repondre`
+  (captures regardées). Lint, format, typecheck, Vitest (357), e2e social Desktop Chrome verts.
+
+### Reste / prochaine action
+- PR 4 « cloche » (`feature/cloche-1.1.0`, depuis cette branche) : colonne `member.notifications_seen_at` (V26),
+  `GET /api/v1/me/notifications` (calculé à la volée : réactions/commentaires sur mes séances, réponses à mes
+  commentaires, séances d'amis, demandes d'ami), `PUT /api/v1/me/notifications/seen`, cloche + point dans l'en-tête.
+
+### Points bloquants
+- Push (PR 5) : clés VAPID dans les `.env` dev/prod (Willem) et accès HTTPS sortant du serveur.
+
 ## 2026-11-17 — 1.2.0, PR 2/5 : qui a réagi (D-128)
 
 **Branche** : `feature/qui-a-reagi-1.1.0`, empilée sur `feature/badge-enchainement-heure-1.1.0` (PR #81) : chaque

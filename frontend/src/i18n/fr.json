@@ -565,6 +565,11 @@
     "deleted": "Commentaire supprimé.",
     "required": "Écris quelque chose avant de publier.",
     "loadError": "Les commentaires ne se chargent pas.",
+    "reply": "Répondre",
+    "replyNamed": "Répondre à {nickname}",
+    "replyLabel": "Ta réponse à {nickname}",
+    "replyCancel": "Annuler la réponse",
+    "answering": "en réponse à {nickname}",
     "session": {
       "empty": "Pas encore de commentaire. Un bravo, une question sur la méthode, un « tu m’avais dit séance tranquille » ?",
       "placeholder": "Un bravo, une question, une vanne gentille…",

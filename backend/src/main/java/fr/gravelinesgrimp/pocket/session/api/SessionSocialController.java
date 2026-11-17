@@ -125,7 +125,8 @@ class SessionSocialController {
             @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
             @PathVariable UUID id,
             @Valid @RequestBody SessionCommentRequest body) {
-        return SessionCommentResponse.from(comments.add(me.memberId(), id, body.body()));
+        return SessionCommentResponse.from(
+                comments.add(me.memberId(), id, body.body(), body.replyTo()));
     }
 
     @DeleteMapping("/session-comments/{id}")

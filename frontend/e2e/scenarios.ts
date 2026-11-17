@@ -154,8 +154,13 @@ const feedAlive = (club: FakeClub) => {
   club.climbs.comment(tom, hers, 'Les avant-bras en béton ? Les miens sont en guimauve.', 90)
   club.climbs.react(lea, his, 'CLAP')
   club.climbs.react(marie, his, 'STRONG')
-  club.climbs.comment(lea, his, 'Enfin ! Tu me montres la méthode du crux jeudi ?', 120)
-  club.climbs.comment(tom, his, 'Jeudi 19 h, ramène de la magnésie.', 60)
+  const leaAsks = club.climbs.comment(
+    lea,
+    his,
+    'Enfin ! Tu me montres la méthode du crux jeudi ?',
+    120,
+  )
+  club.climbs.comment(tom, his, 'Jeudi 19 h, ramène de la magnésie.', 60, leaAsks)
   club.climbs.add(lea, 0, [{ route: 'Réglisse', mode: 'LEAD', clean: true }], { feeling: 7 })
   // Who held the rope: marie for tom, tom then léa for marie (D-101).
   for (const ascent of his.ascents) ascent.belayerId = marie.id
@@ -583,6 +588,17 @@ export const CAPTURES: Capture[] = [
         .first()
         .click()
       await page.getByRole('dialog', { name: 'Qui a réagi' }).getByRole('link').first().waitFor()
+    },
+  },
+  {
+    name: 'seance-repondre',
+    path: '/actu',
+    as: 'CLIMBER',
+    prepare: feedAlive,
+    act: async (page) => {
+      await page.getByRole('link', { name: 'Séance d’hier de tom.bloc' }).click()
+      await page.getByRole('button', { name: 'Répondre à tom.bloc' }).click()
+      await page.getByLabel('Ta réponse à tom.bloc').fill('J’arrive avec un seau de magnésie.')
     },
   },
   {

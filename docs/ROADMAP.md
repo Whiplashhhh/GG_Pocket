@@ -188,7 +188,7 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [x] Badge « Première cotation » gagné à l'enchaînement, en tête comme en mouli (`feature/badge-enchainement-heure-1.1.0`)
 - [x] Heure de publication sur les cartes de séance
 - [x] Qui a réagi : toucher les réactions d'une séance montre qui a mis quoi (`feature/qui-a-reagi-1.1.0`)
-- [ ] Répondre à un commentaire de séance (un niveau, « @pseudo »)
+- [x] Répondre à un commentaire de séance, réponses en retrait sous le premier commentaire (`feature/repondre-commentaires-1.1.0`)
 - [ ] Cloche : réactions et commentaires sur mes séances, réponses, séances d'amis, demandes d'ami, point rouge
 - [ ] Notifications push (PWA installée) : abonnement par appareil, réglage par type (feu vert de Willem, phase 9 avancée)
 

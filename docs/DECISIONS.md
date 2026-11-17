@@ -1541,6 +1541,11 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
   - Heure : on connaît l'heure d'enregistrement, pas celle de la grimpe. Séance saisie le jour même : « Séance
     d'aujourd'hui · 19 h 42 » ; saisie plus tard : « Séance d'hier · publiée aujourd'hui à 9 h 05 », pour ne jamais
     afficher une heure sur un jour où elle n'a pas eu lieu. Sur les cartes avec auteur (fil, profil, fiche), pas dans le carnet.
+  - Réponses : colonne `session_comment.reply_to_id` (V25) vers le commentaire **directement** répondu (même séance,
+    non supprimé, sinon 400), pour prévenir la bonne personne dans la cloche. Répondre à une réponse est permis ;
+    l'appli range toutes les réponses sous le premier commentaire, un seul niveau de retrait, et affiche « en réponse
+    à X ». La réponse à un commentaire supprimé reste, au premier niveau, avec son « en réponse à ». Pas de bouton
+    « Répondre » sur ses propres commentaires.
   - Cloche : contenu calculé à la volée depuis les tables existantes + date de dernière ouverture par membre (rien à
     synchroniser, une suppression ou une fin d'amitié retire l'élément d'elle-même). Contenu : réactions et commentaires
     sur mes séances, réponses à mes commentaires, séances d'amis, demandes d'ami (Willem).
