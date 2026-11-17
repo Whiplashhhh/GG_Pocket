@@ -1947,6 +1947,7 @@ export interface components {
       email?: string
       favoriteRoute?: components['schemas']['ExportedRoute']
       firstName?: string
+      inClubFeed?: boolean
       lastName?: string
       /** Format: date-time */
       lastSeenAt?: string
