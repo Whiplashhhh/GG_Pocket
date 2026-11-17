@@ -1549,6 +1549,13 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
   - Cloche : contenu calculé à la volée depuis les tables existantes + date de dernière ouverture par membre (rien à
     synchroniser, une suppression ou une fin d'amitié retire l'élément d'elle-même). Contenu : réactions et commentaires
     sur mes séances, réponses à mes commentaires, séances d'amis, demandes d'ami (Willem).
+  - Cloche, détails : module `notification`, table `notification_seen` (V26, une ligne par membre, effacée avec le
+    compte). Requête unique (`NotificationQueries`) sur le dernier mois, 50 événements au plus ; s'y ajoute « X a
+    accepté ta demande d'ami ». Une réponse sous la séance d'un autre n'apparaît que si je peux encore lire la séance ;
+    les comptes inactifs disparaissent. `unread` = plus récent que la dernière ouverture (jamais ouverte : tout est
+    nouveau, la cloche sonnera donc pour tout le monde à la sortie de la 1.2.0). L'appli interroge toutes les minutes
+    au premier plan et au retour sur l'appli ; ouvrir la page éteint le point, les marques « Nouveau » restent jusqu'à
+    la visite suivante. Demande d'ami → profil (où l'on répond) ; demande acceptée → profil de l'ami.
   - Push, réglages par défaut (Willem) : commentaires, réponses, demandes d'ami activés ; réactions et séances d'amis
     désactivées.
 - **Statut** : validée (Willem, 2026-11-17).

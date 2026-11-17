@@ -282,6 +282,9 @@ class AuthorizationMatrixIT {
                             "/api/v1/members/" + SOME_ID + "/logbook",
                             null,
                             Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/notifications", null, Role.TOURIST),
+                    new Endpoint(
+                            HttpMethod.PUT, "/api/v1/me/notifications/seen", null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/friends", null, Role.TOURIST),
                     new Endpoint(
                             HttpMethod.PUT, "/api/v1/me/friends/" + SOME_ID, null, Role.TOURIST),
@@ -366,6 +369,7 @@ class AuthorizationMatrixIT {
                     new Endpoint(HttpMethod.GET, "/api/v1/me/sessions", null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/friends", null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/feed", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/notifications", null, Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/badges", null, Role.TOURIST));
 
     @Autowired private MockMvc mockMvc;

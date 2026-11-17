@@ -19,7 +19,23 @@
     "homeLink": "GG Pocket, retour à l’actu",
     "profileLink": "Mon profil",
     "management": "Espace gestion",
-    "profileLinkRequests": "Mon profil, 1 demande d’ami en attente | Mon profil, 1 demande d’ami en attente | Mon profil, {n} demandes d’ami en attente"
+    "profileLinkRequests": "Mon profil, 1 demande d’ami en attente | Mon profil, 1 demande d’ami en attente | Mon profil, {n} demandes d’ami en attente",
+    "notifications": "Notifications | Notifications, 1 nouvelle | Notifications, {n} nouvelles"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "intro": "Ce qui s’est passé autour de toi ce dernier mois.",
+    "new": "Nouveau",
+    "emptyTitle": "Rien de neuf au pied de la voie",
+    "emptyBody": "Quand on réagira à tes séances, quand on te répondra ou quand tes potes grimperont, ça tombera ici.",
+    "kinds": {
+      "REACTION": "{nickname} a réagi {emoji} à ta séance {day}.",
+      "COMMENT": "{nickname} a commenté ta séance {day} : « {excerpt} »",
+      "REPLY": "{nickname} t’a répondu : « {excerpt} »",
+      "FRIEND_SESSION": "{nickname} a publié sa séance {day}.",
+      "FRIEND_REQUEST": "{nickname} te demande en ami. Réponds depuis ton profil.",
+      "FRIEND_ACCEPTED": "{nickname} a accepté ta demande d’ami."
+    }
   },
   "roles": {
     "TOURIST": "Touriste",

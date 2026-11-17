@@ -13,6 +13,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
   a mis le feu, qui a sorti le gorille.
 - **Répondre** sous chaque commentaire d’une séance : ta réponse se range juste en dessous, avec « en réponse à… »
   pour que tout le monde suive la conversation.
+- **La cloche** 🔔 en haut de l’écran : un point rouge quand il s’est passé quelque chose. Dedans, les réactions et
+  commentaires sur tes séances, les réponses à tes commentaires, les séances de tes potes et les demandes d’ami du
+  dernier mois. Un toucher et tu y es.
 
 ### Modifié
 

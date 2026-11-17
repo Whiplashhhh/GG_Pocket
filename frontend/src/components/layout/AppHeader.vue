@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Wrench } from 'lucide-vue-next'
+import { Bell, Wrench } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useCurrentMember } from '@/api/auth'
+import { useNotifications } from '@/api/notifications'
 import { useIncomingRequestCount } from '@/api/social'
 import RoleBadge from '@/components/ui/RoleBadge.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
@@ -16,6 +17,9 @@ const member = useCurrentMember()
 const canManage = computed(() => isAtLeast(member.value?.role, 'SETTER'))
 /** Friend requests waiting for my answer: a dot on my avatar (spec §8.2). */
 const requests = useIncomingRequestCount(() => member.value !== undefined)
+/** What happened since I last opened the bell (D-128): a dot on it. */
+const notifications = useNotifications(() => member.value !== undefined)
+const unread = computed(() => notifications.data.value?.unreadCount ?? 0)
 const profileLabel = computed(() =>
   requests.value > 0 ? t('header.profileLinkRequests', requests.value) : t('header.profileLink'),
 )
@@ -34,6 +38,19 @@ const profileLabel = computed(() =>
 
       <div class="flex-1" />
 
+      <RouterLink
+        v-if="member"
+        to="/notifications"
+        class="relative inline-flex size-11 shrink-0 items-center justify-center rounded-control text-ink hover:bg-surface-sunken aria-[current=page]:text-brand-ink"
+        :aria-label="t('header.notifications', unread)"
+      >
+        <Bell :size="22" aria-hidden="true" />
+        <span
+          v-if="unread > 0"
+          class="absolute top-2 right-2 size-3 rounded-full bg-danger ring-2 ring-bg"
+          aria-hidden="true"
+        />
+      </RouterLink>
       <RouterLink
         v-if="canManage"
         to="/gestion"
