@@ -825,7 +825,7 @@ export class FakeSessions implements AscentSource {
       return empty
     }
 
-    const match = /^\/sessions\/([^/]+)(\/photo|\/privacy|\/reaction|\/comments)?$/.exec(pathname)
+    const match = /^\/sessions\/([^/]+)(\/photo|\/privacy|\/reactions?|\/comments)?$/.exec(pathname)
     if (match === null) return undefined
     const [, id, part] = match as (string | undefined)[]
     const found = this.sessions.find((candidate) => candidate.id === id)
@@ -833,11 +833,20 @@ export class FakeSessions implements AscentSource {
     if (part === '/reaction') {
       if (method === 'PUT') {
         if (found.memberId === me.id) return problem(400, 'VALIDATION_FAILED')
+        // The latest last, like the server's « updated_at ».
+        found.reactions.delete(me.id)
         found.reactions.set(me.id, (body as Schemas['SessionReactionRequest']).kind)
       } else {
         found.reactions.delete(me.id)
       }
       return json(this.reactions(me, found))
+    }
+    if (part === '/reactions' && method === 'GET') {
+      return json(
+        [...found.reactions.entries()]
+          .reverse()
+          .map(([memberId, kind]) => ({ member: this.memberRef(memberId), kind })),
+      )
     }
     if (part === '/comments') {
       if (method === 'GET') {

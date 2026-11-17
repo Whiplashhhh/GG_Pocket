@@ -9,6 +9,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 - **L’heure des séances** : dans le fil, chaque séance dit à quelle heure elle a été publiée. Saisie le lendemain ?
   On l’écrit aussi, pas de faux alibi.
+- **Qui a réagi ?** Touche les réactions de ta séance (ou « Qui a réagi ? » sous celle d’un copain) : tu vois qui
+  a mis le feu, qui a sorti le gorille.
 
 ### Modifié
 

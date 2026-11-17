@@ -4,6 +4,7 @@ import static fr.gravelinesgrimp.pocket.MemberFixtures.as;
 import static fr.gravelinesgrimp.pocket.MemberFixtures.xsrf;
 import static fr.gravelinesgrimp.pocket.SessionFixtures.clean;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -117,6 +118,38 @@ class SessionReactionIT {
     }
 
     @Test
+    void whoReactedIsForTheReadersOfTheSession() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var friend = members.create(Role.CLIMBER);
+        var other = members.create(Role.CLIMBER);
+        friendships.befriend(me, friend);
+        friendships.befriend(me, other);
+        var stranger = members.create(Role.CLIMBER);
+        var admin = members.create(Role.ADMIN);
+        var session = shared(me);
+        react(friend, session, "FIRE").andExpect(status().isOk());
+        react(other, session, "CLAP").andExpect(status().isOk());
+
+        // The climber and every reader of the session see who reacted, the latest first.
+        for (var reader : new Member[] {me, friend}) {
+            reactors(reader, session)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(2)))
+                    .andExpect(jsonPath("$[0].member.id").value(other.id().toString()))
+                    .andExpect(jsonPath("$[0].member.nickname").value(other.nickname()))
+                    .andExpect(jsonPath("$[0].kind").value("CLAP"))
+                    .andExpect(jsonPath("$[1].member.id").value(friend.id().toString()))
+                    .andExpect(jsonPath("$[1].kind").value("FIRE"));
+        }
+        // Who cannot read the session cannot list them, whatever their role (no IDOR).
+        for (var reader : new Member[] {stranger, admin}) {
+            reactors(reader, session).andExpect(status().isNotFound());
+        }
+        mockMvc.perform(get("/api/v1/sessions/" + session.id() + "/reactions"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void anUnknownKindIsRefused() throws Exception {
         var me = members.create(Role.CLIMBER);
         var friend = members.create(Role.CLIMBER);
@@ -131,6 +164,11 @@ class SessionReactionIT {
                 today(),
                 8,
                 clean(routes.create(members.create(Role.SETTER)), ClimbMode.LEAD));
+    }
+
+    private ResultActions reactors(Member member, ClimbingSession session) throws Exception {
+        return mockMvc.perform(
+                get("/api/v1/sessions/" + session.id() + "/reactions").with(as(member)));
     }
 
     private ResultActions react(Member member, ClimbingSession session, String kind)
