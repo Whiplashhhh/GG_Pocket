@@ -22,6 +22,38 @@
     "profileLinkRequests": "Mon profil, 1 demande d’ami en attente | Mon profil, 1 demande d’ami en attente | Mon profil, {n} demandes d’ami en attente",
     "notifications": "Notifications | Notifications, 1 nouvelle | Notifications, {n} nouvelles"
   },
+  "push": {
+    "title": "Notifications sur ton téléphone",
+    "intro": "Reçois une notification quand on commente ta séance, quand on te répond ou quand on te demande en ami, même appli fermée.",
+    "unsupported": "Ce navigateur ne sait pas recevoir de notifications. La cloche de l’appli, elle, marche partout.",
+    "needsInstall": "Sur iPhone, les notifications ne marchent que dans l’appli installée sur l’écran d’accueil. Installe-la, ouvre-la depuis son icône, et reviens ici.",
+    "install": "Installer l’appli",
+    "denied": "Tu as refusé les notifications dans ton navigateur. Pour changer d’avis, autorise-les dans les réglages du navigateur (ou de l’iPhone) pour GG Pocket, puis reviens ici.",
+    "off": "Les notifications sont coupées sur cet appareil.",
+    "on": "Les notifications arrivent sur cet appareil.",
+    "turnOn": "Activer sur cet appareil",
+    "turnOff": "Couper sur cet appareil",
+    "refused": "Ton navigateur n’a pas donné son feu vert. Réessaie, et choisis « Autoriser ».",
+    "failed": "L’activation n’a pas abouti. Vérifie ta connexion et réessaie.",
+    "kindsTitle": "Ce qui te notifie",
+    "kindsHint": "Pour tous tes appareils. La cloche de l’appli montre tout, quoi que tu choisisses ici.",
+    "kinds": {
+      "comments": "Un commentaire sur ta séance",
+      "replies": "Une réponse à ton commentaire",
+      "friendRequests": "Les demandes d’ami, et quand on accepte la tienne",
+      "reactions": "Une réaction à ta séance",
+      "friendSessions": "Une séance publiée par un pote"
+    },
+    "messages": {
+      "REACTION": "{nickname} a réagi {emoji} à ta séance {day}",
+      "COMMENT": "{nickname} a commenté ta séance {day}",
+      "REPLY": "{nickname} t’a répondu",
+      "FRIEND_SESSION": "{nickname} a publié sa séance {day}",
+      "FRIEND_REQUEST": "{nickname} te demande en ami",
+      "FRIEND_ACCEPTED": "{nickname} a accepté ta demande d’ami"
+    },
+    "fallback": "Du nouveau sur GG Pocket"
+  },
   "notifications": {
     "title": "Notifications",
     "intro": "Ce qui s’est passé autour de toi ce dernier mois.",
@@ -816,6 +848,7 @@
     "comingSoon": "Les chiffres clés arrivent bientôt : en attendant, ton carnet tient les comptes.",
     "settings": "Réglages",
     "password": "Mot de passe",
+    "push": "Notifications sur ton téléphone",
     "devices": "Mes appareils",
     "belays": "Mes assurages",
     "install": "Installer l’appli",

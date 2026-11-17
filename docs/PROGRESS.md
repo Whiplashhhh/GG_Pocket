@@ -4,6 +4,32 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-17 — 1.2.0, PR 5/5 : notifications push (D-130)
+
+**Branche** : `feature/notifications-push-1.1.0`, empilée sur `feature/cloche-1.1.0` (PR #85). Dernière de la pile :
+c'est elle qu'on déploie en dev pour tout tester.
+
+### Fait
+- Backend (module `notification`) : `WebPush` (RFC 8291/8292 avec le JDK, vecteur de la RFC en test, vérifié aussi
+  en Python), `PushService` (Apple/Google/Mozilla seulement), `PushStore` (V27), `PushDelivery` (après commit, thread
+  virtuel), `PushSettingsService` + `PushController` (`/me/push`, `/preferences`, `/devices`). Événements publiés par
+  réactions (la première), commentaires/réponses, séances partagées, demandes/acceptations d'ami. `PushIT` déchiffre
+  le message reçu comme un téléphone ; matrice d'autorisations complétée.
+- Déploiement : relais `:8081` dans `deploy/web/Caddyfile`, `GG_PUSH_*` dans `compose.yml` et `application.yml`,
+  `deploy/scripts/vapid-keys.sh` (paire vérifiée en Python), DEPLOYMENT §11.
+- Front : `/profil/notifications` (`PushSettingsView`, `usePushDevice`, `lib/push.ts`), `push-sw.js` généré au build
+  (`lib/pushWorker.ts`, textes de `fr.json`, `importScripts`), ouverture de page au toucher (`main.ts`), appareil
+  retiré à la déconnexion. Vitest (366), e2e notifications/social/accounts/app-shell/sessions verts, captures
+  `profil-notifications` regardées.
+
+### Reste / prochaine action
+- Réconcilier `openapi.json` avec celui généré par la CI (#84 d'abord : dérive de `main`, puis la pile).
+- CI verte sur #81 → #86, puis Willem : clés VAPID + `GG_PUSH_SUBJECT` dans `/opt/gg-pocket/dev/.env`, déploiement
+  dev de `feature/notifications-push-1.1.0`, essais (iPhone installé, Android), merge dans l'ordre, release `minor`.
+
+### Points bloquants
+- Clés VAPID et adresse de contact : à poser par Willem (secrets, serveur).
+
 ## 2026-11-17 — 1.2.0, PR 4/5 : la cloche (D-128)
 
 **Branche** : `feature/cloche-1.1.0`, empilée sur `feature/repondre-commentaires-1.1.0` (PR #83).

@@ -16,6 +16,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 - **La cloche** 🔔 en haut de l’écran : un point rouge quand il s’est passé quelque chose. Dedans, les réactions et
   commentaires sur tes séances, les réponses à tes commentaires, les séances de tes potes et les demandes d’ami du
   dernier mois. Un toucher et tu y es.
+- **Les notifications sur ton téléphone**, même appli fermée : un commentaire, une réponse, une demande d’ami… Active-les
+  dans ton profil, « Notifications sur ton téléphone », et choisis ce qui te fait vibrer. Sur iPhone, ça marche depuis
+  l’appli installée sur l’écran d’accueil.
 
 ### Modifié
 

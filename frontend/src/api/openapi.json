@@ -1667,6 +1667,114 @@
         ]
       }
     },
+    "/api/v1/me/push": {
+      "get": {
+        "operationId": "getMyPushSettings",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "endpoint",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushSettings"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Whether push is on, what I want, and whether this device receives it",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/me/push/devices": {
+      "delete": {
+        "operationId": "removeMyPushDevice",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "endpoint",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "This device no longer receives my notifications",
+        "tags": [
+          "Notifications"
+        ]
+      },
+      "put": {
+        "operationId": "addMyPushDevice",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushDevice"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "This device receives my notifications",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/me/push/preferences": {
+      "put": {
+        "operationId": "saveMyPushPreferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushPreferences"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushPreferences"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Which notifications I want",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
     "/api/v1/me/sessions": {
       "get": {
         "operationId": "listMySessions",
@@ -5791,6 +5899,89 @@
           "firstName",
           "lastName",
           "nickname"
+        ]
+      },
+      "PushDevice": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1
+          },
+          "keys": {
+            "$ref": "#/components/schemas/PushDeviceKeys"
+          }
+        },
+        "required": [
+          "endpoint",
+          "keys"
+        ]
+      },
+      "PushDeviceKeys": {
+        "type": "object",
+        "properties": {
+          "auth": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1
+          },
+          "p256dh": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1
+          }
+        },
+        "required": [
+          "auth",
+          "p256dh"
+        ]
+      },
+      "PushPreferences": {
+        "type": "object",
+        "properties": {
+          "comments": {
+            "type": "boolean"
+          },
+          "friendRequests": {
+            "type": "boolean"
+          },
+          "friendSessions": {
+            "type": "boolean"
+          },
+          "reactions": {
+            "type": "boolean"
+          },
+          "replies": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "comments",
+          "friendRequests",
+          "friendSessions",
+          "reactions",
+          "replies"
+        ]
+      },
+      "PushSettings": {
+        "type": "object",
+        "properties": {
+          "preferences": {
+            "$ref": "#/components/schemas/PushPreferences"
+          },
+          "publicKey": {
+            "type": "string",
+            "description": "The server's VAPID key; absent when push is off"
+          },
+          "thisDevice": {
+            "type": "boolean",
+            "description": "Whether the device asked about receives my notifications"
+          }
+        },
+        "required": [
+          "preferences",
+          "thisDevice"
         ]
       },
       "Ranking": {

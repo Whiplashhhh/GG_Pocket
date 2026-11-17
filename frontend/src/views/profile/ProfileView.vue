@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  BellRing,
   BookOpen,
   ChevronRight,
   Download,
@@ -230,6 +231,10 @@ const facts = computed(() => {
         <SettingsLink to="/profil/mot-de-passe">
           <template #icon><KeyRound :size="20" /></template>
           {{ t('profile.password') }}
+        </SettingsLink>
+        <SettingsLink to="/profil/notifications">
+          <template #icon><BellRing :size="20" /></template>
+          {{ t('profile.push') }}
         </SettingsLink>
         <SettingsLink to="/profil/appareils">
           <template #icon><Smartphone :size="20" /></template>

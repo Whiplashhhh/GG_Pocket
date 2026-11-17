@@ -61,4 +61,44 @@ test.describe('the bell (D-128)', () => {
     await page.goto('/notifications')
     await expect(page.getByText('Rien de neuf au pied de la voie')).toBeVisible()
   })
+
+  test('push: the kinds are chosen in the profile, and the device is turned on there (D-130)', async ({
+    page,
+    club,
+    me,
+  }) => {
+    const marie = signedIn(me)
+    club.pushKey =
+      'BP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A8'
+
+    // Headless Chromium answers « denied » whatever it is granted: the browser has not been asked yet.
+    await page.addInitScript(() => {
+      Object.defineProperty(Notification, 'permission', { get: () => 'default' })
+    })
+    await page.goto('/profil')
+    await page.getByRole('link', { name: 'Notifications sur ton téléphone' }).click()
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Notifications sur ton téléphone' }),
+    ).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Activer sur cet appareil' })).toBeVisible()
+
+    const reactions = page.getByRole('checkbox', { name: 'Une réaction à ta séance' })
+    await expect(reactions).not.toBeChecked()
+    await expect(page.getByRole('checkbox', { name: 'Un commentaire sur ta séance' })).toBeChecked()
+    await reactions.check()
+    await expect(reactions).toBeChecked()
+    expect(club.pushPreferences.get(marie.id)?.reactions).toBe(true)
+  })
+
+  test('push: without keys on the server, the page says the bell still works', async ({
+    page,
+    me,
+  }) => {
+    signedIn(me)
+    await page.goto('/profil/notifications')
+    await expect(
+      page.getByText('Ce navigateur ne sait pas recevoir de notifications.'),
+    ).toBeVisible()
+    await expect(page.getByRole('checkbox')).toHaveCount(0)
+  })
 })

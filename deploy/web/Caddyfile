@@ -76,3 +76,30 @@
 		file_server
 	}
 }
+
+# Push relay (D-130): the API has no Internet access; it hands its Web Push messages to this port,
+# which forwards them to the push services of the browsers, and to nothing else. Never published:
+# only the containers of the environment reach it (the API, on the "app" network).
+:8081 {
+	request_body {
+		max_size 8KB
+	}
+	handle_path /apple/* {
+		reverse_proxy https://web.push.apple.com {
+			header_up Host {upstream_hostport}
+		}
+	}
+	handle_path /fcm/* {
+		reverse_proxy https://fcm.googleapis.com {
+			header_up Host {upstream_hostport}
+		}
+	}
+	handle_path /mozilla/* {
+		reverse_proxy https://updates.push.services.mozilla.com {
+			header_up Host {upstream_hostport}
+		}
+	}
+	handle {
+		respond 404
+	}
+}
