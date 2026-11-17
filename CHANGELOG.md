@@ -5,6 +5,17 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- **L’heure des séances** : dans le fil, chaque séance dit à quelle heure elle a été publiée. Saisie le lendemain ?
+  On l’écrit aussi, pas de faux alibi.
+
+### Modifié
+
+- **Badge « Première cotation »** : il se gagne maintenant en **enchaînant** une voie de la cotation (topée sans
+  chute, en tête ou en mouli), plus juste en la topant. Si tu avais décroché une cotation avec des chutes et que tu ne
+  l’as jamais enchaînée depuis, le badge repart au mur : va le chercher proprement.
+
 ## 1.1.0 — 2026-11-15
 
 ### Ajouté

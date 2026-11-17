@@ -32,7 +32,9 @@ public final class BadgeEngine {
 
     private BadgeEngine() {}
 
-    /** @param closedDays the days the gym was closed, whatever the climber */
+    /**
+     * @param closedDays the days the gym was closed, whatever the climber
+     */
     public static List<Award> awards(List<ClimbRecord> history, Set<LocalDate> closedDays) {
         var replay = new Replay(Set.copyOf(closedDays));
         history.stream()
@@ -160,9 +162,10 @@ public final class BadgeEngine {
                     lead++;
                     tiers(BadgeFamily.LEAD, lead, session);
                 }
-                if (line.grade() != null) {
-                    firstGrade(line.grade(), session);
-                }
+            }
+            // « Enchaînée », not just topped (club feedback, 2026-11-16, D-128): both modes count.
+            if (line.clean() && line.grade() != null) {
+                firstGrade(line.grade(), session);
             }
             if (isFlash(session.climbedOn(), line) && flashedRoutes.add(line.routeId())) {
                 award(BadgeCode.FLASH, line.routeId().toString(), session);

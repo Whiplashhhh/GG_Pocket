@@ -50,15 +50,23 @@ export function formatShortDate(value: string): string {
   return firstOfMonth(SHORT_DAY.format(date))
 }
 
-/** "12 octobre à 18 h 30", "12 octobre à 10 h": the French way of writing a time. */
+/** "18 h 30", "10 h", "0 h 05": the French way of writing the time of an instant. */
+export function formatTime(value: string): string {
+  const [hours = '0', minutes = '00'] = HOUR_MINUTE.format(new Date(value)).split(':')
+  return minutes === '00'
+    ? `${String(Number(hours))}\u00a0h`
+    : `${String(Number(hours))}\u00a0h\u00a0${minutes}`
+}
+
+/** "12 octobre à 18 h 30", "12 octobre à 10 h". */
 export function formatDateTime(value: string): string {
-  const date = new Date(value)
-  const [hours = '0', minutes = '00'] = HOUR_MINUTE.format(date).split(':')
-  const time =
-    minutes === '00'
-      ? `${String(Number(hours))}\u00a0h`
-      : `${String(Number(hours))}\u00a0h\u00a0${minutes}`
-  return `${firstOfMonth(DAY_MONTH.format(date))} à ${time}`
+  return `${firstOfMonth(DAY_MONTH.format(new Date(value)))} à ${formatTime(value)}`
+}
+
+/** "12 octobre", without the year: a recent day. Same inputs as {@link formatDate}. */
+export function formatDayMonth(value: string): string {
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T12:00:00Z`) : new Date(value)
+  return firstOfMonth(DAY_MONTH.format(date))
 }
 
 const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [

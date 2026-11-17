@@ -4,6 +4,27 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-17 — 1.2.0, PR 1/5 : badge à l'enchaînement, heure des séances (D-128)
+
+**Branche** : `feature/badge-enchainement-heure-1.1.0` (depuis `main` en `2a10c28`, release 1.1.0).
+
+### Fait
+- Retours du club (2026-11-16) cadrés avec Willem : tout en 1.2.0, push compris, en 5 PR (voir ROADMAP « Version 1.2.0 »).
+- `BadgeEngine` : « Première cotation » sur `line.clean()` (enchaînée, tous modes) au lieu de `topped`. Tests
+  unitaires adaptés + cas « topée avec chutes puis enchaînée » ; `BadgeIT` (recompte) passe sur une ascension enchaînée.
+  Textes du badge (dico, condition) mis à jour.
+- Carte de séance avec auteur : « Séance d'aujourd'hui · 19 h 42 » ou « … · publiée hier à 9 h » (`sessionPublished`,
+  `formatTime`, `formatDayMonth`), Vitest. Captures `actu-fil` 360 px clair/sombre regardées.
+- Vérifié ici : typecheck, lint, format, Vitest (356). Backend : CI.
+
+### Reste / prochaine action
+- CI verte, puis PR 2 « qui a réagi » (`feature/qui-a-reagi-1.1.0`) : `GET /api/v1/sessions/{id}/reactions`
+  (lecteurs de la séance, sinon 404) + feuille ouverte depuis `SessionReactions.vue`.
+- Les 5 PR seront testées ensemble en dev avant la release 1.2.0.
+
+### Points bloquants
+- Push (PR 5) : il faudra des clés VAPID dans les `.env` dev/prod (Willem) et l'accès HTTPS sortant du serveur.
+
 ## 2026-11-15 — Champ date qui déborde sur iPhone
 
 **Branche** : `fix/champ-date-ios-1.0.0` (depuis `main` en `eaa5155`, après le merge de #73).
