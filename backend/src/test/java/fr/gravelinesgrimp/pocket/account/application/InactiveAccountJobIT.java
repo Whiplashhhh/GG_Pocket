@@ -137,11 +137,7 @@ class InactiveAccountJobIT {
     }
 
     private Instant yearsAndDaysAgo(int years, int days) {
-        return clock.instant()
-                .atZone(ClubTime.ZONE)
-                .minusYears(years)
-                .minusDays(days)
-                .toInstant();
+        return clock.instant().atZone(ClubTime.ZONE).minusYears(years).minusDays(days).toInstant();
     }
 
     private Member lastSeen(Member member, Instant at) {

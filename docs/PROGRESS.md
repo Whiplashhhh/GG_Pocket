@@ -4,6 +4,21 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-17 — CI backend qui ne testait plus rien (D-129)
+
+**Branche** : `fix/ci-backend-masque-1.1.0` (depuis `main` en `2a10c28`).
+
+### Fait
+- Repéré en suivant les PR de la 1.2.0 : l'étape Maven finissait en 10 s, `BUILD FAILURE` (Spotless 3.11.0, 3
+  fichiers) masqué par `| tee`. `shell: bash` (pipefail) sur l'étape, 3 fichiers reformatés, actionlint OK.
+
+### Reste / prochaine action
+- CI de cette PR : vérifier que l'étape Maven dure des minutes et que les tests passent (des échecs cachés depuis le
+  2026-11-08 peuvent apparaître). Puis fusionner `main` dans la pile 1.2.0 (#81 → #82 → #83).
+
+### Points bloquants
+- Aucun.
+
 ## 2026-11-15 — Champ date qui déborde sur iPhone
 
 **Branche** : `fix/champ-date-ios-1.0.0` (depuis `main` en `eaa5155`, après le merge de #73).
