@@ -143,9 +143,14 @@ test.describe('the feed', () => {
     const myCard = page.getByRole('article', { name: 'Séance d’aujourd’hui de marie' })
     const tomsCard = page.getByRole('article', { name: 'Séance d’hier de tom' })
     await expect(tomsCard.getByText('« Le dévers a cédé. »')).toBeVisible()
-    // On my own session, what the others gave, nothing to tap.
+    // On my own session, what the others gave: a tap shows who (D-128).
     await expect(myCard.getByText('Mode gorille : 1')).toHaveCount(1)
-    await expect(myCard.getByRole('button')).toHaveCount(0)
+    await expect(myCard.getByRole('button')).toHaveCount(1)
+    await myCard.getByRole('button', { name: /Qui a réagi/ }).click()
+    const reactors = page.getByRole('dialog', { name: 'Qui a réagi' })
+    await expect(reactors.getByRole('link', { name: /tom.*Mode gorille/ })).toBeVisible()
+    await reactors.getByRole('button', { name: 'Fermer' }).click()
+    await expect(reactors).toBeHidden()
 
     await tomsCard.getByRole('button', { name: 'Ça chauffe : 0' }).click()
     await expect(tomsCard.getByRole('button', { name: 'Ça chauffe : 1' })).toHaveAttribute(

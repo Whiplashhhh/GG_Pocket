@@ -98,6 +98,18 @@ class SessionSocialController {
         return SessionReactionsResponse.from(reactions.takeBack(me.memberId(), id));
     }
 
+    @GetMapping("/sessions/{id}/reactions")
+    @Operation(
+            operationId = "listSessionReactions",
+            summary = "Who reacted to a session, and with what, the latest first")
+    List<SessionReactorResponse> listReactions(
+            @Parameter(hidden = true) @AuthenticationPrincipal MemberPrincipal me,
+            @PathVariable UUID id) {
+        return reactions.list(me.memberId(), id).stream()
+                .map(SessionReactorResponse::from)
+                .toList();
+    }
+
     @GetMapping("/sessions/{id}/comments")
     @Operation(operationId = "listSessionComments", summary = "Comments on a session, oldest first")
     List<SessionCommentResponse> listComments(

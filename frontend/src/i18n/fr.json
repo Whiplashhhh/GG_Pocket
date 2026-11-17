@@ -250,6 +250,11 @@
     "give": "{name} : {count}",
     "received": "{name} : {count}",
     "failed": "Ta réaction n’est pas passée, réessaie.",
+    "who": "Qui a réagi ?",
+    "whoTitle": "Qui a réagi",
+    "whoEmpty": "Plus personne : les réactions ont été reprises entre-temps.",
+    "whoFailed": "Impossible de charger la liste.",
+    "whoClose": "Fermer",
     "names": {
       "FIRE": "Ça chauffe",
       "STRONG": "Costaud",

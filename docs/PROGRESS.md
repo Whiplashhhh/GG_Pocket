@@ -18,6 +18,26 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ### Points bloquants
 - Aucun.
+## 2026-11-17 — 1.2.0, PR 2/5 : qui a réagi (D-128)
+
+**Branche** : `feature/qui-a-reagi-1.1.0`, empilée sur `feature/badge-enchainement-heure-1.1.0` (PR #81) : chaque
+PR de la 1.2.0 part de la précédente, la dernière branche porte tout pour le test en dev.
+
+### Fait
+- `GET /api/v1/sessions/{id}/reactions` (`SessionReactionService.list`, lecteurs de la séance, sinon 404 ; le plus
+  récent d'abord). `SessionReactionIT` : auteur et ami OK, inconnu et admin 404, anonyme 401.
+- Contrat `openapi.json` écrit à la main (pas de Java ici, la CI compare), `schema.d.ts` régénéré.
+- Front : `ReactorsDialog.vue` (feuille), ouverte en touchant les compteurs de ma séance, ou par « Qui a réagi ? »
+  sous les réactions d'une séance d'ami. Faux serveur e2e, `social.spec.ts`, scénario `actu-qui-a-reagi` (captures
+  360 px clair/sombre regardées). Lint, format, typecheck, Vitest (354), e2e social Desktop Chrome verts.
+
+### Reste / prochaine action
+- PR 3 « répondre aux commentaires » (`feature/repondre-commentaires-1.1.0`, depuis cette branche) : migration
+  `session_comment.reply_to_id` (un niveau), `SessionCommentRequest.replyTo`, affichage en retrait, « @pseudo ».
+
+### Points bloquants
+- Push (PR 5) : clés VAPID dans les `.env` dev/prod (Willem) et accès HTTPS sortant du serveur.
+
 ## 2026-11-17 — 1.2.0, PR 1/5 : badge à l'enchaînement, heure des séances (D-128)
 
 **Branche** : `feature/badge-enchainement-heure-1.1.0` (depuis `main` en `2a10c28`, release 1.1.0).
@@ -29,7 +49,7 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
   Textes du badge (dico, condition) mis à jour.
 - Carte de séance avec auteur : « Séance d'aujourd'hui · 19 h 42 » ou « … · publiée hier à 9 h » (`sessionPublished`,
   `formatTime`, `formatDayMonth`), Vitest. Captures `actu-fil` 360 px clair/sombre regardées.
-- Vérifié ici : typecheck, lint, format, Vitest (356). Backend : CI.
+- Vérifié ici : typecheck, lint, format, Vitest (354). Backend : CI.
 
 ### Reste / prochaine action
 - CI verte, puis PR 2 « qui a réagi » (`feature/qui-a-reagi-1.1.0`) : `GET /api/v1/sessions/{id}/reactions`

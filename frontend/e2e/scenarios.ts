@@ -573,6 +573,19 @@ export const CAPTURES: Capture[] = [
   { name: 'actu-club', path: '/actu?club', as: 'CLIMBER', prepare: clubFeedAlive },
   { name: 'actu-club-en-attente', path: '/actu?club', as: 'TOURIST', prepare: marieAwaits },
   {
+    name: 'actu-qui-a-reagi',
+    path: '/actu',
+    as: 'CLIMBER',
+    prepare: feedAlive,
+    act: async (page) => {
+      await page
+        .getByRole('button', { name: /Qui a réagi/ })
+        .first()
+        .click()
+      await page.getByRole('dialog', { name: 'Qui a réagi' }).getByRole('link').first().waitFor()
+    },
+  },
+  {
     name: 'seance-ami',
     path: '/actu',
     as: 'CLIMBER',

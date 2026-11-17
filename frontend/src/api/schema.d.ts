@@ -1417,6 +1417,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/sessions/{id}/reactions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Who reacted to a session, and with what, the latest first */
+    get: operations['listSessionReactions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/stats/attendance': {
     parameters: {
       query?: never
@@ -2865,6 +2882,11 @@ export interface components {
       counts: components['schemas']['ReactionCount'][]
       /** @enum {string} */
       mine?: 'FIRE' | 'STRONG' | 'CLAP' | 'GORILLA'
+    }
+    SessionReactor: {
+      /** @enum {string} */
+      kind: 'FIRE' | 'STRONG' | 'CLAP' | 'GORILLA'
+      member: components['schemas']['MemberRef']
     }
     SessionRequest: {
       /** @description In the order climbed */
@@ -5239,6 +5261,28 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['SessionReactions']
+        }
+      }
+    }
+  }
+  listSessionReactions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionReactor'][]
         }
       }
     }
