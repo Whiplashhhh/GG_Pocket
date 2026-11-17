@@ -66,6 +66,7 @@ test.describe('the bell (D-128)', () => {
     page,
     club,
     me,
+    isMobile,
   }) => {
     const marie = signedIn(me)
     club.pushKey =
@@ -73,14 +74,23 @@ test.describe('the bell (D-128)', () => {
 
     // Headless Chromium answers « denied » whatever it is granted: the browser has not been asked yet.
     await page.addInitScript(() => {
-      Object.defineProperty(Notification, 'permission', { get: () => 'default' })
+      if (typeof Notification !== 'undefined') {
+        Object.defineProperty(Notification, 'permission', { get: () => 'default' })
+      }
     })
     await page.goto('/profil')
     await page.getByRole('link', { name: 'Notifications sur ton téléphone' }).click()
     await expect(
       page.getByRole('heading', { level: 1, name: 'Notifications sur ton téléphone' }),
     ).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Activer sur cet appareil' })).toBeVisible()
+    // The iPhone of the tests is Safari, not the installed app: Apple keeps push for installed apps.
+    await expect(
+      isMobile
+        ? page.getByText('Sur iPhone, les notifications ne marchent que dans l’appli installée', {
+            exact: false,
+          })
+        : page.getByRole('button', { name: 'Activer sur cet appareil' }),
+    ).toBeVisible()
 
     const reactions = page.getByRole('checkbox', { name: 'Une réaction à ta séance' })
     await expect(reactions).not.toBeChecked()
