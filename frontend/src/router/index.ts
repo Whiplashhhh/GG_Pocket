@@ -129,6 +129,12 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'session.editTitle', layout: 'bare' },
   },
 
+  {
+    path: '/notifications',
+    component: () => import('@/views/NotificationsView.vue'),
+    meta: { titleKey: 'notifications.title' },
+  },
+
   // Profile and settings
   {
     path: '/profil',

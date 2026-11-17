@@ -1545,6 +1545,41 @@
         ]
       }
     },
+    "/api/v1/me/notifications": {
+      "get": {
+        "operationId": "getMyNotifications",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notifications"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "What happened to me lately (reactions, comments, answers, friends' sessions, friend requests), newest first, and how much is new",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/me/notifications/seen": {
+      "put": {
+        "operationId": "markMyNotificationsSeen",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "I opened the bell",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
     "/api/v1/me/password": {
       "put": {
         "operationId": "changeMyPassword",
@@ -5429,6 +5464,89 @@
           "pastHalf",
           "sessionId",
           "topped"
+        ]
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "$ref": "#/components/schemas/MemberRef"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "climbedOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Its day; absent for a friendship"
+          },
+          "excerpt": {
+            "type": "string",
+            "description": "The start of a comment or an answer"
+          },
+          "id": {
+            "type": "string",
+            "description": "Stable, for the list keys"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "REACTION",
+              "COMMENT",
+              "REPLY",
+              "FRIEND_SESSION",
+              "FRIEND_REQUEST",
+              "FRIEND_ACCEPTED"
+            ]
+          },
+          "reaction": {
+            "type": "string",
+            "enum": [
+              "FIRE",
+              "STRONG",
+              "CLAP",
+              "GORILLA"
+            ],
+            "description": "For a reaction"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The session concerned; absent for a friendship"
+          },
+          "unread": {
+            "type": "boolean",
+            "description": "New since I last looked"
+          }
+        },
+        "required": [
+          "actor",
+          "at",
+          "id",
+          "kind",
+          "unread"
+        ]
+      },
+      "Notifications": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "Newest first, a month back",
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            }
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "How many came since I last opened the bell"
+          }
+        },
+        "required": [
+          "items",
+          "unreadCount"
         ]
       },
       "PasswordChange": {

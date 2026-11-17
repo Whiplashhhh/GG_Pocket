@@ -4,6 +4,30 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-17 — 1.2.0, PR 4/5 : la cloche (D-128)
+
+**Branche** : `feature/cloche-1.1.0`, empilée sur `feature/repondre-commentaires-1.1.0` (PR #83).
+
+### Fait
+- Backend : module `notification` (`NotificationQueries` en SQL natif via `JdbcClient`, `NotificationService`,
+  `NotificationController` : `GET /me/notifications`, `PUT /me/notifications/seen`), V26. `NotificationIT` (6 types,
+  non lu / vu, réaction changée = nouvelle, séance plus lisible = rien, 401) ; matrice d'autorisations complétée
+  (y compris `GET /sessions/{id}/reactions` de la PR 2).
+- Front : `api/notifications.ts` (sondage 60 s), `lib/notifications.ts` (+ Vitest), `NotificationsView.vue`
+  (`/notifications`), cloche et point rouge dans `AppHeader`. Faux serveur (`club.notify`), e2e
+  `notifications.spec.ts`, scénarios `notifications` et `actu-cloche` (captures clair/sombre regardées).
+  Lint, format, typecheck, Vitest (360), e2e notifications/social/app-shell Desktop Chrome verts.
+- Contrat écrit à la main : à réconcilier avec celui généré par la CI (cf. #84, le contrat de `main` a dérivé).
+
+### Reste / prochaine action
+- Réconcilier `openapi.json` avec la CI (journal du job Backend, `BEGIN GENERATED OPENAPI`), sur #84 puis la pile.
+- PR 5 push (`feature/notifications-push-1.1.0`) : VAPID (clés dans les `.env`, Willem), table des abonnements,
+  envoi à l'enregistrement des réactions/commentaires/réponses/séances/demandes, service worker en `injectManifest`,
+  réglages par type dans le profil.
+
+### Points bloquants
+- Push : clés VAPID dans les `.env` dev/prod (Willem) et accès HTTPS sortant du serveur.
+
 ## 2026-11-17 — CI backend qui ne testait plus rien (D-129)
 
 **Branche** : `fix/ci-backend-masque-1.1.0` (depuis `main` en `2a10c28`).

@@ -776,6 +776,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/notifications': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** What happened to me lately (reactions, comments, answers, friends' sessions, friend requests), newest first, and how much is new */
+    get: operations['getMyNotifications']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/notifications/seen': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** I opened the bell */
+    put: operations['markMyNotificationsSeen']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/password': {
     parameters: {
       query?: never
@@ -2361,6 +2395,44 @@ export interface components {
       /** Format: uuid */
       sessionId: string
       topped: boolean
+    }
+    Notification: {
+      actor: components['schemas']['MemberRef']
+      /** Format: date-time */
+      at: string
+      /**
+       * Format: date
+       * @description Its day; absent for a friendship
+       */
+      climbedOn?: string
+      /** @description The start of a comment or an answer */
+      excerpt?: string
+      /** @description Stable, for the list keys */
+      id: string
+      /** @enum {string} */
+      kind:
+        'REACTION' | 'COMMENT' | 'REPLY' | 'FRIEND_SESSION' | 'FRIEND_REQUEST' | 'FRIEND_ACCEPTED'
+      /**
+       * @description For a reaction
+       * @enum {string}
+       */
+      reaction?: 'FIRE' | 'STRONG' | 'CLAP' | 'GORILLA'
+      /**
+       * Format: uuid
+       * @description The session concerned; absent for a friendship
+       */
+      sessionId?: string
+      /** @description New since I last looked */
+      unread: boolean
+    }
+    Notifications: {
+      /** @description Newest first, a month back */
+      items: components['schemas']['Notification'][]
+      /**
+       * Format: int32
+       * @description How many came since I last opened the bell
+       */
+      unreadCount: number
     }
     PasswordChange: {
       currentPassword: string
@@ -4165,6 +4237,44 @@ export interface operations {
         content: {
           'application/json': components['schemas']['Logbook']
         }
+      }
+    }
+  }
+  getMyNotifications: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Notifications']
+        }
+      }
+    }
+  }
+  markMyNotificationsSeen: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }

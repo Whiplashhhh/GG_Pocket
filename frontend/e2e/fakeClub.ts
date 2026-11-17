@@ -122,6 +122,27 @@ export class FakeClub {
     this.climbs,
   )
 
+  /** The bell of each member (D-128): set by the tests, newest first; and when it was last opened. */
+  readonly notifications = new Map<string, Schemas['Notification'][]>()
+  readonly notificationsSeenAt = new Map<string, number>()
+
+  /** Something happened to {@code member}, {@code minutesAgo} minutes ago. */
+  notify(
+    member: FakeMember,
+    event: Omit<Schemas['Notification'], 'id' | 'at' | 'unread'>,
+    minutesAgo = 5,
+  ): void {
+    const list = this.notifications.get(member.id) ?? []
+    list.push({
+      ...event,
+      id: this.nextId(),
+      at: new Date(this.now - minutesAgo * 60_000).toISOString(),
+      unread: false,
+    })
+    list.sort((a, b) => b.at.localeCompare(a.at))
+    this.notifications.set(member.id, list)
+  }
+
   addMember(overrides: Partial<FakeMember> & Pick<FakeMember, 'nickname'>): FakeMember {
     const member: FakeMember = {
       id: this.nextId(),
@@ -501,6 +522,18 @@ export class FakeClub {
     if (topo?.kind === 'empty') return route.fulfill({ status: 204 })
     if (topo?.kind === 'problem') return fail(topo.status, topo.code)
 
+    if (path === '/me/notifications' && method === 'GET') {
+      const seenAt = this.notificationsSeenAt.get(me.id) ?? 0
+      const items = (this.notifications.get(me.id) ?? []).map((item) => ({
+        ...item,
+        unread: Date.parse(item.at) > seenAt,
+      }))
+      return json({ items, unreadCount: items.filter((item) => item.unread).length })
+    }
+    if (path === '/me/notifications/seen' && method === 'PUT') {
+      this.notificationsSeenAt.set(me.id, this.now)
+      return route.fulfill({ status: 204 })
+    }
     if (path === '/me' && method === 'GET') return json(this.profile(me))
     if (path === '/me/profile') {
       const update = body() as Schemas['ProfileUpdate']
