@@ -89,6 +89,10 @@ class WebPushTest {
                 .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> WebPush.VapidKeys.of(SERVER_PUBLIC, "c2hvcnQ"))
                 .isInstanceOf(IllegalArgumentException.class);
+        // Each half valid, but of two pairs: the API would not start (wrong .env lines).
+        assertThatThrownBy(() -> WebPush.VapidKeys.of(DEVICE_PUBLIC, SERVER_PRIVATE))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("same pair");
         assertThatThrownBy(
                         () ->
                                 WebPush.encrypt(

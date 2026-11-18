@@ -61,6 +61,13 @@ class HttpPushGatewayTest {
     }
 
     @Test
+    void aRefusalIsAFailure() {
+        status = 403;
+
+        assertThat(send("https://web.push.apple.com/refused")).isEqualTo(Outcome.FAILED);
+    }
+
+    @Test
     void aDeviceGoneIsToldApart() {
         status = 410;
 

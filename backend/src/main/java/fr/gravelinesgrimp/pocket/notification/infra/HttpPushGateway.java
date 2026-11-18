@@ -1,5 +1,7 @@
 package fr.gravelinesgrimp.pocket.notification.infra;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import fr.gravelinesgrimp.pocket.notification.domain.PushGateway;
 import fr.gravelinesgrimp.pocket.notification.domain.PushService;
 import fr.gravelinesgrimp.pocket.notification.domain.PushSubscription;
@@ -24,6 +26,9 @@ public class HttpPushGateway implements PushGateway {
 
     /** A day: a message about a reaction is stale after that. */
     static final int TTL_SECONDS = 24 * 60 * 60;
+
+    /** Enough of a refusal's body for the logs. */
+    private static final int REASON_LENGTH = 300;
 
     private final HttpClient http;
     private final String relay;
@@ -61,7 +66,12 @@ public class HttpPushGateway implements PushGateway {
                         .POST(HttpRequest.BodyPublishers.ofByteArray(body))
                         .build();
         try {
-            var status = http.send(request, HttpResponse.BodyHandlers.discarding()).statusCode();
+            var response = http.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            var status = response.statusCode();
+            String reason;
+            try (var answer = response.body()) {
+                reason = new String(answer.readNBytes(REASON_LENGTH), UTF_8);
+            }
             if (status >= 200 && status < 300) {
                 return Outcome.DELIVERED;
             }
@@ -69,7 +79,12 @@ public class HttpPushGateway implements PushGateway {
                 return Outcome.GONE;
             }
             // The endpoint is a secret of the device: the service's name is enough in the logs.
-            log.warn("Push to {} refused with HTTP {}", service, status);
+            // The reason (Apple: {"reason":"BadJwtToken"}) tells what to fix.
+            log.warn(
+                    "Push to {} refused with HTTP {}: {}",
+                    service,
+                    status,
+                    reason.replaceAll("\\s+", " ").strip());
             return Outcome.FAILED;
         } catch (IOException e) {
             log.warn("Push to {} failed: {}", service, e.toString());

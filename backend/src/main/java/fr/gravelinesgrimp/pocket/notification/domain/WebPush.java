@@ -59,8 +59,24 @@ public final class WebPush {
          */
         public static VapidKeys of(String publicKey, String privateKey) {
             var raw = decode(publicKey);
-            WebPush.publicKey(raw);
-            return new VapidKeys(WebPush.privateKey(decode(privateKey)), raw);
+            var keys = new VapidKeys(WebPush.privateKey(decode(privateKey)), raw);
+            // Two halves of different pairs would sign what no push service accepts (HTTP 403).
+            try {
+                var probe = "GG Pocket".getBytes(US_ASCII);
+                var signer = Signature.getInstance("SHA256withECDSA");
+                signer.initSign(keys.privateKey());
+                signer.update(probe);
+                var verifier = Signature.getInstance("SHA256withECDSA");
+                verifier.initVerify(WebPush.publicKey(raw));
+                verifier.update(probe);
+                if (!verifier.verify(signer.sign())) {
+                    throw new IllegalArgumentException(
+                            "The VAPID public and private keys are not of the same pair");
+                }
+            } catch (GeneralSecurityException e) {
+                throw new IllegalArgumentException("Invalid VAPID keys", e);
+            }
+            return keys;
         }
 
         public String publicKeyBase64() {
