@@ -34,6 +34,9 @@ public class HttpPushGateway implements PushGateway {
     public HttpPushGateway(String relay) {
         this.http =
                 HttpClient.newBuilder()
+                        // In plain http (the relay), HTTP/2 would mean an "Upgrade: h2c" request,
+                        // which the relay passes on and the push services refuse (HTTP 502).
+                        .version(HttpClient.Version.HTTP_1_1)
                         .connectTimeout(Duration.ofSeconds(10))
                         .followRedirects(HttpClient.Redirect.NEVER)
                         .build();
