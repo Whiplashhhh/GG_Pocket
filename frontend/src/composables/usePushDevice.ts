@@ -1,7 +1,7 @@
 import { onMounted, ref } from 'vue'
 
 import { addPushDevice, currentPushSubscription, removePushDevice } from '@/api/push'
-import { applicationServerKey } from '@/lib/push'
+import { applicationServerKey, sameServerKey } from '@/lib/push'
 
 /**
  * This browser's side of push (D-128): its subscription, turning it on (the browser asks the
@@ -29,8 +29,15 @@ export function usePushDevice() {
     if (answer !== 'granted') return false
     const registration = await navigator.serviceWorker.getRegistration()
     if (registration === undefined) throw new Error('No service worker')
+    let existing = await registration.pushManager.getSubscription()
+    if (existing !== null && !sameServerKey(existing.options.applicationServerKey, serverKey)) {
+      // Made with the keys of before: the push service would refuse every message.
+      await removePushDevice(existing.endpoint)
+      await existing.unsubscribe()
+      existing = null
+    }
     const subscription =
-      (await registration.pushManager.getSubscription()) ??
+      existing ??
       (await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: applicationServerKey(serverKey),

@@ -41,6 +41,19 @@ export function applicationServerKey(base64url: string): Uint8Array<ArrayBuffer>
   return bytes
 }
 
+/**
+ * Whether a subscription was made with this server key. After a change of keys (D-130), the old
+ * subscription is refused by the push service: it has to be made again.
+ */
+export function sameServerKey(subscriptionKey: ArrayBuffer | null, serverKey: string): boolean {
+  if (subscriptionKey === null) return false
+  const expected = applicationServerKey(serverKey)
+  const actual = new Uint8Array(subscriptionKey)
+  return (
+    actual.length === expected.length && actual.every((byte, index) => byte === expected[index])
+  )
+}
+
 /** What the service worker receives (PushDelivery.payload on the server). */
 export interface PushMessage {
   kind: 'REACTION' | 'COMMENT' | 'REPLY' | 'FRIEND_SESSION' | 'FRIEND_REQUEST' | 'FRIEND_ACCEPTED'

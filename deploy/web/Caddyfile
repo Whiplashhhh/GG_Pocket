@@ -80,23 +80,24 @@
 # Push relay (D-130): the API has no Internet access; it hands its Web Push messages to this port,
 # which forwards them to the push services of the browsers, and to nothing else. Never published:
 # only the containers of the environment reach it (the API, on the "app" network).
+# Host without ":443": Apple checks the token's audience against it (403 BadJwtToken otherwise).
 :8081 {
 	request_body {
 		max_size 8KB
 	}
 	handle_path /apple/* {
 		reverse_proxy https://web.push.apple.com {
-			header_up Host {upstream_hostport}
+			header_up Host web.push.apple.com
 		}
 	}
 	handle_path /fcm/* {
 		reverse_proxy https://fcm.googleapis.com {
-			header_up Host {upstream_hostport}
+			header_up Host fcm.googleapis.com
 		}
 	}
 	handle_path /mozilla/* {
 		reverse_proxy https://updates.push.services.mozilla.com {
-			header_up Host {upstream_hostport}
+			header_up Host updates.push.services.mozilla.com
 		}
 	}
 	handle {
