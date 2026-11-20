@@ -44,6 +44,8 @@ public interface SessionReactionRepository extends JpaRepository<SessionReaction
                     + " group by r.sessionId, r.kind")
     List<ReactionCount> countPerSessionAndKind(Collection<UUID> sessionIds);
 
+    boolean existsBySessionIdAndMemberId(UUID sessionId, UUID memberId);
+
     /** Who reacted to a session, the latest first (D-128). */
     List<SessionReaction> findAllBySessionIdOrderByUpdatedAtDesc(UUID sessionId);
 

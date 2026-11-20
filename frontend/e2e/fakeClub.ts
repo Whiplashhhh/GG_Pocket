@@ -126,6 +126,10 @@ export class FakeClub {
   readonly notifications = new Map<string, Schemas['Notification'][]>()
   readonly notificationsSeenAt = new Map<string, number>()
 
+  /** The server's VAPID key: push off when undefined (D-130). */
+  pushKey: string | undefined = undefined
+  readonly pushPreferences = new Map<string, Schemas['PushPreferences']>()
+
   /** Something happened to {@code member}, {@code minutesAgo} minutes ago. */
   notify(
     member: FakeMember,
@@ -530,6 +534,25 @@ export class FakeClub {
       }))
       return json({ items, unreadCount: items.filter((item) => item.unread).length })
     }
+    if (path === '/me/push' && method === 'GET') {
+      return json({
+        ...(this.pushKey === undefined ? {} : { publicKey: this.pushKey }),
+        preferences: this.pushPreferences.get(me.id) ?? {
+          comments: true,
+          replies: true,
+          reactions: false,
+          friendSessions: false,
+          friendRequests: true,
+        },
+        thisDevice: false,
+      })
+    }
+    if (path === '/me/push/preferences' && method === 'PUT') {
+      const preferences = body() as Schemas['PushPreferences']
+      this.pushPreferences.set(me.id, preferences)
+      return json(preferences)
+    }
+    if (path === '/me/push/devices') return route.fulfill({ status: 204 })
     if (path === '/me/notifications/seen' && method === 'PUT') {
       this.notificationsSeenAt.set(me.id, this.now)
       return route.fulfill({ status: 204 })

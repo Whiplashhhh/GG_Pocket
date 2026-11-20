@@ -4,6 +4,55 @@ Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, p
 
 ---
 
+## 2026-11-18 — 1.2.0 : la pile est verte, reste les essais en dev
+
+**Branches** : #84 `fix/ci-backend-masque-1.1.0` → #81 → #82 → #83 → #85 → #86 `feature/notifications-push-1.1.0`
+(chaque PR a pour base la précédente ; les correctifs de la base ont été fusionnés vers le haut, sans force-push).
+
+### Fait
+- Backend vert partout (860 tests sur #86). Contrats alignés sur ceux générés par la CI (dérive de `main` corrigée
+  sur #84 : `ExportedProfile.inClubFeed`).
+- `.gitleaks.toml` (base de la pile) : les clés d'exemple de la RFC 8291 des tests push sont exemptées, et elles
+  seules ; vérifié en local avec gitleaks 8.30.1 (2 fuites sans la config, 0 avec). gitleaks lit toutes les branches.
+- e2e iPhone : la page push y montre « installe l'appli d'abord » (Safari non installé), test et scénario adaptés.
+- #85 et #86 entièrement vertes. Sur #81 à #84, l'e2e a dépassé 25 min : le téléchargement des navigateurs
+  Playwright a pris 22 min (CDN), aucun test n'a échoué. Le jeton `gh` ne peut pas relancer (D-066).
+
+### Reste / prochaine action
+- Willem : relancer les jobs e2e de #81 à #84 (« Re-run failed jobs »), poser les clés VAPID + `GG_PUSH_SUBJECT`
+  dans le `.env` du dev, déployer `feature/notifications-push-1.1.0` en dev, essayer (iPhone installé, Android).
+- Puis merge dans l'ordre #84, #81, #82, #83, #85, #86 (GitHub rebascule chaque PR sur `main` quand la précédente
+  est fusionnée et sa branche supprimée), « Prepare release » en `minor` (1.2.0).
+
+### Points bloquants
+- Aucun côté code. Les clés VAPID sont des secrets : à poser par Willem.
+
+## 2026-11-17 — 1.2.0, PR 5/5 : notifications push (D-130)
+
+**Branche** : `feature/notifications-push-1.1.0`, empilée sur `feature/cloche-1.1.0` (PR #85). Dernière de la pile :
+c'est elle qu'on déploie en dev pour tout tester.
+
+### Fait
+- Backend (module `notification`) : `WebPush` (RFC 8291/8292 avec le JDK, vecteur de la RFC en test, vérifié aussi
+  en Python), `PushService` (Apple/Google/Mozilla seulement), `PushStore` (V27), `PushDelivery` (après commit, thread
+  virtuel), `PushSettingsService` + `PushController` (`/me/push`, `/preferences`, `/devices`). Événements publiés par
+  réactions (la première), commentaires/réponses, séances partagées, demandes/acceptations d'ami. `PushIT` déchiffre
+  le message reçu comme un téléphone ; matrice d'autorisations complétée.
+- Déploiement : relais `:8081` dans `deploy/web/Caddyfile`, `GG_PUSH_*` dans `compose.yml` et `application.yml`,
+  `deploy/scripts/vapid-keys.sh` (paire vérifiée en Python), DEPLOYMENT §11.
+- Front : `/profil/notifications` (`PushSettingsView`, `usePushDevice`, `lib/push.ts`), `push-sw.js` généré au build
+  (`lib/pushWorker.ts`, textes de `fr.json`, `importScripts`), ouverture de page au toucher (`main.ts`), appareil
+  retiré à la déconnexion. Vitest (366), e2e notifications/social/accounts/app-shell/sessions verts, captures
+  `profil-notifications` regardées.
+
+### Reste / prochaine action
+- Réconcilier `openapi.json` avec celui généré par la CI (#84 d'abord : dérive de `main`, puis la pile).
+- CI verte sur #81 → #86, puis Willem : clés VAPID + `GG_PUSH_SUBJECT` dans `/opt/gg-pocket/dev/.env`, déploiement
+  dev de `feature/notifications-push-1.1.0`, essais (iPhone installé, Android), merge dans l'ordre, release `minor`.
+
+### Points bloquants
+- Clés VAPID et adresse de contact : à poser par Willem (secrets, serveur).
+
 ## 2026-11-17 — 1.2.0, PR 4/5 : la cloche (D-128)
 
 **Branche** : `feature/cloche-1.1.0`, empilée sur `feature/repondre-commentaires-1.1.0` (PR #83).

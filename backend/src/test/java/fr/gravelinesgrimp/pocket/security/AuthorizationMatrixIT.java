@@ -285,6 +285,14 @@ class AuthorizationMatrixIT {
                     new Endpoint(HttpMethod.GET, "/api/v1/me/notifications", null, Role.TOURIST),
                     new Endpoint(
                             HttpMethod.PUT, "/api/v1/me/notifications/seen", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.GET, "/api/v1/me/push", null, Role.TOURIST),
+                    new Endpoint(HttpMethod.PUT, "/api/v1/me/push/preferences", "{}", Role.TOURIST),
+                    new Endpoint(HttpMethod.PUT, "/api/v1/me/push/devices", "{}", Role.TOURIST),
+                    new Endpoint(
+                            HttpMethod.DELETE,
+                            "/api/v1/me/push/devices?endpoint=x",
+                            null,
+                            Role.TOURIST),
                     new Endpoint(HttpMethod.GET, "/api/v1/me/friends", null, Role.TOURIST),
                     new Endpoint(
                             HttpMethod.PUT, "/api/v1/me/friends/" + SOME_ID, null, Role.TOURIST),

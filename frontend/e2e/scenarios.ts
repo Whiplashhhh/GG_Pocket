@@ -629,6 +629,26 @@ export const CAPTURES: Capture[] = [
     },
   },
   { name: 'actu-cloche', path: '/actu', as: 'CLIMBER', prepare: bellRings },
+  {
+    name: 'profil-notifications',
+    path: '/profil/notifications',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      club.pushKey =
+        'BP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A8'
+    },
+    act: async (page) => {
+      // Headless Chromium answers « denied »: shown as on a phone not asked yet (Safari, on the
+      // iPhone of the tests, shows « install the app first »).
+      await page.addInitScript(() => {
+        if (typeof Notification !== 'undefined') {
+          Object.defineProperty(Notification, 'permission', { get: () => 'default' })
+        }
+      })
+      await page.reload()
+      await page.getByRole('heading', { name: 'Ce qui te notifie' }).waitFor()
+    },
+  },
   { name: 'notifications', path: '/notifications', as: 'CLIMBER', prepare: bellRings },
   {
     name: 'seance-repondre',

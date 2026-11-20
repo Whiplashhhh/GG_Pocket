@@ -6,6 +6,8 @@ import fr.gravelinesgrimp.pocket.admin.domain.AuditTargetType;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.domain.Role;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.notification.domain.NotificationEvent;
+import fr.gravelinesgrimp.pocket.notification.domain.NotificationKind;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
@@ -14,6 +16,7 @@ import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
 import fr.gravelinesgrimp.pocket.session.infra.SessionCommentRepository;
 import fr.gravelinesgrimp.pocket.topo.application.MemberRefView;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +57,7 @@ public class SessionCommentService {
     private final MemberRepository members;
     private final RateLimiter rateLimiter;
     private final AuditLog auditLog;
+    private final ApplicationEventPublisher events;
     private final Clock clock;
 
     public SessionCommentService(
@@ -63,6 +67,7 @@ public class SessionCommentService {
             MemberRepository members,
             RateLimiter rateLimiter,
             AuditLog auditLog,
+            ApplicationEventPublisher events,
             Clock clock) {
         this.comments = comments;
         this.sessions = sessions;
@@ -70,6 +75,7 @@ public class SessionCommentService {
         this.members = members;
         this.rateLimiter = rateLimiter;
         this.auditLog = auditLog;
+        this.events = events;
         this.clock = clock;
     }
 
@@ -146,12 +152,13 @@ public class SessionCommentService {
     @Transactional
     public SessionCommentView add(UUID authorId, UUID sessionId, String body, UUID replyTo) {
         var author = loadMember(authorId);
-        readable.load(authorId, sessionId);
+        var session = readable.load(authorId, sessionId);
         var text = body == null ? "" : body.strip();
         if (text.isEmpty() || text.length() > SessionComment.BODY_LENGTH) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Comment empty or too long");
         }
         ReplyToView answering = null;
+        UUID answeredAuthor = null;
         if (replyTo != null) {
             var target =
                     comments.findById(replyTo)
@@ -162,6 +169,7 @@ public class SessionCommentService {
                                             new BusinessException(
                                                     ErrorCode.VALIDATION_FAILED,
                                                     "No such comment to answer"));
+            answeredAuthor = target.authorId();
             answering =
                     members.findById(target.authorId())
                             .map(found -> new ReplyToView(target.id(), MemberRefView.of(found)))
@@ -169,6 +177,29 @@ public class SessionCommentService {
         }
         rateLimiter.consume(RateLimiter.SESSION_COMMENT_PER_MEMBER, authorId.toString());
         var comment = comments.save(new SessionComment(sessionId, authorId, text, replyTo));
+        // One ring per person: the one answered hears « answer », the climber « comment ».
+        if (answeredAuthor != null && !answeredAuthor.equals(authorId)) {
+            events.publishEvent(
+                    NotificationEvent.aboutSession(
+                            answeredAuthor,
+                            NotificationKind.REPLY,
+                            authorId,
+                            sessionId,
+                            session.climbedOn(),
+                            null,
+                            text));
+        }
+        if (!session.memberId().equals(authorId) && !session.memberId().equals(answeredAuthor)) {
+            events.publishEvent(
+                    NotificationEvent.aboutSession(
+                            session.memberId(),
+                            NotificationKind.COMMENT,
+                            authorId,
+                            sessionId,
+                            session.climbedOn(),
+                            null,
+                            text));
+        }
         return toView(comment, author, author, answering);
     }
 

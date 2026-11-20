@@ -5,6 +5,7 @@ import {
   useQueryClient,
   type QueryClient,
 } from '@tanstack/vue-query'
+import { forgetThisPushDevice } from './push'
 import { computed } from 'vue'
 
 import { api } from './client'
@@ -87,7 +88,10 @@ export const signOut = { intentional: false }
 export function useLogout() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: () => requestNoContent(api.POST('/api/v1/auth/logout')),
+    mutationFn: async () => {
+      await forgetThisPushDevice()
+      await requestNoContent(api.POST('/api/v1/auth/logout'))
+    },
     onSettled: () => {
       signOut.intentional = true
       forgetMemberData(queryClient)

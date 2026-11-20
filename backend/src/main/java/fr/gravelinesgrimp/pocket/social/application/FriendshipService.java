@@ -3,6 +3,8 @@ package fr.gravelinesgrimp.pocket.social.application;
 import fr.gravelinesgrimp.pocket.member.application.ValidatedMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.notification.domain.NotificationEvent;
+import fr.gravelinesgrimp.pocket.notification.domain.NotificationKind;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
@@ -11,6 +13,7 @@ import fr.gravelinesgrimp.pocket.social.domain.Friendship;
 import fr.gravelinesgrimp.pocket.social.domain.FriendshipState;
 import fr.gravelinesgrimp.pocket.social.infra.FriendshipRepository;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,16 +36,19 @@ public class FriendshipService {
     private final FriendshipRepository friendships;
     private final MemberRepository members;
     private final RateLimiter rateLimiter;
+    private final ApplicationEventPublisher events;
     private final Clock clock;
 
     public FriendshipService(
             FriendshipRepository friendships,
             MemberRepository members,
             RateLimiter rateLimiter,
+            ApplicationEventPublisher events,
             Clock clock) {
         this.friendships = friendships;
         this.members = members;
         this.rateLimiter = rateLimiter;
+        this.events = events;
         this.clock = clock;
     }
 
@@ -66,11 +72,17 @@ public class FriendshipService {
             var friendship = existing.get();
             if (!friendship.isAccepted() && friendship.addresseeId().equals(me)) {
                 friendship.acceptBy(me, clock.instant());
+                events.publishEvent(
+                        NotificationEvent.aboutFriendship(
+                                friendship.requesterId(), NotificationKind.FRIEND_ACCEPTED, me));
             }
             return FriendshipState.of(friendship, me);
         }
         rateLimiter.consume(RateLimiter.FRIEND_REQUEST_PER_MEMBER, me.toString());
-        return FriendshipState.of(friendships.save(Friendship.request(me, otherId)), me);
+        var asked = friendships.save(Friendship.request(me, otherId));
+        events.publishEvent(
+                NotificationEvent.aboutFriendship(otherId, NotificationKind.FRIEND_REQUEST, me));
+        return FriendshipState.of(asked, me);
     }
 
     /**

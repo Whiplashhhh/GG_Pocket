@@ -172,6 +172,11 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'releaseNotes.title' },
   },
   {
+    path: '/profil/notifications',
+    component: () => import('@/views/profile/PushSettingsView.vue'),
+    meta: { titleKey: 'push.title' },
+  },
+  {
     path: '/profil/installer',
     component: () => import('@/views/profile/InstallView.vue'),
     meta: { titleKey: 'install.title' },

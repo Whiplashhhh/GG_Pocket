@@ -2,6 +2,8 @@ package fr.gravelinesgrimp.pocket.session.application;
 
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.notification.domain.NotificationEvent;
+import fr.gravelinesgrimp.pocket.notification.domain.NotificationKind;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ErrorCode;
@@ -10,6 +12,7 @@ import fr.gravelinesgrimp.pocket.session.domain.SessionReaction;
 import fr.gravelinesgrimp.pocket.session.infra.SessionReactionRepository;
 import fr.gravelinesgrimp.pocket.topo.application.MemberRefView;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,7 @@ public class SessionReactionService {
     private final ReadableSessions readable;
     private final SessionViews views;
     private final MemberRepository members;
+    private final ApplicationEventPublisher events;
     private final RateLimiter rateLimiter;
     private final Clock clock;
 
@@ -43,12 +47,14 @@ public class SessionReactionService {
             ReadableSessions readable,
             SessionViews views,
             MemberRepository members,
+            ApplicationEventPublisher events,
             RateLimiter rateLimiter,
             Clock clock) {
         this.reactions = reactions;
         this.readable = readable;
         this.views = views;
         this.members = members;
+        this.events = events;
         this.rateLimiter = rateLimiter;
         this.clock = clock;
     }
@@ -66,7 +72,20 @@ public class SessionReactionService {
                     ErrorCode.VALIDATION_FAILED, "No reaction to one's own session");
         }
         rateLimiter.consume(RateLimiter.SESSION_REACTION_PER_MEMBER, memberId.toString());
+        // A first reaction rings the climber's phone; changing one's mind does not ring again.
+        var first = !reactions.existsBySessionIdAndMemberId(sessionId, memberId);
         reactions.upsert(UUID.randomUUID(), sessionId, memberId, kind.name(), clock.instant());
+        if (first) {
+            events.publishEvent(
+                    NotificationEvent.aboutSession(
+                            session.memberId(),
+                            NotificationKind.REACTION,
+                            memberId,
+                            sessionId,
+                            session.climbedOn(),
+                            kind.name(),
+                            null));
+        }
         return views.reactions(sessionId, memberId);
     }
 

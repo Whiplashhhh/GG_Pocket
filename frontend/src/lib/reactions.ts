@@ -11,13 +11,7 @@ export const REACTION_KINDS = [
   'GORILLA',
 ] as const satisfies ReactionKind[]
 
-/** The only emoji of the interface: reactions are emoji by nature (docs/DESIGN.md). */
-export const REACTION_EMOJI: Record<ReactionKind, string> = {
-  FIRE: '🔥',
-  STRONG: '💪',
-  CLAP: '👏',
-  GORILLA: '🦍',
-}
+export { REACTION_EMOJI } from './reactionEmoji'
 
 /** Tapping my reaction takes it back; tapping another one changes it. */
 export function nextReaction(

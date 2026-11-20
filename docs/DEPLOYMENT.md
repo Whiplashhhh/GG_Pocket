@@ -293,3 +293,23 @@ qui manquent à une base d'une version plus ancienne. Ensuite, arrêter l'ancien
   `sudo -u deploy` (le compte `willem` est dans le groupe `docker`).
 - État : `docker ps --filter label=com.docker.compose.project=gg-pocket-prod`.
 - Mémoire : environ 1,5 Go au plus (API 768 Mo, base 512 Mo, sauvegarde 128 Mo, Caddy de l'appli 64 Mo).
+
+## 11. Notifications push (1.2.0, D-130)
+
+Sans clés, l'appli ne propose pas les notifications push ; la cloche, elle, marche toujours. Pour les activer dans un
+environnement (dev et prod ont chacun leur paire de clés) :
+
+1. Générer une paire de clés, sur n'importe quelle machine avec `openssl` :
+   `deploy/scripts/vapid-keys.sh` → deux lignes `GG_PUSH_PUBLIC_KEY=…` et `GG_PUSH_PRIVATE_KEY=…`.
+2. Les ajouter au `.env` de l'environnement (`/opt/gg-pocket/dev/.env`, `/srv/ggpocket/.env`), avec un contact pour
+   les services de push : `GG_PUSH_SUBJECT=mailto:une-adresse@du-club` (ou une URL `https://`).
+3. Redéployer (ou redémarrer l'API). Au démarrage, des clés invalides ou un `GG_PUSH_SUBJECT` mal formé arrêtent l'API :
+   le journal le dit.
+
+La clé privée est un secret, comme les mots de passe de la base. Changer de paire coupe les notifications de tous les
+appareils déjà abonnés : leurs membres devront les réactiver dans « Notifications sur ton téléphone ».
+
+L'API n'a toujours aucun accès à Internet : elle remet ses messages au conteneur `web` (port 8081, jamais publié), qui
+les relaie vers les trois services de push des navigateurs (Apple, Google, Mozilla), et vers rien d'autre
+(`deploy/web/Caddyfile`). Si les notifications n'arrivent pas : `sudo docker logs <env>-api-1 | grep -i push` (un refus
+du service de push y apparaît avec son code HTTP), puis le journal du conteneur `web`.

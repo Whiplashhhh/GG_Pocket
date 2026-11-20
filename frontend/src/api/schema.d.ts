@@ -861,6 +861,58 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/push': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Whether push is on, what I want, and whether this device receives it */
+    get: operations['getMyPushSettings']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/push/devices': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** This device receives my notifications */
+    put: operations['addMyPushDevice']
+    post?: never
+    /** This device no longer receives my notifications */
+    delete: operations['removeMyPushDevice']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/push/preferences': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Which notifications I want */
+    put: operations['saveMyPushPreferences']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/sessions': {
     parameters: {
       query?: never
@@ -2512,6 +2564,28 @@ export interface components {
       parentalConsent?: boolean
       /** @description Ignored, and saved unchecked, for a member under 18 (D-119) */
       showAge?: boolean
+    }
+    PushDevice: {
+      endpoint: string
+      keys: components['schemas']['PushDeviceKeys']
+    }
+    PushDeviceKeys: {
+      auth: string
+      p256dh: string
+    }
+    PushPreferences: {
+      comments: boolean
+      friendRequests: boolean
+      friendSessions: boolean
+      reactions: boolean
+      replies: boolean
+    }
+    PushSettings: {
+      preferences: components['schemas']['PushPreferences']
+      /** @description The server's VAPID key; absent when push is off */
+      publicKey?: string
+      /** @description Whether the device asked about receives my notifications */
+      thisDevice: boolean
     }
     Ranking: {
       /** @description False when I chose not to appear in the rankings */
@@ -4343,6 +4417,94 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['MyProfile']
+        }
+      }
+    }
+  }
+  getMyPushSettings: {
+    parameters: {
+      query?: {
+        endpoint?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PushSettings']
+        }
+      }
+    }
+  }
+  addMyPushDevice: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PushDevice']
+      }
+    }
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  removeMyPushDevice: {
+    parameters: {
+      query: {
+        endpoint: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  saveMyPushPreferences: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PushPreferences']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PushPreferences']
         }
       }
     }

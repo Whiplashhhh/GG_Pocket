@@ -1567,3 +1567,30 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
 - **Choix** : `shell: bash` sur l'étape (GitHub lance alors `bash -eo pipefail`) ; les 3 fichiers reformatés à
   l'identique de ce que demande Spotless 3.11.0. Repère pour la suite : l'étape Maven dure plusieurs minutes, pas 10 s.
 - **Statut** : validée (correctif CI, aucun changement visible).
+
+### D-130 — Notifications push (1.2.0)
+- **Contexte** : le club voulait une cloche « pas forcément en push » ; Willem met le push dans la 1.2.0 (avancé de la
+  phase 9), réglages par défaut choisis par lui (D-128). Tout le monde a l'appli installée (iOS : push seulement dans la
+  PWA installée, iOS 16.4+).
+- **Choix** :
+  - Web Push standard (VAPID, RFC 8291/8292) **sans bibliothèque** : chiffrement et jeton écrits avec le JDK (`WebPush`,
+    une centaine de lignes, testées octet pour octet sur l'exemple de la RFC 8291). Les bibliothèques Java existantes
+    sont peu ou pas maintenues.
+  - **L'API reste sans Internet** (D-060) : elle envoie au relais du conteneur `web` (Caddy, port 8081 non publié), qui
+    ne mène qu'à `web.push.apple.com`, `fcm.googleapis.com` et `updates.push.services.mozilla.com`. Les abonnements
+    vers un autre service sont refusés (400) : pas de SSRF possible par un « endpoint » forgé. Pas de Windows (WNS) :
+    Edge sur PC n'est pas la cible.
+  - Envoi après le commit (`@TransactionalEventListener`), sur un thread virtuel : un service de push lent ne retient
+    jamais une requête ; un échec est journalisé, rien d'autre. Un appareil déclaré disparu (404/410) est oublié.
+  - Le message porte des données (type, pseudo, jour, extrait, lien), pas de texte : le service worker (`push-sw.js`,
+    généré au build depuis `fr.json`) rédige la notification ; les textes restent dans l'i18n.
+  - Une notification par personne et par événement : la réponse à un commentaire sous ma séance me parvient comme
+    « réponse », pas aussi comme « commentaire ». Une réaction modifiée ne re-notifie pas.
+  - Tables `push_subscription` (10 appareils au plus par membre, un appareil = un membre : le dernier qui l'active)
+    et `push_preference` (pas de ligne = défauts). Effacées avec le compte. Se déconnecter retire l'appareil (un
+    téléphone partagé ne montre pas au suivant les notifications du précédent).
+  - Clés par environnement dans le `.env` (`deploy/scripts/vapid-keys.sh`) ; sans clés, push coupé et non proposé.
+- **Alternatives** : ouvrir Internet à l'API (contraire à D-060) ; un proxy sortant dédié (une image de plus à
+  maintenir) ; `nl.martijndwars:web-push` (abandonnée, BouncyCastle).
+- **Statut** : à valider (Willem : clés et `GG_PUSH_SUBJECT` à poser sur le serveur ; essai sur iPhone et Android en dev).
+

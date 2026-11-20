@@ -39,6 +39,12 @@ services:
       GG_DB_URL: jdbc:postgresql://db:5432/${GG_DB_NAME:-ggpocket}
       GG_DB_USER: ${GG_DB_USER:?GG_DB_USER is required}
       GG_DB_PASSWORD: ${GG_DB_PASSWORD:?GG_DB_PASSWORD is required}
+      # Push notifications (D-130): off without both keys (deploy/scripts/vapid-keys.sh).
+      GG_PUSH_PUBLIC_KEY: ${GG_PUSH_PUBLIC_KEY:-}
+      GG_PUSH_PRIVATE_KEY: ${GG_PUSH_PRIVATE_KEY:-}
+      GG_PUSH_SUBJECT: ${GG_PUSH_SUBJECT:-}
+      # The API has no Internet access: push messages go out through the web container's relay.
+      GG_PUSH_RELAY: http://web:8081
     volumes:
       - media:/data/media
     # Both networks are internal: the API never talks to the internet, and 8080 is never published.
