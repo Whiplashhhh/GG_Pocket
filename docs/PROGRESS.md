@@ -2,6 +2,17 @@
 
 Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, prochaine action exacte, points bloquants.
 
+## 2026-11-21 — `feature/fil-ordre-publication-1.1.0` (PR #87, base #86)
+
+- **Fait** : push validé en dev par le club après trois correctifs sur #86 (HTTP/1.1 vers le relais, raison du refus
+  dans les logs et paire VAPID vérifiée au démarrage, `Host` sans `:443` vers Apple + réabonnement si les clés
+  changent). Nouvelle demande du club : fil d'actu (amis et club) trié par date de publication (D-131, V28) ;
+  carnet, profil, assurages inchangés. e2e social, notifications, club-feed verts en local (Desktop Chrome).
+- **Reste** : CI de #87 ; essai en dev (Deploy dev avec `feature/fil-ordre-publication-1.1.0`, réinitialisation
+  décochée) ; puis fusion #84 → #81 → #82 → #83 → #85 → #86 → #87, « Prepare release » minor, clés VAPID prod dans
+  `/srv/ggpocket/.env` (nouvelle paire) avant d'approuver le déploiement prod.
+- **Bloquant** : aucun ; le jeton `gh` ne peut ni relancer un job ni déclencher un workflow (D-066).
+
 ---
 
 ## 2026-11-18 — 1.2.0 : la pile est verte, reste les essais en dev
