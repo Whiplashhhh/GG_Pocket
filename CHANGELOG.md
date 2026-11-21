@@ -22,6 +22,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ### Modifié
 
+- **Le fil d’actu suit l’ordre de publication** : la dernière séance postée arrive en haut, même si la grimpe date de
+  cinq jours. Fini les séances saisies après coup qui se planquent en bas du fil sans un seul 🔥. Ton carnet, lui,
+  reste rangé par jour de grimpe.
 - **Badge « Première cotation »** : il se gagne maintenant en **enchaînant** une voie de la cotation (topée sans
   chute, en tête ou en mouli), plus juste en la topant. Si tu avais décroché une cotation avec des chutes et que tu ne
   l’as jamais enchaînée depuis, le badge repart au mur : va le chercher proprement.

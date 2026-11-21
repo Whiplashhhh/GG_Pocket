@@ -1594,3 +1594,12 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
   maintenir) ; `nl.martijndwars:web-push` (abandonnée, BouncyCastle).
 - **Statut** : à valider (Willem : clés et `GG_PUSH_SUBJECT` à poser sur le serveur ; essai sur iPhone et Android en dev).
 
+### D-131 — Le fil d'actu dans l'ordre de publication (1.2.0)
+- **Contexte** : retour du club en dev : une séance saisie cinq jours après coup se rangeait à son jour de grimpe, sous
+  les plus récentes, et personne ne la voyait.
+- **Choix** : le fil des amis et le fil du club se trient par date de publication (`created_at`, puis `id`), curseur
+  sur ces deux colonnes, index `climbing_session_posted_idx` (V28). Le carnet, le profil et les assurages restent
+  par jour de grimpe (c'est un journal). La carte dit déjà « séance du …, publiée … » (D-128).
+- **Alternatives** : trier par jour de grimpe en remontant les séances saisies tard (deux ordres mêlés, curseur
+  bancal) ; par dernière activité (réactions, commentaires : le fil bougerait sans cesse).
+- **Statut** : demandé par le club via Willem.

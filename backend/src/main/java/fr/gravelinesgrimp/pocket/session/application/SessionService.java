@@ -273,7 +273,8 @@ public class SessionService {
 
     /**
      * The feed (spec §8.2): my sessions and the ones my friends share with friends or with the
-     * club, latest day first. A friend whose account is disabled drops out, like everywhere else.
+     * club, the latest posted first (D-131). A friend whose account is disabled drops out, like
+     * everywhere else.
      */
     @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
@@ -292,20 +293,15 @@ public class SessionService {
             var position = Cursor.decode(cursor);
             found =
                     sessions.findInFeedBefore(
-                            readerId,
-                            climberIds,
-                            position.climbedOn(),
-                            position.createdAt(),
-                            position.id(),
-                            limit + 1);
+                            readerId, climberIds, position.createdAt(), position.id(), limit + 1);
         }
         return page(found, limit, readerId);
     }
 
     /**
      * The club feed (D-120): the sessions shared with the club by every member who takes part, mine
-     * included, latest day first. Only for a member who takes part: to read it, one shows oneself
-     * in it.
+     * included, the latest posted first (D-131). Only for a member who takes part: to read it, one
+     * shows oneself in it.
      *
      * @throws BusinessException {@code CLUB_FEED_NOT_JOINED}
      */
@@ -319,9 +315,7 @@ public class SessionService {
             found = sessions.findLatestInClubFeed(limit + 1);
         } else {
             var position = Cursor.decode(cursor);
-            found =
-                    sessions.findInClubFeedBefore(
-                            position.climbedOn(), position.createdAt(), position.id(), limit + 1);
+            found = sessions.findInClubFeedBefore(position.createdAt(), position.id(), limit + 1);
         }
         return page(found, limit, readerId);
     }

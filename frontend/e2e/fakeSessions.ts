@@ -667,10 +667,8 @@ export class FakeSessions implements AscentSource {
             : session.memberId === me.id ||
               (session.visibility !== 'PRIVATE' && this.isFriend(me.id, session.memberId)),
         )
-        .sort(
-          (a, b) =>
-            b.climbedOn.localeCompare(a.climbedOn) || b.createdAt.localeCompare(a.createdAt),
-        )
+        // Latest posted first, whatever the day of the climb (D-131).
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       const start = Number(url.searchParams.get('cursor') ?? '0')
       const size = Number(url.searchParams.get('size') ?? '10')
       return json({
