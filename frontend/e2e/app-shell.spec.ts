@@ -116,9 +116,11 @@ test.describe('app shell', () => {
     // A fresh page, not an in-app navigation: the new version is fetched.
     await expect.poll(() => page.evaluate(() => 'e2eBeforeReload' in window)).toBe(false)
 
-    // WebKit remembers a failed module for the whole tab and does not ask again after the reload:
-    // it ends on the failure screen. A real release points to a file with a new name.
-    const heading = browserName === 'webkit' ? FAILURE_TITLE : 'Mon profil'
+    // Up to Playwright 1.64, WebKit remembered a failed module for the whole tab and did not ask
+    // again after the reload: it ended on the failure screen (a real release points to a file with
+    // a new name). Its newer builds ask again, like Chromium. Either way, never a blank page.
+    const heading =
+      browserName === 'webkit' ? new RegExp(`^(Mon profil|${FAILURE_TITLE})$`) : 'Mon profil'
     await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible()
   })
 
