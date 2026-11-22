@@ -5,6 +5,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+## 1.2.0 — 2026-11-22
+
 ### Ajouté
 
 - **L’heure des séances** : dans le fil, chaque séance dit à quelle heure elle a été publiée. Saisie le lendemain ?
