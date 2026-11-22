@@ -1545,6 +1545,41 @@
         ]
       }
     },
+    "/api/v1/me/notifications": {
+      "get": {
+        "operationId": "getMyNotifications",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notifications"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "What happened to me lately (reactions, comments, answers, friends' sessions, friend requests), newest first, and how much is new",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/me/notifications/seen": {
+      "put": {
+        "operationId": "markMyNotificationsSeen",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "I opened the bell",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
     "/api/v1/me/password": {
       "put": {
         "operationId": "changeMyPassword",
@@ -1629,6 +1664,114 @@
         "summary": "Edit my profile",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/v1/me/push": {
+      "get": {
+        "operationId": "getMyPushSettings",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "endpoint",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushSettings"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Whether push is on, what I want, and whether this device receives it",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/me/push/devices": {
+      "delete": {
+        "operationId": "removeMyPushDevice",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "endpoint",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "This device no longer receives my notifications",
+        "tags": [
+          "Notifications"
+        ]
+      },
+      "put": {
+        "operationId": "addMyPushDevice",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushDevice"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "This device receives my notifications",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/me/push/preferences": {
+      "put": {
+        "operationId": "saveMyPushPreferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushPreferences"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushPreferences"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Which notifications I want",
+        "tags": [
+          "Notifications"
         ]
       }
     },
@@ -3103,6 +3246,41 @@
         ]
       }
     },
+    "/api/v1/sessions/{id}/reactions": {
+      "get": {
+        "operationId": "listSessionReactions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionReactor"
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Who reacted to a session, and with what, the latest first",
+        "tags": [
+          "Feed"
+        ]
+      }
+    },
     "/api/v1/stats/attendance": {
       "get": {
         "operationId": "getMonthAttendance",
@@ -4122,6 +4300,9 @@
           },
           "firstName": {
             "type": "string"
+          },
+          "inClubFeed": {
+            "type": "boolean"
           },
           "lastName": {
             "type": "string"
@@ -5393,6 +5574,89 @@
           "topped"
         ]
       },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "$ref": "#/components/schemas/MemberRef"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "climbedOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Its day; absent for a friendship"
+          },
+          "excerpt": {
+            "type": "string",
+            "description": "The start of a comment or an answer"
+          },
+          "id": {
+            "type": "string",
+            "description": "Stable, for the list keys"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "REACTION",
+              "COMMENT",
+              "REPLY",
+              "FRIEND_SESSION",
+              "FRIEND_REQUEST",
+              "FRIEND_ACCEPTED"
+            ]
+          },
+          "reaction": {
+            "type": "string",
+            "description": "For a reaction",
+            "enum": [
+              "FIRE",
+              "STRONG",
+              "CLAP",
+              "GORILLA"
+            ]
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The session concerned; absent for a friendship"
+          },
+          "unread": {
+            "type": "boolean",
+            "description": "New since I last looked"
+          }
+        },
+        "required": [
+          "actor",
+          "at",
+          "id",
+          "kind",
+          "unread"
+        ]
+      },
+      "Notifications": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "Newest first, a month back",
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            }
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "How many came since I last opened the bell"
+          }
+        },
+        "required": [
+          "items",
+          "unreadCount"
+        ]
+      },
       "PasswordChange": {
         "type": "object",
         "properties": {
@@ -5638,6 +5902,89 @@
           "firstName",
           "lastName",
           "nickname"
+        ]
+      },
+      "PushDevice": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0
+          },
+          "keys": {
+            "$ref": "#/components/schemas/PushDeviceKeys"
+          }
+        },
+        "required": [
+          "endpoint",
+          "keys"
+        ]
+      },
+      "PushDeviceKeys": {
+        "type": "object",
+        "properties": {
+          "auth": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 0
+          },
+          "p256dh": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "auth",
+          "p256dh"
+        ]
+      },
+      "PushPreferences": {
+        "type": "object",
+        "properties": {
+          "comments": {
+            "type": "boolean"
+          },
+          "friendRequests": {
+            "type": "boolean"
+          },
+          "friendSessions": {
+            "type": "boolean"
+          },
+          "reactions": {
+            "type": "boolean"
+          },
+          "replies": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "comments",
+          "friendRequests",
+          "friendSessions",
+          "reactions",
+          "replies"
+        ]
+      },
+      "PushSettings": {
+        "type": "object",
+        "properties": {
+          "preferences": {
+            "$ref": "#/components/schemas/PushPreferences"
+          },
+          "publicKey": {
+            "type": "string",
+            "description": "The server's VAPID key; absent when push is off"
+          },
+          "thisDevice": {
+            "type": "boolean",
+            "description": "Whether the device asked about receives my notifications"
+          }
+        },
+        "required": [
+          "preferences",
+          "thisDevice"
         ]
       },
       "Ranking": {
@@ -6625,6 +6972,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "replyTo": {
+            "$ref": "#/components/schemas/SessionCommentReplyTo",
+            "description": "The comment it answers; absent for a plain comment"
           }
         },
         "required": [
@@ -6635,6 +6986,22 @@
           "id"
         ]
       },
+      "SessionCommentReplyTo": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "$ref": "#/components/schemas/MemberRef"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "author",
+          "id"
+        ]
+      },
       "SessionCommentRequest": {
         "type": "object",
         "properties": {
@@ -6642,6 +7009,11 @@
             "type": "string",
             "maxLength": 500,
             "minLength": 1
+          },
+          "replyTo": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The comment of the same session this one answers"
           }
         },
         "required": [
@@ -6726,6 +7098,27 @@
         },
         "required": [
           "counts"
+        ]
+      },
+      "SessionReactor": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "FIRE",
+              "STRONG",
+              "CLAP",
+              "GORILLA"
+            ]
+          },
+          "member": {
+            "$ref": "#/components/schemas/MemberRef"
+          }
+        },
+        "required": [
+          "kind",
+          "member"
         ]
       },
       "SessionRequest": {

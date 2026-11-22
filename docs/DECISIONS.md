@@ -1529,3 +1529,77 @@ D-043) ; confirmation quand on décoche « Plusieurs assureur·ses » avec des v
   devant les résultats ; vider la recherche ramène la liste telle qu'on l'avait laissée. Mention du développeur dans le
   pied de page du profil, sous « Chercher une mise à jour », hors CHANGELOG (donc absente de « Quoi de neuf ? »).
 - **Statut** : validée (Willem, 2026-11-14 : tri par cotation croissante plutôt que par secteur).
+
+### D-128 — 1.2.0 : retours du club du 2026-11-16 (Willem, 2026-11-17)
+- **Contexte** : message du club relayé par Willem : le badge de cotation devait se gagner à l'**enchaînement** (le club
+  avait dit « topé » par erreur) ; demandes d'une cloche de notifications, de voir qui a réagi, de répondre aux
+  commentaires et de l'heure des posts. Willem met tout en 1.2.0, push compris (avancé de la phase 9).
+- **Choix** :
+  - Badge « Première cotation » : première ascension **enchaînée** (topée sans chute), **tête et moulinette** (Willem).
+    Le recalcul au démarrage (`BadgeRecount`) reprend les badges gagnés avec chutes et redate les autres au premier
+    enchaînement : à annoncer au club.
+  - Heure : on connaît l'heure d'enregistrement, pas celle de la grimpe. Séance saisie le jour même : « Séance
+    d'aujourd'hui · 19 h 42 » ; saisie plus tard : « Séance d'hier · publiée aujourd'hui à 9 h 05 », pour ne jamais
+    afficher une heure sur un jour où elle n'a pas eu lieu. Sur les cartes avec auteur (fil, profil, fiche), pas dans le carnet.
+  - Réponses : colonne `session_comment.reply_to_id` (V25) vers le commentaire **directement** répondu (même séance,
+    non supprimé, sinon 400), pour prévenir la bonne personne dans la cloche. Répondre à une réponse est permis ;
+    l'appli range toutes les réponses sous le premier commentaire, un seul niveau de retrait, et affiche « en réponse
+    à X ». La réponse à un commentaire supprimé reste, au premier niveau, avec son « en réponse à ». Pas de bouton
+    « Répondre » sur ses propres commentaires.
+  - Cloche : contenu calculé à la volée depuis les tables existantes + date de dernière ouverture par membre (rien à
+    synchroniser, une suppression ou une fin d'amitié retire l'élément d'elle-même). Contenu : réactions et commentaires
+    sur mes séances, réponses à mes commentaires, séances d'amis, demandes d'ami (Willem).
+  - Cloche, détails : module `notification`, table `notification_seen` (V26, une ligne par membre, effacée avec le
+    compte). Requête unique (`NotificationQueries`) sur le dernier mois, 50 événements au plus ; s'y ajoute « X a
+    accepté ta demande d'ami ». Une réponse sous la séance d'un autre n'apparaît que si je peux encore lire la séance ;
+    les comptes inactifs disparaissent. `unread` = plus récent que la dernière ouverture (jamais ouverte : tout est
+    nouveau, la cloche sonnera donc pour tout le monde à la sortie de la 1.2.0). L'appli interroge toutes les minutes
+    au premier plan et au retour sur l'appli ; ouvrir la page éteint le point, les marques « Nouveau » restent jusqu'à
+    la visite suivante. Demande d'ami → profil (où l'on répond) ; demande acceptée → profil de l'ami.
+  - Push, réglages par défaut (Willem) : commentaires, réponses, demandes d'ami activés ; réactions et séances d'amis
+    désactivées.
+- **Statut** : validée (Willem, 2026-11-17).
+
+### D-129 — CI backend : les échecs Maven étaient masqués (2026-11-17)
+- **Contexte** : depuis #64 (2026-11-08), l'étape Maven de la CI écrit dans `| tee` sans `pipefail` : un échec de
+  Maven ne faisait pas échouer le job. Depuis le passage de Spotless en 3.11.0 (#67), `spotless:check` refusait 3
+  fichiers et Maven s'arrêtait **avant les tests** : le job « Backend » restait vert sans rien tester (1.1.0 comprise).
+- **Choix** : `shell: bash` sur l'étape (GitHub lance alors `bash -eo pipefail`) ; les 3 fichiers reformatés à
+  l'identique de ce que demande Spotless 3.11.0. Repère pour la suite : l'étape Maven dure plusieurs minutes, pas 10 s.
+- **Statut** : validée (correctif CI, aucun changement visible).
+
+### D-130 — Notifications push (1.2.0)
+- **Contexte** : le club voulait une cloche « pas forcément en push » ; Willem met le push dans la 1.2.0 (avancé de la
+  phase 9), réglages par défaut choisis par lui (D-128). Tout le monde a l'appli installée (iOS : push seulement dans la
+  PWA installée, iOS 16.4+).
+- **Choix** :
+  - Web Push standard (VAPID, RFC 8291/8292) **sans bibliothèque** : chiffrement et jeton écrits avec le JDK (`WebPush`,
+    une centaine de lignes, testées octet pour octet sur l'exemple de la RFC 8291). Les bibliothèques Java existantes
+    sont peu ou pas maintenues.
+  - **L'API reste sans Internet** (D-060) : elle envoie au relais du conteneur `web` (Caddy, port 8081 non publié), qui
+    ne mène qu'à `web.push.apple.com`, `fcm.googleapis.com` et `updates.push.services.mozilla.com`. Les abonnements
+    vers un autre service sont refusés (400) : pas de SSRF possible par un « endpoint » forgé. Pas de Windows (WNS) :
+    Edge sur PC n'est pas la cible.
+  - Envoi après le commit (`@TransactionalEventListener`), sur un thread virtuel : un service de push lent ne retient
+    jamais une requête ; un échec est journalisé, rien d'autre. Un appareil déclaré disparu (404/410) est oublié.
+  - Le message porte des données (type, pseudo, jour, extrait, lien), pas de texte : le service worker (`push-sw.js`,
+    généré au build depuis `fr.json`) rédige la notification ; les textes restent dans l'i18n.
+  - Une notification par personne et par événement : la réponse à un commentaire sous ma séance me parvient comme
+    « réponse », pas aussi comme « commentaire ». Une réaction modifiée ne re-notifie pas.
+  - Tables `push_subscription` (10 appareils au plus par membre, un appareil = un membre : le dernier qui l'active)
+    et `push_preference` (pas de ligne = défauts). Effacées avec le compte. Se déconnecter retire l'appareil (un
+    téléphone partagé ne montre pas au suivant les notifications du précédent).
+  - Clés par environnement dans le `.env` (`deploy/scripts/vapid-keys.sh`) ; sans clés, push coupé et non proposé.
+- **Alternatives** : ouvrir Internet à l'API (contraire à D-060) ; un proxy sortant dédié (une image de plus à
+  maintenir) ; `nl.martijndwars:web-push` (abandonnée, BouncyCastle).
+- **Statut** : à valider (Willem : clés et `GG_PUSH_SUBJECT` à poser sur le serveur ; essai sur iPhone et Android en dev).
+
+### D-131 — Le fil d'actu dans l'ordre de publication (1.2.0)
+- **Contexte** : retour du club en dev : une séance saisie cinq jours après coup se rangeait à son jour de grimpe, sous
+  les plus récentes, et personne ne la voyait.
+- **Choix** : le fil des amis et le fil du club se trient par date de publication (`created_at`, puis `id`), curseur
+  sur ces deux colonnes, index `climbing_session_posted_idx` (V28). Le carnet, le profil et les assurages restent
+  par jour de grimpe (c'est un journal). La carte dit déjà « séance du …, publiée … » (D-128).
+- **Alternatives** : trier par jour de grimpe en remontant les séances saisies tard (deux ordres mêlés, curseur
+  bancal) ; par dernière activité (réactions, commentaires : le fil bougerait sans cesse).
+- **Statut** : demandé par le club via Willem.

@@ -183,6 +183,16 @@ Découpée en deux PR (D-098), chacune fusionnée et testable sur le dev avant l
 - [x] Séance : toutes les voies du mur dans une liste dépliable sous la recherche (D-127, `feature/credit-et-liste-voies-1.0.0`)
 - [x] Profil : « Développé par Willem Vanbaelinghem » en pied de page, sans annonce (D-127)
 
+## Version 1.2.0 — retours du club du 2026-11-16 (D-128)
+
+- [x] Badge « Première cotation » gagné à l'enchaînement, en tête comme en mouli (`feature/badge-enchainement-heure-1.1.0`)
+- [x] Heure de publication sur les cartes de séance
+- [x] Qui a réagi : toucher les réactions d'une séance montre qui a mis quoi (`feature/qui-a-reagi-1.1.0`)
+- [x] Répondre à un commentaire de séance, réponses en retrait sous le premier commentaire (`feature/repondre-commentaires-1.1.0`)
+- [x] Cloche : réactions et commentaires sur mes séances, réponses, séances d'amis, demandes d'ami, point rouge (`feature/cloche-1.1.0`)
+- [x] Notifications push (PWA installée) : abonnement par appareil, réglage par type (D-130, `feature/notifications-push-1.1.0`)
+- [ ] Clés VAPID et `GG_PUSH_SUBJECT` dans les `.env` dev et prod (Willem), essai iPhone + Android en dev
+
 ## Phase 9 — Après lancement (pas sans feu vert)
 
 - [ ] Passkeys, notifications push, graphiques de progression, classement pondéré, e-mail optionnel

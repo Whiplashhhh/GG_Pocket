@@ -29,6 +29,10 @@ public class SessionComment extends TimestampedEntity {
     @Column(nullable = false, length = 500)
     private String body;
 
+    /** The comment of the same session this one answers, if any (D-128). */
+    @Column(name = "reply_to_id", updatable = false)
+    private UUID replyToId;
+
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
@@ -41,9 +45,15 @@ public class SessionComment extends TimestampedEntity {
 
     /** {@code body} already stripped and checked (1 to 500 characters). */
     public SessionComment(UUID sessionId, UUID authorId, String body) {
+        this(sessionId, authorId, body, null);
+    }
+
+    /** {@code replyToId}: a comment of the same session, checked by the service. */
+    public SessionComment(UUID sessionId, UUID authorId, String body, UUID replyToId) {
         this.sessionId = sessionId;
         this.authorId = authorId;
         this.body = body;
+        this.replyToId = replyToId;
     }
 
     /**
@@ -74,6 +84,10 @@ public class SessionComment extends TimestampedEntity {
 
     public String body() {
         return body;
+    }
+
+    public UUID replyToId() {
+        return replyToId;
     }
 
     public Instant deletedAt() {

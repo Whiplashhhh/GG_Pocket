@@ -120,6 +120,38 @@ test.describe('friends', () => {
 })
 
 test.describe('the feed', () => {
+  test('I answer a comment under my session, and the answer sits under it (D-128)', async ({
+    page,
+    club,
+    me,
+  }) => {
+    const marie = signedIn(me)
+    const tom = club.addMember({ nickname: 'tom', firstName: 'Tom', lastName: 'Bloc' })
+    club.social.link(tom, marie)
+    const mine = club.climbs.add(marie, 0, [{ route: 'Réglisse' }])
+    club.climbs.comment(tom, mine, 'Tu me montres la méthode ?', 10)
+    club.climbs.comment(marie, mine, 'Le talon, à droite.', 5)
+
+    await page.clock.setSystemTime(new Date(club.now))
+    await page.goto(`/seances/${mine.id}`)
+    await expect(page.getByRole('heading', { name: 'Commentaires (2)' })).toBeVisible()
+    // Not to myself.
+    await expect(page.getByRole('button', { name: 'Répondre à marie' })).toHaveCount(0)
+    await page.getByRole('button', { name: 'Répondre à tom' }).click()
+    const field = page.getByLabel('Ta réponse à tom')
+    await expect(field).toBeFocused()
+    await field.fill('Jeudi, promis.')
+    await page.getByRole('button', { name: 'Publier' }).click()
+
+    await expect(page.getByText('en réponse à tom')).toBeVisible()
+    await expect(page.getByLabel('Ton commentaire')).toBeVisible()
+    // Under the comment it answers, before the later plain one.
+    await expect(page.getByRole('listitem').filter({ hasText: /promis|méthode|talon/ })).toHaveText(
+      [/méthode/, /promis/, /talon/],
+    )
+    expect(mine.comments.at(-1)?.replyTo).toBe(mine.comments[0]?.id)
+  })
+
   test('mixes my sessions with my friends’ shared ones; I react and comment', async ({
     page,
     club,
@@ -143,9 +175,14 @@ test.describe('the feed', () => {
     const myCard = page.getByRole('article', { name: 'Séance d’aujourd’hui de marie' })
     const tomsCard = page.getByRole('article', { name: 'Séance d’hier de tom' })
     await expect(tomsCard.getByText('« Le dévers a cédé. »')).toBeVisible()
-    // On my own session, what the others gave, nothing to tap.
+    // On my own session, what the others gave: a tap shows who (D-128).
     await expect(myCard.getByText('Mode gorille : 1')).toHaveCount(1)
-    await expect(myCard.getByRole('button')).toHaveCount(0)
+    await expect(myCard.getByRole('button')).toHaveCount(1)
+    await myCard.getByRole('button', { name: /Qui a réagi/ }).click()
+    const reactors = page.getByRole('dialog', { name: 'Qui a réagi' })
+    await expect(reactors.getByRole('link', { name: /tom.*Mode gorille/ })).toBeVisible()
+    await reactors.getByRole('button', { name: 'Fermer' }).click()
+    await expect(reactors).toBeHidden()
 
     await tomsCard.getByRole('button', { name: 'Ça chauffe : 0' }).click()
     await expect(tomsCard.getByRole('button', { name: 'Ça chauffe : 1' })).toHaveAttribute(

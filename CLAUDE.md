@@ -47,6 +47,9 @@ dès qu'elles existent. Tiens cette section à jour.
   - lancer : `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev` (ou `./mvnw spring-boot:test-run`, base Testcontainers) ;
   - tout vérifier : `./mvnw verify` (Spotless, unitaires `*Test`, intégration `*IT` Testcontainers, ArchUnit, contrat OpenAPI) ;
   - formater : `./mvnw spotless:apply` (google-java-format AOSP ; binaire natif possible : `google-java-format --aosp --skip-reflowing-long-strings --replace`, sans quoi il recoupe les longues chaînes autrement que Spotless) ;
+    sans Java, `git ls-files 'backend/src/**/*.java' | xargs google-java-format --aosp --skip-reflowing-long-strings --dry-run`
+    liste ce que Spotless refuserait (il fait foi, javadoc comprise) ;
+  - le job « Backend » de la CI dure plusieurs minutes : s'il finit en quelques secondes, Maven s'est arrêté avant les tests (D-129) ;
   - mettre à jour le contrat : `./mvnw verify -Dgg.openapi.write=true` (écrit `frontend/src/api/openapi.json`).
 - Frontend (`frontend/`, Node 26, pnpm 12) :
   - `pnpm install`, `pnpm dev` (port 5173, `/api` → 8080), galerie sur `/dev/galerie` ;

@@ -5,6 +5,30 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et les v
 
 ## Non publié
 
+### Ajouté
+
+- **L’heure des séances** : dans le fil, chaque séance dit à quelle heure elle a été publiée. Saisie le lendemain ?
+  On l’écrit aussi, pas de faux alibi.
+- **Qui a réagi ?** Touche les réactions de ta séance (ou « Qui a réagi ? » sous celle d’un copain) : tu vois qui
+  a mis le feu, qui a sorti le gorille.
+- **Répondre** sous chaque commentaire d’une séance : ta réponse se range juste en dessous, avec « en réponse à… »
+  pour que tout le monde suive la conversation.
+- **La cloche** 🔔 en haut de l’écran : un point rouge quand il s’est passé quelque chose. Dedans, les réactions et
+  commentaires sur tes séances, les réponses à tes commentaires, les séances de tes potes et les demandes d’ami du
+  dernier mois. Un toucher et tu y es.
+- **Les notifications sur ton téléphone**, même appli fermée : un commentaire, une réponse, une demande d’ami… Active-les
+  dans ton profil, « Notifications sur ton téléphone », et choisis ce qui te fait vibrer. Sur iPhone, ça marche depuis
+  l’appli installée sur l’écran d’accueil.
+
+### Modifié
+
+- **Le fil d’actu suit l’ordre de publication** : la dernière séance postée arrive en haut, même si la grimpe date de
+  cinq jours. Fini les séances saisies après coup qui se planquent en bas du fil sans un seul 🔥. Ton carnet, lui,
+  reste rangé par jour de grimpe.
+- **Badge « Première cotation »** : il se gagne maintenant en **enchaînant** une voie de la cotation (topée sans
+  chute, en tête ou en mouli), plus juste en la topant. Si tu avais décroché une cotation avec des chutes et que tu ne
+  l’as jamais enchaînée depuis, le badge repart au mur : va le chercher proprement.
+
 ## 1.1.0 — 2026-11-15
 
 ### Ajouté

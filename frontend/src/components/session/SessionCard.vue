@@ -12,7 +12,7 @@ import RouteSummaryLabel from '@/components/topo/RouteSummaryLabel.vue'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
 import { sessionBelayers } from '@/lib/belayers'
 import { formatList } from '@/lib/format'
-import { ascentOutcome, sessionDay } from '@/lib/sessionView'
+import { ascentOutcome, sessionDay, sessionPublished } from '@/lib/sessionView'
 
 /**
  * A session as a full-width block, Strava style (docs/DESIGN.md, « Actu »): who climbed (in the
@@ -49,6 +49,10 @@ const day = computed(() => {
   return value.kind === 'date'
     ? t('session.day.date', { date: value.date })
     : t(`session.day.${value.kind}`)
+})
+const published = computed(() => {
+  const value = sessionPublished(props.session.climbedOn, props.session.createdAt)
+  return t(`session.published.${value.kind}`, value)
 })
 const lines = computed(() =>
   props.maxLines === undefined
@@ -106,7 +110,8 @@ const belayers = computed(() =>
           <FavoriteBadges :badges="session.authorBadges" :size="22" />
         </div>
         <p class="text-sm text-ink-muted" :aria-hidden="linked ? true : undefined">
-          {{ t('session.cardTitle', { day }) }}
+          {{ t('session.cardTitle', { day }) }} ·
+          <time :datetime="session.createdAt">{{ published }}</time>
         </p>
       </div>
       <span

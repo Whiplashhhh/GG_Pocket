@@ -776,6 +776,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/me/notifications': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** What happened to me lately (reactions, comments, answers, friends' sessions, friend requests), newest first, and how much is new */
+    get: operations['getMyNotifications']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/notifications/seen': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** I opened the bell */
+    put: operations['markMyNotificationsSeen']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/me/password': {
     parameters: {
       query?: never
@@ -820,6 +854,58 @@ export interface paths {
     get?: never
     /** Edit my profile */
     put: operations['updateMyProfile']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/push': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Whether push is on, what I want, and whether this device receives it */
+    get: operations['getMyPushSettings']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/push/devices': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** This device receives my notifications */
+    put: operations['addMyPushDevice']
+    post?: never
+    /** This device no longer receives my notifications */
+    delete: operations['removeMyPushDevice']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/me/push/preferences': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Which notifications I want */
+    put: operations['saveMyPushPreferences']
     post?: never
     delete?: never
     options?: never
@@ -1417,6 +1503,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/sessions/{id}/reactions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Who reacted to a session, and with what, the latest first */
+    get: operations['listSessionReactions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/stats/attendance': {
     parameters: {
       query?: never
@@ -1896,6 +1999,7 @@ export interface components {
       email?: string
       favoriteRoute?: components['schemas']['ExportedRoute']
       firstName?: string
+      inClubFeed?: boolean
       lastName?: string
       /** Format: date-time */
       lastSeenAt?: string
@@ -2344,6 +2448,44 @@ export interface components {
       sessionId: string
       topped: boolean
     }
+    Notification: {
+      actor: components['schemas']['MemberRef']
+      /** Format: date-time */
+      at: string
+      /**
+       * Format: date
+       * @description Its day; absent for a friendship
+       */
+      climbedOn?: string
+      /** @description The start of a comment or an answer */
+      excerpt?: string
+      /** @description Stable, for the list keys */
+      id: string
+      /** @enum {string} */
+      kind:
+        'REACTION' | 'COMMENT' | 'REPLY' | 'FRIEND_SESSION' | 'FRIEND_REQUEST' | 'FRIEND_ACCEPTED'
+      /**
+       * @description For a reaction
+       * @enum {string}
+       */
+      reaction?: 'FIRE' | 'STRONG' | 'CLAP' | 'GORILLA'
+      /**
+       * Format: uuid
+       * @description The session concerned; absent for a friendship
+       */
+      sessionId?: string
+      /** @description New since I last looked */
+      unread: boolean
+    }
+    Notifications: {
+      /** @description Newest first, a month back */
+      items: components['schemas']['Notification'][]
+      /**
+       * Format: int32
+       * @description How many came since I last opened the bell
+       */
+      unreadCount: number
+    }
     PasswordChange: {
       currentPassword: string
       newPassword: string
@@ -2422,6 +2564,28 @@ export interface components {
       parentalConsent?: boolean
       /** @description Ignored, and saved unchecked, for a member under 18 (D-119) */
       showAge?: boolean
+    }
+    PushDevice: {
+      endpoint: string
+      keys: components['schemas']['PushDeviceKeys']
+    }
+    PushDeviceKeys: {
+      auth: string
+      p256dh: string
+    }
+    PushPreferences: {
+      comments: boolean
+      friendRequests: boolean
+      friendSessions: boolean
+      reactions: boolean
+      replies: boolean
+    }
+    PushSettings: {
+      preferences: components['schemas']['PushPreferences']
+      /** @description The server's VAPID key; absent when push is off */
+      publicKey?: string
+      /** @description Whether the device asked about receives my notifications */
+      thisDevice: boolean
     }
     Ranking: {
       /** @description False when I chose not to appear in the rankings */
@@ -2840,9 +3004,21 @@ export interface components {
       deletable: boolean
       /** Format: uuid */
       id: string
+      /** @description The comment it answers; absent for a plain comment */
+      replyTo?: components['schemas']['SessionCommentReplyTo']
+    }
+    SessionCommentReplyTo: {
+      author: components['schemas']['MemberRef']
+      /** Format: uuid */
+      id: string
     }
     SessionCommentRequest: {
       body: string
+      /**
+       * Format: uuid
+       * @description The comment of the same session this one answers
+       */
+      replyTo?: string
     }
     /** @description nextCursor is absent on the last page. */
     SessionPage: {
@@ -2864,6 +3040,11 @@ export interface components {
       counts: components['schemas']['ReactionCount'][]
       /** @enum {string} */
       mine?: 'FIRE' | 'STRONG' | 'CLAP' | 'GORILLA'
+    }
+    SessionReactor: {
+      /** @enum {string} */
+      kind: 'FIRE' | 'STRONG' | 'CLAP' | 'GORILLA'
+      member: components['schemas']['MemberRef']
     }
     SessionRequest: {
       /** @description In the order climbed */
@@ -4133,6 +4314,44 @@ export interface operations {
       }
     }
   }
+  getMyNotifications: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Notifications']
+        }
+      }
+    }
+  }
+  markMyNotificationsSeen: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   changeMyPassword: {
     parameters: {
       query?: never
@@ -4198,6 +4417,94 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['MyProfile']
+        }
+      }
+    }
+  }
+  getMyPushSettings: {
+    parameters: {
+      query?: {
+        endpoint?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PushSettings']
+        }
+      }
+    }
+  }
+  addMyPushDevice: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PushDevice']
+      }
+    }
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  removeMyPushDevice: {
+    parameters: {
+      query: {
+        endpoint: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  saveMyPushPreferences: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PushPreferences']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PushPreferences']
         }
       }
     }
@@ -5238,6 +5545,28 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['SessionReactions']
+        }
+      }
+    }
+  }
+  listSessionReactions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SessionReactor'][]
         }
       }
     }

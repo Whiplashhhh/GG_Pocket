@@ -1,0 +1,12 @@
+# Secret scan (CI, job « Secret scan »): gitleaks' own rules, plus the exceptions below, each one
+# a value that is public on purpose.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Example keys of RFC 8291 (Web Push), published in the RFC, used by the push tests (D-130)"
+regexTarget = "match"
+regexes = [
+  '''yfWPiYE-n46HLnH0KqZOF1fJJU3MYrct3AELtAQ-oRw''',
+  '''BTBZMqHH6r4Tts7J_aSIgg''',
+]

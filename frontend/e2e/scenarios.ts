@@ -154,8 +154,13 @@ const feedAlive = (club: FakeClub) => {
   club.climbs.comment(tom, hers, 'Les avant-bras en béton ? Les miens sont en guimauve.', 90)
   club.climbs.react(lea, his, 'CLAP')
   club.climbs.react(marie, his, 'STRONG')
-  club.climbs.comment(lea, his, 'Enfin ! Tu me montres la méthode du crux jeudi ?', 120)
-  club.climbs.comment(tom, his, 'Jeudi 19 h, ramène de la magnésie.', 60)
+  const leaAsks = club.climbs.comment(
+    lea,
+    his,
+    'Enfin ! Tu me montres la méthode du crux jeudi ?',
+    120,
+  )
+  club.climbs.comment(tom, his, 'Jeudi 19 h, ramène de la magnésie.', 60, leaAsks)
   club.climbs.add(lea, 0, [{ route: 'Réglisse', mode: 'LEAD', clean: true }], { feeling: 7 })
   // Who held the rope: marie for tom, tom then léa for marie (D-101).
   for (const ascent of his.ascents) ascent.belayerId = marie.id
@@ -166,6 +171,44 @@ const feedAlive = (club: FakeClub) => {
   if (sam !== undefined) {
     club.climbs.add(sam, 4, [{ route: 'Bye Bye Morice', belayerId: marie.id }])
   }
+}
+
+/** The bell (D-128): a bit of everything around marie, the newest still new. */
+const bellRings = (club: FakeClub) => {
+  feedAlive(club)
+  const marie = club.members.find((member) => member.nickname === 'marie')
+  const tom = club.members.find((member) => member.nickname === 'tom.bloc')
+  const lea = club.members.find((member) => member.nickname === 'lea.dyno')
+  if (marie === undefined || tom === undefined || lea === undefined) return
+  const hers = club.climbs.sessions.find((session) => session.memberId === marie.id)
+  const his = club.climbs.sessions.find((session) => session.memberId === tom.id)
+  if (hers === undefined || his === undefined) return
+  const ref = (member: FakeMember) => ({ id: member.id, nickname: member.nickname })
+  const mine = { sessionId: hers.id, climbedOn: hers.climbedOn }
+  club.notify(marie, { kind: 'FRIEND_ACCEPTED', actor: ref(lea) }, 60 * 30)
+  club.notify(
+    marie,
+    { kind: 'FRIEND_SESSION', actor: ref(tom), sessionId: his.id, climbedOn: his.climbedOn },
+    60 * 20,
+  )
+  club.notify(marie, { kind: 'REACTION', actor: ref(lea), reaction: 'GORILLA', ...mine }, 60 * 3)
+  club.notify(marie, { kind: 'REACTION', actor: ref(tom), reaction: 'FIRE', ...mine }, 90)
+  club.notify(
+    marie,
+    {
+      kind: 'COMMENT',
+      actor: ref(tom),
+      excerpt: 'Les avant-bras en béton ? Les miens sont en guimauve.',
+      ...mine,
+    },
+    30,
+  )
+  club.notify(
+    marie,
+    { kind: 'REPLY', actor: ref(lea), excerpt: 'Jeudi 19 h, ramène de la magnésie.', ...mine },
+    5,
+  )
+  club.notificationsSeenAt.set(marie.id, club.now - 60 * 60_000)
 }
 
 const addToSession = async (page: Page, search: string, name: string) => {
@@ -572,6 +615,52 @@ export const CAPTURES: Capture[] = [
   { name: 'actu-club-flou', path: '/actu?club', as: 'CLIMBER', prepare: feedAlive },
   { name: 'actu-club', path: '/actu?club', as: 'CLIMBER', prepare: clubFeedAlive },
   { name: 'actu-club-en-attente', path: '/actu?club', as: 'TOURIST', prepare: marieAwaits },
+  {
+    name: 'actu-qui-a-reagi',
+    path: '/actu',
+    as: 'CLIMBER',
+    prepare: feedAlive,
+    act: async (page) => {
+      await page
+        .getByRole('button', { name: /Qui a réagi/ })
+        .first()
+        .click()
+      await page.getByRole('dialog', { name: 'Qui a réagi' }).getByRole('link').first().waitFor()
+    },
+  },
+  { name: 'actu-cloche', path: '/actu', as: 'CLIMBER', prepare: bellRings },
+  {
+    name: 'profil-notifications',
+    path: '/profil/notifications',
+    as: 'CLIMBER',
+    prepare: (club) => {
+      club.pushKey =
+        'BP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A8'
+    },
+    act: async (page) => {
+      // Headless Chromium answers « denied »: shown as on a phone not asked yet (Safari, on the
+      // iPhone of the tests, shows « install the app first »).
+      await page.addInitScript(() => {
+        if (typeof Notification !== 'undefined') {
+          Object.defineProperty(Notification, 'permission', { get: () => 'default' })
+        }
+      })
+      await page.reload()
+      await page.getByRole('heading', { name: 'Ce qui te notifie' }).waitFor()
+    },
+  },
+  { name: 'notifications', path: '/notifications', as: 'CLIMBER', prepare: bellRings },
+  {
+    name: 'seance-repondre',
+    path: '/actu',
+    as: 'CLIMBER',
+    prepare: feedAlive,
+    act: async (page) => {
+      await page.getByRole('link', { name: 'Séance d’hier de tom.bloc' }).click()
+      await page.getByRole('button', { name: 'Répondre à tom.bloc' }).click()
+      await page.getByLabel('Ta réponse à tom.bloc').fill('J’arrive avec un seau de magnésie.')
+    },
+  },
   {
     name: 'seance-ami',
     path: '/actu',

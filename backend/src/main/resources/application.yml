@@ -40,6 +40,11 @@ server:
 gg:
   media:
     root: ${GG_MEDIA_ROOT:data/media}
+  push:
+    public-key: ${GG_PUSH_PUBLIC_KEY:}
+    private-key: ${GG_PUSH_PRIVATE_KEY:}
+    subject: ${GG_PUSH_SUBJECT:}
+    relay: ${GG_PUSH_RELAY:}
 
 management:
   endpoints:

@@ -8,6 +8,8 @@ import fr.gravelinesgrimp.pocket.member.application.ValidatedMember;
 import fr.gravelinesgrimp.pocket.member.domain.FormerMember;
 import fr.gravelinesgrimp.pocket.member.domain.Member;
 import fr.gravelinesgrimp.pocket.member.infra.MemberRepository;
+import fr.gravelinesgrimp.pocket.notification.domain.NotificationEvent;
+import fr.gravelinesgrimp.pocket.notification.domain.NotificationKind;
 import fr.gravelinesgrimp.pocket.platform.application.RateLimiter;
 import fr.gravelinesgrimp.pocket.platform.domain.BusinessException;
 import fr.gravelinesgrimp.pocket.platform.domain.ClubTime;
@@ -24,6 +26,7 @@ import fr.gravelinesgrimp.pocket.session.infra.ClimbingSessionRepository;
 import fr.gravelinesgrimp.pocket.social.application.Friendships;
 import fr.gravelinesgrimp.pocket.topo.infra.RouteRepository;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +74,8 @@ public class SessionService {
     private final RateLimiter rateLimiter;
     private final Clock clock;
 
+    private final ApplicationEventPublisher events;
+
     public SessionService(
             ClimbingSessionRepository sessions,
             AscentRepository ascents,
@@ -84,7 +89,9 @@ public class SessionService {
             SessionViews views,
             MediaService media,
             RateLimiter rateLimiter,
+            ApplicationEventPublisher events,
             Clock clock) {
+        this.events = events;
         this.sessions = sessions;
         this.ascents = ascents;
         this.routes = routes;
@@ -126,6 +133,7 @@ public class SessionService {
         var session = sessions.save(ClimbingSession.create(memberId, clientRef, draft));
         autoChecks.refresh(memberId, routeModes(session));
         var unlocked = badges.refresh(memberId);
+        announce(session);
         return new Saved(views.of(session, memberId).withUnlocked(codes(unlocked)), true);
     }
 
@@ -265,7 +273,8 @@ public class SessionService {
 
     /**
      * The feed (spec §8.2): my sessions and the ones my friends share with friends or with the
-     * club, latest day first. A friend whose account is disabled drops out, like everywhere else.
+     * club, the latest posted first (D-131). A friend whose account is disabled drops out, like
+     * everywhere else.
      */
     @PreAuthorize("hasRole('TOURIST')")
     @Transactional(readOnly = true)
@@ -284,20 +293,15 @@ public class SessionService {
             var position = Cursor.decode(cursor);
             found =
                     sessions.findInFeedBefore(
-                            readerId,
-                            climberIds,
-                            position.climbedOn(),
-                            position.createdAt(),
-                            position.id(),
-                            limit + 1);
+                            readerId, climberIds, position.createdAt(), position.id(), limit + 1);
         }
         return page(found, limit, readerId);
     }
 
     /**
      * The club feed (D-120): the sessions shared with the club by every member who takes part, mine
-     * included, latest day first. Only for a member who takes part: to read it, one shows oneself
-     * in it.
+     * included, the latest posted first (D-131). Only for a member who takes part: to read it, one
+     * shows oneself in it.
      *
      * @throws BusinessException {@code CLUB_FEED_NOT_JOINED}
      */
@@ -311,9 +315,7 @@ public class SessionService {
             found = sessions.findLatestInClubFeed(limit + 1);
         } else {
             var position = Cursor.decode(cursor);
-            found =
-                    sessions.findInClubFeedBefore(
-                            position.climbedOn(), position.createdAt(), position.id(), limit + 1);
+            found = sessions.findInClubFeedBefore(position.createdAt(), position.id(), limit + 1);
         }
         return page(found, limit, readerId);
     }
@@ -445,5 +447,25 @@ public class SessionService {
                 throw new BusinessException(ErrorCode.MALFORMED_REQUEST, "Bad session cursor");
             }
         }
+    }
+
+    /** A new shared session rings my active friends' phones, if they want (D-128). */
+    private void announce(ClimbingSession session) {
+        if (session.visibility() == SessionVisibility.PRIVATE) {
+            return;
+        }
+        members.findAllById(friendships.friendIdsOf(session.memberId())).stream()
+                .filter(Member::isActive)
+                .forEach(
+                        friend ->
+                                events.publishEvent(
+                                        NotificationEvent.aboutSession(
+                                                friend.id(),
+                                                NotificationKind.FRIEND_SESSION,
+                                                session.memberId(),
+                                                session.id(),
+                                                session.climbedOn(),
+                                                null,
+                                                null)));
     }
 }

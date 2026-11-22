@@ -26,9 +26,11 @@ import {
 import { MEMBERS_KEY } from './social'
 
 export type SessionComment = components['schemas']['SessionComment']
+export type SessionReactor = components['schemas']['SessionReactor']
 
 export { CLUB_FEED_KEY, FEED_KEY }
 export const sessionCommentsKey = (id: string) => [...sessionKey(id), 'comments'] as const
+export const sessionReactorsKey = (id: string) => [...sessionKey(id), 'reactors'] as const
 
 const PAGE_SIZE = 10
 
@@ -149,6 +151,26 @@ export function useReact(session: MaybeRefOrGetter<Session>) {
       if (before === undefined) return
       patchSession(queryClient, toValue(session).id, (found) => ({ ...found, reactions: before }))
     },
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: sessionReactorsKey(toValue(session).id) }),
+  })
+}
+
+/** Who reacted to a session and with what, the latest first (D-128): fetched once the list opens. */
+export function useSessionReactors(
+  id: MaybeRefOrGetter<string>,
+  enabled: MaybeRefOrGetter<boolean>,
+) {
+  return useQuery({
+    queryKey: computed(() => sessionReactorsKey(toValue(id))),
+    queryFn: ({ signal }) =>
+      request(
+        api.GET('/api/v1/sessions/{id}/reactions', {
+          params: { path: { id: toValue(id) } },
+          signal,
+        }),
+      ),
+    enabled: computed(() => toValue(enabled)),
   })
 }
 
@@ -165,16 +187,22 @@ export function useSessionComments(id: MaybeRefOrGetter<string>) {
   })
 }
 
-export function useAddSessionComment(sessionId: MaybeRefOrGetter<string>) {
+/** `replyTo`: the comment answered (D-128), read when the comment is sent. */
+export function useAddSessionComment(
+  sessionId: MaybeRefOrGetter<string>,
+  replyTo?: MaybeRefOrGetter<string | undefined>,
+) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (body: string) =>
-      request(
+    mutationFn: (body: string) => {
+      const answered = toValue(replyTo)
+      return request(
         api.POST('/api/v1/sessions/{id}/comments', {
           params: { path: { id: toValue(sessionId) } },
-          body: { body },
+          body: answered === undefined ? { body } : { body, replyTo: answered },
         }),
-      ),
+      )
+    },
     onSuccess: (comment) => {
       const id = toValue(sessionId)
       queryClient.setQueryData<SessionComment[]>(sessionCommentsKey(id), (comments) =>

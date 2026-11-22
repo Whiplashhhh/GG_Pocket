@@ -34,9 +34,9 @@ import java.time.Clock;
 import java.time.LocalDate;
 
 /**
- * The feed (spec §8.2): my sessions and the ones my friends share with friends, latest day first,
- * page by page. Never a "juste moi" session of a friend, never a stranger's, never a disabled
- * friend's.
+ * The feed (spec §8.2): my sessions and the ones my friends share with friends, latest posted
+ * first, page by page. Never a "juste moi" session of a friend, never a stranger's, never a
+ * disabled friend's.
  */
 @IntegrationTest
 class FeedIT {
@@ -80,14 +80,31 @@ class FeedIT {
     }
 
     @Test
+    void aSessionPostedDaysLaterShowsOnTop() throws Exception {
+        var me = members.create(Role.CLIMBER);
+        var friend = members.create(Role.CLIMBER);
+        friendships.befriend(me, friend);
+        var route = routes.create(members.create(Role.SETTER));
+        var yesterdays = log(me, 1, SessionVisibility.FRIENDS, route);
+        // Five days after the climb, my friend finally logs it: it is what is new.
+        var late = log(friend, 5, SessionVisibility.FRIENDS, route);
+
+        mockMvc.perform(get("/api/v1/feed").with(as(me)))
+                .andExpect(
+                        jsonPath("$.items[*].id")
+                                .value(contains(late.id().toString(), yesterdays.id().toString())));
+    }
+
+    @Test
     void pageByPage() throws Exception {
         var me = members.create(Role.CLIMBER);
         var friend = members.create(Role.CLIMBER);
         friendships.befriend(me, friend);
         var route = routes.create(members.create(Role.SETTER));
-        var latest = log(friend, 0, SessionVisibility.FRIENDS, route);
-        var middle = log(me, 1, SessionVisibility.FRIENDS, route);
-        var oldest = log(friend, 2, SessionVisibility.FRIENDS, route);
+        // Posted in this order, whatever the day of the climb (D-131).
+        var oldest = log(friend, 0, SessionVisibility.FRIENDS, route);
+        var middle = log(me, 2, SessionVisibility.FRIENDS, route);
+        var latest = log(friend, 1, SessionVisibility.FRIENDS, route);
 
         var first =
                 mockMvc.perform(get("/api/v1/feed").param("size", "2").with(as(me)))

@@ -129,6 +129,12 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'session.editTitle', layout: 'bare' },
   },
 
+  {
+    path: '/notifications',
+    component: () => import('@/views/NotificationsView.vue'),
+    meta: { titleKey: 'notifications.title' },
+  },
+
   // Profile and settings
   {
     path: '/profil',
@@ -164,6 +170,11 @@ const routes: RouteRecordRaw[] = [
     path: '/profil/nouveautes',
     component: () => import('@/views/profile/ReleaseNotesView.vue'),
     meta: { titleKey: 'releaseNotes.title' },
+  },
+  {
+    path: '/profil/notifications',
+    component: () => import('@/views/profile/PushSettingsView.vue'),
+    meta: { titleKey: 'push.title' },
   },
   {
     path: '/profil/installer',

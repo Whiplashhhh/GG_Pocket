@@ -275,7 +275,7 @@ class BadgeIT {
     void theStartUpRecountTakesBackAGradeTierStoredUnderTheOldRule() throws Exception {
         var me = members.create(Role.CLIMBER);
         var route = routes.create(members.create(Role.SETTER), "6b");
-        var id = idOf(create(me, UUID.randomUUID(), today(), ascent(route, "LEAD", true, false)));
+        var id = idOf(create(me, UUID.randomUUID(), today(), ascent(route, "LEAD", true, true)));
         // Before D-111, a first 6b also gave the 5b, 5c and 6a below it.
         jdbc.update(
                 "insert into badge_award (id, member_id, code, award_key, session_id, earned_on,"

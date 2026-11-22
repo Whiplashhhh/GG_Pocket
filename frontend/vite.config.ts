@@ -10,6 +10,8 @@ import { VitePWA, type VitePWAOptions } from 'vite-plugin-pwa'
 import { parseChangelog } from './src/lib/changelog.ts'
 import { renderGuide } from './src/lib/guide.ts'
 import { OFFLINE_READS, OFFLINE_READS_CACHE } from './src/lib/offlineReads.ts'
+import { pushWorkerSource } from './src/lib/pushWorker.ts'
+import { REACTION_EMOJI } from './src/lib/reactionEmoji.ts'
 
 /** Single source of truth for the version: the repository's VERSION file (docs/DECISIONS.md D-032). */
 const appVersion = readFileSync(new URL('../VERSION', import.meta.url), 'utf8').trim()
@@ -48,6 +50,8 @@ const pwaOptions = {
     navigateFallback: '/index.html',
     navigateFallbackDenylist: [/^\/api\//],
     cleanupOutdatedCaches: true,
+    // Push notifications (D-130): written by the pushWorker plugin below.
+    importScripts: ['push-sw.js'],
     // Spec §12: topo, profile, planning and "à faire" readable offline (src/lib/offlineReads.ts).
     runtimeCaching: [
       {
@@ -64,6 +68,34 @@ const pwaOptions = {
     ],
   },
 } satisfies Partial<VitePWAOptions>
+
+/**
+ * The push part of the service worker (D-130): `push-sw.js`, worded with the texts of fr.json
+ * (`push.messages`, `session.day`) so every word of the app stays in the i18n file.
+ */
+function pushWorker(): Plugin {
+  const file = fileURLToPath(new URL('./src/i18n/fr.json', import.meta.url))
+  return {
+    name: 'gg-push-worker',
+    apply: 'build',
+    generateBundle() {
+      const fr = JSON.parse(readFileSync(file, 'utf8')) as {
+        push: { messages: Record<string, string>; fallback: string }
+        session: { day: { today: string; yesterday: string; date: string } }
+      }
+      this.emitFile({
+        type: 'asset',
+        fileName: 'push-sw.js',
+        source: pushWorkerSource({
+          messages: fr.push.messages,
+          day: fr.session.day,
+          emoji: REACTION_EMOJI,
+          fallback: fr.push.fallback,
+        }),
+      })
+    },
+  }
+}
 
 /**
  * A repository document turned into data at build time, served as a virtual module: the release
@@ -143,6 +175,7 @@ export function createViteConfig({
           fullInstall: false,
         }),
       pwa && VitePWA(pwaOptions),
+      pwa && pushWorker(),
     ],
     define: {
       __APP_VERSION__: JSON.stringify(appVersion),

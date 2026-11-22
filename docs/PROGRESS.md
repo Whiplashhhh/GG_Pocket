@@ -2,7 +2,167 @@
 
 Entrée la plus récente en haut. Chaque entrée : date, branche, fait, reste, prochaine action exacte, points bloquants.
 
+## 2026-11-21 — `feature/fil-ordre-publication-1.1.0` (PR #87, base #86)
+
+- **Fait** : push validé en dev par le club après trois correctifs sur #86 (HTTP/1.1 vers le relais, raison du refus
+  dans les logs et paire VAPID vérifiée au démarrage, `Host` sans `:443` vers Apple + réabonnement si les clés
+  changent). Nouvelle demande du club : fil d'actu (amis et club) trié par date de publication (D-131, V28) ;
+  carnet, profil, assurages inchangés. e2e social, notifications, club-feed verts en local (Desktop Chrome).
+- **Reste** : CI de #87 ; essai en dev (Deploy dev avec `feature/fil-ordre-publication-1.1.0`, réinitialisation
+  décochée) ; puis fusion #84 → #81 → #82 → #83 → #85 → #86 → #87, « Prepare release » minor, clés VAPID prod dans
+  `/srv/ggpocket/.env` (nouvelle paire) avant d'approuver le déploiement prod.
+- **Bloquant** : aucun ; le jeton `gh` ne peut ni relancer un job ni déclencher un workflow (D-066).
+
 ---
+
+## 2026-11-18 — 1.2.0 : la pile est verte, reste les essais en dev
+
+**Branches** : #84 `fix/ci-backend-masque-1.1.0` → #81 → #82 → #83 → #85 → #86 `feature/notifications-push-1.1.0`
+(chaque PR a pour base la précédente ; les correctifs de la base ont été fusionnés vers le haut, sans force-push).
+
+### Fait
+- Backend vert partout (860 tests sur #86). Contrats alignés sur ceux générés par la CI (dérive de `main` corrigée
+  sur #84 : `ExportedProfile.inClubFeed`).
+- `.gitleaks.toml` (base de la pile) : les clés d'exemple de la RFC 8291 des tests push sont exemptées, et elles
+  seules ; vérifié en local avec gitleaks 8.30.1 (2 fuites sans la config, 0 avec). gitleaks lit toutes les branches.
+- e2e iPhone : la page push y montre « installe l'appli d'abord » (Safari non installé), test et scénario adaptés.
+- #85 et #86 entièrement vertes. Sur #81 à #84, l'e2e a dépassé 25 min : le téléchargement des navigateurs
+  Playwright a pris 22 min (CDN), aucun test n'a échoué. Le jeton `gh` ne peut pas relancer (D-066).
+
+### Reste / prochaine action
+- Willem : relancer les jobs e2e de #81 à #84 (« Re-run failed jobs »), poser les clés VAPID + `GG_PUSH_SUBJECT`
+  dans le `.env` du dev, déployer `feature/notifications-push-1.1.0` en dev, essayer (iPhone installé, Android).
+- Puis merge dans l'ordre #84, #81, #82, #83, #85, #86 (GitHub rebascule chaque PR sur `main` quand la précédente
+  est fusionnée et sa branche supprimée), « Prepare release » en `minor` (1.2.0).
+
+### Points bloquants
+- Aucun côté code. Les clés VAPID sont des secrets : à poser par Willem.
+
+## 2026-11-17 — 1.2.0, PR 5/5 : notifications push (D-130)
+
+**Branche** : `feature/notifications-push-1.1.0`, empilée sur `feature/cloche-1.1.0` (PR #85). Dernière de la pile :
+c'est elle qu'on déploie en dev pour tout tester.
+
+### Fait
+- Backend (module `notification`) : `WebPush` (RFC 8291/8292 avec le JDK, vecteur de la RFC en test, vérifié aussi
+  en Python), `PushService` (Apple/Google/Mozilla seulement), `PushStore` (V27), `PushDelivery` (après commit, thread
+  virtuel), `PushSettingsService` + `PushController` (`/me/push`, `/preferences`, `/devices`). Événements publiés par
+  réactions (la première), commentaires/réponses, séances partagées, demandes/acceptations d'ami. `PushIT` déchiffre
+  le message reçu comme un téléphone ; matrice d'autorisations complétée.
+- Déploiement : relais `:8081` dans `deploy/web/Caddyfile`, `GG_PUSH_*` dans `compose.yml` et `application.yml`,
+  `deploy/scripts/vapid-keys.sh` (paire vérifiée en Python), DEPLOYMENT §11.
+- Front : `/profil/notifications` (`PushSettingsView`, `usePushDevice`, `lib/push.ts`), `push-sw.js` généré au build
+  (`lib/pushWorker.ts`, textes de `fr.json`, `importScripts`), ouverture de page au toucher (`main.ts`), appareil
+  retiré à la déconnexion. Vitest (366), e2e notifications/social/accounts/app-shell/sessions verts, captures
+  `profil-notifications` regardées.
+
+### Reste / prochaine action
+- Réconcilier `openapi.json` avec celui généré par la CI (#84 d'abord : dérive de `main`, puis la pile).
+- CI verte sur #81 → #86, puis Willem : clés VAPID + `GG_PUSH_SUBJECT` dans `/opt/gg-pocket/dev/.env`, déploiement
+  dev de `feature/notifications-push-1.1.0`, essais (iPhone installé, Android), merge dans l'ordre, release `minor`.
+
+### Points bloquants
+- Clés VAPID et adresse de contact : à poser par Willem (secrets, serveur).
+
+## 2026-11-17 — 1.2.0, PR 4/5 : la cloche (D-128)
+
+**Branche** : `feature/cloche-1.1.0`, empilée sur `feature/repondre-commentaires-1.1.0` (PR #83).
+
+### Fait
+- Backend : module `notification` (`NotificationQueries` en SQL natif via `JdbcClient`, `NotificationService`,
+  `NotificationController` : `GET /me/notifications`, `PUT /me/notifications/seen`), V26. `NotificationIT` (6 types,
+  non lu / vu, réaction changée = nouvelle, séance plus lisible = rien, 401) ; matrice d'autorisations complétée
+  (y compris `GET /sessions/{id}/reactions` de la PR 2).
+- Front : `api/notifications.ts` (sondage 60 s), `lib/notifications.ts` (+ Vitest), `NotificationsView.vue`
+  (`/notifications`), cloche et point rouge dans `AppHeader`. Faux serveur (`club.notify`), e2e
+  `notifications.spec.ts`, scénarios `notifications` et `actu-cloche` (captures clair/sombre regardées).
+  Lint, format, typecheck, Vitest (360), e2e notifications/social/app-shell Desktop Chrome verts.
+- Contrat écrit à la main : à réconcilier avec celui généré par la CI (cf. #84, le contrat de `main` a dérivé).
+
+### Reste / prochaine action
+- Réconcilier `openapi.json` avec la CI (journal du job Backend, `BEGIN GENERATED OPENAPI`), sur #84 puis la pile.
+- PR 5 push (`feature/notifications-push-1.1.0`) : VAPID (clés dans les `.env`, Willem), table des abonnements,
+  envoi à l'enregistrement des réactions/commentaires/réponses/séances/demandes, service worker en `injectManifest`,
+  réglages par type dans le profil.
+
+### Points bloquants
+- Push : clés VAPID dans les `.env` dev/prod (Willem) et accès HTTPS sortant du serveur.
+
+## 2026-11-17 — CI backend qui ne testait plus rien (D-129)
+
+**Branche** : `fix/ci-backend-masque-1.1.0` (depuis `main` en `2a10c28`).
+
+### Fait
+- Repéré en suivant les PR de la 1.2.0 : l'étape Maven finissait en 10 s, `BUILD FAILURE` (Spotless 3.11.0, 3
+  fichiers) masqué par `| tee`. `shell: bash` (pipefail) sur l'étape, 3 fichiers reformatés, actionlint OK.
+
+### Reste / prochaine action
+- CI de cette PR : vérifier que l'étape Maven dure des minutes et que les tests passent (des échecs cachés depuis le
+  2026-11-08 peuvent apparaître). Puis fusionner `main` dans la pile 1.2.0 (#81 → #82 → #83).
+
+### Points bloquants
+- Aucun.
+## 2026-11-17 — 1.2.0, PR 3/5 : répondre aux commentaires (D-128)
+
+**Branche** : `feature/repondre-commentaires-1.1.0`, empilée sur `feature/qui-a-reagi-1.1.0` (PR #82).
+
+### Fait
+- Migration `V25__add_session_comment_reply.sql` (`reply_to_id`, `on delete set null`, index partiel).
+  `SessionCommentService.add(…, replyTo)` : même séance et non supprimé, sinon 400 ; `list` renvoie `replyTo`
+  (id + auteur, même si le commentaire répondu est supprimé). `SessionCommentIT.aCommentAnswersAnotherOfTheSameSession`.
+- Contrat écrit à la main (`SessionCommentReplyTo`, `replyTo` dans requête et réponse), types régénérés.
+- Front : `lib/commentThread.ts` (+ Vitest), `CommentThread.vue` (« Répondre », retrait, « en réponse à », libellé
+  « Ta réponse à X » + « Annuler la réponse »), faux serveur, e2e `social.spec.ts`, scénario `seance-repondre`
+  (captures regardées). Lint, format, typecheck, Vitest (357), e2e social Desktop Chrome verts.
+
+### Reste / prochaine action
+- PR 4 « cloche » (`feature/cloche-1.1.0`, depuis cette branche) : colonne `member.notifications_seen_at` (V26),
+  `GET /api/v1/me/notifications` (calculé à la volée : réactions/commentaires sur mes séances, réponses à mes
+  commentaires, séances d'amis, demandes d'ami), `PUT /api/v1/me/notifications/seen`, cloche + point dans l'en-tête.
+
+### Points bloquants
+- Push (PR 5) : clés VAPID dans les `.env` dev/prod (Willem) et accès HTTPS sortant du serveur.
+
+## 2026-11-17 — 1.2.0, PR 2/5 : qui a réagi (D-128)
+
+**Branche** : `feature/qui-a-reagi-1.1.0`, empilée sur `feature/badge-enchainement-heure-1.1.0` (PR #81) : chaque
+PR de la 1.2.0 part de la précédente, la dernière branche porte tout pour le test en dev.
+
+### Fait
+- `GET /api/v1/sessions/{id}/reactions` (`SessionReactionService.list`, lecteurs de la séance, sinon 404 ; le plus
+  récent d'abord). `SessionReactionIT` : auteur et ami OK, inconnu et admin 404, anonyme 401.
+- Contrat `openapi.json` écrit à la main (pas de Java ici, la CI compare), `schema.d.ts` régénéré.
+- Front : `ReactorsDialog.vue` (feuille), ouverte en touchant les compteurs de ma séance, ou par « Qui a réagi ? »
+  sous les réactions d'une séance d'ami. Faux serveur e2e, `social.spec.ts`, scénario `actu-qui-a-reagi` (captures
+  360 px clair/sombre regardées). Lint, format, typecheck, Vitest (354), e2e social Desktop Chrome verts.
+
+### Reste / prochaine action
+- PR 3 « répondre aux commentaires » (`feature/repondre-commentaires-1.1.0`, depuis cette branche) : migration
+  `session_comment.reply_to_id` (un niveau), `SessionCommentRequest.replyTo`, affichage en retrait, « @pseudo ».
+
+### Points bloquants
+- Push (PR 5) : clés VAPID dans les `.env` dev/prod (Willem) et accès HTTPS sortant du serveur.
+
+## 2026-11-17 — 1.2.0, PR 1/5 : badge à l'enchaînement, heure des séances (D-128)
+
+**Branche** : `feature/badge-enchainement-heure-1.1.0` (depuis `main` en `2a10c28`, release 1.1.0).
+
+### Fait
+- Retours du club (2026-11-16) cadrés avec Willem : tout en 1.2.0, push compris, en 5 PR (voir ROADMAP « Version 1.2.0 »).
+- `BadgeEngine` : « Première cotation » sur `line.clean()` (enchaînée, tous modes) au lieu de `topped`. Tests
+  unitaires adaptés + cas « topée avec chutes puis enchaînée » ; `BadgeIT` (recompte) passe sur une ascension enchaînée.
+  Textes du badge (dico, condition) mis à jour.
+- Carte de séance avec auteur : « Séance d'aujourd'hui · 19 h 42 » ou « … · publiée hier à 9 h » (`sessionPublished`,
+  `formatTime`, `formatDayMonth`), Vitest. Captures `actu-fil` 360 px clair/sombre regardées.
+- Vérifié ici : typecheck, lint, format, Vitest (354). Backend : CI.
+
+### Reste / prochaine action
+- CI verte, puis PR 2 « qui a réagi » (`feature/qui-a-reagi-1.1.0`) : `GET /api/v1/sessions/{id}/reactions`
+  (lecteurs de la séance, sinon 404) + feuille ouverte depuis `SessionReactions.vue`.
+- Les 5 PR seront testées ensemble en dev avant la release 1.2.0.
+
+### Points bloquants
+- Push (PR 5) : il faudra des clés VAPID dans les `.env` dev/prod (Willem) et l'accès HTTPS sortant du serveur.
 
 ## 2026-11-15 — Champ date qui déborde sur iPhone
 

@@ -14,6 +14,7 @@ interface FakeSessionComment {
   body: string
   createdAt: string
   deleted: boolean
+  replyTo?: string
 }
 
 interface FakeSession {
@@ -445,15 +446,24 @@ export class FakeSessions implements AscentSource {
     session.reactions.set(member.id, kind)
   }
 
-  /** A comment written before the test, `minutesAgo` minutes ago. */
-  comment(member: TopoMember, session: FakeSession, body: string, minutesAgo = 5): void {
+  /** A comment written before the test, `minutesAgo` minutes ago, maybe answering another one. */
+  comment(
+    member: TopoMember,
+    session: FakeSession,
+    body: string,
+    minutesAgo = 5,
+    replyTo?: string,
+  ): string {
+    const id = this.nextId()
     session.comments.push({
-      id: this.nextId(),
+      id,
       authorId: member.id,
       body,
       createdAt: new Date(this.clock() - minutesAgo * 60_000).toISOString(),
       deleted: false,
+      ...(replyTo === undefined ? {} : { replyTo }),
     })
+    return id
   }
 
   /** The visible comments on sessions, newest first (the moderation list). */
@@ -510,7 +520,18 @@ export class FakeSessions implements AscentSource {
       body: comment.body,
       createdAt: comment.createdAt,
       deletable: comment.authorId === me.id || me.role === 'BOARD' || me.role === 'ADMIN',
+      ...this.replyToView(comment),
     }
+  }
+
+  private replyToView(comment: FakeSessionComment): Pick<Schemas['SessionComment'], 'replyTo'> {
+    if (comment.replyTo === undefined) return {}
+    const answered = this.sessions
+      .flatMap((session) => session.comments)
+      .find((candidate) => candidate.id === comment.replyTo)
+    return answered === undefined
+      ? {}
+      : { replyTo: { id: answered.id, author: this.memberRef(answered.authorId) } }
   }
 
   private allAscents() {
@@ -646,10 +667,8 @@ export class FakeSessions implements AscentSource {
             : session.memberId === me.id ||
               (session.visibility !== 'PRIVATE' && this.isFriend(me.id, session.memberId)),
         )
-        .sort(
-          (a, b) =>
-            b.climbedOn.localeCompare(a.climbedOn) || b.createdAt.localeCompare(a.createdAt),
-        )
+        // Latest posted first, whatever the day of the climb (D-131).
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       const start = Number(url.searchParams.get('cursor') ?? '0')
       const size = Number(url.searchParams.get('size') ?? '10')
       return json({
@@ -825,7 +844,7 @@ export class FakeSessions implements AscentSource {
       return empty
     }
 
-    const match = /^\/sessions\/([^/]+)(\/photo|\/privacy|\/reaction|\/comments)?$/.exec(pathname)
+    const match = /^\/sessions\/([^/]+)(\/photo|\/privacy|\/reactions?|\/comments)?$/.exec(pathname)
     if (match === null) return undefined
     const [, id, part] = match as (string | undefined)[]
     const found = this.sessions.find((candidate) => candidate.id === id)
@@ -833,11 +852,20 @@ export class FakeSessions implements AscentSource {
     if (part === '/reaction') {
       if (method === 'PUT') {
         if (found.memberId === me.id) return problem(400, 'VALIDATION_FAILED')
+        // The latest last, like the server's « updated_at ».
+        found.reactions.delete(me.id)
         found.reactions.set(me.id, (body as Schemas['SessionReactionRequest']).kind)
       } else {
         found.reactions.delete(me.id)
       }
       return json(this.reactions(me, found))
+    }
+    if (part === '/reactions' && method === 'GET') {
+      return json(
+        [...found.reactions.entries()]
+          .reverse()
+          .map(([memberId, kind]) => ({ member: this.memberRef(memberId), kind })),
+      )
     }
     if (part === '/comments') {
       if (method === 'GET') {
@@ -847,14 +875,22 @@ export class FakeSessions implements AscentSource {
             .map((comment) => this.commentView(me, comment)),
         )
       }
-      const text = (body as Schemas['SessionCommentRequest']).body.trim()
+      const sent = body as Schemas['SessionCommentRequest']
+      const text = sent.body.trim()
       if (text === '' || text.length > 500) return problem(400, 'VALIDATION_FAILED')
+      if (
+        sent.replyTo !== undefined &&
+        !found.comments.some((comment) => comment.id === sent.replyTo && !comment.deleted)
+      ) {
+        return problem(400, 'VALIDATION_FAILED')
+      }
       const comment: FakeSessionComment = {
         id: this.nextId(),
         authorId: me.id,
         body: text,
         createdAt: new Date(this.clock()).toISOString(),
         deleted: false,
+        ...(sent.replyTo === undefined ? {} : { replyTo: sent.replyTo }),
       }
       found.comments.push(comment)
       return json(this.commentView(me, comment), 201)
